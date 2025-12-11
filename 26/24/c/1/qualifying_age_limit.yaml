@@ -1,0 +1,11 @@
+# 26 USC § 24(c)(1) - Qualifying Child Age Limit
+#
+# "who has not attained age 17"
+
+qualifying_age_limit:
+  description: "Maximum age for qualifying child (exclusive)"
+  unit: years
+  values:
+    1998-01-01: 17
+  citations:
+    - "§ 24(c)(1): has not attained age 17"

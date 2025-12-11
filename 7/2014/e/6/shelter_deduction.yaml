@@ -1,0 +1,14 @@
+# 7 USC § 2014(e)(6) - Excess Shelter Expense Deduction
+#
+# "(B) cap on excess shelter expense deduction
+#  (C) no cap for elderly/disabled households"
+
+shelter_deduction_cap:
+  description: "Maximum excess shelter deduction (non-elderly/disabled)"
+  unit: currency-USD
+  values:
+    2023-10-01: 672
+    2022-10-01: 624
+  citations:
+    - "7 USC § 2014(e)(6)(B): excess shelter cap"
+    - "FNS FY2024 COLA memo"

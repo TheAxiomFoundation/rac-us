@@ -1,0 +1,77 @@
+# Tests for 7 USC § 2017(a) - Value of Allotment
+
+variable: snap_allotment
+fiscal_year: 2024
+
+test_cases:
+  # Maximum allotment (zero income)
+  - name: "1-person household, no income"
+    inputs:
+      household_size: 1
+      gross_income: 0
+      earned_income: 0
+      shelter_costs: 0
+    expected:
+      snap_allotment: 291
+    citations:
+      - "7 USC § 2017(a): max allotment when net income = 0"
+
+  - name: "4-person household, no income"
+    inputs:
+      household_size: 4
+      gross_income: 0
+      earned_income: 0
+      shelter_costs: 0
+    expected:
+      snap_allotment: 973
+    citations:
+      - "FNS FY2024: max for 4 persons = $973"
+
+  # With income
+  - name: "1-person, earned income $1000"
+    description: "Net = $1000 - $200 (20%) - $198 (std) = $602; benefit = $291 - $181 = $110"
+    inputs:
+      household_size: 1
+      gross_income: 1000
+      earned_income: 1000
+      shelter_costs: 0
+    expected:
+      snap_allotment: 110
+    citations:
+      - "7 USC § 2017(a): max - 30% net income"
+
+  # Minimum benefit
+  - name: "1-person, high income near cutoff"
+    inputs:
+      household_size: 1
+      gross_income: 1100
+      earned_income: 1100
+      shelter_costs: 0
+    expected:
+      snap_allotment: 23
+    citations:
+      - "7 USC § 2017(a): minimum benefit for 1-2 person"
+
+  # Over income limit
+  - name: "1-person, over gross income limit"
+    inputs:
+      household_size: 1
+      gross_income: 2000
+      earned_income: 2000
+      shelter_costs: 0
+    expected:
+      snap_allotment: 0
+    citations:
+      - "7 USC § 2014(c): 130% gross income test"
+
+  # Large household
+  - name: "Large household (10 persons)"
+    inputs:
+      household_size: 10
+      gross_income: 0
+      earned_income: 0
+      shelter_costs: 0
+    expected:
+      snap_allotment: 2189  # $1,751 + 2×$219
+    citations:
+      - "FNS: each person beyond 8 adds $219"

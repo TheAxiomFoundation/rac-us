@@ -1,0 +1,29 @@
+# 26 USC § 63(c)(5) - Limitation on Basic Standard Deduction for Dependents
+#
+# "(A) IN GENERAL.—In the case of an individual with respect to whom a
+# deduction... is allowable to another taxpayer... the basic standard
+# deduction... shall not exceed the greater of—
+#   (i) $500, or
+#   (ii) the sum of $250 and such individual's earned income."
+# (Amounts indexed for inflation)
+
+references {
+  dependent_minimum: statute/26/63/c/5/dependent_minimum
+  dependent_earned_addon: statute/26/63/c/5/dependent_earned_addon
+  basic_standard_deduction: statute/26/63/c/2/basic_standard_deduction
+}
+
+variable dependent_standard_deduction {
+  entity TaxUnit
+  period Year
+  dtype Money
+
+  formula {
+    # § 63(c)(5)(A): Greater of minimum or (earned income + addon)
+    let earned_plus = earned_income + dependent_earned_addon
+    let dependent_amount = max(dependent_minimum, earned_plus)
+
+    # Cannot exceed the regular basic standard deduction
+    return min(dependent_amount, basic_standard_deduction)
+  }
+}

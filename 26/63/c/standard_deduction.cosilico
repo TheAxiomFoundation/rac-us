@@ -1,0 +1,29 @@
+# 26 USC § 63(c) - Standard Deduction
+#
+# Main entry point combining basic deduction, dependent limitation,
+# and additional amounts.
+
+references {
+  basic_standard_deduction: statute/26/63/c/2/basic_standard_deduction
+  dependent_standard_deduction: statute/26/63/c/5/dependent_standard_deduction
+  additional_standard_deduction: statute/26/63/f/additional_standard_deduction
+  is_ineligible_for_standard_deduction: statute/26/63/c/6/is_ineligible_for_standard_deduction
+}
+
+variable standard_deduction {
+  entity TaxUnit
+  period Year
+  dtype Money
+
+  formula {
+    # § 63(c)(6): Check for ineligibility
+    if is_ineligible_for_standard_deduction then
+      return 0
+
+    # § 63(c)(5): Use dependent limitation if applicable
+    let basic = is_dependent ? dependent_standard_deduction : basic_standard_deduction
+
+    # § 63(f): Add additional amounts for age/blindness
+    return basic + additional_standard_deduction
+  }
+}

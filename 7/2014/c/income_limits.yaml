@@ -1,0 +1,32 @@
+# 7 USC § 2014(c) - Income Eligibility Limits
+
+gross_income_limit_pct:
+  description: "Gross income limit as percentage of FPL"
+  unit: rate
+  values:
+    1977-01-01: 1.30
+  citations:
+    - "7 USC § 2014(c)(2): 130 percent of poverty line"
+
+net_income_limit_pct:
+  description: "Net income limit as percentage of FPL"
+  unit: rate
+  values:
+    1977-01-01: 1.00
+  citations:
+    - "7 USC § 2014(c)(1): 100 percent of poverty line"
+
+# Federal Poverty Level (monthly, 48 states + DC)
+fpl_by_household_size:
+  description: "Monthly Federal Poverty Level by household size"
+  unit: currency-USD
+  values:
+    by_household_size:
+      1:
+        2024-01-01: 1255
+        2023-01-01: 1215
+      additional_per_person:
+        2024-01-01: 440
+        2023-01-01: 426
+  citations:
+    - "HHS Poverty Guidelines"

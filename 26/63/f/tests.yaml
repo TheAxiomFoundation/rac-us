@@ -1,0 +1,84 @@
+# Tests for 26 USC § 63(f) - Additional Amounts for Aged and Blind
+
+variable: standard_deduction
+tax_year: 2024
+
+test_cases:
+  - name: "Single, age 65"
+    description: "Base + additional for aged"
+    inputs:
+      filing_status: single
+      age: 65
+      is_blind: false
+      is_dependent: false
+    expected:
+      standard_deduction: 16550  # 14600 + 1950
+    citations:
+      - "§ 63(f)(1): additional for aged (unmarried)"
+
+  - name: "Single, age 65, blind"
+    description: "Base + additional for aged + additional for blind"
+    inputs:
+      filing_status: single
+      age: 65
+      is_blind: true
+      is_dependent: false
+    expected:
+      standard_deduction: 18500  # 14600 + 1950 + 1950
+    citations:
+      - "§ 63(f)(1): additional for aged"
+      - "§ 63(f)(2): additional for blind"
+
+  - name: "Joint, both 65+"
+    description: "Base + 2 × additional for aged"
+    inputs:
+      filing_status: joint
+      age: 67
+      spouse_age: 66
+      is_blind: false
+      spouse_is_blind: false
+      is_dependent: false
+    expected:
+      standard_deduction: 32300  # 29200 + 1550 + 1550
+    citations:
+      - "§ 63(f)(1): additional for each aged spouse"
+
+  - name: "Joint, one 65+, one blind"
+    inputs:
+      filing_status: joint
+      age: 67
+      spouse_age: 55
+      is_blind: false
+      spouse_is_blind: true
+      is_dependent: false
+    expected:
+      standard_deduction: 32300  # 29200 + 1550 (aged) + 1550 (blind)
+    citations:
+      - "§ 63(f): additional amounts stack"
+
+  - name: "Joint, both 65+ and both blind"
+    inputs:
+      filing_status: joint
+      age: 70
+      spouse_age: 68
+      is_blind: true
+      spouse_is_blind: true
+      is_dependent: false
+    expected:
+      standard_deduction: 35400  # 29200 + 4×1550
+    citations:
+      - "§ 63(f): 4 additional amounts"
+
+  - name: "Dependent, age 65, blind"
+    description: "Dependent rules + additional amounts"
+    inputs:
+      filing_status: single
+      age: 68
+      is_blind: true
+      is_dependent: true
+      earned_income: 2000
+    expected:
+      standard_deduction: 6350  # min(2000+450, 14600) + 1950 + 1950
+    citations:
+      - "§ 63(c)(5): dependent limitation"
+      - "§ 63(f): additional amounts still apply"

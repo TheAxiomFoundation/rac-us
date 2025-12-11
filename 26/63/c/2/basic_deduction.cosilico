@@ -1,0 +1,26 @@
+# 26 USC § 63(c)(2) - Basic Standard Deduction
+
+references {
+  basic_joint: statute/26/63/c/2/basic_joint
+  basic_head_of_household: statute/26/63/c/2/basic_head_of_household
+  basic_single: statute/26/63/c/2/basic_single
+}
+
+variable basic_standard_deduction {
+  entity TaxUnit
+  period Year
+  dtype Money
+
+  formula {
+    # § 63(c)(2)(A): Joint return or surviving spouse
+    if filing_status == JOINT then
+      return basic_joint
+
+    # § 63(c)(2)(B): Head of household
+    if filing_status == HEAD_OF_HOUSEHOLD then
+      return basic_head_of_household
+
+    # § 63(c)(2)(C): Single or married filing separately
+    return basic_single
+  }
+}

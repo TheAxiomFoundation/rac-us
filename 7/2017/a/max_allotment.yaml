@@ -1,0 +1,58 @@
+# 7 USC § 2017(a) - Maximum Allotments (Thrifty Food Plan)
+#
+# "the cost of the thrifty food plan... for a household"
+# Values published in annual FNS COLA memos by household size.
+
+max_allotment:
+  description: "Maximum monthly allotment by household size"
+  unit: currency-USD
+  values:
+    by_household_size:
+      1:
+        2023-10-01: 291
+        2022-10-01: 281
+      2:
+        2023-10-01: 535
+        2022-10-01: 516
+      3:
+        2023-10-01: 766
+        2022-10-01: 740
+      4:
+        2023-10-01: 973
+        2022-10-01: 939
+      5:
+        2023-10-01: 1155
+        2022-10-01: 1116
+      6:
+        2023-10-01: 1386
+        2022-10-01: 1339
+      7:
+        2023-10-01: 1532
+        2022-10-01: 1480
+      8:
+        2023-10-01: 1751
+        2022-10-01: 1691
+      additional_per_person:
+        2023-10-01: 219
+        2022-10-01: 211
+  citations:
+    - "7 USC § 2017(a): cost of thrifty food plan"
+    - "FNS FY2024 COLA memo"
+
+expected_contribution_rate:
+  description: "Percentage of net income counted against benefits"
+  unit: rate
+  values:
+    1977-01-01: 0.30
+  citations:
+    - "7 USC § 2017(a): 30 percent of household's net income"
+
+minimum_benefit:
+  description: "Minimum monthly benefit for 1-2 person households"
+  unit: currency-USD
+  values:
+    2023-10-01: 23
+    2022-10-01: 23
+  citations:
+    - "7 USC § 2017(a): minimum allotment"
+    - "FNS FY2024 COLA memo"

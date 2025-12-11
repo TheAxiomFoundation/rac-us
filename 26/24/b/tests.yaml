@@ -1,0 +1,66 @@
+# Tests for 26 USC § 24(b) - Limitation Based on AGI
+
+variable: child_tax_credit
+tax_year: 2024
+
+test_cases:
+  - name: "Single, phaseout begins at $200,000"
+    description: "AGI $210,000 → reduce by $50 × 10 = $500"
+    inputs:
+      filing_status: single
+      agi: 210000
+      ctc_qualifying_children: 1
+      earned_income: 210000
+    expected:
+      child_tax_credit: 1500
+    citations:
+      - "§ 24(b)(1)(B): threshold = $200,000 for non-joint"
+      - "§ 24(b)(2): reduce $50 per $1,000 over threshold"
+
+  - name: "Joint, phaseout begins at $400,000"
+    description: "AGI $420,000 → reduce by $50 × 20 = $1,000"
+    inputs:
+      filing_status: joint
+      agi: 420000
+      ctc_qualifying_children: 1
+      earned_income: 420000
+    expected:
+      child_tax_credit: 1000
+    citations:
+      - "§ 24(b)(1)(A): threshold = $400,000 for joint"
+
+  - name: "Single, fully phased out"
+    description: "AGI $240,000 → reduce by $50 × 40 = $2,000 → $0"
+    inputs:
+      filing_status: single
+      agi: 240000
+      ctc_qualifying_children: 1
+      earned_income: 240000
+    expected:
+      child_tax_credit: 0
+    citations:
+      - "§ 24(b): credit fully phased out"
+
+  - name: "Joint, 2 children, partial phaseout"
+    description: "AGI $430,000 → reduce by $50 × 30 = $1,500 from $4,000"
+    inputs:
+      filing_status: joint
+      agi: 430000
+      ctc_qualifying_children: 2
+      earned_income: 430000
+    expected:
+      child_tax_credit: 2500
+    citations:
+      - "§ 24(b): $4,000 - $1,500 = $2,500"
+
+  - name: "High income with many children"
+    description: "Joint $500,000, 4 kids: $8,000 - $50×100 = $3,000"
+    inputs:
+      filing_status: joint
+      agi: 500000
+      ctc_qualifying_children: 4
+      earned_income: 500000
+    expected:
+      child_tax_credit: 3000
+    citations:
+      - "§ 24(b): $8,000 - $5,000 phaseout = $3,000"

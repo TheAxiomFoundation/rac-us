@@ -1,0 +1,58 @@
+# Tests for 26 USC § 24(d) - Additional Child Tax Credit (Refundable)
+
+variable: additional_child_tax_credit
+tax_year: 2024
+
+test_cases:
+  - name: "Low income, refundable credit"
+    description: "15% × ($15,000 - $2,500) = $1,875, capped at $1,700"
+    inputs:
+      filing_status: single
+      agi: 15000
+      ctc_qualifying_children: 1
+      earned_income: 15000
+      tax_liability: 0
+    expected:
+      additional_child_tax_credit: 1700
+    citations:
+      - "§ 24(d)(1)(B)(i): 15% of earned income over $2,500"
+      - "§ 24(h)(5): refundable limited to $1,700 (2024)"
+
+  - name: "Very low income, partial refundable"
+    description: "15% × ($5,000 - $2,500) = $375"
+    inputs:
+      filing_status: single
+      agi: 5000
+      ctc_qualifying_children: 1
+      earned_income: 5000
+      tax_liability: 0
+    expected:
+      additional_child_tax_credit: 375
+    citations:
+      - "§ 24(d)(1)(B)(i): 15% × $2,500 = $375"
+
+  - name: "Below earned income threshold"
+    description: "Earned income < $2,500 → no refundable credit"
+    inputs:
+      filing_status: single
+      agi: 2000
+      ctc_qualifying_children: 1
+      earned_income: 2000
+      tax_liability: 0
+    expected:
+      additional_child_tax_credit: 0
+    citations:
+      - "§ 24(d)(1)(B)(i): must exceed $2,500 threshold"
+
+  - name: "Multiple children, refundable capped"
+    description: "3 children × $1,700 max = $5,100 cap"
+    inputs:
+      filing_status: single
+      agi: 25000
+      ctc_qualifying_children: 3
+      earned_income: 25000
+      tax_liability: 0
+    expected:
+      additional_child_tax_credit: 3375  # 15% × (25000 - 2500) = 3375
+    citations:
+      - "§ 24(d): refundable = min(credit, 15% × (EI - 2500))"

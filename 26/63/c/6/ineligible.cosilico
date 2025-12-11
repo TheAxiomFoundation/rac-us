@@ -1,0 +1,22 @@
+# 26 USC § 63(c)(6) - Certain Individuals Not Eligible for Standard Deduction
+#
+# "(A) married individual filing separate return where spouse itemizes
+#  (B) nonresident alien individual"
+
+variable is_ineligible_for_standard_deduction {
+  entity TaxUnit
+  period Year
+  dtype Boolean
+
+  formula {
+    # § 63(c)(6)(A): MFS where spouse itemizes
+    if filing_status == MARRIED_SEPARATE and spouse_itemizes then
+      return true
+
+    # § 63(c)(6)(B): Nonresident alien
+    if is_nonresident_alien then
+      return true
+
+    return false
+  }
+}

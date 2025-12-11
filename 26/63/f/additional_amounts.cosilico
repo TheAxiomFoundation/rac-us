@@ -1,0 +1,40 @@
+# 26 USC § 63(f) - Additional Amounts for Aged and Blind
+
+references {
+  additional_aged_unmarried: statute/26/63/f/1/additional_aged_unmarried
+  additional_aged_married: statute/26/63/f/1/additional_aged_married
+  additional_blind_unmarried: statute/26/63/f/2/additional_blind_unmarried
+  additional_blind_married: statute/26/63/f/2/additional_blind_married
+}
+
+variable additional_standard_deduction {
+  entity TaxUnit
+  period Year
+  dtype Money
+
+  formula {
+    let additional = 0
+    let is_married = filing_status in [JOINT, MARRIED_SEPARATE]
+
+    # Select amounts based on marital status
+    let aged_amount = is_married ? additional_aged_married : additional_aged_unmarried
+    let blind_amount = is_married ? additional_blind_married : additional_blind_unmarried
+
+    # § 63(f)(1): Primary taxpayer aged 65+
+    if age >= 65 then
+      additional = additional + aged_amount
+
+    # § 63(f)(2): Primary taxpayer blind
+    if is_blind then
+      additional = additional + blind_amount
+
+    # Spouse (joint filers only)
+    if filing_status == JOINT then
+      if spouse_age >= 65 then
+        additional = additional + aged_amount
+      if spouse_is_blind then
+        additional = additional + blind_amount
+
+    return additional
+  }
+}

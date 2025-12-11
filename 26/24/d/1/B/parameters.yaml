@@ -1,0 +1,20 @@
+# 26 USC § 24(d)(1)(B)(i) - ACTC Parameters
+#
+# "15 percent of so much of the taxpayer's earned income...
+#  as exceeds $2,500"
+
+earned_income_threshold:
+  description: "Earned income floor for refundable credit"
+  unit: currency-USD
+  values:
+    2018-01-01: 2500
+  citations:
+    - "§ 24(d)(1)(B)(i): earned income in excess of $2,500"
+
+refundable_rate:
+  description: "Percentage of earned income above threshold"
+  unit: rate
+  values:
+    2018-01-01: 0.15
+  citations:
+    - "§ 24(d)(1)(B)(i): 15 percent"

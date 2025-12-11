@@ -1,0 +1,126 @@
+# Tests for 26 USC § 63(c) - Standard Deduction
+
+variable: standard_deduction
+tax_year: 2024
+
+test_cases:
+  # Basic amounts by filing status
+  - name: "Single filer"
+    inputs:
+      filing_status: single
+      age: 35
+      is_blind: false
+      is_dependent: false
+    expected:
+      standard_deduction: 14600
+    citations:
+      - "§ 63(c)(2)(C): single filer amount"
+
+  - name: "Married filing jointly"
+    inputs:
+      filing_status: joint
+      age: 40
+      spouse_age: 38
+      is_blind: false
+      spouse_is_blind: false
+      is_dependent: false
+    expected:
+      standard_deduction: 29200
+    citations:
+      - "§ 63(c)(2)(A): joint return"
+
+  - name: "Married filing separately"
+    inputs:
+      filing_status: married_separate
+      age: 45
+      is_blind: false
+      is_dependent: false
+    expected:
+      standard_deduction: 14600
+    citations:
+      - "§ 63(c)(2)(C): 50% of joint amount"
+
+  - name: "Head of household"
+    inputs:
+      filing_status: head_of_household
+      age: 35
+      is_blind: false
+      is_dependent: false
+    expected:
+      standard_deduction: 21900
+    citations:
+      - "§ 63(c)(2)(B): head of household"
+
+  # Dependent limitation - § 63(c)(5)
+  - name: "Dependent with no earned income"
+    inputs:
+      filing_status: single
+      age: 16
+      is_blind: false
+      is_dependent: true
+      earned_income: 0
+    expected:
+      standard_deduction: 1300
+    citations:
+      - "§ 63(c)(5)(A): minimum amount"
+
+  - name: "Dependent with $500 earned income"
+    inputs:
+      filing_status: single
+      age: 17
+      is_blind: false
+      is_dependent: true
+      earned_income: 500
+    expected:
+      standard_deduction: 1300  # max(1300, 500+450) = 1300
+    citations:
+      - "§ 63(c)(5)(A): greater of minimum or earned + addon"
+
+  - name: "Dependent with $3,000 earned income"
+    inputs:
+      filing_status: single
+      age: 19
+      is_blind: false
+      is_dependent: true
+      earned_income: 3000
+    expected:
+      standard_deduction: 3450  # max(1300, 3000+450) = 3450
+    citations:
+      - "§ 63(c)(5)(A): earned income + $450"
+
+  - name: "Dependent with high earned income"
+    inputs:
+      filing_status: single
+      age: 22
+      is_blind: false
+      is_dependent: true
+      earned_income: 20000
+    expected:
+      standard_deduction: 14600  # capped at regular
+    citations:
+      - "§ 63(c)(5)(A): cannot exceed basic"
+
+  # Ineligibility - § 63(c)(6)
+  - name: "Married filing separately, spouse itemizes"
+    inputs:
+      filing_status: married_separate
+      age: 40
+      is_blind: false
+      is_dependent: false
+      spouse_itemizes: true
+    expected:
+      standard_deduction: 0
+    citations:
+      - "§ 63(c)(6)(A): zero if spouse itemizes"
+
+  - name: "Nonresident alien"
+    inputs:
+      filing_status: single
+      age: 30
+      is_blind: false
+      is_dependent: false
+      is_nonresident_alien: true
+    expected:
+      standard_deduction: 0
+    citations:
+      - "§ 63(c)(6)(B): zero for nonresident aliens"

@@ -1,0 +1,30 @@
+# 26 USC § 24(c)(1) - Qualifying Child
+#
+# "The term 'qualifying child' means a qualifying child of the taxpayer
+# (as defined in section 152(c)) who has not attained age 17."
+
+references {
+  is_qualifying_child_152c: statute/26/152/c/is_qualifying_child
+  qualifying_age_limit: statute/26/24/c/1/qualifying_age_limit
+}
+
+variable is_ctc_qualifying_child {
+  entity Person
+  period Year
+  dtype Boolean
+
+  formula {
+    if not is_qualifying_child_152c then return false
+    return age < qualifying_age_limit
+  }
+}
+
+variable ctc_qualifying_children {
+  entity TaxUnit
+  period Year
+  dtype Integer
+
+  formula {
+    return sum(members, is_ctc_qualifying_child)
+  }
+}

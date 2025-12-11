@@ -1,0 +1,24 @@
+# 26 USC § 24(h)(5) - Refundable Credit Maximum (TCJA)
+#
+# "the increase... shall not exceed $1,400 per qualifying child"
+# (indexed for inflation after 2018)
+
+refundable_maximum:
+  description: "Maximum refundable amount per child (ACTC)"
+  unit: currency-USD
+  indexing:
+    method: cpi-u
+    base_year: 2018
+    round_to: 100
+  values:
+    2018-01-01: 1400
+    2019-01-01: 1400
+    2020-01-01: 1400
+    2021-01-01: 1400
+    2022-01-01: 1500
+    2023-01-01: 1600
+    2024-01-01: 1700
+    2025-01-01: 1700
+  citations:
+    - "§ 24(h)(5): $1,400 indexed for inflation"
+    - "Rev. Proc. 2023-34: $1,700 for 2024"

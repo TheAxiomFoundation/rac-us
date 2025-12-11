@@ -1,0 +1,69 @@
+# 26 USC § 63(c)(2) - Basic Standard Deduction Amounts
+#
+# "(A) 200 percent of the dollar amount in effect under subparagraph (C)
+#      for the taxable year in the case of—
+#      (i) a joint return, or
+#      (ii) a surviving spouse...
+#  (B) $4,400 in the case of a head of household...
+#  (C) $3,000 in any other case."
+# (Amounts indexed for inflation and modified by TCJA § 11021)
+
+basic_joint:
+  description: "Standard deduction for joint filers"
+  unit: currency-USD
+  indexing:
+    method: cpi-u
+    base_year: 2017
+    round_to: 50
+  values:
+    2018-01-01: 24000
+    2019-01-01: 24400
+    2020-01-01: 24800
+    2021-01-01: 25100
+    2022-01-01: 25900
+    2023-01-01: 27700
+    2024-01-01: 29200
+    2025-01-01: 30000
+  citations:
+    - "§ 63(c)(2)(A): joint return amount"
+    - "Rev. Proc. 2023-34: $29,200 for 2024"
+
+basic_head_of_household:
+  description: "Standard deduction for head of household"
+  unit: currency-USD
+  indexing:
+    method: cpi-u
+    base_year: 2017
+    round_to: 50
+  values:
+    2018-01-01: 18000
+    2019-01-01: 18350
+    2020-01-01: 18650
+    2021-01-01: 18800
+    2022-01-01: 19400
+    2023-01-01: 20800
+    2024-01-01: 21900
+    2025-01-01: 22500
+  citations:
+    - "§ 63(c)(2)(B): head of household"
+    - "Rev. Proc. 2023-34: $21,900 for 2024"
+
+basic_single:
+  description: "Standard deduction for single filers"
+  unit: currency-USD
+  indexing:
+    method: cpi-u
+    base_year: 2017
+    round_to: 50
+  values:
+    2018-01-01: 12000
+    2019-01-01: 12200
+    2020-01-01: 12400
+    2021-01-01: 12550
+    2022-01-01: 12950
+    2023-01-01: 13850
+    2024-01-01: 14600
+    2025-01-01: 15000
+  citations:
+    - "§ 63(c)(2)(C): 50% of joint amount"
+    - "Rev. Proc. 2023-34: $14,600 for 2024"

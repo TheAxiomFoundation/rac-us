@@ -1,0 +1,33 @@
+# 26 USC § 24(d)(1)(B) - Additional Child Tax Credit
+#
+# "(i) the credit... shall be increased by the lesser of—
+#  (I) 15 percent of so much of the taxpayer's earned income...
+#      as exceeds $2,500, or
+#  (II) the excess (if any) of... the credit... over the tax imposed"
+
+references {
+  child_tax_credit: statute/26/24/a/child_tax_credit
+  earned_income_threshold: statute/26/24/d/1/B/earned_income_threshold
+  refundable_rate: statute/26/24/d/1/B/refundable_rate
+  refundable_maximum: statute/26/24/h/5/refundable_maximum
+  ctc_qualifying_children: statute/26/24/c/1/ctc_qualifying_children
+}
+
+variable additional_child_tax_credit {
+  entity TaxUnit
+  period Year
+  dtype Money
+
+  formula {
+    # Unused credit (exceeds tax liability)
+    let unused = max(0, child_tax_credit - tax_liability_before_credits)
+
+    # 15% of earned income over $2,500
+    let ei_amount = refundable_rate * max(0, earned_income - earned_income_threshold)
+
+    # Per-child cap from § 24(h)(5)
+    let max_refundable = ctc_qualifying_children * refundable_maximum
+
+    return min(unused, ei_amount, max_refundable)
+  }
+}

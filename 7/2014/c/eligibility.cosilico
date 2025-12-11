@@ -1,0 +1,38 @@
+# 7 USC § 2014(c) - Income Eligibility Standards
+#
+# "(2) households... shall have... gross income that does not exceed
+# 130 percent of the poverty line... and net income that does not
+# exceed 100 percent of the poverty line"
+# "(2) Elderly and disabled exemption from gross income test"
+
+references {
+  gross_income_limit_pct: statute/7/2014/c/gross_income_limit_pct
+  net_income_limit_pct: statute/7/2014/c/net_income_limit_pct
+  fpl_by_household_size: statute/7/2014/c/fpl_by_household_size
+  snap_net_income: statute/7/2014/e/snap_net_income
+}
+
+variable snap_eligible {
+  entity Household
+  period Month
+  dtype Boolean
+
+  formula {
+    let fpl = fpl_by_household_size[household_size]
+
+    # § 2014(c)(2): Elderly/disabled exempt from gross income test
+    if has_elderly_disabled then
+      # Only net income test applies
+      let net_limit = fpl * net_income_limit_pct
+      return snap_net_income <= net_limit
+
+    # § 2014(c)(2): Gross income test - 130% FPL
+    let gross_limit = fpl * gross_income_limit_pct
+    if gross_income > gross_limit then
+      return false
+
+    # § 2014(c)(1): Net income test - 100% FPL
+    let net_limit = fpl * net_income_limit_pct
+    return snap_net_income <= net_limit
+  }
+}

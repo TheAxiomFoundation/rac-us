@@ -1,0 +1,45 @@
+# 26 USC § 63(f)(1) - Additional Amount for Aged
+#
+# "an additional amount of $600 ($750 in the case of an individual who
+# is not married and is not a surviving spouse)"
+# (Amounts indexed for inflation)
+
+additional_aged_unmarried:
+  description: "Additional deduction for taxpayers 65+ (single/HoH)"
+  unit: currency-USD
+  indexing:
+    method: cpi-u
+    base_year: 2017
+    round_to: 50
+  values:
+    2018-01-01: 1600
+    2019-01-01: 1650
+    2020-01-01: 1650
+    2021-01-01: 1700
+    2022-01-01: 1750
+    2023-01-01: 1850
+    2024-01-01: 1950
+    2025-01-01: 2000
+  citations:
+    - "§ 63(f)(1): additional for aged (unmarried)"
+    - "Rev. Proc. 2023-34: $1,950 for 2024"
+
+additional_aged_married:
+  description: "Additional deduction for taxpayers 65+ (married)"
+  unit: currency-USD
+  indexing:
+    method: cpi-u
+    base_year: 2017
+    round_to: 50
+  values:
+    2018-01-01: 1300
+    2019-01-01: 1300
+    2020-01-01: 1300
+    2021-01-01: 1350
+    2022-01-01: 1400
+    2023-01-01: 1500
+    2024-01-01: 1550
+    2025-01-01: 1600
+  citations:
+    - "§ 63(f)(1): additional for aged (married)"
+    - "Rev. Proc. 2023-34: $1,550 for 2024"

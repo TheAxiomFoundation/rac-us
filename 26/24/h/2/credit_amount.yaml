@@ -1,0 +1,19 @@
+# 26 USC § 24(h)(2) - Credit Amount (TCJA)
+#
+# "In the case of a taxable year beginning after December 31, 2017,
+# and before January 1, 2026, paragraph (1) of subsection (a) shall
+# be applied by substituting '$2,000' for '$1,000'."
+
+credit_amount:
+  description: "Credit amount per qualifying child"
+  unit: currency-USD
+  values:
+    # Pre-TCJA
+    1998-01-01: 1000
+    # TCJA modification (2018-2025)
+    2018-01-01: 2000
+    # Post-TCJA sunset
+    2026-01-01: 1000
+  citations:
+    - "§ 24(a)(1): $1,000 base amount"
+    - "§ 24(h)(2): $2,000 for tax years 2018-2025"

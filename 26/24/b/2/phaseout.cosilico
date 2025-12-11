@@ -1,0 +1,35 @@
+# 26 USC § 24(b)(2) - Reduction of Credit
+#
+# "The credit allowable... shall be reduced by $50 for each $1,000
+# (or fraction thereof) by which the taxpayer's modified adjusted
+# gross income exceeds the threshold amount."
+
+references {
+  phaseout_threshold_joint: statute/26/24/b/1/phaseout_threshold_joint
+  phaseout_threshold_single: statute/26/24/b/1/phaseout_threshold_single
+  phaseout_rate: statute/26/24/b/2/phaseout_rate
+}
+
+variable phaseout_threshold {
+  entity TaxUnit
+  period Year
+  dtype Money
+
+  formula {
+    if filing_status == JOINT then
+      return phaseout_threshold_joint
+    return phaseout_threshold_single
+  }
+}
+
+variable phaseout_reduction {
+  entity TaxUnit
+  period Year
+  dtype Money
+
+  formula {
+    let excess = max(0, adjusted_gross_income - phaseout_threshold)
+    let units = ceil(excess / 1000)
+    return units * phaseout_rate
+  }
+}

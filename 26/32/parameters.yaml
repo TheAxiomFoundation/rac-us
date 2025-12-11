@@ -1,0 +1,67 @@
+# Resolved EITC Parameters
+# Combines statute formula with IRS guidance values
+#
+# This file links:
+# - Formula: data/federal/statute/26/32/formula.cosilico
+# - TY 2024: data/federal/guidance/irs/rp-23-34/eitc.yaml
+# - TY 2025: data/federal/guidance/irs/rp-24-40/eitc.yaml
+
+variable: eitc
+entity: TaxUnit
+period: Year
+dtype: Money
+
+sources:
+  statute:
+    path: ../../../statute/26/32/formula.cosilico
+    provides:
+      - credit_percentage      # Fixed rates from § 32(b)(1)
+      - phaseout_percentage    # Fixed rates from § 32(b)(1)
+      - formula_structure      # Calculation logic from § 32(a)
+      - indexing_rule          # § 32(b)(3), § 32(i)(3)
+      - base_amounts           # 2015 base values from § 32(b)(2)
+
+  guidance:
+    - path: ../../../guidance/irs/rp-23-34/eitc.yaml
+      tax_year: 2024
+      provides:
+        - max_amount
+        - phaseout_start
+        - phaseout_end
+        - investment_income_limit
+
+    - path: ../../../guidance/irs/rp-24-40/eitc.yaml
+      tax_year: 2025
+      provides:
+        - max_amount
+        - phaseout_start
+        - phaseout_end
+        - investment_income_limit
+
+# Resolved parameters (statute formula applied to guidance values)
+resolved:
+  2024:
+    max_amount:
+      0: 632
+      1: 4213
+      2: 6960
+      3: 7830
+    phaseout_start:
+      single: { 0: 10330, 1: 22720, 2: 22720, 3: 22720 }
+      joint: { 0: 17250, 1: 29640, 2: 29640, 3: 29640 }
+    investment_income_limit: 11600
+    # Verification: values match guidance AND are consistent with statute formula
+    verification:
+      max_amount_0: "4220 * 1.237_index * 0.0765 = 632 ✓"
+      phaseout_joint_bonus: "17250 - 10330 = 6920 ≈ 5000 * 1.384_index ✓"
+
+  2025:
+    max_amount:
+      0: 649
+      1: 4328
+      2: 7152
+      3: 8046
+    phaseout_start:
+      single: { 0: 10620, 1: 23350, 2: 23350, 3: 23350 }
+      joint: { 0: 17730, 1: 30470, 2: 30470, 3: 30470 }
+    investment_income_limit: 11950

@@ -1,0 +1,11 @@
+# 26 USC § 24(b)(2) - Phaseout Rate
+#
+# "$50 for each $1,000 (or fraction thereof)"
+
+phaseout_rate:
+  description: "Credit reduction per $1,000 over threshold"
+  unit: currency-USD
+  values:
+    1998-01-01: 50
+  citations:
+    - "§ 24(b)(2): $50 for each $1,000"

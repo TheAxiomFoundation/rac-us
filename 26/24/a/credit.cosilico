@@ -1,0 +1,22 @@
+# 26 USC § 24(a) - Allowance of Credit
+#
+# "There shall be allowed as a credit... the sum of (1) $1,000 multiplied
+# by the number of qualifying children..."
+# (Modified by § 24(h)(2) for 2018-2025: $2,000)
+
+references {
+  credit_amount: statute/26/24/h/2/credit_amount
+  ctc_qualifying_children: statute/26/24/c/1/ctc_qualifying_children
+  phaseout_reduction: statute/26/24/b/2/phaseout_reduction
+}
+
+variable child_tax_credit {
+  entity TaxUnit
+  period Year
+  dtype Money
+
+  formula {
+    let base = credit_amount * ctc_qualifying_children
+    return max(0, base - phaseout_reduction)
+  }
+}

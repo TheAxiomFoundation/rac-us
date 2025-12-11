@@ -1,0 +1,29 @@
+# Tests for 26 USC § 24(c) - Definitions and Special Rules
+
+variable: child_tax_credit
+tax_year: 2024
+
+test_cases:
+  - name: "Child age 16 - qualifying"
+    inputs:
+      filing_status: single
+      agi: 50000
+      ctc_qualifying_children: 1
+      earned_income: 50000
+    expected:
+      child_tax_credit: 2000
+    citations:
+      - "§ 24(c)(1): under age 17 qualifies"
+
+  - name: "Child age 17 - not qualifying"
+    description: "Child must be UNDER 17"
+    inputs:
+      filing_status: single
+      agi: 50000
+      ctc_qualifying_children: 0
+      children_age_17: 1
+      earned_income: 50000
+    expected:
+      child_tax_credit: 0
+    citations:
+      - "§ 24(c)(1): must not have attained age 17"

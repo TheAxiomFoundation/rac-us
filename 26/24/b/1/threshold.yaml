@@ -1,0 +1,20 @@
+# 26 USC § 24(b)(1) - Threshold Amount
+#
+# "(A) $400,000 in the case of a joint return, and
+#  (B) $200,000 in any other case."
+
+phaseout_threshold_joint:
+  description: "AGI threshold where phaseout begins (joint)"
+  unit: currency-USD
+  values:
+    2018-01-01: 400000
+  citations:
+    - "§ 24(b)(1)(A): $400,000 for joint returns"
+
+phaseout_threshold_single:
+  description: "AGI threshold where phaseout begins (non-joint)"
+  unit: currency-USD
+  values:
+    2018-01-01: 200000
+  citations:
+    - "§ 24(b)(1)(B): $200,000 for other than joint"

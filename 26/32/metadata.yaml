@@ -1,0 +1,81 @@
+# Encoding Metadata for 26 USC § 32 (EITC)
+
+encoding:
+  created: 2024-12-10
+  updated: 2024-12-10
+  status: validated
+  encoded_by: claude-opus-4.5
+
+variable:
+  name: eitc
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+
+coverage:
+  tax_years: [2023, 2024, 2025]
+  validators:
+    - name: policyengine-us
+      version: ">=1.0.0"
+      pass_rate: 100%
+      notes: "21/21 tests pass for TY 2024"
+    - name: taxsim-35
+      version: "35"
+      pass_rate: 92%
+      notes: "12/13 tests pass for TY 2023 - age eligibility not enforced by TAXSIM"
+
+sources:
+  statute:
+    - citation: "26 USC § 32"
+      title: "Earned income"
+      path: ../../../statute/26/32/
+      files:
+        - text.md       # Full statute text
+        - formula.cosilico  # Formula encoding
+
+  guidance:
+    - citation: "Rev. Proc. 2022-38"
+      title: "Inflation adjustments for TY 2023"
+      path: ../../../guidance/irs/rp-22-38/
+      source: https://www.irs.gov/pub/irs-drop/rp-22-38.pdf
+
+    - citation: "Rev. Proc. 2023-34"
+      title: "Inflation adjustments for TY 2024"
+      path: ../../../guidance/irs/rp-23-34/
+      source: https://www.irs.gov/pub/irs-drop/rp-23-34.pdf
+
+    - citation: "Rev. Proc. 2024-40"
+      title: "Inflation adjustments for TY 2025"
+      path: ../../../guidance/irs/rp-24-40/
+      source: https://www.irs.gov/pub/irs-drop/rp-24-40.pdf
+
+architecture:
+  description: |
+    Three-layer architecture separating law from implementation:
+
+    1. STATUTE layer (data/federal/statute/26/32/)
+       - text.md: Full statute text from uscode.house.gov
+       - formula.cosilico: Encodes the calculation rules
+         - Fixed percentages (§ 32(b)(1))
+         - Base year amounts (§ 32(b)(2))
+         - Indexing rules (§ 32(b)(3), § 32(i)(3))
+
+    2. GUIDANCE layer (data/federal/guidance/irs/)
+       - rp-23-34/: Rev. Proc. with TY 2024 values
+       - rp-24-40/: Rev. Proc. with TY 2025 values
+       - Annual IRS publications applying statute indexing
+
+    3. ENCODED layer (data/federal/encoded/26/32/)
+       - parameters.yaml: Links statute + guidance
+       - tests.yaml: Validation test cases
+       - metadata.yaml: This file
+
+  separation_rationale: |
+    - Statute defines WHAT (formula, rules, indexing method)
+    - Guidance defines WHEN (annual parameter values)
+    - Encoded layer RESOLVES them for calculation
+
+    This allows:
+    - Updating guidance without touching statute encoding
+    - Tracking provenance of each value
+    - Validating guidance values match statute formula

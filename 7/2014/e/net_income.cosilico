@@ -1,0 +1,51 @@
+# 7 USC § 2014(e) - Deductions from Income
+
+references {
+  earned_income_deduction_rate: statute/7/2014/e/1/earned_income_deduction_rate
+  standard_deduction: statute/7/2014/e/1/standard_deduction
+  shelter_deduction_cap: statute/7/2014/e/6/shelter_deduction_cap
+}
+
+variable snap_net_income {
+  entity Household
+  period Month
+  dtype Money
+
+  formula {
+    # § 2014(e)(1): 20% earned income deduction
+    let earned_deduction = earned_income * earned_income_deduction_rate
+
+    # § 2014(e)(1): Standard deduction
+    let std_deduction = standard_deduction[household_size]
+
+    # Adjusted income (before shelter)
+    let adjusted = gross_income - earned_deduction - std_deduction
+
+    # § 2014(e)(6): Excess shelter deduction
+    let shelter_excess = shelter_costs - (adjusted * 0.5)
+    let shelter_deduction = shelter_excess > 0 ? snap_shelter_deduction : 0
+
+    return max(0, adjusted - shelter_deduction)
+  }
+}
+
+variable snap_shelter_deduction {
+  entity Household
+  period Month
+  dtype Money
+
+  formula {
+    let adjusted = gross_income - (earned_income * earned_income_deduction_rate) - standard_deduction[household_size]
+    let excess = shelter_costs - (adjusted * 0.5)
+
+    if excess <= 0 then
+      return 0
+
+    # § 2014(e)(6)(B): Cap for non-elderly/disabled
+    # § 2014(e)(6)(C): No cap for elderly/disabled
+    if has_elderly_disabled then
+      return excess
+
+    return min(excess, shelter_deduction_cap)
+  }
+}

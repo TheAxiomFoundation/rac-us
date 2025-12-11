@@ -1,0 +1,51 @@
+# Tests for 26 USC § 24(a) - Allowance of Credit
+
+variable: child_tax_credit
+tax_year: 2024
+
+test_cases:
+  - name: "Single filer, 1 child, below phaseout"
+    description: "Full $2,000 credit"
+    inputs:
+      filing_status: single
+      agi: 50000
+      ctc_qualifying_children: 1
+      earned_income: 50000
+    expected:
+      child_tax_credit: 2000
+    citations:
+      - "§ 24(a): credit per qualifying child"
+      - "§ 24(h)(2): $2,000 for 2018-2025"
+
+  - name: "Single filer, 2 children, below phaseout"
+    inputs:
+      filing_status: single
+      agi: 75000
+      ctc_qualifying_children: 2
+      earned_income: 75000
+    expected:
+      child_tax_credit: 4000
+    citations:
+      - "§ 24(a): $2,000 × 2 = $4,000"
+
+  - name: "Joint filers, 3 children, below phaseout"
+    inputs:
+      filing_status: joint
+      agi: 150000
+      ctc_qualifying_children: 3
+      earned_income: 150000
+    expected:
+      child_tax_credit: 6000
+    citations:
+      - "§ 24(a): $2,000 × 3 = $6,000"
+
+  - name: "No children"
+    inputs:
+      filing_status: single
+      agi: 50000
+      ctc_qualifying_children: 0
+      earned_income: 50000
+    expected:
+      child_tax_credit: 0
+    citations:
+      - "§ 24(a): credit only for qualifying children"
