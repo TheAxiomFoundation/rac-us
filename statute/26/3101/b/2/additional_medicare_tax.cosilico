@@ -10,8 +10,6 @@
 #   (B) in the case of a married individual (as defined in section 7703)
 #       filing a separate return, $125,000, and
 #   (C) in any other case, $200,000."
-#
-# Note: §1401(b)(2) applies same tax to self-employment income
 
 module statute.26.3101.b.2
 version "2024.1"
@@ -27,22 +25,6 @@ references {
   filing_status: statute/26/1/filing_status
 }
 
-parameter additional_medicare_tax_rate {
-  description "Additional Medicare Tax rate per §3101(b)(2)"
-  value 0.009  # 0.9%
-}
-
-parameter additional_medicare_tax_threshold {
-  description "Wage threshold by filing status per §3101(b)(2)"
-  by filing_status {
-    JOINT: 250000
-    SURVIVING_SPOUSE: 250000
-    SEPARATE: 125000
-    SINGLE: 200000
-    HEAD_OF_HOUSEHOLD: 200000
-  }
-}
-
 variable medicare_wages {
   entity TaxUnit
   period Year
@@ -56,8 +38,6 @@ variable medicare_wages {
     # Per §3101(b)(2) and §1401(b)(2)
     return employment_income + self_employment_income
   }
-
-  default 0
 }
 
 variable additional_medicare_tax {
@@ -69,18 +49,17 @@ variable additional_medicare_tax {
   description "0.9% additional Medicare tax on wages above threshold per §3101(b)(2)"
 
   formula {
-    # Get threshold for filing status
-    threshold = additional_medicare_tax_threshold[filing_status]
+    # Get threshold for filing status per §3101(b)(2)(A)-(C)
+    let threshold = if filing_status == JOINT then
+      250000
+    else if filing_status == SEPARATE then
+      125000
+    else
+      200000
 
     # Tax applies to wages exceeding threshold
-    excess_wages = max(0, medicare_wages - threshold)
+    let excess_wages = max(0, medicare_wages - threshold)
 
-    return additional_medicare_tax_rate * excess_wages
+    return 0.009 * excess_wages
   }
-
-  defined_for {
-    medicare_wages > additional_medicare_tax_threshold[filing_status]
-  }
-
-  default 0
 }
