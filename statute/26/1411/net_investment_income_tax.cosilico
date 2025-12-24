@@ -1,0 +1,101 @@
+# 26 USC §1411 - Net Investment Income Tax
+#
+# "(a) In general - In the case of an individual, there shall be imposed
+# (in addition to any other tax imposed by this subtitle) for each taxable year
+# a tax equal to 3.8 percent of the lesser of -
+#   (A) net investment income for such taxable year, or
+#   (B) the excess (if any) of -
+#     (i) modified adjusted gross income for such taxable year, over
+#     (ii) the threshold amount."
+#
+# §1411(b) Threshold amount:
+#   - Joint return or surviving spouse: $250,000
+#   - Married filing separately: $125,000
+#   - All other cases: $200,000
+
+module statute.26.1411
+version "2024.1"
+
+references {
+  # Income components for NII - §1411(c)(1)(A)
+  interest_income: statute/26/61/a/4/interest_income
+  dividend_income: statute/26/61/a/7/dividend_income
+  capital_gains: statute/26/61/a/3/gains_from_property
+  rental_income: statute/26/32/i/2/C/net_rent_royalty_income
+  passive_income: statute/26/32/i/2/E/net_passive_income
+
+  # MAGI for NIIT purposes
+  adjusted_gross_income: statute/26/62/a/adjusted_gross_income
+
+  # Filing status
+  filing_status: statute/26/1/filing_status
+}
+
+parameter niit_rate {
+  description "Net Investment Income Tax rate per §1411(a)(1)"
+  value 0.038  # 3.8%
+}
+
+parameter niit_threshold {
+  description "MAGI threshold by filing status per §1411(b)"
+  by filing_status {
+    JOINT: 250000
+    SURVIVING_SPOUSE: 250000
+    SEPARATE: 125000
+    SINGLE: 200000
+    HEAD_OF_HOUSEHOLD: 200000
+  }
+}
+
+variable net_investment_income {
+  entity TaxUnit
+  period Year
+  dtype Money
+  unit "USD"
+  label "Net Investment Income"
+  description "Sum of investment income per §1411(c)(1)(A)"
+
+  formula {
+    # §1411(c)(1)(A) - Net investment income includes:
+    # (i) gross income from interest, dividends, annuities, royalties, and rents
+    # (ii) other gross income from passive activities
+    # (iii) net gain from disposition of property
+    return max(0,
+      interest_income +
+      dividend_income +
+      capital_gains +
+      rental_income +
+      passive_income
+    )
+  }
+
+  default 0
+}
+
+variable net_investment_income_tax {
+  entity TaxUnit
+  period Year
+  dtype Money
+  unit "USD"
+  label "Net Investment Income Tax"
+  description "3.8% tax on investment income for high earners per §1411(a)"
+
+  formula {
+    # Get threshold for filing status
+    threshold = niit_threshold[filing_status]
+
+    # §1411(a)(1)(B) - Excess of MAGI over threshold
+    excess_magi = max(0, adjusted_gross_income - threshold)
+
+    # §1411(a)(1) - Tax is 3.8% of lesser of NII or excess MAGI
+    taxable_amount = min(net_investment_income, excess_magi)
+
+    return niit_rate * taxable_amount
+  }
+
+  defined_for {
+    adjusted_gross_income > niit_threshold[filing_status]
+  }
+
+  default 0
+}
