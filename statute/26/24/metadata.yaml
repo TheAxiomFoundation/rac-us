@@ -1,0 +1,109 @@
+# Encoding Metadata for 26 USC § 24 (Child Tax Credit)
+
+encoding:
+  created: 2024-12-24
+  updated: 2024-12-24
+  status: implemented
+  encoded_by: claude-opus-4.5
+
+variable:
+  name: child_tax_credit
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+
+coverage:
+  tax_years: [2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025]
+  notes: |
+    TCJA provisions (2018-2025):
+    - $2,000 credit per child
+    - $1,700 max refundable per child (2024, indexed)
+    - $400,000 joint / $200,000 other phase-out thresholds
+
+sources:
+  statute:
+    - citation: "26 USC § 24"
+      title: "Child tax credit"
+      path: statute/26/24/
+      files:
+        - child_tax_credit.cosilico       # Nonrefundable portion
+        - total_child_tax_credit.cosilico # Combined total
+        - ctc_validation.cosilico         # Standalone validation version
+
+  guidance:
+    - citation: "Rev. Proc. 2023-34"
+      title: "Inflation adjustments for TY 2024"
+      source: https://www.irs.gov/pub/irs-drop/rp-23-34.pdf
+      provides:
+        - max_refundable_per_child: 1700
+
+    - citation: "Rev. Proc. 2024-40"
+      title: "Inflation adjustments for TY 2025"
+      source: https://www.irs.gov/pub/irs-drop/rp-24-40.pdf
+
+architecture:
+  description: |
+    The Child Tax Credit encoding follows the statute structure:
+
+    1. § 24(a) - Credit Amount
+       - $2,000 per qualifying child (TCJA 2018-2025)
+       - child_tax_credit_amount.cosilico
+
+    2. § 24(b) - Phase-Out Limitation
+       - $50 reduction per $1,000 over threshold
+       - Thresholds: $400k joint, $200k other
+       - credit_reduction.cosilico
+
+    3. § 24(c) - Qualifying Child Definition
+       - Must be qualifying child per § 152(c)
+       - Must be under 17 at year end
+       - is_ctc_qualifying_child.cosilico
+
+    4. § 24(d) - Additional Child Tax Credit (Refundable)
+       - 15% of earned income over $2,500
+       - OR social security taxes minus EITC (3+ children)
+       - Capped at $1,700 per child (2024)
+       - additional_child_tax_credit.cosilico
+
+    5. § 24(h) - TCJA Special Rules (2018-2025)
+       - Increased credit from $1,000 to $2,000
+       - Increased phase-out thresholds
+       - phaseout.yaml
+
+  key_provisions:
+    - provision: "§ 24(a)"
+      description: "Credit amount per child"
+      variable: child_tax_credit_amount
+      parameters:
+        - credit_per_child
+
+    - provision: "§ 24(b)"
+      description: "Phase-out based on income"
+      variable: ctc_credit_reduction
+      parameters:
+        - phaseout_threshold
+        - phaseout_rate
+
+    - provision: "§ 24(c)"
+      description: "Qualifying child requirements"
+      variable: is_ctc_qualifying_child
+      parameters:
+        - age_limit
+
+    - provision: "§ 24(d)"
+      description: "Refundable portion (ACTC)"
+      variable: additional_child_tax_credit
+      parameters:
+        - max_refundable_per_child
+        - earned_income_threshold
+        - earned_income_percentage
+
+  dependencies:
+    - path: statute/26/152/c
+      description: "Qualifying child definition"
+    - path: statute/26/62/a
+      description: "Adjusted gross income"
+    - path: statute/26/32/c/2/A
+      description: "Earned income (for ACTC)"
+    - path: statute/26/1
+      description: "Filing status"

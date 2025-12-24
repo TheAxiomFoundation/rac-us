@@ -82,3 +82,28 @@ test_cases:
     citations:
       - "§ 63(c)(5): dependent limitation"
       - "§ 63(f): additional amounts still apply"
+
+  - name: "Surviving spouse (qualifying widow), age 65"
+    description: "Surviving spouse gets married rate for additional amount"
+    inputs:
+      filing_status: qualifying_widow
+      age: 67
+      is_blind: false
+      is_dependent: false
+    expected:
+      standard_deduction: 30750  # 29200 + 1550 (married rate, not 1950)
+    citations:
+      - "§ 63(c)(2)(A): surviving spouse gets joint base amount"
+      - "§ 63(f)(1): surviving spouse gets married additional rate"
+
+  - name: "Head of household, age 65, blind"
+    description: "HoH gets unmarried rate for additional amounts"
+    inputs:
+      filing_status: head_of_household
+      age: 66
+      is_blind: true
+      is_dependent: false
+    expected:
+      standard_deduction: 25800  # 21900 + 1950 + 1950
+    citations:
+      - "§ 63(f): HoH gets unmarried additional amounts"

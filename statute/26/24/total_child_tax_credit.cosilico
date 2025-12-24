@@ -1,0 +1,28 @@
+# 26 USC § 24 - Total Child Tax Credit
+#
+# The total CTC is the sum of the nonrefundable Child Tax Credit
+# and the refundable Additional Child Tax Credit.
+
+module statute.26.24.total
+version "2024.1"
+
+references {
+  # Nonrefundable portion
+  child_tax_credit: statute/26/24/child_tax_credit
+
+  # Refundable portion (ACTC)
+  additional_child_tax_credit: statute/26/24/d/1/additional_child_tax_credit
+}
+
+variable total_child_tax_credit {
+  entity TaxUnit
+  period Year
+  dtype Money
+  unit "USD"
+  label "Total Child Tax Credit"
+  description "Sum of nonrefundable CTC and refundable ACTC per 26 USC § 24"
+
+  formula {
+    return child_tax_credit + additional_child_tax_credit
+  }
+}

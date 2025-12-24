@@ -14,7 +14,8 @@ variable additional_standard_deduction {
 
   formula {
     let additional = 0
-    let is_married = filing_status in [JOINT, MARRIED_SEPARATE]
+    # § 63(f)(3): "married" includes surviving spouse per statute text
+    let is_married = filing_status in [MARRIED_FILING_JOINTLY, MARRIED_FILING_SEPARATELY, QUALIFYING_WIDOW]
 
     # Select amounts based on marital status
     let aged_amount = is_married ? additional_aged_married : additional_aged_unmarried
@@ -29,7 +30,7 @@ variable additional_standard_deduction {
       additional = additional + blind_amount
 
     # Spouse (joint filers only)
-    if filing_status == JOINT then
+    if filing_status == MARRIED_FILING_JOINTLY then
       if spouse_age >= 65 then
         additional = additional + aged_amount
       if spouse_is_blind then

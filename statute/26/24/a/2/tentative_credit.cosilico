@@ -1,0 +1,29 @@
+# 26 USC § 24 - Tentative Child Tax Credit (After Phase-Out)
+#
+# The tentative credit is the credit amount after phase-out reduction,
+# before applying the limitation based on tax liability.
+
+module statute.26.24.a.2
+version "2024.1"
+
+references {
+  # Credit before phase-out
+  child_tax_credit_amount: statute/26/24/a/1/child_tax_credit_amount
+
+  # Phase-out reduction
+  ctc_credit_reduction: statute/26/24/b/1/ctc_credit_reduction
+}
+
+variable tentative_child_tax_credit {
+  entity TaxUnit
+  period Year
+  dtype Money
+  unit "USD"
+  label "Tentative Child Tax Credit"
+  description "Child Tax Credit after phase-out, before tax liability limitation"
+
+  formula {
+    # Credit minus reduction, but not below zero
+    return max(0, child_tax_credit_amount - ctc_credit_reduction)
+  }
+}

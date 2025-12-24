@@ -1,0 +1,204 @@
+# 26 USC § 24 - Child Tax Credit Tests
+#
+# Test cases for validating CTC implementation against known values.
+# Uses 2024 tax year parameters from Rev. Proc. 2023-34.
+#
+# Key 2024 parameters:
+# - Credit per child: $2,000 (statute)
+# - Refundable portion (ACTC): up to $1,700 per child
+# - Phase-out thresholds: $200,000 (single/HoH), $400,000 (joint)
+# - Phase-out rate: $50 reduction per $1,000 over threshold
+
+reference: "26 USC § 24"
+tax_year: 2024
+
+tests:
+  # Test 1: Single filer, 1 child, low income (no phase-out)
+  - name: "Single filer with 1 qualifying child, below phase-out"
+    inputs:
+      filing_status: SINGLE
+      num_qualifying_children: 1
+      adjusted_gross_income: 50000
+      earned_income: 50000
+      tax_liability_before_credits: 5000
+    expected:
+      child_tax_credit: 2000
+      additional_child_tax_credit: 0
+      total_ctc: 2000
+    notes: "Full credit of $2,000, no refundable portion needed since liability covers it"
+
+  # Test 2: Joint filers, 2 children, below phase-out
+  - name: "Joint filers with 2 qualifying children, below phase-out"
+    inputs:
+      filing_status: JOINT
+      num_qualifying_children: 2
+      adjusted_gross_income: 100000
+      earned_income: 100000
+      tax_liability_before_credits: 8000
+    expected:
+      child_tax_credit: 4000
+      additional_child_tax_credit: 0
+      total_ctc: 4000
+    notes: "Full credit of $4,000 for 2 children"
+
+  # Test 3: Single filer at phase-out threshold
+  - name: "Single filer at phase-out threshold"
+    inputs:
+      filing_status: SINGLE
+      num_qualifying_children: 1
+      adjusted_gross_income: 200000
+      earned_income: 200000
+      tax_liability_before_credits: 30000
+    expected:
+      child_tax_credit: 2000
+      additional_child_tax_credit: 0
+      total_ctc: 2000
+    notes: "At threshold, no reduction yet"
+
+  # Test 4: Single filer above phase-out, partial credit
+  - name: "Single filer above phase-out threshold"
+    inputs:
+      filing_status: SINGLE
+      num_qualifying_children: 1
+      adjusted_gross_income: 210000
+      earned_income: 210000
+      tax_liability_before_credits: 35000
+    expected:
+      # Phase-out: $10,000 over threshold, rounded up to 10 * $50 = $500 reduction
+      child_tax_credit: 1500
+      additional_child_tax_credit: 0
+      total_ctc: 1500
+    notes: "10K over threshold = $500 reduction, credit is $1,500"
+
+  # Test 5: Joint filers at phase-out threshold
+  - name: "Joint filers at phase-out threshold"
+    inputs:
+      filing_status: JOINT
+      num_qualifying_children: 2
+      adjusted_gross_income: 400000
+      earned_income: 400000
+      tax_liability_before_credits: 80000
+    expected:
+      child_tax_credit: 4000
+      additional_child_tax_credit: 0
+      total_ctc: 4000
+    notes: "Joint threshold is $400,000"
+
+  # Test 6: Joint filers above phase-out, credit reduced
+  - name: "Joint filers above phase-out threshold"
+    inputs:
+      filing_status: JOINT
+      num_qualifying_children: 2
+      adjusted_gross_income: 420000
+      earned_income: 420000
+      tax_liability_before_credits: 90000
+    expected:
+      # Phase-out: $20,000 over threshold, 20 * $50 = $1,000 reduction
+      child_tax_credit: 3000
+      additional_child_tax_credit: 0
+      total_ctc: 3000
+    notes: "20K over threshold = $1,000 reduction, credit is $3,000"
+
+  # Test 7: Joint filers far above threshold, credit phased out completely
+  - name: "Joint filers with credit fully phased out"
+    inputs:
+      filing_status: JOINT
+      num_qualifying_children: 1
+      adjusted_gross_income: 450000
+      earned_income: 450000
+      tax_liability_before_credits: 100000
+    expected:
+      # Phase-out: $50,000 over threshold, 50 * $50 = $2,500, exceeds $2,000 credit
+      child_tax_credit: 0
+      additional_child_tax_credit: 0
+      total_ctc: 0
+    notes: "Credit fully phased out"
+
+  # Test 8: Low income, refundable ACTC applies
+  - name: "Low income with refundable ACTC"
+    inputs:
+      filing_status: SINGLE
+      num_qualifying_children: 1
+      adjusted_gross_income: 25000
+      earned_income: 25000
+      tax_liability_before_credits: 500
+    expected:
+      # Total credit is $2,000, tax liability only $500
+      # ACTC = min(15% * (earned_income - $2,500), $1,700)
+      # ACTC = min(15% * 22,500, $1,700) = min($3,375, $1,700) = $1,700
+      # But ACTC is limited to credit not used against tax
+      # Nonrefundable portion: $500 (covers liability)
+      # Refundable ACTC: min($2,000 - $500, $1,700) = min($1,500, $1,700) = $1,500
+      child_tax_credit: 500
+      additional_child_tax_credit: 1500
+      total_ctc: 2000
+    notes: "Low tax liability triggers ACTC"
+
+  # Test 9: Very low income, ACTC limited by earned income formula
+  - name: "Very low income, ACTC limited by earned income"
+    inputs:
+      filing_status: SINGLE
+      num_qualifying_children: 1
+      adjusted_gross_income: 5000
+      earned_income: 5000
+      tax_liability_before_credits: 0
+    expected:
+      # ACTC = min(15% * (5000 - 2500), $1,700) = min($375, $1,700) = $375
+      child_tax_credit: 0
+      additional_child_tax_credit: 375
+      total_ctc: 375
+    notes: "ACTC limited by earned income formula"
+
+  # Test 10: Multiple children, ACTC scales
+  - name: "Multiple children with ACTC"
+    inputs:
+      filing_status: SINGLE
+      num_qualifying_children: 3
+      adjusted_gross_income: 30000
+      earned_income: 30000
+      tax_liability_before_credits: 1000
+    expected:
+      # Total credit potential: 3 * $2,000 = $6,000
+      # ACTC limit: 3 * $1,700 = $5,100
+      # Earned income formula: 15% * (30000 - 2500) = $4,125
+      # ACTC = min($4,125, $5,100) = $4,125, capped by credit remaining
+      # Nonrefundable: $1,000, Refundable: min($5,000, $4,125) = $4,125
+      child_tax_credit: 1000
+      additional_child_tax_credit: 4125
+      total_ctc: 5125
+    notes: "ACTC for multiple children limited by earned income formula"
+
+  # Test 11: Child age limit - 16 year old qualifies, 17 does not
+  - name: "Age eligibility - only children under 17 qualify"
+    inputs:
+      filing_status: JOINT
+      children:
+        - age: 5   # qualifies
+        - age: 10  # qualifies
+        - age: 16  # qualifies
+        - age: 17  # does NOT qualify
+        - age: 20  # does NOT qualify
+      adjusted_gross_income: 100000
+      earned_income: 100000
+      tax_liability_before_credits: 10000
+    expected:
+      num_qualifying_children: 3
+      child_tax_credit: 6000
+      additional_child_tax_credit: 0
+      total_ctc: 6000
+    notes: "Only 3 children under 17 qualify"
+
+  # Test 12: Married filing separately - credit still available
+  - name: "Married filing separately - half threshold"
+    inputs:
+      filing_status: SEPARATE
+      num_qualifying_children: 1
+      adjusted_gross_income: 200000
+      earned_income: 200000
+      tax_liability_before_credits: 30000
+    expected:
+      # Married filing separately uses $200,000 threshold (same as single)
+      child_tax_credit: 2000
+      additional_child_tax_credit: 0
+      total_ctc: 2000
+    notes: "MFS uses single/HoH threshold"

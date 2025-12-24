@@ -51,6 +51,17 @@ test_cases:
     citations:
       - "§ 63(c)(2)(B): head of household"
 
+  - name: "Qualifying widow(er) (surviving spouse)"
+    inputs:
+      filing_status: qualifying_widow
+      age: 50
+      is_blind: false
+      is_dependent: false
+    expected:
+      standard_deduction: 29200
+    citations:
+      - "§ 63(c)(2)(A): surviving spouse gets joint amount"
+
   # Dependent limitation - § 63(c)(5)
   - name: "Dependent with no earned income"
     inputs:

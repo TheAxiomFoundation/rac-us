@@ -13,7 +13,7 @@ variable basic_standard_deduction {
 
   formula {
     # § 63(c)(2)(A): Joint return or surviving spouse
-    if filing_status == JOINT then
+    if filing_status in [MARRIED_FILING_JOINTLY, QUALIFYING_WIDOW] then
       return basic_joint
 
     # § 63(c)(2)(B): Head of household

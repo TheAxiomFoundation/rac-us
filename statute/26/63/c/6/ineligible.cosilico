@@ -10,7 +10,7 @@ variable is_ineligible_for_standard_deduction {
 
   formula {
     # § 63(c)(6)(A): MFS where spouse itemizes
-    if filing_status == MARRIED_SEPARATE and spouse_itemizes then
+    if filing_status == MARRIED_FILING_SEPARATELY and spouse_itemizes then
       return true
 
     # § 63(c)(6)(B): Nonresident alien
