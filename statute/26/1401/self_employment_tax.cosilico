@@ -1,0 +1,144 @@
+# 26 USC § 1401 - Tax on Self-Employment Income
+#
+# Imposes Social Security and Medicare taxes on self-employment income.
+# For 2024:
+# - Social Security: 12.4% on first $168,600 of net earnings
+# - Medicare: 2.9% on all net earnings
+# - Net earnings = 92.35% of self-employment income (§ 1402(a))
+#
+# NOTE: PE's taxable_self_employment_income already includes the 92.35%
+# adjustment, so we use it directly without re-applying the multiplier.
+#
+# References:
+# - § 1401(a): Old-Age, Survivors, and Disability Insurance (OASDI) rate
+# - § 1401(b): Hospital Insurance (Medicare) rate
+# - § 1402(a): Definition of net earnings from self-employment
+# - Rev. Proc. 2023-34: 2024 Social Security wage base ($168,600)
+
+module statute.26.1401
+version "2024.1"
+
+# Net earnings from self-employment per § 1402(a)
+# PE's taxable_self_employment_income already includes the 92.35% adjustment
+variable net_self_employment_earnings {
+  entity Person
+  period Year
+  dtype Money
+  unit "USD"
+  label "Net Self-Employment Earnings"
+  description "Net self-employment income per § 1402(a) - already adjusted by 92.35%"
+
+  formula {
+    # taxable_self_employment_income from PE is already gross × 0.9235
+    return max(0, taxable_self_employment_income)
+  }
+}
+
+# Social Security wage base for 2024 (from Rev. Proc. 2023-34)
+variable social_security_wage_base {
+  entity Person
+  period Year
+  dtype Money
+
+  formula {
+    return 168600
+  }
+}
+
+# OASDI (Social Security) rate per § 1401(a): 12.4%
+variable oasdi_rate {
+  entity Person
+  period Year
+  dtype Rate
+
+  formula {
+    return 0.124
+  }
+}
+
+# Hospital Insurance (Medicare) rate per § 1401(b): 2.9%
+variable hi_rate {
+  entity Person
+  period Year
+  dtype Rate
+
+  formula {
+    return 0.029
+  }
+}
+
+# SS cap remaining after W-2 wages per § 1402(b)
+# W-2 wages already subject to SS payroll tax reduce the cap for SE income
+variable social_security_cap_remaining {
+  entity Person
+  period Year
+  dtype Money
+  unit "USD"
+  label "Social Security Cap Remaining"
+  description "SS wage base minus W-2 wages already subject to payroll tax"
+
+  formula {
+    # taxable_earnings_for_social_security is W-2 wages subject to SS
+    let wages_subject_to_ss = min(taxable_earnings_for_social_security, social_security_wage_base)
+    return max(0, social_security_wage_base - wages_subject_to_ss)
+  }
+}
+
+# SE income subject to SS tax per § 1402(b)
+variable social_security_taxable_self_employment_income {
+  entity Person
+  period Year
+  dtype Money
+  unit "USD"
+  label "SS Taxable SE Income"
+  description "SE income subject to SS tax after W-2 wages coordination"
+
+  formula {
+    # SE income is limited by remaining cap after W-2 wages
+    return min(net_self_employment_earnings, social_security_cap_remaining)
+  }
+}
+
+# Social Security portion of self-employment tax
+variable self_employment_social_security_tax {
+  entity Person
+  period Year
+  dtype Money
+  unit "USD"
+  label "Self-Employment Social Security Tax"
+  description "OASDI tax on self-employment earnings per § 1401(a)"
+
+  formula {
+    # 12.4% on SE earnings up to remaining cap
+    return oasdi_rate * social_security_taxable_self_employment_income
+  }
+}
+
+# Medicare portion of self-employment tax
+variable self_employment_medicare_tax {
+  entity Person
+  period Year
+  dtype Money
+  unit "USD"
+  label "Self-Employment Medicare Tax"
+  description "Hospital Insurance tax on self-employment earnings per § 1401(b)"
+
+  formula {
+    # 2.9% on all net SE earnings (no cap)
+    return hi_rate * net_self_employment_earnings
+  }
+}
+
+# Total self-employment tax per § 1401
+variable self_employment_tax {
+  entity Person
+  period Year
+  dtype Money
+  unit "USD"
+  label "Self-Employment Tax"
+  description "Combined OASDI and HI taxes on self-employment income per § 1401"
+
+  formula {
+    return self_employment_social_security_tax + self_employment_medicare_tax
+  }
+}
