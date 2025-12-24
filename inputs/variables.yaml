@@ -1,0 +1,316 @@
+# Input Variable Schema for Cosilico-US
+#
+# Maps microdata sources (CPS, PE) to Cosilico variable paths.
+# Used by validation runner to extract inputs for calculations.
+
+version: "2024.1"
+
+# Entity definitions
+entities:
+  Person:
+    description: "Individual person in the household"
+    cps_id: PERIDNUM
+    pe_id: person_id
+  TaxUnit:
+    description: "Tax filing unit (filer + spouse + dependents)"
+    pe_id: tax_unit_id
+  Household:
+    description: "Physical household (may contain multiple tax units)"
+    cps_id: H_SEQ
+    pe_id: household_id
+
+# Input variable definitions
+# These are variables with no formula - values come from microdata
+
+variables:
+  # ============================================================
+  # DEMOGRAPHICS
+  # ============================================================
+  age:
+    cosilico_path: null  # No statute path - demographic input
+    entity: Person
+    dtype: Integer
+    pe_variable: age
+    cps_variable: A_AGE
+    description: "Person's age in years"
+
+  is_tax_unit_head:
+    cosilico_path: null
+    entity: Person
+    dtype: Boolean
+    pe_variable: is_tax_unit_head
+    cps_variable: null  # Derived
+    description: "Person is the primary filer of the tax unit"
+
+  is_tax_unit_spouse:
+    cosilico_path: null
+    entity: Person
+    dtype: Boolean
+    pe_variable: is_tax_unit_spouse
+    cps_variable: null  # Derived
+    description: "Person is the spouse of the primary filer"
+
+  is_tax_unit_dependent:
+    cosilico_path: null
+    entity: Person
+    dtype: Boolean
+    pe_variable: is_tax_unit_dependent
+    cps_variable: null  # Derived
+    description: "Person is a dependent on the tax unit"
+
+  # ============================================================
+  # INCOME - WAGES & COMPENSATION (26 USC §61(a)(1))
+  # ============================================================
+  wages:
+    cosilico_path: statute/26/61/a/1/wages
+    entity: Person
+    dtype: Money
+    pe_variable: employment_income
+    cps_variable: WSAL_VAL
+    description: "Wages from employment"
+    statute_ref: "26 USC § 61(a)(1)"
+
+  salaries:
+    cosilico_path: statute/26/61/a/1/salaries
+    entity: Person
+    dtype: Money
+    pe_variable: null  # Combined with wages in PE
+    cps_variable: WSAL_VAL  # Combined with wages
+    description: "Salaries from employment"
+    statute_ref: "26 USC § 61(a)(1)"
+
+  tips:
+    cosilico_path: statute/26/61/a/1/tips
+    entity: Person
+    dtype: Money
+    pe_variable: null  # Separate in some datasets
+    cps_variable: null  # Often combined with wages
+    description: "Tip income"
+    statute_ref: "26 USC § 61(a)(1)"
+
+  # ============================================================
+  # INCOME - SELF-EMPLOYMENT (26 USC §1402)
+  # ============================================================
+  self_employment_income:
+    cosilico_path: statute/26/1402/a/net_earnings_self_employment
+    entity: Person
+    dtype: Money
+    pe_variable: self_employment_income
+    cps_variable: SEMP_VAL
+    description: "Net earnings from self-employment"
+    statute_ref: "26 USC § 1402(a)"
+
+  # ============================================================
+  # INCOME - INVESTMENT (26 USC §61(a)(4), (7))
+  # ============================================================
+  interest_income:
+    cosilico_path: statute/26/61/a/4/interest_income
+    entity: Person
+    dtype: Money
+    pe_variable: interest_income
+    cps_variable: INT_VAL
+    description: "Interest income"
+    statute_ref: "26 USC § 61(a)(4)"
+
+  dividend_income:
+    cosilico_path: statute/26/61/a/7/dividend_income
+    entity: Person
+    dtype: Money
+    pe_variable: dividend_income
+    cps_variable: DIV_VAL
+    description: "Dividend income"
+    statute_ref: "26 USC § 61(a)(7)"
+
+  capital_gains:
+    cosilico_path: statute/26/1222/11/capital_gain_net_income
+    entity: Person
+    dtype: Money
+    pe_variable: capital_gains
+    cps_variable: CAP_VAL
+    description: "Net capital gain income"
+    statute_ref: "26 USC § 1222(11)"
+
+  rental_income:
+    cosilico_path: statute/26/32/i/2/C/net_rent_royalty_income
+    entity: Person
+    dtype: Money
+    pe_variable: rental_income
+    cps_variable: RNT_VAL
+    description: "Net rent and royalty income"
+    statute_ref: "26 USC § 32(i)(2)(C)"
+
+  # ============================================================
+  # AGGREGATED INCOME MEASURES
+  # ============================================================
+  earned_income:
+    cosilico_path: statute/26/32/c/2/A/earned_income
+    entity: TaxUnit
+    dtype: Money
+    pe_variable: earned_income
+    cps_variable: null  # Calculated
+    description: "Earned income per EITC definition"
+    statute_ref: "26 USC § 32(c)(2)(A)"
+    formula: true  # Has calculation logic
+
+  adjusted_gross_income:
+    cosilico_path: statute/26/62/a/adjusted_gross_income
+    entity: TaxUnit
+    dtype: Money
+    pe_variable: adjusted_gross_income
+    cps_variable: null  # Calculated
+    description: "Adjusted Gross Income"
+    statute_ref: "26 USC § 62(a)"
+    formula: true
+
+  investment_income:
+    cosilico_path: null  # Combined measure
+    entity: TaxUnit
+    dtype: Money
+    pe_variable: investment_income
+    cps_variable: null  # Calculated
+    description: "Investment income for EITC disqualification test"
+
+  # ============================================================
+  # FILING STATUS (26 USC §1)
+  # ============================================================
+  filing_status:
+    cosilico_path: statute/26/1/filing_status
+    entity: TaxUnit
+    dtype: Enum
+    pe_variable: filing_status
+    cps_variable: FILESTAT
+    description: "Tax filing status"
+    statute_ref: "26 USC § 1"
+    enum_values:
+      - SINGLE
+      - JOINT  # Married Filing Jointly
+      - SEPARATE  # Married Filing Separately
+      - HEAD_OF_HOUSEHOLD
+      - SURVIVING_SPOUSE
+
+  # ============================================================
+  # CHILDREN & DEPENDENTS (26 USC §152)
+  # ============================================================
+  is_child:
+    cosilico_path: null
+    entity: Person
+    dtype: Boolean
+    pe_variable: is_child
+    cps_variable: null  # Derived from age/relationship
+    description: "Person is a child (age < 19)"
+
+  is_qualifying_child:
+    cosilico_path: statute/26/152/c/is_qualifying_child
+    entity: Person
+    dtype: Boolean
+    pe_variable: is_child_of_tax_head
+    cps_variable: null  # Derived
+    description: "Is a qualifying child per 26 USC §152(c)"
+    statute_ref: "26 USC § 152(c)"
+
+  is_ctc_qualifying_child:
+    cosilico_path: statute/26/24/c/1/qualifying_child
+    entity: Person
+    dtype: Boolean
+    pe_variable: is_ctc_qualifying_child
+    cps_variable: null  # Derived
+    description: "Is a qualifying child for CTC"
+    statute_ref: "26 USC § 24(c)(1)"
+
+  is_eitc_qualifying_child:
+    cosilico_path: statute/26/32/c/3/A/num_qualifying_children
+    entity: Person
+    dtype: Boolean
+    pe_variable: is_eitc_qualifying_child
+    cps_variable: null  # Derived
+    description: "Is a qualifying child for EITC"
+    statute_ref: "26 USC § 32(c)(3)"
+
+  num_qualifying_children:
+    cosilico_path: statute/26/32/c/3/A/num_qualifying_children
+    entity: TaxUnit
+    dtype: Integer
+    pe_variable: eitc_child_count
+    cps_variable: null  # Derived
+    description: "Number of EITC qualifying children (max 3)"
+    statute_ref: "26 USC § 32(c)(3)(A)"
+    formula: true
+
+  # ============================================================
+  # RESIDENCY & CITIZENSHIP
+  # ============================================================
+  is_us_citizen:
+    cosilico_path: null
+    entity: Person
+    dtype: Boolean
+    pe_variable: is_us_citizen
+    cps_variable: PRCITSHP
+    description: "Person is a US citizen"
+
+  is_resident_alien:
+    cosilico_path: null
+    entity: Person
+    dtype: Boolean
+    pe_variable: is_resident_alien
+    cps_variable: null
+    description: "Person is a resident alien"
+
+  state_code:
+    cosilico_path: null
+    entity: Household
+    dtype: String
+    pe_variable: state_code
+    cps_variable: GESTFIPS
+    description: "State FIPS code"
+
+  # ============================================================
+  # TAX IDENTIFIERS
+  # ============================================================
+  has_ssn:
+    cosilico_path: null
+    entity: Person
+    dtype: Boolean
+    pe_variable: has_ssn
+    cps_variable: null  # Assumed true in CPS
+    description: "Person has a Social Security Number"
+
+  has_itin:
+    cosilico_path: null
+    entity: Person
+    dtype: Boolean
+    pe_variable: has_itin
+    cps_variable: null
+    description: "Person has an Individual Taxpayer Identification Number"
+
+# Variable groups for common use cases
+groups:
+  eitc_inputs:
+    description: "Variables needed for EITC calculation"
+    variables:
+      - wages
+      - self_employment_income
+      - earned_income
+      - adjusted_gross_income
+      - investment_income
+      - filing_status
+      - num_qualifying_children
+      - age
+      - is_us_citizen
+      - has_ssn
+
+  ctc_inputs:
+    description: "Variables needed for CTC calculation"
+    variables:
+      - adjusted_gross_income
+      - filing_status
+      - is_ctc_qualifying_child
+      - age
+
+  standard_deduction_inputs:
+    description: "Variables needed for standard deduction"
+    variables:
+      - filing_status
+      - age
+      - is_blind
+      - is_tax_unit_dependent
+      - earned_income
