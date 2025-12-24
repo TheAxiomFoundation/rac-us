@@ -23,7 +23,7 @@ earned_income_amount:
     - effective_from: 2024-01-01
       source: "Rev. Proc. 2023-34, Section 3.07"
       breakdown:
-        0: 7840
+        0: 8260  # $632 max / 7.65% = $8,261
         1: 12390
         2: 17400
         3: 17400  # "3 or more"
