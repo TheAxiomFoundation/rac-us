@@ -1,0 +1,18 @@
+# 26 USC § 61(a)(7) - Dividends
+#
+# Gross income includes "dividends."
+# This includes both qualified and ordinary dividends.
+
+module statute.26.61.a.7
+version "2024.1"
+
+variable dividend_income {
+  entity Person
+  period Year
+  dtype Money
+  unit "USD"
+  label "Dividend Income"
+  description "Dividend income including qualified and ordinary dividends"
+  reference "26 USC § 61(a)(7)"
+  # Input from CPS: DIV_VAL (dividend income)
+}

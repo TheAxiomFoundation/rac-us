@@ -1,0 +1,27 @@
+# 26 USC §1222(11) - Capital Gain Net Income
+#
+# "The term 'capital gain net income' means the excess of the gains from
+# sales or exchanges of capital assets over the losses from such sales
+# or exchanges."
+#
+# For EITC disqualified income purposes under §32(i)(2)(D), capital gain
+# net income means gains minus losses, but only if positive (gains exceed
+# losses). If there is a net capital loss, it does not reduce other
+# components of disqualified income.
+
+module statute.26.1222.11
+version "2024.1"
+
+variable capital_gain_net_income {
+  entity TaxUnit
+  period Year
+  dtype Money
+  unit "USD"
+  label "Capital Gain Net Income"
+  description "Net capital gains (gains minus losses) per 26 USC §1222(11), counted for EITC investment income test"
+
+  # Input: From Schedule D, the excess of capital gains over capital losses.
+  # If losses exceed gains, this is zero for EITC purposes (cannot reduce
+  # other disqualified income). Includes both short-term and long-term
+  # capital gains.
+}

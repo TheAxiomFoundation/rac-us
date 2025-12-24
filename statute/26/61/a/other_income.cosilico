@@ -1,0 +1,20 @@
+# 26 USC § 61(a) - Other Income
+#
+# Gross income includes "all income from whatever source derived" including
+# but not limited to the enumerated items. This captures income not
+# specifically categorized elsewhere.
+
+module statute.26.61.a
+version "2024.1"
+
+variable other_income {
+  entity Person
+  period Year
+  dtype Money
+  unit "USD"
+  label "Other Income"
+  description "Miscellaneous income not categorized as wages, interest, dividends, etc."
+  reference "26 USC § 61(a)"
+  # Input from CPS: OI_VAL (other income) or derived from multiple sources
+  # Includes prizes, awards, gambling winnings, etc.
+}

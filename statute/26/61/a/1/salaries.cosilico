@@ -1,0 +1,19 @@
+# 26 USC § 61(a)(1) - Salaries
+#
+# Gross income includes "compensation for services, including fees, commissions,
+# fringe benefits, and similar items."
+
+module statute.26.61.a.1
+version "2024.1"
+
+variable salaries {
+  entity Person
+  period Year
+  dtype Money
+  unit "USD"
+  label "Salaries"
+  description "Fixed periodic compensation for services as an employee"
+  reference "26 USC § 61(a)(1)"
+  # Input from CPS: included in WSAL_VAL
+  # Note: Often combined with wages in data sources
+}

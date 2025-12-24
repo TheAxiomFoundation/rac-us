@@ -1,0 +1,22 @@
+# 26 USC § 1402(a) - Net Earnings from Self-Employment
+#
+# "The term 'net earnings from self-employment' means the gross income derived
+# by an individual from any trade or business carried on by such individual,
+# less the deductions allowed by this subtitle which are attributable to such
+# trade or business..."
+#
+# This is used for both self-employment tax and earned income calculations.
+
+module statute.26.1402.a
+version "2024.1"
+
+variable net_earnings_self_employment {
+  entity Person
+  period Year
+  dtype Money
+  unit "USD"
+  label "Net Earnings from Self-Employment"
+  description "Gross self-employment income less attributable business deductions"
+  reference "26 USC § 1402(a)"
+  # Input from CPS: SEMP_VAL (self-employment income)
+}

@@ -1,0 +1,8 @@
+# 26 USC §32(b)(2)(A) - AGI Limit
+
+variable agi_limit {
+  entity TaxUnit
+  period Year
+  dtype Money
+  # Parameter: maximum AGI for EITC eligibility
+}
