@@ -21,15 +21,16 @@ earned_income_amount:
     3: 17400
 
 # Phaseout threshold amounts per § 32(b)(2)(A)
+# For single/HOH filers - joint filers add joint_return_adjustment
 phaseout_amount:
   implements: statute/26/32/j/1
   overrides: statute/26/32/b/2/A/base_amounts#phaseout_amount
   indexed_by: num_qualifying_children
   values:
-    0: 9800
-    1: 21560
-    2: 21560
-    3: 21560
+    0: 10330   # Corrected from Rev. Proc. 2023-34
+    1: 22720   # Corrected from Rev. Proc. 2023-34
+    2: 22720
+    3: 22720
 
 # Joint return adjustment per § 32(b)(2)(B)
 joint_return_adjustment:
