@@ -1,0 +1,22 @@
+# 26 USC § 55(b)(1) - AMT Tax Rates
+#
+# "(A) 26 percent of so much of the taxable excess as does not exceed
+#      the amount determined under paragraph (3), plus
+#  (B) 28 percent of so much of the taxable excess as exceeds the
+#      amount determined under paragraph (3)."
+
+amt_rate_low:
+  description: "AMT rate applied to AMTI up to the bracket threshold"
+  unit: rate
+  values:
+    1993-01-01: 0.26
+  citations:
+    - "§ 55(b)(1)(A)(i): 26 percent of the taxable excess below threshold"
+
+amt_rate_high:
+  description: "AMT rate applied to AMTI above the bracket threshold"
+  unit: rate
+  values:
+    1993-01-01: 0.28
+  citations:
+    - "§ 55(b)(1)(A)(ii): 28 percent of the taxable excess above threshold"

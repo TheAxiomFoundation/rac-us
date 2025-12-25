@@ -1,0 +1,14 @@
+# 26 USC 1401(b) - Hospital Insurance Rate
+#
+# "In addition to the tax imposed by the preceding subsection, there shall be
+# imposed for each taxable year, on the self-employment income of every individual,
+# a tax equal to 2.9 percent of the amount of the self-employment income..."
+
+hi_rate:
+  description: "Medicare (Hospital Insurance) portion of self-employment tax rate"
+  unit: /1
+  values:
+    # Current rate since 1986
+    1986-01-01: 0.029
+  citations:
+    - "26 USC 1401(b): 2.9% rate on self-employment income"

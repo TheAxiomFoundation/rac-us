@@ -1,0 +1,42 @@
+# 26 USC § 164(b)(6) - Limitation on Individual Deductions for Taxable Years 2018 Through 2025
+#
+# "(A) IN GENERAL.—In the case of an individual, the aggregate amount of taxes
+#      taken into account under subsection (a) for any taxable year shall not exceed
+#      $10,000 ($5,000 in the case of a married individual filing a separate return).
+#
+#  (B) EXCEPTION FOR FOREIGN REAL PROPERTY TAXES.—Subparagraph (A) shall not
+#      apply to any foreign real property taxes described in subsection (a)(3).
+#
+#  (C) TERMINATION.—This paragraph shall not apply to taxable years beginning
+#      after December 31, 2025."
+#
+# The SALT cap was introduced by the Tax Cuts and Jobs Act of 2017 (P.L. 115-97).
+
+salt_cap:
+  description: "Maximum state and local tax deduction for individuals (non-MFS)"
+  unit: currency-USD
+  values:
+    # Pre-TCJA: no cap
+    1913-01-01: .inf  # Effectively unlimited
+    # TCJA period (2018-2025)
+    2018-01-01: 10000
+    # Post-TCJA sunset: cap removed
+    2026-01-01: .inf  # Unlimited again
+  citations:
+    - "§ 164(b)(6)(A): $10,000 cap for tax years 2018-2025"
+    - "§ 164(b)(6)(C): Terminates after December 31, 2025"
+    - "P.L. 115-97 § 11042: Tax Cuts and Jobs Act of 2017"
+
+salt_cap_married_separate:
+  description: "Maximum state and local tax deduction for married filing separately"
+  unit: currency-USD
+  values:
+    # Pre-TCJA: no cap
+    1913-01-01: .inf
+    # TCJA period (2018-2025) - half of regular cap for MFS
+    2018-01-01: 5000
+    # Post-TCJA sunset: cap removed
+    2026-01-01: .inf
+  citations:
+    - "§ 164(b)(6)(A): $5,000 cap for MFS filers (2018-2025)"
+    - "§ 164(b)(6)(C): Terminates after December 31, 2025"

@@ -1,0 +1,58 @@
+# 26 USC Section 86(c) - Base Amounts for Social Security Taxability
+#
+# These thresholds have NOT been indexed for inflation since enacted in 1984.
+# As a result, an increasing share of Social Security recipients pay tax on benefits.
+#
+# References:
+# - 86(c)(1)(A): Base amounts
+# - 86(c)(2): Adjusted base amounts (for 85% tier)
+# - Social Security Administration: www.ssa.gov/benefits/retirement/planner/taxes.html
+
+reference: "26 USC Section 86(c)"
+
+# Tier 1 base amounts (50% tier threshold)
+# Per 86(c)(1)(A)
+base_amount_single:
+  description: "Base amount for single, HoH, or MFS living apart"
+  values:
+    1984-01-01: 25000
+  unit: USD
+  notes: "Not indexed - frozen since 1984"
+
+base_amount_joint:
+  description: "Base amount for married filing jointly or qualifying widow(er)"
+  values:
+    1984-01-01: 32000
+  unit: USD
+  notes: "Not indexed - frozen since 1984"
+
+base_amount_mfs:
+  description: "Base amount for married filing separately living with spouse"
+  values:
+    1984-01-01: 0
+  unit: USD
+  notes: "Zero base means all benefits potentially taxable per 86(c)(1)(C)"
+
+# Tier 2 adjusted base amounts (85% tier threshold)
+# Per 86(c)(2)
+adjusted_base_amount_single:
+  description: "Adjusted base for single, HoH, or MFS living apart (85% tier)"
+  values:
+    1984-01-01: 34000
+  unit: USD
+  notes: "Not indexed - frozen since 1984"
+
+adjusted_base_amount_joint:
+  description: "Adjusted base for married filing jointly or QW (85% tier)"
+  values:
+    1984-01-01: 44000
+  unit: USD
+  notes: "Not indexed - frozen since 1984"
+
+# Combined income fraction
+combined_income_ss_fraction:
+  description: "Fraction of SS benefits added to MAGI for combined income"
+  values:
+    1984-01-01: 0.5
+  unit: percentage
+  notes: "Per 86(b)(2) - one-half of Social Security benefits"

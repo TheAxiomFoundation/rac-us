@@ -1,0 +1,124 @@
+# Encoding Metadata for 26 USC Section 1 (Tax Imposed - Ordinary Income Tax)
+
+encoding:
+  created: 2024-12-24
+  updated: 2024-12-24
+  status: implemented
+  encoded_by: claude-opus-4.5
+
+variable:
+  name: income_tax_before_credits
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+
+coverage:
+  tax_years: [2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025]
+  notes: |
+    TCJA provisions (2018-2025):
+    - Seven marginal rate brackets: 10%, 12%, 22%, 24%, 32%, 35%, 37%
+    - Bracket thresholds indexed for inflation per Section 1(f) using C-CPI-U
+    - Rates scheduled to revert to pre-TCJA levels after 2025
+
+sources:
+  statute:
+    - citation: "26 USC Section 1"
+      title: "Tax imposed"
+      path: statute/26/1/
+      files:
+        - income_tax.cosilico        # Main bracket calculation
+        - filing_status.cosilico     # Filing status enum
+        - brackets/rates.yaml        # Fixed tax rates
+        - brackets/base_thresholds.yaml  # 2018 base thresholds
+        - brackets/thresholds_2024.yaml  # 2024 indexed thresholds
+        - f/indexing_rule.yaml       # Inflation adjustment rules
+
+  guidance:
+    - citation: "Rev. Proc. 2023-34"
+      title: "Inflation adjustments for TY 2024"
+      source: https://www.irs.gov/pub/irs-drop/rp-23-34.pdf
+      provides:
+        - 2024 bracket thresholds by filing status
+
+    - citation: "Rev. Proc. 2024-40"
+      title: "Inflation adjustments for TY 2025"
+      source: https://www.irs.gov/pub/irs-drop/rp-24-40.pdf
+
+    - citation: "Pub. L. 115-97 (TCJA)"
+      title: "Tax Cuts and Jobs Act"
+      section: "Section 11001"
+      provides:
+        - Current rate structure (10%-37%)
+        - Sunset provision (after 2025)
+
+architecture:
+  description: |
+    The ordinary income tax encoding implements 26 USC Section 1's progressive
+    marginal rate structure. Key components:
+
+    1. Section 1(a) - Married Filing Jointly / Surviving Spouse
+       - Uses widest brackets
+       - 37% bracket starts at $731,200 (2024)
+
+    2. Section 1(b) - Head of Household
+       - Intermediate bracket widths
+       - Provides benefit for single parents
+
+    3. Section 1(c) - Single
+       - Standard individual brackets
+       - 37% bracket starts at $609,350 (2024)
+
+    4. Section 1(d) - Married Filing Separately
+       - Generally half of joint thresholds
+       - 37% bracket starts at $365,600 (2024)
+
+    5. Section 1(f) - Cost-of-Living Adjustment
+       - Brackets indexed using C-CPI-U (chained CPI)
+       - Rounded to nearest $50 per Section 1(f)(6)
+
+    6. Section 1(j) - TCJA Rate Structure (2018-2025)
+       - Seven brackets: 10%, 12%, 22%, 24%, 32%, 35%, 37%
+       - Sunsets after 2025, reverting to pre-TCJA rates
+
+  key_provisions:
+    - provision: "Section 1(a)-(d)"
+      description: "Filing status rate schedules"
+      variable: income_tax_before_credits
+      parameters:
+        - brackets/thresholds_2024#single
+        - brackets/thresholds_2024#married_filing_jointly
+        - brackets/thresholds_2024#head_of_household
+        - brackets/thresholds_2024#married_filing_separately
+        - brackets/thresholds_2024#surviving_spouse
+
+    - provision: "Section 1(f)"
+      description: "Inflation adjustment using C-CPI-U"
+      parameters:
+        - f/indexing_rule#adjustment_method
+
+    - provision: "Section 1(j)"
+      description: "TCJA rate structure"
+      parameters:
+        - brackets/rates#rates
+
+  dependencies:
+    - path: statute/26/1
+      description: "Filing status (for bracket selection)"
+    - path: statute/26/63/c
+      description: "Taxable income (input)"
+    - path: statute/26/62/a
+      description: "Adjusted gross income (for taxable income calculation)"
+
+validation:
+  pe_variable: income_tax_before_credits
+  taxsim_variable: v28
+  tolerance_dollars: 1
+  notes: |
+    Validation compares against PolicyEngine's income_tax_before_credits
+    variable, which should match for ordinary income cases.
+
+    Note: Capital gains and qualified dividends are taxed separately
+    under Section 1(h), so test cases use only ordinary income.
+
+test_files:
+  - tests.yaml  # Comprehensive bracket calculation tests

@@ -1,0 +1,51 @@
+# 26 USC § 55(b)(3) - Maximum Rate of Tax on Long-Term Capital Gain / Bracket Amount
+#
+# The amount at which the AMT rate increases from 26% to 28%.
+# Per Rev. Proc. 2023-34 (2024 values), adjusted for inflation.
+
+amt_bracket_joint:
+  description: "AMT bracket threshold for joint filers (where 28% rate begins)"
+  unit: currency-USD
+  values:
+    # Historical values
+    2018-01-01: 191500
+    2019-01-01: 194800
+    2020-01-01: 197900
+    2021-01-01: 199900
+    2022-01-01: 206100
+    2023-01-01: 220700
+    2024-01-01: 232600
+  citations:
+    - "§ 55(b)(3): Bracket threshold for 28% rate"
+    - "Rev. Proc. 2023-34, Section 3.04: 2024 inflation adjustments"
+
+amt_bracket_single:
+  description: "AMT bracket threshold for single filers (where 28% rate begins)"
+  unit: currency-USD
+  values:
+    # Single/HoH use half of joint amount per § 55(b)(3)(B)
+    2018-01-01: 95750
+    2019-01-01: 97400
+    2020-01-01: 98950
+    2021-01-01: 99950
+    2022-01-01: 103050
+    2023-01-01: 110350
+    2024-01-01: 116300
+  citations:
+    - "§ 55(b)(3)(B): 50% of joint amount for non-joint filers"
+    - "Rev. Proc. 2023-34, Section 3.04: 2024 inflation adjustments"
+
+amt_bracket_married_separate:
+  description: "AMT bracket threshold for married filing separately"
+  unit: currency-USD
+  values:
+    # MFS uses half of joint amount
+    2018-01-01: 95750
+    2019-01-01: 97400
+    2020-01-01: 98950
+    2021-01-01: 99950
+    2022-01-01: 103050
+    2023-01-01: 110350
+    2024-01-01: 116300
+  citations:
+    - "§ 55(b)(3)(C): 50% of joint amount for married filing separately"

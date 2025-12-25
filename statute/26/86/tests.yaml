@@ -1,0 +1,291 @@
+# 26 USC Section 86 - Taxable Social Security Benefits Tests
+#
+# Test cases for validating taxable SS calculation.
+# Thresholds frozen since 1984 (not indexed):
+#   Single/HoH: Base = $25,000, Adjusted = $34,000
+#   Joint/QW:   Base = $32,000, Adjusted = $44,000
+#   MFS:        Base = $0 (all potentially taxable at 85%)
+#
+# Formula:
+#   Combined income = MAGI + 50% of SS benefits
+#   Tier 1 (50%): min(50% of benefits, 50% of excess over base)
+#   Tier 2 (85%): +35% of excess over adjusted base, capped at 85% total
+#
+# References:
+# - IRS Publication 915 (Social Security and Equivalent Railroad Retirement Benefits)
+# - www.ssa.gov/benefits/retirement/planner/taxes.html
+
+reference: "26 USC Section 86"
+tax_year: 2024
+
+tests:
+  # ==========================================================================
+  # SINGLE FILER TESTS
+  # ==========================================================================
+
+  # Test 1: Single - combined income below base amount (no tax)
+  - name: "Single - below base amount, no tax"
+    inputs:
+      filing_status: SINGLE
+      modified_agi: 15000
+      social_security_benefits: 18000
+      # Combined income = 15000 + 9000 = 24000 < 25000
+    expected:
+      combined_income: 24000
+      taxable_social_security: 0
+      social_security_taxable_fraction: 0
+    notes: "Combined income $24,000 is below $25,000 base"
+
+  # Test 2: Single - combined income at base amount exactly
+  - name: "Single - at base amount, no tax"
+    inputs:
+      filing_status: SINGLE
+      modified_agi: 16000
+      social_security_benefits: 18000
+      # Combined income = 16000 + 9000 = 25000 = base
+    expected:
+      combined_income: 25000
+      taxable_social_security: 0
+      social_security_taxable_fraction: 0
+    notes: "At threshold, no excess yet"
+
+  # Test 3: Single - in Tier 1 (50% zone)
+  - name: "Single - in 50% tier only"
+    inputs:
+      filing_status: SINGLE
+      modified_agi: 22000
+      social_security_benefits: 20000
+      # Combined income = 22000 + 10000 = 32000
+      # Excess over base ($25k) = 7000
+      # 50% of excess = 3500
+      # 50% of benefits = 10000
+      # Taxable = min(3500, 10000) = 3500
+    expected:
+      combined_income: 32000
+      tier1_taxable_social_security: 3500
+      tier2_additional_taxable_social_security: 0
+      taxable_social_security: 3500
+      social_security_taxable_fraction: 0.175
+    notes: "50% of $7,000 excess = $3,500 taxable"
+
+  # Test 4: Single - at adjusted base amount
+  - name: "Single - at adjusted base (50%/85% boundary)"
+    inputs:
+      filing_status: SINGLE
+      modified_agi: 24000
+      social_security_benefits: 20000
+      # Combined income = 24000 + 10000 = 34000 = adjusted base
+      # Excess over base ($25k) = 9000
+      # Tier 1: min(50% of 9000, 50% of benefits) = min(4500, 10000) = 4500
+      # No Tier 2 yet (at threshold)
+    expected:
+      combined_income: 34000
+      tier1_taxable_social_security: 4500
+      tier2_additional_taxable_social_security: 0
+      taxable_social_security: 4500
+      social_security_taxable_fraction: 0.225
+    notes: "At 85% threshold, only 50% tier applies"
+
+  # Test 5: Single - in Tier 2 (85% zone)
+  - name: "Single - in 85% tier"
+    inputs:
+      filing_status: SINGLE
+      modified_agi: 30000
+      social_security_benefits: 24000
+      # Combined income = 30000 + 12000 = 42000
+      # Excess over base ($25k) = 17000
+      # Excess over adjusted ($34k) = 8000
+      # Tier 1: min(50% of 17000, 50% of 24000) = min(8500, 12000) = 8500
+      # Tier 2: 35% of 8000 = 2800
+      # Max total = 85% of 24000 = 20400
+      # Total = min(8500 + 2800, 20400) = 11300
+    expected:
+      combined_income: 42000
+      tier1_taxable_social_security: 8500
+      tier2_additional_taxable_social_security: 2800
+      taxable_social_security: 11300
+      social_security_taxable_fraction: 0.4708
+    notes: "Both 50% and 85% tiers apply"
+
+  # Test 6: Single - high income, capped at 85%
+  - name: "Single - high income, 85% cap applies"
+    inputs:
+      filing_status: SINGLE
+      modified_agi: 75000
+      social_security_benefits: 30000
+      # Combined income = 75000 + 15000 = 90000
+      # Excess over base = 65000, over adjusted = 56000
+      # Tier 1: min(32500, 15000) = 15000
+      # Tier 2 raw: 35% of 56000 = 19600
+      # Max Tier 2: 85% * 30000 - 15000 = 25500 - 15000 = 10500
+      # Total = 15000 + 10500 = 25500 = 85% cap
+    expected:
+      combined_income: 90000
+      taxable_social_security: 25500
+      social_security_taxable_fraction: 0.85
+    notes: "85% maximum cap reached"
+
+  # ==========================================================================
+  # JOINT FILER TESTS
+  # ==========================================================================
+
+  # Test 7: Joint - below base amount
+  - name: "Joint - below base amount"
+    inputs:
+      filing_status: MARRIED_FILING_JOINTLY
+      modified_agi: 20000
+      social_security_benefits: 22000
+      # Combined income = 20000 + 11000 = 31000 < 32000
+    expected:
+      combined_income: 31000
+      taxable_social_security: 0
+    notes: "Below joint base of $32,000"
+
+  # Test 8: Joint - in 50% tier
+  - name: "Joint - in 50% tier"
+    inputs:
+      filing_status: MARRIED_FILING_JOINTLY
+      modified_agi: 32000
+      social_security_benefits: 28000
+      # Combined income = 32000 + 14000 = 46000
+      # Excess over base ($32k) = 14000
+      # Excess over adjusted ($44k) = 2000
+      # Tier 1: min(7000, 14000) = 7000
+      # Tier 2: 35% of 2000 = 700
+    expected:
+      combined_income: 46000
+      tier1_taxable_social_security: 7000
+      tier2_additional_taxable_social_security: 700
+      taxable_social_security: 7700
+    notes: "Joint filers with moderate income"
+
+  # Test 9: Joint - high income, 85% cap
+  - name: "Joint - high income, 85% cap"
+    inputs:
+      filing_status: MARRIED_FILING_JOINTLY
+      modified_agi: 80000
+      social_security_benefits: 36000
+      # Combined income = 80000 + 18000 = 98000
+      # Far above all thresholds, hits 85% cap
+    expected:
+      combined_income: 98000
+      taxable_social_security: 30600  # 85% of 36000
+      social_security_taxable_fraction: 0.85
+    notes: "Hits 85% cap"
+
+  # ==========================================================================
+  # MARRIED FILING SEPARATELY TESTS
+  # ==========================================================================
+
+  # Test 10: MFS - special rule (base = 0)
+  - name: "MFS - all benefits potentially taxable"
+    inputs:
+      filing_status: MARRIED_FILING_SEPARATELY
+      modified_agi: 10000
+      social_security_benefits: 12000
+      # Combined income = 10000 + 6000 = 16000
+      # Base = 0, so all excess from $0
+      # Tier 1: min(50% of 16000, 50% of 12000) = min(8000, 6000) = 6000
+      # Adjusted base = 0, so tier 2 from $0
+      # Tier 2: 35% of 16000 = 5600, but max is 85% * 12000 - 6000 = 4200
+    expected:
+      combined_income: 16000
+      tier1_taxable_social_security: 6000
+      tier2_additional_taxable_social_security: 4200
+      taxable_social_security: 10200  # 85% of 12000
+      social_security_taxable_fraction: 0.85
+    notes: "MFS with spouse filing - 85% from start"
+
+  # ==========================================================================
+  # HEAD OF HOUSEHOLD TESTS
+  # ==========================================================================
+
+  # Test 11: HoH - uses single thresholds
+  - name: "Head of Household - uses single thresholds"
+    inputs:
+      filing_status: HEAD_OF_HOUSEHOLD
+      modified_agi: 28000
+      social_security_benefits: 16000
+      # Combined income = 28000 + 8000 = 36000
+      # Uses single thresholds: base=$25k, adjusted=$34k
+      # Excess over base = 11000
+      # Excess over adjusted = 2000
+      # Tier 1: min(5500, 8000) = 5500
+      # Tier 2: 35% of 2000 = 700
+    expected:
+      combined_income: 36000
+      tier1_taxable_social_security: 5500
+      tier2_additional_taxable_social_security: 700
+      taxable_social_security: 6200
+    notes: "HoH uses same thresholds as single"
+
+  # ==========================================================================
+  # QUALIFYING WIDOW(ER) TESTS
+  # ==========================================================================
+
+  # Test 12: QW - uses joint thresholds
+  - name: "Qualifying Widow(er) - uses joint thresholds"
+    inputs:
+      filing_status: QUALIFYING_WIDOW
+      modified_agi: 35000
+      social_security_benefits: 20000
+      # Combined income = 35000 + 10000 = 45000
+      # Uses joint thresholds: base=$32k, adjusted=$44k
+      # Excess over base = 13000
+      # Excess over adjusted = 1000
+      # Tier 1: min(6500, 10000) = 6500
+      # Tier 2: 35% of 1000 = 350
+    expected:
+      combined_income: 45000
+      tier1_taxable_social_security: 6500
+      tier2_additional_taxable_social_security: 350
+      taxable_social_security: 6850
+    notes: "QW uses same thresholds as joint"
+
+  # ==========================================================================
+  # EDGE CASES
+  # ==========================================================================
+
+  # Test 13: Zero Social Security benefits
+  - name: "Zero SS benefits"
+    inputs:
+      filing_status: SINGLE
+      modified_agi: 50000
+      social_security_benefits: 0
+    expected:
+      taxable_social_security: 0
+      social_security_taxable_fraction: 0
+    notes: "No benefits = no tax"
+
+  # Test 14: Very low SS benefits
+  - name: "Very low SS benefits"
+    inputs:
+      filing_status: SINGLE
+      modified_agi: 30000
+      social_security_benefits: 1000
+      # Combined income = 30000 + 500 = 30500
+      # Excess over base = 5500
+      # Tier 1: min(2750, 500) = 500
+    expected:
+      combined_income: 30500
+      tier1_taxable_social_security: 500
+      taxable_social_security: 500
+      social_security_taxable_fraction: 0.50
+    notes: "Small benefits fully taxable at 50%"
+
+  # Test 15: Exactly 50% taxable
+  - name: "Exactly 50% of benefits taxable"
+    inputs:
+      filing_status: SINGLE
+      modified_agi: 25000
+      social_security_benefits: 16000
+      # Combined income = 25000 + 8000 = 33000
+      # At adjusted base boundary but excess over base limited
+      # Excess over base = 8000
+      # Tier 1: min(4000, 8000) = 4000 = 25% of 16000
+      # Just under adjusted base so minimal tier 2
+    expected:
+      combined_income: 33000
+      tier1_taxable_social_security: 4000
+      social_security_taxable_fraction: 0.25
+    notes: "Just under 85% threshold"

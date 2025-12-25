@@ -1,0 +1,155 @@
+# 26 USC 1401 - Self-Employment Tax Tests
+#
+# Test cases for validating SE tax implementation against known values.
+# Uses 2024 tax year parameters.
+#
+# Key 2024 parameters:
+# - OASDI rate: 12.4%
+# - HI rate: 2.9%
+# - Total SE rate: 15.3%
+# - SS wage base: $168,600
+# - Net earnings = 92.35% of gross SE income (per 1402(a))
+
+reference: "26 USC 1401"
+tax_year: 2024
+
+tests:
+  # Test 1: Basic SE income below wage base
+  - name: "Self-employment income below wage base"
+    inputs:
+      self_employment_income: 50000
+      # PE already applies 92.35% to get taxable_self_employment_income
+      # So net SE earnings = 50000 * 0.9235 = 46175
+      taxable_self_employment_income: 46175
+      employment_income: 0
+    expected:
+      # SS tax: 46175 * 0.124 = 5725.70
+      # Medicare tax: 46175 * 0.029 = 1339.08
+      # Total: 7064.78
+      self_employment_social_security_tax: 5725.70
+      self_employment_medicare_tax: 1339.08
+      self_employment_tax: 7064.78
+      se_tax_deduction: 3532.39
+    notes: "Full SE income subject to both SS and Medicare taxes"
+
+  # Test 2: SE income at exactly the wage base
+  - name: "Self-employment income at wage base"
+    inputs:
+      self_employment_income: 182575  # 182575 * 0.9235 = 168600 (wage base)
+      taxable_self_employment_income: 168600
+      employment_income: 0
+    expected:
+      # SS tax: 168600 * 0.124 = 20906.40
+      # Medicare tax: 168600 * 0.029 = 4889.40
+      # Total: 25795.80
+      self_employment_social_security_tax: 20906.40
+      self_employment_medicare_tax: 4889.40
+      self_employment_tax: 25795.80
+      se_tax_deduction: 12897.90
+    notes: "SE income exactly at wage base cap"
+
+  # Test 3: SE income exceeds wage base
+  - name: "Self-employment income exceeds wage base"
+    inputs:
+      self_employment_income: 250000  # 250000 * 0.9235 = 230875
+      taxable_self_employment_income: 230875
+      employment_income: 0
+    expected:
+      # SS tax: 168600 (capped) * 0.124 = 20906.40
+      # Medicare tax: 230875 * 0.029 = 6695.38
+      # Total: 27601.78
+      self_employment_social_security_tax: 20906.40
+      self_employment_medicare_tax: 6695.38
+      self_employment_tax: 27601.78
+      se_tax_deduction: 13800.89
+    notes: "SS tax capped at wage base, Medicare on full amount"
+
+  # Test 4: W-2 wages use part of wage base
+  - name: "W-2 wages reduce available wage base for SE"
+    inputs:
+      self_employment_income: 100000  # 100000 * 0.9235 = 92350
+      taxable_self_employment_income: 92350
+      employment_income: 100000  # W-2 wages
+      # taxable_earnings_for_social_security = 100000 (all subject to SS)
+    expected:
+      # Remaining cap: 168600 - 100000 = 68600
+      # SE income subject to SS: min(92350, 68600) = 68600
+      # SS tax: 68600 * 0.124 = 8506.40
+      # Medicare tax: 92350 * 0.029 = 2678.15
+      # Total: 11184.55
+      social_security_cap_remaining: 68600
+      social_security_taxable_self_employment_income: 68600
+      self_employment_social_security_tax: 8506.40
+      self_employment_medicare_tax: 2678.15
+      self_employment_tax: 11184.55
+      se_tax_deduction: 5592.28
+    notes: "W-2 wages reduce SS cap available for SE income"
+
+  # Test 5: W-2 wages exhaust wage base
+  - name: "W-2 wages exhaust wage base"
+    inputs:
+      self_employment_income: 50000  # 50000 * 0.9235 = 46175
+      taxable_self_employment_income: 46175
+      employment_income: 175000  # Exceeds wage base
+    expected:
+      # Remaining cap: max(0, 168600 - 168600) = 0
+      # SE income subject to SS: 0
+      # SS tax: 0
+      # Medicare tax: 46175 * 0.029 = 1339.08
+      # Total: 1339.08
+      social_security_cap_remaining: 0
+      social_security_taxable_self_employment_income: 0
+      self_employment_social_security_tax: 0
+      self_employment_medicare_tax: 1339.08
+      self_employment_tax: 1339.08
+      se_tax_deduction: 669.54
+    notes: "No SS tax on SE income when W-2 wages exhaust wage base"
+
+  # Test 6: Zero SE income
+  - name: "Zero self-employment income"
+    inputs:
+      self_employment_income: 0
+      taxable_self_employment_income: 0
+      employment_income: 50000
+    expected:
+      self_employment_social_security_tax: 0
+      self_employment_medicare_tax: 0
+      self_employment_tax: 0
+      se_tax_deduction: 0
+    notes: "No SE tax when no SE income"
+
+  # Test 7: Very high SE income
+  - name: "Very high self-employment income"
+    inputs:
+      self_employment_income: 500000  # 500000 * 0.9235 = 461750
+      taxable_self_employment_income: 461750
+      employment_income: 0
+    expected:
+      # SS tax: 168600 (capped) * 0.124 = 20906.40
+      # Medicare tax: 461750 * 0.029 = 13390.75
+      # Total: 34297.15
+      self_employment_social_security_tax: 20906.40
+      self_employment_medicare_tax: 13390.75
+      self_employment_tax: 34297.15
+      se_tax_deduction: 17148.58
+    notes: "High earner - SS capped, Medicare on full amount"
+
+  # Test 8: Mixed income near wage base boundary
+  - name: "Mixed income near wage base boundary"
+    inputs:
+      self_employment_income: 108389  # 108389 * 0.9235 = 100097
+      taxable_self_employment_income: 100097
+      employment_income: 68503  # W-2 wages
+    expected:
+      # Remaining cap: 168600 - 68503 = 100097
+      # SE income subject to SS: min(100097, 100097) = 100097
+      # SS tax: 100097 * 0.124 = 12412.03
+      # Medicare tax: 100097 * 0.029 = 2902.81
+      # Total: 15314.84
+      social_security_cap_remaining: 100097
+      social_security_taxable_self_employment_income: 100097
+      self_employment_social_security_tax: 12412.03
+      self_employment_medicare_tax: 2902.81
+      self_employment_tax: 15314.84
+      se_tax_deduction: 7657.42
+    notes: "Mixed income exactly filling remaining wage base cap"
