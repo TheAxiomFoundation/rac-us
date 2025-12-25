@@ -96,6 +96,14 @@ architecture:
       parameters:
         - f/indexing_rule#adjustment_method
 
+    - provision: "Section 1(h)"
+      description: "Maximum capital gains rate (0%, 15%, 20%)"
+      path: h/
+      variable: capital_gains_tax
+      parameters:
+        - h/thresholds_2024#zero_percent_max
+        - h/thresholds_2024#fifteen_percent_max
+
     - provision: "Section 1(j)"
       description: "TCJA rate structure"
       parameters:

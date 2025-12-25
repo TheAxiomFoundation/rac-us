@@ -1,0 +1,60 @@
+# 26 USC § 25A(b) - American Opportunity Credit Parameters
+#
+# "(1) Per student credit - A credit... equal to the sum of—
+#  (A) 100 percent of so much of the qualified tuition and related expenses
+#      paid... as does not exceed $2,000, plus
+#  (B) 25 percent of such expenses so paid as exceeds $2,000 but does not exceed $4,000."
+
+# Maximum credit amount per student ($2,000 * 100% + $2,000 * 25% = $2,500)
+aoc_maximum_credit:
+  description: "Maximum American Opportunity Credit per eligible student"
+  unit: currency-USD
+  values:
+    2009-01-01: 2500
+  citations:
+    - "§ 25A(b)(1): sum of 100% of first $2,000 + 25% of next $2,000 = $2,500"
+
+# First tier expense limit (100% credit rate)
+aoc_first_tier_limit:
+  description: "Qualified expense threshold for 100% credit rate"
+  unit: currency-USD
+  values:
+    2009-01-01: 2000
+  citations:
+    - "§ 25A(b)(1)(A): 100 percent of expenses not exceeding $2,000"
+
+# Second tier expense limit (25% credit rate)
+aoc_second_tier_limit:
+  description: "Qualified expense threshold for 25% credit rate"
+  unit: currency-USD
+  values:
+    2009-01-01: 4000
+  citations:
+    - "§ 25A(b)(1)(B): 25 percent of expenses exceeding $2,000 but not $4,000"
+
+# First tier credit rate
+aoc_first_tier_rate:
+  description: "Credit rate for first $2,000 of expenses"
+  unit: rate
+  values:
+    2009-01-01: 1.0
+  citations:
+    - "§ 25A(b)(1)(A): 100 percent"
+
+# Second tier credit rate
+aoc_second_tier_rate:
+  description: "Credit rate for expenses between $2,000 and $4,000"
+  unit: rate
+  values:
+    2009-01-01: 0.25
+  citations:
+    - "§ 25A(b)(1)(B): 25 percent"
+
+# Maximum years of credit eligibility (4 years)
+aoc_year_limit:
+  description: "Maximum taxable years credit may be claimed per student"
+  unit: years
+  values:
+    2009-01-01: 4
+  citations:
+    - "§ 25A(b)(2)(C): only for the first 4 taxable years"

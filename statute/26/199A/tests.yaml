@@ -1,0 +1,472 @@
+# Tests for 26 USC § 199A - Qualified Business Income Deduction
+#
+# Test categories:
+# 1. Simple QBI with no limitations (below threshold)
+# 2. W-2 wage limitation (above threshold)
+# 3. SSTB phaseout scenarios
+# 4. High-income full limitations
+# 5. Taxable income limitation
+# 6. REIT/PTP income
+# 7. Combined scenarios
+
+variable: qualified_business_income_deduction
+tax_year: 2024
+
+test_cases:
+
+  # ===========================================================================
+  # Category 1: Simple QBI - Below Threshold (No Limitations)
+  # ===========================================================================
+
+  - name: "Single filer, $100,000 QBI, below threshold"
+    description: "Below $182,100 threshold - no W-2 wage limitation applies"
+    inputs:
+      filing_status: single
+      taxable_income: 150000
+      qualified_business_income: 100000
+      qbi_w2_wages: 0
+      qbi_ubia: 0
+      net_capital_gain: 0
+    expected:
+      qualified_business_income_deduction: 20000  # 20% of $100,000
+    citations:
+      - "§ 199A(a): 20% deduction"
+      - "§ 199A(b)(3): No W-2 limitation below threshold"
+
+  - name: "MFJ, $200,000 QBI, below threshold"
+    description: "Below $364,200 threshold - no W-2 wage limitation applies"
+    inputs:
+      filing_status: joint
+      taxable_income: 350000
+      qualified_business_income: 200000
+      qbi_w2_wages: 0
+      qbi_ubia: 0
+      net_capital_gain: 0
+    expected:
+      qualified_business_income_deduction: 40000  # 20% of $200,000
+    citations:
+      - "§ 199A(a): 20% deduction for joint filers"
+
+  - name: "Single with modest QBI and wages"
+    description: "Even with zero W-2 wages, full deduction allowed below threshold"
+    inputs:
+      filing_status: single
+      taxable_income: 100000
+      qualified_business_income: 50000
+      qbi_w2_wages: 0
+      qbi_ubia: 0
+      net_capital_gain: 0
+    expected:
+      qualified_business_income_deduction: 10000  # 20% of $50,000
+    citations:
+      - "§ 199A(b)(3): Threshold exception"
+
+  # ===========================================================================
+  # Category 2: W-2 Wage Limitation (Above Threshold)
+  # ===========================================================================
+
+  - name: "Single, above phaseout, W-2 wage limitation - 50% test"
+    description: "Above $232,100 phaseout end, W-2 limit = greater of 50% wages or 25%+2.5%"
+    inputs:
+      filing_status: single
+      taxable_income: 300000
+      qualified_business_income: 100000
+      qbi_w2_wages: 30000  # 50% = $15,000
+      qbi_ubia: 0
+      net_capital_gain: 0
+    expected:
+      qualified_business_income_deduction: 15000  # min(20000, 15000) = 15000
+    citations:
+      - "§ 199A(b)(2)(B)(i): 50% of W-2 wages"
+
+  - name: "Single, above phaseout, W-2 + UBIA limitation"
+    description: "25% wages + 2.5% UBIA is greater than 50% wages alone"
+    inputs:
+      filing_status: single
+      taxable_income: 300000
+      qualified_business_income: 100000
+      qbi_w2_wages: 20000   # 50% = $10,000; 25% = $5,000
+      qbi_ubia: 400000      # 2.5% = $10,000
+      net_capital_gain: 0
+    expected:
+      # 50% of wages = $10,000
+      # 25% of wages + 2.5% UBIA = $5,000 + $10,000 = $15,000
+      # W-2 limit = max(10000, 15000) = $15,000
+      # Tentative = 20% of $100,000 = $20,000
+      # Deduction = min(20000, 15000) = $15,000
+      qualified_business_income_deduction: 15000
+    citations:
+      - "§ 199A(b)(2)(B)(ii): 25% wages plus 2.5% UBIA"
+
+  - name: "MFJ, above phaseout, high W-2 wages - no limitation"
+    description: "W-2 limit exceeds 20% of QBI, so full deduction allowed"
+    inputs:
+      filing_status: joint
+      taxable_income: 600000
+      qualified_business_income: 150000
+      qbi_w2_wages: 100000  # 50% = $50,000 > $30,000 tentative
+      qbi_ubia: 0
+      net_capital_gain: 0
+    expected:
+      # Tentative = 20% of $150,000 = $30,000
+      # W-2 limit = 50% of $100,000 = $50,000
+      # Deduction = min(30000, 50000) = $30,000
+      qualified_business_income_deduction: 30000
+    citations:
+      - "§ 199A(b)(2): Lesser of 20% QBI or W-2 limit"
+
+  # ===========================================================================
+  # Category 3: W-2 Phaseout Range (Partial Limitation)
+  # ===========================================================================
+
+  - name: "Single, middle of phaseout range"
+    description: "At $207,100 (halfway through phaseout), 50% of reduction applies"
+    inputs:
+      filing_status: single
+      taxable_income: 207100  # $182,100 + $25,000 = halfway
+      qualified_business_income: 100000
+      qbi_w2_wages: 20000  # 50% = $10,000
+      qbi_ubia: 0
+      net_capital_gain: 0
+    expected:
+      # Tentative = $20,000
+      # W-2 limit = $10,000
+      # Excess = $20,000 - $10,000 = $10,000
+      # Reduction ratio = $25,000 / $50,000 = 0.5
+      # Reduction = $10,000 * 0.5 = $5,000
+      # Deduction = $20,000 - $5,000 = $15,000
+      qualified_business_income_deduction: 15000
+    citations:
+      - "§ 199A(b)(3)(B): Phase-in of W-2 limitation"
+
+  - name: "MFJ, early in phaseout range"
+    description: "Just above threshold, minimal reduction"
+    inputs:
+      filing_status: joint
+      taxable_income: 374200  # $364,200 + $10,000 (10% through)
+      qualified_business_income: 200000
+      qbi_w2_wages: 50000  # 50% = $25,000
+      qbi_ubia: 0
+      net_capital_gain: 0
+    expected:
+      # Tentative = $40,000
+      # W-2 limit = $25,000
+      # Excess = $40,000 - $25,000 = $15,000
+      # Reduction ratio = $10,000 / $100,000 = 0.1
+      # Reduction = $15,000 * 0.1 = $1,500
+      # Deduction = $40,000 - $1,500 = $38,500
+      qualified_business_income_deduction: 38500
+    citations:
+      - "§ 199A(b)(3)(B): Early phaseout"
+
+  # ===========================================================================
+  # Category 4: SSTB Phaseout Scenarios
+  # ===========================================================================
+
+  - name: "SSTB, below threshold - full deduction"
+    description: "SSTB treated as qualified business below threshold"
+    inputs:
+      filing_status: single
+      taxable_income: 150000
+      qualified_business_income: 80000
+      is_sstb: true
+      sstb_qbi: 80000
+      sstb_w2_wages: 0
+      sstb_ubia: 0
+      net_capital_gain: 0
+    expected:
+      qualified_business_income_deduction: 16000  # 20% of $80,000
+    citations:
+      - "§ 199A(d)(3): SSTB exception below threshold"
+
+  - name: "SSTB, middle of phaseout - partial deduction"
+    description: "At midpoint of SSTB phaseout, only 50% of SSTB income counts"
+    inputs:
+      filing_status: single
+      taxable_income: 207100  # $182,100 + $25,000 = halfway through phaseout
+      qualified_business_income: 100000
+      is_sstb: true
+      sstb_qbi: 100000
+      sstb_w2_wages: 50000
+      sstb_ubia: 0
+      net_capital_gain: 0
+    expected:
+      # Applicable percentage = 1 - (207100 - 182100) / 50000 = 0.5
+      # Allowed SSTB QBI = $100,000 * 0.5 = $50,000
+      # Allowed W-2 = $50,000 * 0.5 = $25,000
+      # Tentative = 20% of $50,000 = $10,000
+      # W-2 limit = 50% of $25,000 = $12,500
+      # Deduction = min(10000, 12500) = $10,000
+      qualified_business_income_deduction: 10000
+    citations:
+      - "§ 199A(d)(3): SSTB applicable percentage"
+
+  - name: "SSTB, above phaseout - zero deduction"
+    description: "Above $232,100 phaseout end, SSTB gets no QBI deduction"
+    inputs:
+      filing_status: single
+      taxable_income: 300000
+      qualified_business_income: 200000
+      is_sstb: true
+      sstb_qbi: 200000
+      sstb_w2_wages: 100000
+      sstb_ubia: 0
+      net_capital_gain: 0
+    expected:
+      qualified_business_income_deduction: 0
+    citations:
+      - "§ 199A(d)(1)(A): SSTB excluded above phaseout"
+
+  - name: "MFJ, SSTB at end of phaseout"
+    description: "Just below $464,200 threshold, small SSTB deduction remains"
+    inputs:
+      filing_status: joint
+      taxable_income: 454200  # $364,200 + $90,000 (90% through)
+      qualified_business_income: 200000
+      is_sstb: true
+      sstb_qbi: 200000
+      sstb_w2_wages: 100000
+      sstb_ubia: 0
+      net_capital_gain: 0
+    expected:
+      # Applicable percentage = 1 - 90000/100000 = 0.1
+      # Allowed SSTB QBI = $200,000 * 0.1 = $20,000
+      # Allowed W-2 = $100,000 * 0.1 = $10,000
+      # Tentative = 20% of $20,000 = $4,000
+      # W-2 limit = 50% of $10,000 = $5,000
+      # Deduction = min(4000, 5000) = $4,000
+      qualified_business_income_deduction: 4000
+    citations:
+      - "§ 199A(d)(3)(A): SSTB phaseout near end"
+
+  # ===========================================================================
+  # Category 5: Mixed SSTB and Non-SSTB
+  # ===========================================================================
+
+  - name: "Mixed businesses, above phaseout"
+    description: "Non-SSTB gets deduction, SSTB gets nothing above phaseout"
+    inputs:
+      filing_status: single
+      taxable_income: 300000
+      qualified_business_income: 150000
+      is_sstb: true
+      sstb_qbi: 50000
+      sstb_w2_wages: 25000
+      sstb_ubia: 0
+      qbi_w2_wages: 75000  # Total W-2 (includes SSTB)
+      qbi_ubia: 0
+      net_capital_gain: 0
+    expected:
+      # Non-SSTB QBI = $150,000 - $50,000 = $100,000
+      # Non-SSTB W-2 = $75,000 - $25,000 = $50,000
+      # Non-SSTB tentative = 20% of $100,000 = $20,000
+      # Non-SSTB W-2 limit = 50% of $50,000 = $25,000
+      # Non-SSTB deduction = min(20000, 25000) = $20,000
+      # SSTB deduction = $0 (above phaseout)
+      qualified_business_income_deduction: 20000
+    citations:
+      - "§ 199A(d): SSTB excluded, non-SSTB allowed"
+
+  # ===========================================================================
+  # Category 6: Taxable Income Limitation
+  # ===========================================================================
+
+  - name: "Taxable income limitation applies"
+    description: "QBI deduction capped at 20% of taxable income less capital gains"
+    inputs:
+      filing_status: single
+      taxable_income: 50000
+      qualified_business_income: 80000  # Would give $16,000 deduction
+      qbi_w2_wages: 0
+      qbi_ubia: 0
+      net_capital_gain: 10000
+    expected:
+      # Combined QBI amount = 20% of $80,000 = $16,000
+      # Taxable income limit = 20% of ($50,000 - $10,000) = 20% of $40,000 = $8,000
+      # Deduction = min(16000, 8000) = $8,000
+      qualified_business_income_deduction: 8000
+    citations:
+      - "§ 199A(a)(2): 20% of taxable income less capital gain"
+
+  - name: "Capital gains consume all ordinary income"
+    description: "No QBI deduction when capital gains equal taxable income"
+    inputs:
+      filing_status: single
+      taxable_income: 100000
+      qualified_business_income: 50000
+      qbi_w2_wages: 0
+      qbi_ubia: 0
+      net_capital_gain: 100000  # All income is capital gains
+    expected:
+      qualified_business_income_deduction: 0
+    citations:
+      - "§ 199A(a)(2)(B): Reduce by net capital gain"
+
+  # ===========================================================================
+  # Category 7: REIT and PTP Income
+  # ===========================================================================
+
+  - name: "REIT dividends only"
+    description: "REIT dividends get 20% deduction regardless of W-2 wages"
+    inputs:
+      filing_status: single
+      taxable_income: 300000  # Above all thresholds
+      qualified_business_income: 0
+      qbi_reit_ptp_income: 50000
+      qbi_w2_wages: 0
+      qbi_ubia: 0
+      net_capital_gain: 0
+    expected:
+      # REIT/PTP component = 20% of $50,000 = $10,000
+      # Not subject to W-2 limitation per § 199A(b)(1)(B)
+      qualified_business_income_deduction: 10000
+    citations:
+      - "§ 199A(b)(1)(B): 20% of qualified REIT dividends"
+
+  - name: "Combined QBI and REIT income"
+    description: "Both QBI and REIT get 20% (REIT not limited by W-2)"
+    inputs:
+      filing_status: single
+      taxable_income: 100000  # Below threshold
+      qualified_business_income: 30000
+      qbi_reit_ptp_income: 20000
+      qbi_w2_wages: 0
+      qbi_ubia: 0
+      net_capital_gain: 0
+    expected:
+      # QBI component = 20% of $30,000 = $6,000
+      # REIT component = 20% of $20,000 = $4,000
+      # Total = $10,000
+      qualified_business_income_deduction: 10000
+    citations:
+      - "§ 199A(b)(1): Combined amount calculation"
+
+  # ===========================================================================
+  # Category 8: Edge Cases
+  # ===========================================================================
+
+  - name: "Zero QBI - no deduction"
+    description: "No qualified business income means no deduction"
+    inputs:
+      filing_status: single
+      taxable_income: 100000
+      qualified_business_income: 0
+      qbi_w2_wages: 0
+      qbi_ubia: 0
+      net_capital_gain: 0
+    expected:
+      qualified_business_income_deduction: 0
+    citations:
+      - "§ 199A(a): Deduction requires QBI"
+
+  - name: "Negative QBI - no deduction, carries forward"
+    description: "Negative QBI results in no deduction, loss carries to next year"
+    inputs:
+      filing_status: single
+      taxable_income: 100000
+      qualified_business_income: -20000  # Business loss
+      qbi_w2_wages: 0
+      qbi_ubia: 0
+      net_capital_gain: 0
+    expected:
+      qualified_business_income_deduction: 0
+    citations:
+      - "§ 199A(c)(2): Negative QBI carries forward"
+
+  - name: "Head of household filing status"
+    description: "HOH uses single thresholds"
+    inputs:
+      filing_status: head_of_household
+      taxable_income: 150000
+      qualified_business_income: 60000
+      qbi_w2_wages: 0
+      qbi_ubia: 0
+      net_capital_gain: 0
+    expected:
+      qualified_business_income_deduction: 12000  # 20% of $60,000
+    citations:
+      - "§ 199A(e)(2): HOH uses single threshold"
+
+  - name: "Married filing separately"
+    description: "MFS uses single thresholds"
+    inputs:
+      filing_status: married_separate
+      taxable_income: 180000
+      qualified_business_income: 75000
+      qbi_w2_wages: 0
+      qbi_ubia: 0
+      net_capital_gain: 0
+    expected:
+      qualified_business_income_deduction: 15000  # 20% of $75,000, below $191,950
+    citations:
+      - "§ 199A(e)(2): MFS uses single threshold"
+
+  # ===========================================================================
+  # Category 9: Complete Scenarios
+  # ===========================================================================
+
+  - name: "Professional services firm, high income"
+    description: "Law firm partner with high income - SSTB limitation applies"
+    inputs:
+      filing_status: joint
+      taxable_income: 600000
+      qualified_business_income: 400000
+      is_sstb: true
+      sstb_qbi: 400000
+      sstb_w2_wages: 200000
+      sstb_ubia: 100000
+      net_capital_gain: 0
+    expected:
+      # Above $464,200 phaseout end
+      # Applicable percentage = 0
+      # SSTB deduction = 0
+      qualified_business_income_deduction: 0
+    citations:
+      - "§ 199A(d)(2)(A): Law is SSTB"
+      - "§ 199A(d)(3): SSTB excluded above phaseout"
+
+  - name: "Manufacturing business, high income"
+    description: "Non-SSTB business with full W-2 limitation"
+    inputs:
+      filing_status: joint
+      taxable_income: 600000
+      qualified_business_income: 300000
+      is_sstb: false
+      qbi_w2_wages: 150000
+      qbi_ubia: 500000
+      net_capital_gain: 20000
+    expected:
+      # Tentative = 20% of $300,000 = $60,000
+      # W-2 limit option 1: 50% of $150,000 = $75,000
+      # W-2 limit option 2: 25% of $150,000 + 2.5% of $500,000 = $37,500 + $12,500 = $50,000
+      # W-2 limit = max(75000, 50000) = $75,000
+      # Combined QBI = min(60000, 75000) = $60,000
+      # Taxable income limit = 20% of ($600,000 - $20,000) = $116,000
+      # Deduction = min(60000, 116000) = $60,000
+      qualified_business_income_deduction: 60000
+    citations:
+      - "§ 199A(b)(2): Full W-2 limitation above phaseout"
+
+  - name: "Real estate investor with REIT income"
+    description: "Combination of rental QBI and REIT dividends"
+    inputs:
+      filing_status: single
+      taxable_income: 250000
+      qualified_business_income: 80000
+      qbi_reit_ptp_income: 30000
+      is_sstb: false
+      qbi_w2_wages: 60000
+      qbi_ubia: 200000
+      net_capital_gain: 0
+    expected:
+      # Above $232,100 phaseout end
+      # QBI tentative = 20% of $80,000 = $16,000
+      # W-2 limit option 1: 50% of $60,000 = $30,000
+      # W-2 limit option 2: 25% of $60,000 + 2.5% of $200,000 = $15,000 + $5,000 = $20,000
+      # W-2 limit = max(30000, 20000) = $30,000
+      # QBI deduction = min(16000, 30000) = $16,000
+      # REIT = 20% of $30,000 = $6,000
+      # Total = $22,000
+      qualified_business_income_deduction: 22000
+    citations:
+      - "§ 199A(b)(1): Combined QBI and REIT"

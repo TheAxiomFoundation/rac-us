@@ -1,0 +1,423 @@
+# 26 USC Section 55-59 - Alternative Minimum Tax Test Cases
+#
+# Comprehensive test suite for AMT calculations.
+# Uses 2024 parameter values from Rev. Proc. 2023-34.
+#
+# 2024 AMT Parameters:
+#   Exemption amounts:
+#     - Joint/Surviving spouse: $133,300
+#     - Single/HoH: $85,700
+#     - MFS: $66,650
+#
+#   Phaseout thresholds (25% rate):
+#     - Joint/Surviving spouse: $1,218,700
+#     - Single/HoH: $609,350
+#     - MFS: $609,350
+#
+#   Rate brackets (26%/28% threshold):
+#     - Joint: $232,600
+#     - Single/HoH/MFS: $116,300
+#
+#   AMT Rates: 26% (low), 28% (high)
+
+reference: "26 USC Sections 55-59"
+tax_year: 2024
+
+tests:
+  # ==========================================================================
+  # BASIC AMT CALCULATION - NO AMT OWED (Regular Tax > TMT)
+  # ==========================================================================
+
+  - name: "Single filer - no AMT (low income)"
+    description: "Low-income single filer where regular tax exceeds TMT"
+    inputs:
+      filing_status: SINGLE
+      amti: 50000
+      regular_tax: 6000
+    expected:
+      amt_exemption_base: 85700
+      amt_exemption: 85700  # No phaseout (AMTI < threshold)
+      amt_taxable_excess: 0  # 50000 - 85700 = negative, so 0
+      tentative_minimum_tax: 0
+      alternative_minimum_tax: 0
+    notes: "AMTI below exemption, no AMT owed"
+
+  - name: "Joint filers - no AMT (moderate income)"
+    inputs:
+      filing_status: MARRIED_FILING_JOINTLY
+      amti: 200000
+      regular_tax: 30000
+    expected:
+      amt_exemption_base: 133300
+      amt_exemption: 133300  # No phaseout
+      amt_taxable_excess: 66700  # 200000 - 133300
+      tentative_minimum_tax: 17342  # 66700 * 0.26
+      alternative_minimum_tax: 0  # 17342 < 30000
+    notes: "TMT less than regular tax, no AMT owed"
+
+  # ==========================================================================
+  # BASIC AMT CALCULATION - AMT OWED
+  # ==========================================================================
+
+  - name: "Single filer - AMT owed (high AMTI, low regular tax)"
+    description: "High AMTI with low regular tax triggers AMT"
+    inputs:
+      filing_status: SINGLE
+      amti: 300000
+      regular_tax: 40000
+    expected:
+      amt_exemption_base: 85700
+      amt_exemption: 85700  # AMTI below phaseout threshold
+      amt_taxable_excess: 214300  # 300000 - 85700
+      # 116300 @ 26% = 30238
+      # 98000 @ 28% = 27440
+      # Total TMT = 57678
+      tentative_minimum_tax: 57678
+      alternative_minimum_tax: 17678  # 57678 - 40000
+    notes: "AMT owed when TMT exceeds regular tax"
+
+  - name: "Joint filers - AMT owed"
+    inputs:
+      filing_status: MARRIED_FILING_JOINTLY
+      amti: 500000
+      regular_tax: 80000
+    expected:
+      amt_exemption_base: 133300
+      amt_exemption: 133300  # Below phaseout threshold
+      amt_taxable_excess: 366700  # 500000 - 133300
+      # 232600 @ 26% = 60476
+      # 134100 @ 28% = 37548
+      # Total TMT = 98024
+      tentative_minimum_tax: 98024
+      alternative_minimum_tax: 18024  # 98024 - 80000
+    notes: "Joint filers with AMT liability"
+
+  # ==========================================================================
+  # EXEMPTION PHASEOUT TESTS
+  # ==========================================================================
+
+  - name: "Single filer - exemption phaseout begins"
+    description: "AMTI just above phaseout threshold ($609,350)"
+    inputs:
+      filing_status: SINGLE
+      amti: 650000
+      regular_tax: 120000
+    expected:
+      amt_exemption_base: 85700
+      # Phaseout: (650000 - 609350) * 0.25 = 10162.50
+      amt_exemption: 75537.50  # 85700 - 10162.50
+      amt_taxable_excess: 574462.50  # 650000 - 75537.50
+      # 116300 @ 26% = 30238
+      # 458162.50 @ 28% = 128285.50
+      # Total TMT = 158523.50
+      tentative_minimum_tax: 158523.50
+      alternative_minimum_tax: 38523.50  # 158523.50 - 120000
+    notes: "Partial exemption phaseout"
+
+  - name: "Single filer - exemption fully phased out"
+    description: "AMTI high enough for complete exemption phaseout"
+    inputs:
+      filing_status: SINGLE
+      # Complete phaseout at: 609350 + (85700 * 4) = 952150
+      amti: 1000000
+      regular_tax: 200000
+    expected:
+      amt_exemption_base: 85700
+      # Phaseout: (1000000 - 609350) * 0.25 = 97662.50 > 85700
+      amt_exemption: 0  # Fully phased out
+      amt_taxable_excess: 1000000
+      # 116300 @ 26% = 30238
+      # 883700 @ 28% = 247436
+      # Total TMT = 277674
+      tentative_minimum_tax: 277674
+      alternative_minimum_tax: 77674  # 277674 - 200000
+    notes: "Exemption completely phased out"
+
+  - name: "Joint filers - exemption phaseout"
+    inputs:
+      filing_status: MARRIED_FILING_JOINTLY
+      amti: 1400000
+      regular_tax: 300000
+    expected:
+      amt_exemption_base: 133300
+      # Phaseout: (1400000 - 1218700) * 0.25 = 45325
+      amt_exemption: 87975  # 133300 - 45325
+      amt_taxable_excess: 1312025  # 1400000 - 87975
+      # 232600 @ 26% = 60476
+      # 1079425 @ 28% = 302239
+      # Total TMT = 362715
+      tentative_minimum_tax: 362715
+      alternative_minimum_tax: 62715  # 362715 - 300000
+    notes: "Joint filers with partial phaseout"
+
+  # ==========================================================================
+  # FILING STATUS VARIATIONS
+  # ==========================================================================
+
+  - name: "Head of Household - same as single"
+    inputs:
+      filing_status: HEAD_OF_HOUSEHOLD
+      amti: 300000
+      regular_tax: 40000
+    expected:
+      # HoH uses same exemption as single
+      amt_exemption_base: 85700
+      amt_exemption: 85700
+      amt_taxable_excess: 214300
+      tentative_minimum_tax: 57678
+      alternative_minimum_tax: 17678
+    notes: "HoH uses single filer exemption and brackets"
+
+  - name: "Married Filing Separately"
+    inputs:
+      filing_status: MARRIED_FILING_SEPARATELY
+      amti: 250000
+      regular_tax: 50000
+    expected:
+      # MFS uses half of joint exemption
+      amt_exemption_base: 66650
+      amt_exemption: 66650  # Below phaseout
+      amt_taxable_excess: 183350  # 250000 - 66650
+      # 116300 @ 26% = 30238
+      # 67050 @ 28% = 18774
+      # Total TMT = 49012
+      tentative_minimum_tax: 49012
+      alternative_minimum_tax: 0  # 49012 < 50000
+    notes: "MFS uses smaller exemption"
+
+  - name: "Surviving Spouse - same as joint"
+    inputs:
+      filing_status: QUALIFYING_WIDOW
+      amti: 400000
+      regular_tax: 70000
+    expected:
+      # Surviving spouse uses joint exemption
+      amt_exemption_base: 133300
+      amt_exemption: 133300
+      amt_taxable_excess: 266700
+      # 232600 @ 26% = 60476
+      # 34100 @ 28% = 9548
+      # Total TMT = 70024
+      tentative_minimum_tax: 70024
+      alternative_minimum_tax: 24  # Barely any AMT
+    notes: "Surviving spouse uses joint filer parameters"
+
+  # ==========================================================================
+  # EDGE CASES
+  # ==========================================================================
+
+  - name: "Zero AMTI"
+    inputs:
+      filing_status: SINGLE
+      amti: 0
+      regular_tax: 0
+    expected:
+      amt_exemption: 85700
+      amt_taxable_excess: 0
+      tentative_minimum_tax: 0
+      alternative_minimum_tax: 0
+    notes: "No income, no AMT"
+
+  - name: "AMTI exactly at exemption amount"
+    inputs:
+      filing_status: SINGLE
+      amti: 85700
+      regular_tax: 5000
+    expected:
+      amt_exemption: 85700
+      amt_taxable_excess: 0  # 85700 - 85700 = 0
+      tentative_minimum_tax: 0
+      alternative_minimum_tax: 0
+    notes: "AMTI equals exemption, no taxable excess"
+
+  - name: "AMTI exactly at phaseout threshold"
+    inputs:
+      filing_status: SINGLE
+      amti: 609350
+      regular_tax: 120000
+    expected:
+      amt_exemption: 85700  # No phaseout yet
+      amt_taxable_excess: 523650
+      # 116300 @ 26% = 30238
+      # 407350 @ 28% = 114058
+      # Total = 144296
+      tentative_minimum_tax: 144296
+      alternative_minimum_tax: 24296
+    notes: "Right at phaseout threshold"
+
+  - name: "AMTI exactly at 26%/28% bracket threshold (single)"
+    inputs:
+      filing_status: SINGLE
+      amti: 202000  # 85700 + 116300
+      regular_tax: 25000
+    expected:
+      amt_exemption: 85700
+      amt_taxable_excess: 116300  # Exactly at bracket
+      # All at 26%
+      tentative_minimum_tax: 30238  # 116300 * 0.26
+      alternative_minimum_tax: 5238
+    notes: "Right at bracket boundary"
+
+  - name: "Very high income - $5 million AMTI"
+    inputs:
+      filing_status: MARRIED_FILING_JOINTLY
+      amti: 5000000
+      regular_tax: 1500000
+    expected:
+      # Phaseout: (5000000 - 1218700) * 0.25 = 945325 > 133300
+      amt_exemption: 0  # Fully phased out
+      amt_taxable_excess: 5000000
+      # 232600 @ 26% = 60476
+      # 4767400 @ 28% = 1334872
+      # Total = 1395348
+      tentative_minimum_tax: 1395348
+      alternative_minimum_tax: 0  # 1395348 < 1500000
+    notes: "Very high income, regular tax exceeds AMT"
+
+  # ==========================================================================
+  # AMT ADJUSTMENT TESTS (Section 56)
+  # ==========================================================================
+
+  - name: "SALT deduction addback"
+    description: "State and local tax deduction disallowed for AMT"
+    inputs:
+      filing_status: MARRIED_FILING_JOINTLY
+      taxable_income: 200000
+      state_local_taxes: 15000
+      uses_standard_deduction: false
+    expected:
+      amt_salt_addback: 15000
+      amt_adjustments: 15000  # Assuming no other adjustments
+    notes: "SALT is added back for AMT purposes"
+
+  - name: "Standard deduction addback"
+    description: "Standard deduction disallowed for AMT"
+    inputs:
+      filing_status: SINGLE
+      taxable_income: 80000
+      uses_standard_deduction: true
+      standard_deduction: 14600  # 2024 single standard deduction
+    expected:
+      amt_standard_deduction_addback: 14600
+    notes: "Standard deduction added back for AMT"
+
+  # ==========================================================================
+  # AMT PREFERENCE ITEM TESTS (Section 57)
+  # ==========================================================================
+
+  - name: "Private activity bond interest preference"
+    description: "Tax-exempt PAB interest is AMT preference"
+    inputs:
+      filing_status: SINGLE
+      private_activity_bond_interest: 25000
+    expected:
+      preference_private_activity_bond_interest: 25000
+    notes: "PAB interest added to AMTI"
+
+  - name: "Multiple preference items"
+    inputs:
+      filing_status: MARRIED_FILING_JOINTLY
+      private_activity_bond_interest: 30000
+      percentage_depletion: 10000
+      cost_depletion: 6000
+    expected:
+      preference_private_activity_bond_interest: 30000
+      preference_depletion: 4000  # 10000 - 6000
+      amt_preferences: 34000
+    notes: "Sum of multiple preference items"
+
+  # ==========================================================================
+  # INTEGRATED AMTI CALCULATION TESTS
+  # ==========================================================================
+
+  - name: "Full AMTI calculation"
+    description: "Complete AMTI from taxable income + adjustments + preferences"
+    inputs:
+      filing_status: MARRIED_FILING_JOINTLY
+      taxable_income: 400000
+      state_local_taxes: 20000
+      uses_standard_deduction: false
+      private_activity_bond_interest: 15000
+    expected:
+      amt_salt_addback: 20000
+      amt_adjustments: 20000
+      preference_private_activity_bond_interest: 15000
+      amt_preferences: 15000
+      alternative_minimum_taxable_income: 435000  # 400000 + 20000 + 15000
+    notes: "AMTI = taxable income + adjustments + preferences"
+
+  - name: "AMTI with no adjustments or preferences"
+    inputs:
+      filing_status: SINGLE
+      taxable_income: 150000
+      uses_standard_deduction: true
+      standard_deduction: 14600
+      private_activity_bond_interest: 0
+    expected:
+      amt_standard_deduction_addback: 14600
+      amt_adjustments: 14600
+      amt_preferences: 0
+      alternative_minimum_taxable_income: 164600
+    notes: "Only standard deduction addback affects AMTI"
+
+  # ==========================================================================
+  # COMPLETE END-TO-END TESTS
+  # ==========================================================================
+
+  - name: "E2E: Single filer with SALT causing AMT"
+    description: "Complete AMT calculation where SALT addback triggers liability"
+    inputs:
+      filing_status: SINGLE
+      taxable_income: 250000
+      regular_tax: 52000  # Approximate regular tax
+      state_local_taxes: 30000  # High SALT
+      uses_standard_deduction: false
+    expected:
+      # AMTI = 250000 + 30000 = 280000
+      alternative_minimum_taxable_income: 280000
+      amt_exemption: 85700
+      amt_taxable_excess: 194300
+      # 116300 @ 26% = 30238
+      # 78000 @ 28% = 21840
+      # TMT = 52078
+      tentative_minimum_tax: 52078
+      alternative_minimum_tax: 78  # Barely any AMT (52078 - 52000)
+    notes: "High SALT triggers small AMT liability"
+
+  - name: "E2E: Joint filers with PAB interest causing AMT"
+    inputs:
+      filing_status: MARRIED_FILING_JOINTLY
+      taxable_income: 600000
+      regular_tax: 150000
+      private_activity_bond_interest: 100000
+    expected:
+      # AMTI = 600000 + 100000 = 700000
+      alternative_minimum_taxable_income: 700000
+      amt_exemption: 133300  # Below phaseout
+      amt_taxable_excess: 566700
+      # 232600 @ 26% = 60476
+      # 334100 @ 28% = 93548
+      # TMT = 154024
+      tentative_minimum_tax: 154024
+      alternative_minimum_tax: 4024  # 154024 - 150000
+    notes: "PAB interest triggers AMT"
+
+  - name: "E2E: MFS with phaseout and high AMT"
+    inputs:
+      filing_status: MARRIED_FILING_SEPARATELY
+      taxable_income: 800000
+      regular_tax: 220000
+      state_local_taxes: 40000
+      uses_standard_deduction: false
+    expected:
+      # AMTI = 800000 + 40000 = 840000
+      alternative_minimum_taxable_income: 840000
+      # Phaseout: (840000 - 609350) * 0.25 = 57662.50
+      amt_exemption: 8987.50  # 66650 - 57662.50
+      amt_taxable_excess: 831012.50
+      # 116300 @ 26% = 30238
+      # 714712.50 @ 28% = 200119.50
+      # TMT = 230357.50
+      tentative_minimum_tax: 230357.50
+      alternative_minimum_tax: 10357.50  # 230357.50 - 220000
+    notes: "MFS with partial phaseout"

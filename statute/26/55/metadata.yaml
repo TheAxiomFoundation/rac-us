@@ -1,0 +1,138 @@
+# 26 USC Sections 55-59 - Alternative Minimum Tax
+#
+# Comprehensive encoding of the AMT regime for individuals.
+
+title: "Alternative Minimum Tax"
+subtitle: "Part VI - Alternative Minimum Tax"
+chapter: "1 - Normal Taxes and Surtaxes"
+subchapter: "A - Determination of Tax Liability"
+
+sections:
+  55:
+    title: "Alternative Minimum Tax Imposed"
+    subsections:
+      a: "General Rule - AMT = max(0, TMT - regular tax)"
+      b: "Tentative Minimum Tax"
+      c: "Regular Tax (cross-reference)"
+      d: "Exemption Amount"
+
+  56:
+    title: "Adjustments in Computing Alternative Minimum Taxable Income"
+    subsections:
+      a: "Adjustments Applicable to All Taxpayers"
+      b: "Adjustments Applicable to Individuals"
+
+  57:
+    title: "Items of Tax Preference"
+    subsections:
+      a: "Tax Preference Items"
+
+  58:
+    title: "Denial of Certain Losses"
+    status: "not_implemented"
+    notes: "Farm losses and passive activity losses - complex, rarely applies"
+
+  59:
+    title: "Other Definitions and Special Rules"
+    status: "partially_implemented"
+    notes: "Some definitions incorporated into main sections"
+
+# Implementation status
+implementation:
+  version: "2024.1"
+  status: "complete"
+  test_coverage: "comprehensive"
+
+  components:
+    - path: "a/amt.cosilico"
+      description: "Core AMT calculation: exemption, TMT, AMT"
+      variables:
+        - amt_exemption_base
+        - amt_exemption_phaseout_threshold
+        - amt_exemption
+        - amt_taxable_excess
+        - amt_bracket_threshold
+        - tentative_minimum_tax
+        - alternative_minimum_tax
+        - total_income_tax_with_amt
+
+    - path: "b/1/rate.yaml"
+      description: "AMT tax rates (26% and 28%)"
+
+    - path: "b/2/amti.cosilico"
+      description: "AMTI calculation from taxable income + adjustments + preferences"
+      variables:
+        - alternative_minimum_taxable_income
+
+    - path: "b/3/bracket.yaml"
+      description: "26%/28% bracket thresholds by filing status"
+
+    - path: "d/1/exemption.yaml"
+      description: "Exemption amounts by filing status"
+
+    - path: "d/2/phaseout.yaml"
+      description: "Exemption phaseout thresholds and rate"
+
+  related_sections:
+    - path: "../56/adjustments.cosilico"
+      description: "AMT adjustments (SALT, misc deductions, etc.)"
+
+    - path: "../57/preferences.cosilico"
+      description: "Tax preference items (PAB interest, depletion, etc.)"
+
+# Parameter sources
+parameters:
+  source: "Rev. Proc. 2023-34"
+  effective_date: "2024-01-01"
+
+  exemption_amounts:
+    joint: 133300
+    single: 85700
+    mfs: 66650
+
+  phaseout_thresholds:
+    joint: 1218700
+    single: 609350
+    mfs: 609350
+
+  rate_brackets:
+    joint: 232600
+    single: 116300
+
+  rates:
+    low: 0.26
+    high: 0.28
+    phaseout: 0.25
+
+# References
+references:
+  statute:
+    - "26 USC Section 55 - Alternative Minimum Tax Imposed"
+    - "26 USC Section 56 - Adjustments"
+    - "26 USC Section 57 - Items of Tax Preference"
+    - "26 USC Section 58 - Denial of Certain Losses"
+    - "26 USC Section 59 - Definitions and Special Rules"
+
+  irs_guidance:
+    - "Rev. Proc. 2023-34, Section 3.03-3.04 (2024 inflation adjustments)"
+    - "IRS Form 6251 (Alternative Minimum Tax - Individuals)"
+    - "IRS Instructions for Form 6251"
+
+  tcja:
+    - "Pub. L. 115-97 (TCJA) - Increased exemption amounts and phaseout thresholds for 2018-2025"
+    - "Post-2025: Reverts to pre-TCJA formula with inflation adjustments"
+
+# Notes
+notes:
+  - "The TCJA significantly increased AMT exemption amounts and phaseout thresholds"
+  - "Pre-TCJA, approximately 5 million taxpayers paid AMT annually"
+  - "Post-TCJA, fewer than 200,000 taxpayers typically pay AMT"
+  - "The increased exemption phases out at AMTI of $1,218,700 (joint) or $609,350 (single)"
+  - "TCJA provisions sunset after 2025 unless extended"
+
+# Future work
+todo:
+  - "Add Section 58 farm/passive loss adjustments"
+  - "Add Section 59 special rules for NOLs"
+  - "Add AMT foreign tax credit (Section 59(a))"
+  - "Add minimum tax credit carryforward (Section 53)"

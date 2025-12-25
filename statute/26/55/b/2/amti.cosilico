@@ -1,0 +1,54 @@
+# 26 USC Section 55(b)(2) - Alternative Minimum Taxable Income
+#
+# "The term 'alternative minimum taxable income' means the taxable income
+# of the taxpayer for the taxable year—
+# (A) determined with the adjustments provided in section 56 and section 58, and
+# (B) increased by the amount of the items of tax preference described in section 57."
+#
+# AMTI = Taxable Income + AMT Adjustments (Section 56) + Tax Preferences (Section 57)
+
+module statute.26.55.b.2
+version "2024.1"
+
+references {
+  # Regular taxable income
+  taxable_income: statute/26/63/c/taxable_income
+
+  # AMT adjustments from Section 56
+  amt_adjustments: statute/26/56/adjustments#amt_adjustments
+
+  # Tax preference items from Section 57
+  amt_preferences: statute/26/57/preferences#amt_preferences
+}
+
+variable alternative_minimum_taxable_income {
+  entity TaxUnit
+  period Year
+  dtype Money
+  unit "USD"
+  label "Alternative Minimum Taxable Income"
+  description "AMTI computed per Section 55(b)(2) as taxable income plus adjustments and preferences"
+  reference "26 USC Section 55(b)(2)"
+
+  formula {
+    # Start with regular taxable income
+    let base = taxable_income
+
+    # Add AMT adjustments from Section 56
+    # These are items disallowed or modified for AMT purposes
+    let adjustments = amt_adjustments
+
+    # Add tax preference items from Section 57
+    # These are tax benefits that must be added back for AMT
+    let preferences = amt_preferences
+
+    # AMTI cannot be less than zero
+    return max(0, base + adjustments + preferences)
+  }
+
+  defined_for {
+    taxable_income > 0 or amt_adjustments > 0 or amt_preferences > 0
+  }
+
+  default 0
+}

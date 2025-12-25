@@ -1,0 +1,190 @@
+# 26 USC § 199A(a) - Qualified Business Income Deduction
+#
+# "(a) ALLOWANCE OF DEDUCTION.—In the case of a taxpayer other than a corporation,
+#      there shall be allowed as a deduction for any taxable year an amount equal
+#      to the lesser of—
+#  (1) the combined qualified business income amount of the taxpayer, or
+#  (2) an amount equal to 20 percent of the excess (if any) of—
+#   (A) the taxable income of the taxpayer for the taxable year, over
+#   (B) the sum of any net capital gain (as defined in section 1(h)), plus the
+#       aggregate amount of the qualified cooperative dividends, of the taxpayer
+#       for the taxable year."
+#
+# This is the main entry point for the QBI deduction calculation.
+
+module statute.26.199A.a
+version "2024.1"
+
+references {
+  taxable_income: statute/26/63/taxable_income
+  net_capital_gain: statute/26/1/h/net_capital_gain
+  filing_status: statute/26/1/filing_status
+
+  # QBI from § 199A(c)
+  net_qualified_business_income: statute/26/199A/c/qualified_business_income#net_qualified_business_income
+
+  # SSTB components from § 199A(d)
+  is_sstb: statute/26/199A/d/sstb#is_sstb
+  sstb_qbi: statute/26/199A/d/sstb#sstb_qbi
+  sstb_w2_wages: statute/26/199A/d/sstb#sstb_w2_wages
+  sstb_ubia: statute/26/199A/d/sstb#sstb_ubia
+  qbi_applicable_percentage: statute/26/199A/d/sstb#qbi_applicable_percentage
+
+  # W-2 limitations from § 199A(b)
+  qbi_w2_wages: statute/26/199A/b/w2_wage_limitation#qbi_w2_wages
+  qbi_ubia: statute/26/199A/b/w2_wage_limitation#qbi_ubia
+  qbi_w2_wage_limit: statute/26/199A/b/w2_wage_limitation#qbi_w2_wage_limit
+  is_above_qbi_threshold: statute/26/199A/b/w2_wage_limitation#is_above_qbi_threshold
+  is_in_qbi_phaseout: statute/26/199A/b/w2_wage_limitation#is_in_qbi_phaseout
+  is_above_qbi_phaseout: statute/26/199A/b/w2_wage_limitation#is_above_qbi_phaseout
+  qbi_reduction_ratio: statute/26/199A/b/w2_wage_limitation#qbi_reduction_ratio
+
+  # Parameters
+  qbi_deduction_rate: statute/26/199A/b/parameters#qbi_deduction_rate
+  threshold_single: statute/26/199A/e/parameters#threshold_single
+  threshold_joint: statute/26/199A/e/parameters#threshold_joint
+  phaseout_range_single: statute/26/199A/e/parameters#phaseout_range_single
+  phaseout_range_joint: statute/26/199A/e/parameters#phaseout_range_joint
+  w2_wage_limit_rate: statute/26/199A/b/parameters#w2_wage_limit_rate
+  w2_wage_property_rate: statute/26/199A/b/parameters#w2_wage_property_rate
+  ubia_rate: statute/26/199A/b/parameters#ubia_rate
+}
+
+variable qualified_coop_dividends {
+  entity TaxUnit
+  period Year
+  dtype Money
+  unit "USD"
+  label "Qualified Cooperative Dividends"
+  description "Patronage dividends from agricultural or horticultural cooperatives"
+
+  input {
+    # Reported on Form 1099-PATR
+  }
+
+  default 0
+}
+
+variable qbi_reit_ptp_income {
+  entity TaxUnit
+  period Year
+  dtype Money
+  unit "USD"
+  label "Qualified REIT Dividends and PTP Income"
+  description "Qualified REIT dividends plus qualified publicly traded partnership income per 26 USC § 199A(b)(1)(B)"
+
+  input {
+    # Qualified REIT dividends: ordinary dividends from REITs
+    # (excluding capital gain dividends and qualified dividend income)
+    # Qualified PTP income: taxpayer's share of ordinary income from PTPs
+  }
+
+  default 0
+}
+
+variable qbi_taxable_income_limit {
+  entity TaxUnit
+  period Year
+  dtype Money
+  unit "USD"
+  label "QBI Taxable Income Limitation"
+  description "20% of taxable income less net capital gain per 26 USC § 199A(a)(2)"
+
+  formula {
+    # § 199A(a)(2): 20% of (taxable income - net capital gain - qualified coop dividends)
+    let ordinary_income = taxable_income - net_capital_gain - qualified_coop_dividends
+    return max(0, ordinary_income * qbi_deduction_rate)
+  }
+}
+
+variable qbi_combined_amount {
+  entity TaxUnit
+  period Year
+  dtype Money
+  unit "USD"
+  label "Combined QBI Amount"
+  description "Combined qualified business income amount before taxable income limit per 26 USC § 199A(b)(1)"
+
+  formula {
+    # Per § 199A(b)(1):
+    # Combined QBI = sum of deductible amounts for each business + 20% of REIT/PTP income
+
+    # Aggregate QBI from all members of tax unit
+    let total_qbi = sum(members, net_qualified_business_income)
+    let total_sstb_qbi = sum(members, sstb_qbi)
+    let non_sstb_qbi = total_qbi - total_sstb_qbi
+
+    # Aggregate W-2 wages and UBIA
+    let total_w2_wages = sum(members, qbi_w2_wages)
+    let total_sstb_wages = sum(members, sstb_w2_wages)
+    let non_sstb_wages = total_w2_wages - total_sstb_wages
+
+    let total_ubia = sum(members, qbi_ubia)
+    let total_sstb_ubia = sum(members, sstb_ubia)
+    let non_sstb_ubia = total_ubia - total_sstb_ubia
+
+    # Calculate W-2/UBIA limit for non-SSTB income
+    let non_sstb_w2_limit = max(
+      non_sstb_wages * w2_wage_limit_rate,
+      (non_sstb_wages * w2_wage_property_rate) + (non_sstb_ubia * ubia_rate)
+    )
+
+    # Non-SSTB deduction calculation
+    let non_sstb_tentative = non_sstb_qbi * qbi_deduction_rate
+
+    # Apply W-2 wage limitation based on income level
+    let non_sstb_deduction = if is_above_qbi_phaseout then
+      # Fully above phaseout: full W-2 limitation applies
+      min(non_sstb_tentative, non_sstb_w2_limit)
+    else if is_in_qbi_phaseout then
+      # In phaseout: phase in W-2 limitation
+      let excess_over_tentative = max(0, non_sstb_tentative - non_sstb_w2_limit)
+      non_sstb_tentative - (excess_over_tentative * qbi_reduction_ratio)
+    else
+      # Below threshold: no W-2 limitation
+      non_sstb_tentative
+
+    # SSTB deduction calculation
+    # SSTB gets reduced by applicable_percentage (phases out to 0)
+    let sstb_applicable_pct = qbi_applicable_percentage
+    let sstb_allowed_qbi = total_sstb_qbi * sstb_applicable_pct
+    let sstb_allowed_wages = total_sstb_wages * sstb_applicable_pct
+    let sstb_allowed_ubia = total_sstb_ubia * sstb_applicable_pct
+
+    let sstb_tentative = sstb_allowed_qbi * qbi_deduction_rate
+    let sstb_w2_limit = max(
+      sstb_allowed_wages * w2_wage_limit_rate,
+      (sstb_allowed_wages * w2_wage_property_rate) + (sstb_allowed_ubia * ubia_rate)
+    )
+
+    # Apply W-2 limitation to SSTB if above threshold
+    let sstb_deduction = if is_above_qbi_phaseout then
+      min(sstb_tentative, sstb_w2_limit)
+    else if is_in_qbi_phaseout then
+      let excess = max(0, sstb_tentative - sstb_w2_limit)
+      sstb_tentative - (excess * qbi_reduction_ratio)
+    else
+      sstb_tentative
+
+    # Total combined amount = business income + 20% of REIT/PTP
+    let reit_ptp_component = qbi_reit_ptp_income * qbi_deduction_rate
+
+    return non_sstb_deduction + sstb_deduction + reit_ptp_component
+  }
+}
+
+variable qualified_business_income_deduction {
+  entity TaxUnit
+  period Year
+  dtype Money
+  unit "USD"
+  label "Qualified Business Income Deduction"
+  description "Section 199A deduction for pass-through income per 26 USC § 199A(a)"
+
+  formula {
+    # § 199A(a): Lesser of combined QBI amount or taxable income limit
+    return min(qbi_combined_amount, qbi_taxable_income_limit)
+  }
+
+  default 0
+}

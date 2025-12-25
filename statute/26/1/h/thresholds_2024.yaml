@@ -1,0 +1,38 @@
+# 26 USC Section 1(h) - Capital Gains Tax Rate Thresholds for Tax Year 2024
+#
+# These thresholds determine the applicable capital gains tax rate (0%, 15%, or 20%).
+# The rate depends on taxable income, not just capital gains amount.
+# Thresholds are adjusted for inflation per Section 1(h)(1)(B)-(D).
+# Published in Rev. Proc. 2023-34 (IRS, November 9, 2023).
+#
+# Note: These thresholds apply to "adjusted net capital gain" and "qualified dividend income."
+
+reference: "26 USC Section 1(h)(1)(B)-(D); Rev. Proc. 2023-34"
+description: Capital gains tax rate thresholds for tax year 2024
+
+tax_year: 2024
+
+# 0% rate applies up to these thresholds (Section 1(h)(1)(B))
+# The 0% rate applies to the extent taxable income is below the threshold
+zero_percent_max:
+  single: 47025
+  married_filing_jointly: 94050
+  head_of_household: 63000
+  married_filing_separately: 47025
+  surviving_spouse: 94050
+
+# 15% rate applies from the 0% threshold up to these thresholds (Section 1(h)(1)(C))
+# Above these thresholds, the 20% rate applies (Section 1(h)(1)(D))
+fifteen_percent_max:
+  single: 518900
+  married_filing_jointly: 583750
+  head_of_household: 551350
+  married_filing_separately: 291850
+  surviving_spouse: 583750
+
+# Source reference
+source:
+  publication: "Rev. Proc. 2023-34"
+  date: "2023-11-09"
+  url: "https://www.irs.gov/pub/irs-drop/rp-23-34.pdf"
+  section: "Section 3.10"
