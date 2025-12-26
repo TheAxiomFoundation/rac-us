@@ -1,0 +1,89 @@
+# 26 USC Section 162(l) - Self-Employed Health Insurance Deduction
+#
+# "(l) Special rules for health insurance costs of self-employed individuals.—
+#  (1) Allowance of deduction.—In the case of an individual who is an
+#      employee within the meaning of section 401(c)(1), there shall be
+#      allowed as a deduction under this section an amount equal to the
+#      amount paid during the taxable year for insurance which constitutes
+#      medical care for the taxpayer, his spouse, and dependents.
+#  (2) Limitations.—
+#      (A) Dollar amount.—No deduction shall be allowed under paragraph (1)
+#          to the extent that the amount of such deduction exceeds the
+#          taxpayer's earned income derived by the taxpayer from the trade
+#          or business with respect to which the plan providing the medical
+#          care coverage is established."
+#
+# This is an above-the-line deduction per Section 62(a)(1) for self-employed
+# individuals' health insurance premiums.
+
+module statute.26.162.l
+version "2024.1"
+
+references {
+  self_employment_income: statute/26/1402/a/net_earnings_self_employment
+}
+
+variable self_employed_health_insurance_premiums {
+  entity Person
+  period Year
+  dtype Money
+  unit "USD"
+  label "Self-Employed Health Insurance Premiums"
+  description "Health insurance premiums paid for self-employed individual, spouse, and dependents"
+  reference "26 USC 162(l)"
+
+  # Input variable - amount paid for qualifying health insurance
+}
+
+variable is_self_employed {
+  entity Person
+  period Year
+  dtype Boolean
+  label "Is Self-Employed"
+  description "Whether the individual has self-employment income"
+  reference "26 USC 401(c)(1)"
+
+  formula {
+    return self_employment_income > 0
+  }
+}
+
+variable self_employed_health_insurance_deduction {
+  entity Person
+  period Year
+  dtype Money
+  unit "USD"
+  label "Self-Employed Health Insurance Deduction"
+  description "Above-the-line deduction for self-employed health insurance premiums"
+  reference "26 USC 162(l), 62(a)(1)"
+
+  formula {
+    # Must be self-employed
+    if not is_self_employed {
+      return 0
+    }
+
+    # Deduction cannot exceed self-employment income
+    # (after the self-employment tax deduction)
+    # Simplified: use gross SE income as the limit
+    let se_income_limit = self_employment_income
+
+    # Deduction is lesser of premiums paid or SE income
+    return min(self_employed_health_insurance_premiums, se_income_limit)
+  }
+}
+
+# Tax unit level aggregation
+variable self_employed_health_insurance_deduction_total {
+  entity TaxUnit
+  period Year
+  dtype Money
+  unit "USD"
+  label "Total Self-Employed Health Insurance Deduction"
+  description "Combined self-employed health insurance deduction for tax unit"
+  reference "26 USC 162(l)"
+
+  formula {
+    return sum(members.self_employed_health_insurance_deduction)
+  }
+}

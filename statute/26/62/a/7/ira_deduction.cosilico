@@ -1,0 +1,180 @@
+# 26 USC Section 62(a)(7) - IRA Deduction
+#
+# "(7) Retirement savings.—The deduction allowed by section 219 (relating
+#      to deduction for retirement savings)."
+#
+# This refers to the deduction for contributions to traditional IRAs under
+# Section 219. The deduction may be limited if the taxpayer (or spouse) is
+# covered by an employer retirement plan.
+#
+# 2024 Contribution Limits:
+#   - Under age 50: $7,000
+#   - Age 50+: $8,000 ($7,000 + $1,000 catch-up)
+#
+# Phase-out ranges for 2024 when covered by employer plan:
+#   - Single: $77,000 - $87,000 MAGI
+#   - MFJ (contributor covered): $123,000 - $143,000 MAGI
+#   - MFJ (only spouse covered): $230,000 - $240,000 MAGI
+#   - MFS: $0 - $10,000 MAGI
+
+module statute.26.62.a.7
+version "2024.1"
+
+parameters {
+  # Regular contribution limit
+  contribution_limit: 7000  # 2024
+
+  # Catch-up contribution for age 50+
+  catch_up_amount: 1000
+
+  # Age at which catch-up contributions allowed
+  catch_up_age: 50
+
+  # Phase-out thresholds when covered by employer plan - Single
+  phaseout_single_start: 77000
+  phaseout_single_end: 87000
+
+  # Phase-out thresholds when covered by employer plan - MFJ (contributor covered)
+  phaseout_joint_start: 123000
+  phaseout_joint_end: 143000
+
+  # Phase-out thresholds when only spouse is covered - MFJ
+  phaseout_spouse_covered_start: 230000
+  phaseout_spouse_covered_end: 240000
+
+  # Phase-out for MFS when either spouse is covered
+  phaseout_mfs_start: 0
+  phaseout_mfs_end: 10000
+}
+
+references {
+  filing_status: statute/26/1/filing_status
+}
+
+variable traditional_ira_contributions {
+  entity Person
+  period Year
+  dtype Money
+  unit "USD"
+  label "Traditional IRA Contributions"
+  description "Contributions made to traditional IRA during the tax year"
+  reference "26 USC 219"
+
+  # Input variable - amount contributed by taxpayer
+}
+
+variable has_retirement_plan_at_work {
+  entity Person
+  period Year
+  dtype Boolean
+  label "Covered by Employer Retirement Plan"
+  description "Whether the individual is an active participant in an employer retirement plan"
+  reference "26 USC 219(g)(5)"
+
+  # Input variable - determines whether phase-out applies
+}
+
+variable ira_contribution_limit {
+  entity Person
+  period Year
+  dtype Money
+  unit "USD"
+  label "IRA Contribution Limit"
+  description "Maximum allowable IRA contribution including catch-up"
+  reference "26 USC 219(b)"
+
+  formula {
+    let base_limit = contribution_limit
+
+    # Add catch-up contribution if age 50 or older
+    if age >= catch_up_age {
+      return base_limit + catch_up_amount
+    }
+    return base_limit
+  }
+}
+
+variable ira_deduction_before_phaseout {
+  entity Person
+  period Year
+  dtype Money
+  unit "USD"
+  label "IRA Deduction Before Phase-out"
+  description "IRA deduction amount before applying income phase-out"
+  reference "26 USC 219"
+
+  formula {
+    # Cannot deduct more than contributed or the annual limit
+    return min(traditional_ira_contributions, ira_contribution_limit)
+  }
+}
+
+variable ira_phaseout_ratio {
+  entity Person
+  period Year
+  dtype Rate
+  label "IRA Deduction Phase-out Ratio"
+  description "Ratio of IRA deduction that is phased out based on income"
+  reference "26 USC 219(g)"
+
+  formula {
+    # If not covered by employer plan (and spouse not covered for joint),
+    # no phase-out applies
+    if not has_retirement_plan_at_work {
+      # Check if spouse is covered (for joint filers)
+      # Simplified: if neither covered, no phase-out
+      return 0
+    }
+
+    # Determine phase-out range based on filing status
+    let start = phaseout_single_start
+    let end = phaseout_single_end
+
+    # Note: Actual implementation would use tax unit's MAGI
+    # This is simplified for demonstration
+    let magi = adjusted_gross_income  # Circular reference - would need MAGI
+
+    if magi <= start {
+      return 0  # No phase-out
+    }
+    if magi >= end {
+      return 1  # Fully phased out
+    }
+
+    # Proportional phase-out
+    return (magi - start) / (end - start)
+  }
+}
+
+variable ira_deduction {
+  entity Person
+  period Year
+  dtype Money
+  unit "USD"
+  label "IRA Deduction"
+  description "Above-the-line deduction for traditional IRA contributions"
+  reference "26 USC 62(a)(7), 219"
+
+  formula {
+    let base_deduction = ira_deduction_before_phaseout
+    let phaseout = ira_phaseout_ratio
+
+    # Apply phase-out
+    return base_deduction * (1 - phaseout)
+  }
+}
+
+# Tax unit level aggregation
+variable ira_deduction_total {
+  entity TaxUnit
+  period Year
+  dtype Money
+  unit "USD"
+  label "Total IRA Deduction"
+  description "Combined IRA deduction for tax unit"
+  reference "26 USC 62(a)(7)"
+
+  formula {
+    return sum(members.ira_deduction)
+  }
+}

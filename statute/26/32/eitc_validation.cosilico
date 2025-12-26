@@ -147,14 +147,23 @@ variable earned_income_credit {
   dtype Money
   unit "USD"
   label "Earned Income Tax Credit"
-  description "Refundable credit for low-to-moderate income working individuals per §32(a)(1)"
+  description "Refundable credit for low-to-moderate income working individuals per 26 USC 32(a)(1)"
+  reference (
+    "26 USC 32(a)(1)",
+    "26 USC 32(c)(1)",
+    "26 USC 32(d)",
+    "26 USC 32(i)"
+  )
 
   formula {
-    # §32(d)(2): No credit for married filing separately
-    if filing_status == SEPARATE then
-      return 0
-
-    # Use PE's pre-computed eligibility (includes age, investment income, etc.)
+    # Use is_eligible_individual which checks all requirements:
+    # - 32(c)(1)(A): qualifying children or meets childless requirements (age, abode)
+    # - 32(c)(1)(B): not a qualifying child of another taxpayer
+    # - 32(c)(1)(C): no foreign earned income exclusion
+    # - 32(c)(1)(D): not a nonresident alien
+    # - 32(c)(1)(E): valid SSN for taxpayer and spouse
+    # - 32(d): not married filing separately
+    # - 32(i): disqualified income under limit
     if not is_eligible_individual then
       return 0
 

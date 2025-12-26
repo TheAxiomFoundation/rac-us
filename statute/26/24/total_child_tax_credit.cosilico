@@ -8,10 +8,10 @@ version "2024.1"
 
 references {
   # Nonrefundable portion
-  child_tax_credit: statute/26/24/child_tax_credit
+  child_tax_credit: statute/26/24/child_tax_credit#child_tax_credit
 
   # Refundable portion (ACTC)
-  additional_child_tax_credit: statute/26/24/d/1/additional_child_tax_credit
+  additional_child_tax_credit: statute/26/24/d/1/B/refundable_credit#additional_child_tax_credit
 }
 
 variable total_child_tax_credit {
@@ -20,7 +20,8 @@ variable total_child_tax_credit {
   dtype Money
   unit "USD"
   label "Total Child Tax Credit"
-  description "Sum of nonrefundable CTC and refundable ACTC per 26 USC § 24"
+  description "Sum of nonrefundable CTC and refundable ACTC per 26 USC Section 24"
+  reference "26 USC Section 24"
 
   formula {
     return child_tax_credit + additional_child_tax_credit

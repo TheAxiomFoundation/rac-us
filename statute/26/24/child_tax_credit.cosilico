@@ -8,10 +8,10 @@ version "2024.1"
 
 references {
   # Tentative credit after phase-out
-  tentative_child_tax_credit: statute/26/24/a/2/tentative_child_tax_credit
+  tentative_child_tax_credit: statute/26/24/a/2/tentative_credit#tentative_child_tax_credit
 
-  # Tax liability limit (from §26)
-  tax_liability_before_credits: statute/26/26/a/tax_liability_before_credits
+  # Tax liability limit (from Section 26)
+  tax_liability_before_credits: statute/26/26/a/tax_liability_before_credits#tax_liability_before_credits
 }
 
 variable child_tax_credit {
@@ -20,7 +20,8 @@ variable child_tax_credit {
   dtype Money
   unit "USD"
   label "Child Tax Credit (Nonrefundable)"
-  description "Nonrefundable portion of Child Tax Credit per 26 USC § 24, limited by tax liability"
+  description "Nonrefundable portion of Child Tax Credit per 26 USC Section 24, limited by tax liability"
+  reference "26 USC Section 24, 26 USC Section 26(a)"
 
   formula {
     # CTC is limited to tax liability per §26(a)

@@ -1,0 +1,216 @@
+# 26 USC Section 62 - Above-the-Line Deduction Parameters
+#
+# These are the time-varying parameters for deductions that reduce AGI.
+# Values are updated annually based on IRS guidance (typically in Rev. Proc.).
+
+description: "Parameters for above-the-line deductions under IRC Section 62"
+reference: "26 USC 62"
+
+# =============================================================================
+# Section 62(a)(2)(D) - Educator Expenses
+# =============================================================================
+educator_expenses:
+  description: "Maximum deduction for eligible educator expenses"
+  reference: "26 USC 62(a)(2)(D), Rev. Proc. 2023-34"
+  max_deduction:
+    description: "Maximum deduction per eligible educator"
+    unit: USD
+    values:
+      - date: 2002-01-01
+        value: 250
+        reference: "Job Creation and Worker Assistance Act of 2002"
+      - date: 2022-01-01
+        value: 300
+        reference: "Rev. Proc. 2021-45"
+      - date: 2024-01-01
+        value: 300
+        reference: "Rev. Proc. 2023-34"
+
+# =============================================================================
+# Section 62(a)(7) - Traditional IRA Deduction (via Section 219)
+# =============================================================================
+ira:
+  description: "Traditional IRA contribution and deduction limits"
+  reference: "26 USC 219, Rev. Proc. 2023-34"
+
+  contribution_limit:
+    description: "Maximum annual IRA contribution (under age 50)"
+    unit: USD
+    values:
+      - date: 2019-01-01
+        value: 6000
+      - date: 2023-01-01
+        value: 6500
+      - date: 2024-01-01
+        value: 7000
+        reference: "Rev. Proc. 2023-34"
+
+  catch_up_amount:
+    description: "Additional contribution allowed for age 50+"
+    unit: USD
+    values:
+      - date: 2006-01-01
+        value: 1000
+
+  catch_up_age:
+    description: "Age at which catch-up contributions are allowed"
+    unit: years
+    values:
+      - date: 2006-01-01
+        value: 50
+
+  phaseout:
+    single:
+      description: "Phase-out range for single filer covered by employer plan"
+      reference: "26 USC 219(g), Rev. Proc. 2023-34"
+      start:
+        unit: USD
+        values:
+          - date: 2023-01-01
+            value: 73000
+          - date: 2024-01-01
+            value: 77000
+      end:
+        unit: USD
+        values:
+          - date: 2023-01-01
+            value: 83000
+          - date: 2024-01-01
+            value: 87000
+
+    joint:
+      description: "Phase-out range for MFJ when contributor is covered"
+      start:
+        unit: USD
+        values:
+          - date: 2023-01-01
+            value: 116000
+          - date: 2024-01-01
+            value: 123000
+      end:
+        unit: USD
+        values:
+          - date: 2023-01-01
+            value: 136000
+          - date: 2024-01-01
+            value: 143000
+
+    spouse_covered:
+      description: "Phase-out range for MFJ when only spouse is covered"
+      start:
+        unit: USD
+        values:
+          - date: 2023-01-01
+            value: 218000
+          - date: 2024-01-01
+            value: 230000
+      end:
+        unit: USD
+        values:
+          - date: 2023-01-01
+            value: 228000
+          - date: 2024-01-01
+            value: 240000
+
+    mfs:
+      description: "Phase-out range for MFS"
+      start:
+        unit: USD
+        values:
+          - date: 2020-01-01
+            value: 0
+      end:
+        unit: USD
+        values:
+          - date: 2020-01-01
+            value: 10000
+
+# =============================================================================
+# Section 62(a)(12) - HSA Deduction (via Section 223)
+# =============================================================================
+hsa:
+  description: "Health Savings Account contribution limits"
+  reference: "26 USC 223, Rev. Proc. 2023-22"
+
+  self_only_limit:
+    description: "Maximum HSA contribution for self-only HDHP coverage"
+    unit: USD
+    values:
+      - date: 2023-01-01
+        value: 3850
+      - date: 2024-01-01
+        value: 4150
+        reference: "Rev. Proc. 2023-22"
+
+  family_limit:
+    description: "Maximum HSA contribution for family HDHP coverage"
+    unit: USD
+    values:
+      - date: 2023-01-01
+        value: 7750
+      - date: 2024-01-01
+        value: 8300
+        reference: "Rev. Proc. 2023-22"
+
+  catch_up_amount:
+    description: "Additional HSA contribution for age 55+"
+    unit: USD
+    values:
+      - date: 2004-01-01
+        value: 1000
+
+  catch_up_age:
+    description: "Age at which HSA catch-up contributions are allowed"
+    unit: years
+    values:
+      - date: 2004-01-01
+        value: 55
+
+# =============================================================================
+# Section 62(a)(17) - Student Loan Interest (via Section 221)
+# =============================================================================
+student_loan_interest:
+  description: "Student loan interest deduction limits and phase-outs"
+  reference: "26 USC 221, Rev. Proc. 2023-34"
+
+  max_deduction:
+    description: "Maximum deduction for student loan interest"
+    unit: USD
+    values:
+      - date: 2001-01-01
+        value: 2500
+
+  phaseout:
+    single:
+      description: "Phase-out range for single filers"
+      start:
+        unit: USD
+        values:
+          - date: 2023-01-01
+            value: 75000
+          - date: 2024-01-01
+            value: 80000
+      end:
+        unit: USD
+        values:
+          - date: 2023-01-01
+            value: 90000
+          - date: 2024-01-01
+            value: 95000
+
+    joint:
+      description: "Phase-out range for MFJ"
+      start:
+        unit: USD
+        values:
+          - date: 2023-01-01
+            value: 155000
+          - date: 2024-01-01
+            value: 165000
+      end:
+        unit: USD
+        values:
+          - date: 2023-01-01
+            value: 185000
+          - date: 2024-01-01
+            value: 195000

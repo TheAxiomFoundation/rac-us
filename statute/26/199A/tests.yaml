@@ -397,7 +397,7 @@ test_cases:
       qbi_ubia: 0
       net_capital_gain: 0
     expected:
-      qualified_business_income_deduction: 15000  # 20% of $75,000, below $191,950
+      qualified_business_income_deduction: 15000  # 20% of $75,000, below $182,100
     citations:
       - "§ 199A(e)(2): MFS uses single threshold"
 

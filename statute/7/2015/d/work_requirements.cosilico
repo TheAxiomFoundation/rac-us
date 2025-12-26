@@ -1,0 +1,70 @@
+# 7 USC § 2015(d) & (o) - Work Requirements
+#
+# Two types of work requirements apply to SNAP:
+# 1. General work registration (§ 2015(d)) - must register for work
+# 2. ABAWD requirements (§ 2015(o)) - time-limited benefits for able-bodied
+#    adults without dependents who don't work 80+ hours/month
+#
+# LIMITATIONS OF STATIC MICROSIMULATION:
+# The ABAWD 3-month time limit within a 36-month period CANNOT be tracked
+# in a static microsimulation. This implementation provides:
+# - Determination of ABAWD status (subject to time limit)
+# - Exemption categories
+# But does NOT track actual time limit exhaustion.
+
+references {
+  abawd_min_age: statute/7/2015/d/abawd_min_age
+  abawd_max_age: statute/7/2015/d/abawd_max_age
+  abawd_work_hours: statute/7/2015/d/abawd_work_hours
+}
+
+# Determine if individual is subject to ABAWD requirements
+variable is_snap_abawd {
+  entity Person
+  period Month
+  dtype Boolean
+
+  formula {
+    # § 2015(o)(2): Definition of ABAWD
+    # - Aged 18-54 (as of 2025 phase-in)
+    # - Not disabled
+    # - Not responsible for dependent child
+    # - Not pregnant
+    # - Not exempt from work registration
+
+    let in_age_range = age >= abawd_min_age and age <= abawd_max_age
+    let has_dependent = has_dependent_child
+    let is_exempt = is_disabled or is_pregnant or has_dependent
+
+    return in_age_range and not is_exempt
+  }
+}
+
+# Check if ABAWD meets work requirement
+variable snap_abawd_work_requirement_met {
+  entity Person
+  period Month
+  dtype Boolean
+
+  formula {
+    # Not subject to ABAWD rules = automatically meets requirement
+    if not is_snap_abawd then
+      return true
+
+    # § 2015(o)(2): Must work 80+ hours/month
+    # or participate in qualifying work program
+    let working = work_hours_monthly >= abawd_work_hours
+    let in_program = in_snap_employment_training
+
+    return working or in_program
+  }
+}
+
+# NOTE: The following aspects CANNOT be implemented in static microsimulation:
+# - 3-month time limit tracking within 36-month period
+# - State-level ABAWD waivers
+# - Individual exemption tracking
+# - Work program slot availability
+#
+# For actual eligibility determination, integration with state eligibility
+# systems would be required.
