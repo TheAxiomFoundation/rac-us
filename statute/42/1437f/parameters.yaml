@@ -212,26 +212,41 @@ payment_standards:
   # FY 2025 National Median Fair Market Rents
   # Source: HUD FY 2025 FMR (effective October 1, 2024)
   2025:
-    0_bedroom: 1089   # Efficiency/SRO
-    1_bedroom: 1216
-    2_bedroom: 1483   # Base FMR
-    3_bedroom: 1950
-    4_bedroom: 2193
-    5_bedroom: 2522
-    6_bedroom: 2851
+    by_bedroom:
+      description: "Payment standards indexed by bedroom count (0=efficiency, 1-6=bedrooms)"
+      values:
+        - 1089   # 0-bedroom (Efficiency/SRO)
+        - 1216   # 1-bedroom
+        - 1483   # 2-bedroom (Base FMR)
+        - 1950   # 3-bedroom
+        - 2193   # 4-bedroom
+        - 2522   # 5-bedroom
+        - 2851   # 6-bedroom
     additional_per_bedroom: 329
 
   # FY 2024 National Median Fair Market Rents
   # Source: HUD FY 2024 FMR (effective October 1, 2023)
   2024:
-    0_bedroom: 1037   # Efficiency/SRO
-    1_bedroom: 1158
-    2_bedroom: 1412   # Base FMR
-    3_bedroom: 1857
-    4_bedroom: 2089
-    5_bedroom: 2402
-    6_bedroom: 2716
+    by_bedroom:
+      description: "Payment standards indexed by bedroom count (0=efficiency, 1-6=bedrooms)"
+      values:
+        - 1037   # 0-bedroom (Efficiency/SRO)
+        - 1158   # 1-bedroom
+        - 1412   # 2-bedroom (Base FMR)
+        - 1857   # 3-bedroom
+        - 2089   # 4-bedroom
+        - 2402   # 5-bedroom
+        - 2716   # 6-bedroom
     additional_per_bedroom: 313
+
+  # Maximum bedroom count with specific payment standard (beyond this, use additional_per_bedroom)
+  max_bedroom_count:
+    description: "Maximum bedroom count with specific payment standard in tables"
+    unit: bedrooms
+    values:
+      1937-01-01: 6
+    citations:
+      - "24 CFR 982.503 - Payment standards"
 
 # ============================================================
 # SUBSIDY STANDARDS - 24 CFR 982.402

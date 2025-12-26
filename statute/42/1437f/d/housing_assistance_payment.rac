@@ -26,6 +26,7 @@ parameters:
   persons_per_bedroom: statute/42/1437f/parameters.yaml#subsidy_standards.bedroom_allocation.per_two_persons
   rent_reasonableness_threshold: statute/42/1437f/parameters.yaml#rent_reasonableness.threshold
   base_voucher_bedroom_count: statute/42/1437f/parameters.yaml#subsidy_standards.bedroom_allocation.base_voucher_bedroom_count
+  max_bedroom_count: statute/42/1437f/parameters.yaml#payment_standards.max_bedroom_count
 
 references:
   # Payment standards from parameters
@@ -92,26 +93,16 @@ variable hcv_payment_standard:
   formula:
     let voucher_size = hcv_voucher_size
 
-    # Look up payment standard by bedroom size
-    if voucher_size == 0:
-      return parameter(gov.hud.hcv.payment_standards.0_bedroom)
-    else if voucher_size == 1:
-      return parameter(gov.hud.hcv.payment_standards.1_bedroom)
-    else if voucher_size == 2:
-      return parameter(gov.hud.hcv.payment_standards.2_bedroom)
-    else if voucher_size == 3:
-      return parameter(gov.hud.hcv.payment_standards.3_bedroom)
-    else if voucher_size == 4:
-      return parameter(gov.hud.hcv.payment_standards.4_bedroom)
-    else if voucher_size == 5:
-      return parameter(gov.hud.hcv.payment_standards.5_bedroom)
-    else if voucher_size >= 6:
-      # For larger units, use 6BR base + additional per bedroom
-      let base = parameter(gov.hud.hcv.payment_standards.6_bedroom)
-      let additional = parameter(gov.hud.hcv.payment_standards.additional_per_bedroom)
-      return base + ((voucher_size - 6) * additional)
+    # Look up payment standard by bedroom size from parameter table
+    let standards = parameter(gov.hud.hcv.payment_standards.by_bedroom)
+    let additional = parameter(gov.hud.hcv.payment_standards.additional_per_bedroom)
+
+    if voucher_size < max_bedroom_count:
+      return standards[voucher_size]
     else:
-      return parameter(gov.hud.hcv.payment_standards.2_bedroom)  # Default fallback
+      # For larger units, use max BR base + additional per bedroom
+      let base = standards[max_bedroom_count]
+      return base + ((voucher_size - max_bedroom_count) * additional)
 
   default 0
 

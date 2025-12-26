@@ -18,6 +18,7 @@ imports:
   snap_eligibility: statute/7/2014/a/categorical_eligibility
   federal_poverty_level: statute/7/2014/c/fpl_by_household_size
   adult_age_threshold: statute/42/608/parameters.yaml#adult_age_threshold
+  noncitizen_waiting_period_years: statute/42/608/parameters.yaml#noncitizen_5_year_bar
 
 # Core definition: TANF assistance unit
 # A family unit receiving or eligible for TANF benefits
@@ -131,7 +132,7 @@ formula:
 
   if qualified_alien_exempt_category: return true
 
-  if qualified_alien and years_since_entry >= 5: return true
+  if qualified_alien and years_since_entry >= noncitizen_waiting_period_years: return true
 
   return false
 
