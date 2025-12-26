@@ -41,26 +41,35 @@ enum CCDFAgeGroup:
   PRESCHOOLER  # 3-5 years
   SCHOOL_AGE   # 6-12 years
 
+parameters:
+  infant_max_months_center: parameters#age_groups.infant_max_months_center
+  infant_max_months_home: parameters#age_groups.infant_max_months_home
+  toddler_max_months_center: parameters#age_groups.toddler_max_months_center
+  toddler_max_months_home: parameters#age_groups.toddler_max_months_home
+  preschool_max_years: parameters#age_groups.preschool_max_years
+  months_per_year: parameters#time_periods.months_per_year
+
 formula:
   age = this.age
   is_home_based = this.is_ccdf_home_based
+  age_months = age * months_per_year
 
   # Age thresholds vary by provider type
   # Home-based care typically has different age group cutoffs
 
-  # Infant: under 18 months (center) or under 24 months (home)
-  if (age < 1.5 and not is_home_based) or (age < 2 and is_home_based):
+  # Infant: under infant_max_months (center) or (home)
+  if (age_months < infant_max_months_center and not is_home_based) or (age_months < infant_max_months_home and is_home_based):
     return CCDFAgeGroup.INFANT
 
-  # Toddler: 18-23 months (center) or 24-35 months (home)
-  if (age < 2 and not is_home_based) or (age < 3 and is_home_based):
+  # Toddler: under toddler_max_months
+  if (age_months < toddler_max_months_center and not is_home_based) or (age_months < toddler_max_months_home and is_home_based):
     return CCDFAgeGroup.TODDLER
 
-  # Preschooler: 2/3-5 years
-  if age < 6:
+  # Preschooler: under preschool_max_years
+  if age < preschool_max_years:
     return CCDFAgeGroup.PRESCHOOLER
 
-  # School-age: 6-12 years
+  # School-age: preschool_max_years and above
   return CCDFAgeGroup.SCHOOL_AGE
 
 
@@ -79,24 +88,29 @@ enum CCDFDurationOfCare:
   PART_DAY  # 3-5 hours per day
   HOURLY    # Less than 3 hours per day
 
+parameters:
+  weekly_min_hours: parameters#duration_thresholds.weekly_min_hours
+  daily_min_hours: parameters#duration_thresholds.daily_min_hours
+  part_day_min_hours: parameters#duration_thresholds.part_day_min_hours
+
 formula:
   hours_per_day = this.childcare_hours_per_day
   days_per_week = this.childcare_days_per_week
   hours_per_week = hours_per_day * days_per_week
 
-  # Weekly rate: 30+ hours per week
-  if hours_per_week >= 30:
+  # Weekly rate: weekly_min_hours+ hours per week
+  if hours_per_week >= weekly_min_hours:
     return CCDFDurationOfCare.WEEKLY
 
-  # Daily rate: 6+ hours per day
-  if hours_per_day >= 6:
+  # Daily rate: daily_min_hours+ hours per day
+  if hours_per_day >= daily_min_hours:
     return CCDFDurationOfCare.DAILY
 
-  # Part-day rate: 3-5 hours per day
-  if hours_per_day >= 3:
+  # Part-day rate: part_day_min_hours+ hours per day
+  if hours_per_day >= part_day_min_hours:
     return CCDFDurationOfCare.PART_DAY
 
-  # Hourly rate: under 3 hours per day
+  # Hourly rate: under part_day_min_hours
   return CCDFDurationOfCare.HOURLY
 
 
@@ -109,6 +123,9 @@ unit "USD"
 label "CCDF Market Rate"
 description "Annual market rate for child care based on age, provider, duration, and location"
 reference "42 USC 9858c(c)(4)(B)"
+
+parameters:
+  weeks_per_year: parameters#time_periods.weeks_per_year
 
 formula:
   # Get rate factors
@@ -126,7 +143,6 @@ formula:
   hours_per_day = this.childcare_hours_per_day
   days_per_week = this.childcare_days_per_week
   hours_per_week = hours_per_day * days_per_week
-  weeks_per_year = 52
 
   # Periods per week depends on duration category
   if duration == CCDFDurationOfCare.WEEKLY:
@@ -191,9 +207,12 @@ unit "USD"
 label "CCDF Monthly Subsidy"
 description "Average monthly CCDF child care subsidy"
 
+parameters:
+  months_per_year: parameters#time_periods.months_per_year
+
 formula:
   annual_subsidy = this.ccdf_subsidy
-  return annual_subsidy / 12
+  return annual_subsidy / months_per_year
 
 
 # =============================================================================

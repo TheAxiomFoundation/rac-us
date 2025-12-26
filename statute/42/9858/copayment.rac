@@ -18,6 +18,7 @@ imports:
   # Copayment parameters
   maximum_percent_of_income: statute/42/9858/parameters/copayment/maximum_percent_of_income
   minimum_weekly_fee: statute/42/9858/parameters/copayment/minimum_weekly_fee
+  weeks_per_year: statute/42/9858/parameters/time_periods/weeks_per_year
 
 # =============================================================================
 # COPAYMENT CALCULATION
@@ -81,8 +82,8 @@ formula:
   # Apply maximum copay cap (7% of total income per federal guidance)
   max_copay = family_income * max_copay_rate
 
-  # Ensure minimum fee ($1/week = $52/year typical)
-  min_annual_fee = minimum_weekly_fee * 52
+  # Ensure minimum fee (e.g., $1/week typical)
+  min_annual_fee = minimum_weekly_fee * weeks_per_year
 
   # Copay is minimum of calculated and max, but at least the minimum fee
   copay_before_floor = min(calculated_copay, max_copay)
@@ -100,7 +101,7 @@ description "Weekly family copayment for CCDF child care"
 
 formula:
   annual_copay = this.ccdf_family_copayment
-  return annual_copay / 52
+  return annual_copay / weeks_per_year
 
 
 # =============================================================================

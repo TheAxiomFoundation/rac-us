@@ -67,6 +67,104 @@ age_limits:
     citations:
       - "42 USC 9858n(4)(A)(ii): who is under 19 and physically or mentally incapable"
 
+# Age Group Thresholds for Rate Determination
+# Different rates apply to different age groups (infant, toddler, preschool, school-age)
+age_groups:
+  description: "Age thresholds for CCDF rate category determination per 45 CFR 98.45"
+
+  # Infant age cutoff (center-based care)
+  infant_max_months_center:
+    description: "Maximum age in months for infant rate (center-based)"
+    unit: month
+    values:
+      1991-01-01: 18
+    citations:
+      - "45 CFR 98.45 - Market rate surveys by age category"
+
+  # Infant age cutoff (home-based care, typically higher)
+  infant_max_months_home:
+    description: "Maximum age in months for infant rate (home-based)"
+    unit: month
+    values:
+      1991-01-01: 24
+    citations:
+      - "State CCDF plans - home-based care age categories"
+
+  # Toddler age cutoff (center-based)
+  toddler_max_months_center:
+    description: "Maximum age in months for toddler rate (center-based)"
+    unit: month
+    values:
+      1991-01-01: 24
+    citations:
+      - "45 CFR 98.45 - Market rate surveys by age category"
+
+  # Toddler age cutoff (home-based)
+  toddler_max_months_home:
+    description: "Maximum age in months for toddler rate (home-based)"
+    unit: month
+    values:
+      1991-01-01: 36
+    citations:
+      - "State CCDF plans - home-based care age categories"
+
+  # Preschooler max age (typically under 6)
+  preschool_max_years:
+    description: "Maximum age in years for preschool rate"
+    unit: year
+    values:
+      1991-01-01: 6
+    citations:
+      - "45 CFR 98.45 - School-age begins at kindergarten eligibility"
+
+# Duration of Care Thresholds
+# Different payment rates for weekly, daily, part-day, hourly care
+duration_thresholds:
+  description: "Hours thresholds for care duration categories per 45 CFR 98.45"
+
+  # Weekly rate threshold (30+ hours per week)
+  weekly_min_hours:
+    description: "Minimum hours per week for weekly rate"
+    unit: hour
+    values:
+      1991-01-01: 30
+    citations:
+      - "45 CFR 98.45(l)(2) - full-time/part-time rate categories"
+
+  # Daily rate threshold (6+ hours per day)
+  daily_min_hours:
+    description: "Minimum hours per day for daily rate"
+    unit: hour
+    values:
+      1991-01-01: 6
+    citations:
+      - "State CCDF plans - daily rate eligibility"
+
+  # Part-day rate threshold (3+ hours per day)
+  part_day_min_hours:
+    description: "Minimum hours per day for part-day rate"
+    unit: hour
+    values:
+      1991-01-01: 3
+    citations:
+      - "State CCDF plans - part-day rate eligibility"
+
+# Time Period Constants
+time_periods:
+  description: "Time period conversion constants"
+
+  weeks_per_year:
+    description: "Number of weeks per year for annualization"
+    unit: week
+    values:
+      1991-01-01: 52
+
+  months_per_year:
+    description: "Number of months per year for monthly conversion"
+    unit: month
+    values:
+      1991-01-01: 12
+
 # Activity Requirements
 # 42 USC 9858c(c)(2)(F) - Parents must be working, in training, or in education
 activity_requirements:
