@@ -1,0 +1,21 @@
+# 26 USC 21 - Input Variables
+#
+# Employment-related expenses paid by the taxpayer during the taxable year.
+# These are expenses for the care of a qualifying individual that enable the
+# taxpayer to be gainfully employed.
+
+module statute.26.21.a
+version "2024.1"
+
+variable cdcc_expenses_paid {
+  entity TaxUnit
+  period Year
+  dtype Money
+  unit "USD"
+  label "CDCC Expenses Paid"
+  description "Employment-related child/dependent care expenses paid during the year"
+  reference "26 USC 21(b)(2): employment-related expenses"
+
+  # Input variable - no formula
+  default 0
+}

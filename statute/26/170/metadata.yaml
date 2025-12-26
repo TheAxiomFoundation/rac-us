@@ -1,0 +1,71 @@
+# Encoding Metadata for 26 USC Section 170 (Charitable Contributions)
+
+encoding:
+  created: 2024-12-25
+  updated: 2024-12-25
+  status: initial
+  encoded_by: claude-opus-4.5
+
+variable:
+  name: charitable_deduction
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+
+coverage:
+  tax_years: [2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025]
+  notes: |
+    TCJA changes (2018-2025):
+    - Cash contributions to public charities: 60% AGI limit (up from 50%)
+    - Eliminated contemporaneous written acknowledgment safe harbor
+
+    CARES Act (2020-2021):
+    - 100% AGI limit for cash to public charities (2020-2021)
+    - $300 above-the-line deduction for non-itemizers (2020)
+    - $600 for MFJ non-itemizers (2021)
+
+sources:
+  statute:
+    - citation: "26 USC 170"
+      title: "Charitable, etc., contributions and gifts"
+      sections:
+        - a: Allowance of deduction
+        - b: Percentage limitations
+        - c: Charitable contribution defined
+        - d: Carryovers of excess contributions
+        - e: Certain contributions of ordinary income and capital gain property
+
+  guidance:
+    - citation: "IRS Publication 526"
+      title: "Charitable Contributions"
+      source: https://www.irs.gov/publications/p526
+
+architecture:
+  description: |
+    Charitable deduction structure:
+
+    1. CONTRIBUTION TYPES
+       - Cash contributions
+       - Appreciated property (capital gain property)
+       - Ordinary income property
+
+    2. DONEE CATEGORIES
+       - 50%/60% organizations (public charities, operating foundations)
+       - 30% organizations (private foundations, non-operating)
+
+    3. LIMITATIONS (stacking order per 170(b)(1))
+       - Cash to 50% orgs: 60% AGI (TCJA increased from 50%)
+       - Property to 50% orgs: 30% AGI
+       - Cash to 30% orgs: 30% AGI
+       - Property to 30% orgs: 20% AGI
+
+    4. CARRYFORWARD (170(d))
+       - Excess contributions carry forward 5 years
+       - Applied in order (current year first, then oldest carryforward)
+
+  formula_structure: |
+    charitable_deduction =
+      min(total_contributions, applicable_agi_limit) +
+      carryforward_used
+
+    Total cannot exceed 60% of AGI (generally)

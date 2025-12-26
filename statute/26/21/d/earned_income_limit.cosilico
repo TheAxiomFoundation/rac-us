@@ -1,0 +1,55 @@
+# 26 USC 21(d) - Earned Income Limitation
+#
+# "(d) EARNED INCOME LIMITATION. --
+#   (1) IN GENERAL. -- Except as otherwise provided in this subsection, the amount of
+#       the employment-related expenses incurred during any taxable year which may be
+#       taken into account under subsection (a) shall not exceed --
+#       (A) in the case of an individual who is not married at the close of such year,
+#           such individual's earned income for such year, or
+#       (B) in the case of an individual who is married at the close of such year,
+#           the lesser of such individual's earned income or the earned income of
+#           his spouse for such year."
+#
+# The credit is limited to the taxpayer's earned income (or for married couples,
+# the lesser of the two spouses' earned incomes).
+
+module statute.26.21.d
+version "2024.1"
+
+references {
+  # Filing status
+  filing_status: statute/26/1/filing_status
+
+  # Earned income
+  earned_income: statute/26/32/c/2/A/earned_income
+
+  # Person-level characteristics
+  is_tax_unit_head: statute/26/1/person/is_tax_unit_head
+  is_tax_unit_spouse: statute/26/1/person/is_tax_unit_spouse
+}
+
+variable cdcc_earned_income_limit {
+  entity TaxUnit
+  period Year
+  dtype Money
+  unit "USD"
+  label "CDCC Earned Income Limit"
+  description "Earned income limitation on creditable expenses per 26 USC 21(d)"
+  reference (
+    "26 USC 21(d)(1)(A): single filer's earned income",
+    "26 USC 21(d)(1)(B): lesser of spouses' earned incomes"
+  )
+
+  formula {
+    # For single/HoH filers: use the head's earned income
+    if filing_status == SINGLE or filing_status == HEAD_OF_HOUSEHOLD then
+      return tax_unit.members.sum(earned_income, where: is_tax_unit_head)
+
+    # For married filers: use lesser of two spouses' earned income
+    # This incentivizes work for both spouses
+    let head_earned = tax_unit.members.sum(earned_income, where: is_tax_unit_head)
+    let spouse_earned = tax_unit.members.sum(earned_income, where: is_tax_unit_spouse)
+
+    return min(head_earned, spouse_earned)
+  }
+}

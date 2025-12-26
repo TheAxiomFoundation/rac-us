@@ -1,0 +1,420 @@
+# 26 USC Sections 1211-1212, 1222 - Capital Gain/Loss Netting Rules
+#
+# Capital gains and losses are netted in a specific order:
+#
+# Step 1: Net short-term gains against short-term losses (Section 1222(5)-(6))
+# Step 2: Net long-term gains against long-term losses (Section 1222(7)-(8))
+# Step 3: Net the results against each other (Section 1222(9)-(11))
+#
+# Section 1211(b) - Capital Loss Limitation for Individuals:
+#   Net capital losses can offset only $3,000 of ordinary income per year
+#   ($1,500 for married filing separately)
+#
+# Section 1212(b) - Capital Loss Carryover:
+#   Unused capital losses carry forward indefinitely to future years
+#   (character preserved: ST losses carry as ST, LT losses carry as LT)
+#
+# Net Capital Gain per Section 1222(11):
+#   The excess of net long-term capital gain over net short-term capital loss
+
+module statute.26.1001.netting
+version "2024.1"
+
+references {
+  # Raw gain/loss totals from capital_gains.cosilico
+  short_term_capital_gain: statute/26/1001/capital_gains
+  short_term_capital_loss: statute/26/1001/capital_gains
+  long_term_capital_gain: statute/26/1001/capital_gains
+  long_term_capital_loss: statute/26/1001/capital_gains
+
+  # Filing status for loss limitation
+  filing_status: statute/26/1/filing_status
+
+  # Carryover from prior years
+  short_term_capital_loss_carryover: statute/26/1212/carryover
+  long_term_capital_loss_carryover: statute/26/1212/carryover
+}
+
+parameters {
+  # Capital loss deduction limit per Section 1211(b)
+  capital_loss_limit: 1001/parameters#capital_loss_limit
+  capital_loss_limit_mfs: 1001/parameters#capital_loss_limit_mfs
+}
+
+# =============================================================================
+# Section 1222(5)-(6) - Net Short-Term Capital Gain/Loss
+# =============================================================================
+
+# Net short-term capital gain (Section 1222(5))
+# "The excess of short-term capital gains for the taxable year over the
+# short-term capital losses for such year"
+variable net_short_term_capital_gain {
+  entity TaxUnit
+  period Year
+  dtype Money
+  unit "USD"
+  label "Net Short-Term Capital Gain"
+  description "Excess of ST gains over ST losses per 26 USC Section 1222(5)"
+  reference "26 USC Section 1222(5)"
+
+  formula {
+    # Include carryover losses from prior years
+    let total_st_loss = short_term_capital_loss + short_term_capital_loss_carryover
+    let net = short_term_capital_gain - total_st_loss
+
+    # Only a gain if positive
+    return max(0, net)
+  }
+
+  default 0
+}
+
+# Net short-term capital loss (Section 1222(6))
+# "The excess of short-term capital losses for the taxable year over the
+# short-term capital gains for such year"
+variable net_short_term_capital_loss {
+  entity TaxUnit
+  period Year
+  dtype Money
+  unit "USD"
+  label "Net Short-Term Capital Loss"
+  description "Excess of ST losses over ST gains per 26 USC Section 1222(6)"
+  reference "26 USC Section 1222(6)"
+
+  formula {
+    let total_st_loss = short_term_capital_loss + short_term_capital_loss_carryover
+    let net = total_st_loss - short_term_capital_gain
+
+    # Only a loss if positive (losses stored as positive numbers)
+    return max(0, net)
+  }
+
+  default 0
+}
+
+# =============================================================================
+# Section 1222(7)-(8) - Net Long-Term Capital Gain/Loss
+# =============================================================================
+
+# Net long-term capital gain (Section 1222(7))
+# "The excess of long-term capital gains for the taxable year over the
+# long-term capital losses for such year"
+variable net_long_term_capital_gain {
+  entity TaxUnit
+  period Year
+  dtype Money
+  unit "USD"
+  label "Net Long-Term Capital Gain"
+  description "Excess of LT gains over LT losses per 26 USC Section 1222(7)"
+  reference "26 USC Section 1222(7)"
+
+  formula {
+    let total_lt_loss = long_term_capital_loss + long_term_capital_loss_carryover
+    let net = long_term_capital_gain - total_lt_loss
+
+    return max(0, net)
+  }
+
+  default 0
+}
+
+# Net long-term capital loss (Section 1222(8))
+# "The excess of long-term capital losses for the taxable year over the
+# long-term capital gains for such year"
+variable net_long_term_capital_loss {
+  entity TaxUnit
+  period Year
+  dtype Money
+  unit "USD"
+  label "Net Long-Term Capital Loss"
+  description "Excess of LT losses over LT gains per 26 USC Section 1222(8)"
+  reference "26 USC Section 1222(8)"
+
+  formula {
+    let total_lt_loss = long_term_capital_loss + long_term_capital_loss_carryover
+    let net = total_lt_loss - long_term_capital_gain
+
+    return max(0, net)
+  }
+
+  default 0
+}
+
+# =============================================================================
+# Section 1222(9)-(11) - Final Netting
+# =============================================================================
+
+# Capital gain net income (Section 1222(9))
+# "The excess of the gains from sales or exchanges of capital assets over
+# the losses from such sales or exchanges"
+variable capital_gain_net_income {
+  entity TaxUnit
+  period Year
+  dtype Money
+  unit "USD"
+  label "Capital Gain Net Income"
+  description "Total net capital gains (if gains exceed losses) per 26 USC Section 1222(9)"
+  reference "26 USC Section 1222(9)"
+
+  formula {
+    # Net ST gain/loss + Net LT gain/loss
+    let net_st = net_short_term_capital_gain - net_short_term_capital_loss
+    let net_lt = net_long_term_capital_gain - net_long_term_capital_loss
+
+    let total = net_st + net_lt
+
+    # Only positive if overall gain
+    return max(0, total)
+  }
+
+  default 0
+}
+
+# Net capital loss (Section 1222(10))
+# "The excess of the losses from sales or exchanges of capital assets over
+# the sum allowed under section 1211"
+variable net_capital_loss {
+  entity TaxUnit
+  period Year
+  dtype Money
+  unit "USD"
+  label "Net Capital Loss"
+  description "Total net capital loss (before limitation) per 26 USC Section 1222(10)"
+  reference "26 USC Section 1222(10)"
+
+  formula {
+    let net_st = net_short_term_capital_gain - net_short_term_capital_loss
+    let net_lt = net_long_term_capital_gain - net_long_term_capital_loss
+
+    let total = net_st + net_lt
+
+    # Only positive if overall loss (stored as positive number)
+    return max(0, -total)
+  }
+
+  default 0
+}
+
+# Net capital gain (Section 1222(11)) - KEY for preferential rate treatment
+# "The excess of the net long-term capital gain for the taxable year over
+# the net short-term capital loss for such year"
+variable net_capital_gain {
+  entity TaxUnit
+  period Year
+  dtype Money
+  unit "USD"
+  label "Net Capital Gain"
+  description "Net LTCG minus net STCL, eligible for preferential rates per 26 USC Section 1222(11)"
+  reference "26 USC Section 1222(11)"
+
+  formula {
+    # This is what qualifies for the 0%/15%/20% preferential rates
+    # Net long-term gain - Net short-term loss
+    let result = net_long_term_capital_gain - net_short_term_capital_loss
+
+    return max(0, result)
+  }
+
+  default 0
+}
+
+# =============================================================================
+# Section 1211(b) - Capital Loss Limitation (Individuals)
+# =============================================================================
+
+# Capital loss deduction limit
+# Per Section 1211(b): For individuals, net capital loss deductible against
+# ordinary income is limited to $3,000 ($1,500 MFS)
+variable capital_loss_deduction_limit {
+  entity TaxUnit
+  period Year
+  dtype Money
+  unit "USD"
+  label "Capital Loss Deduction Limit"
+  description "Maximum capital loss deductible against ordinary income per 26 USC Section 1211(b)"
+  reference "26 USC Section 1211(b)"
+
+  formula {
+    match filing_status {
+      MARRIED_FILING_SEPARATELY => capital_loss_limit_mfs
+      else => capital_loss_limit
+    }
+  }
+}
+
+# Allowable capital loss deduction
+# The lesser of: net capital loss or the statutory limit
+variable capital_loss_deduction {
+  entity TaxUnit
+  period Year
+  dtype Money
+  unit "USD"
+  label "Allowable Capital Loss Deduction"
+  description "Capital loss amount deductible against ordinary income per 26 USC Section 1211(b)"
+  reference "26 USC Section 1211(b)"
+
+  formula {
+    return min(net_capital_loss, capital_loss_deduction_limit)
+  }
+
+  defined_for {
+    net_capital_loss > 0
+  }
+
+  default 0
+}
+
+# =============================================================================
+# Section 1212(b) - Capital Loss Carryover
+# =============================================================================
+
+# Total unused capital loss to carry forward
+# Per Section 1212(b): Unused capital losses carry forward indefinitely
+variable capital_loss_carryover_generated {
+  entity TaxUnit
+  period Year
+  dtype Money
+  unit "USD"
+  label "Capital Loss Carryover Generated"
+  description "Unused capital loss to carry to future years per 26 USC Section 1212(b)"
+  reference "26 USC Section 1212(b)"
+
+  formula {
+    # Carryover = Net loss minus amount allowed as deduction this year
+    return max(0, net_capital_loss - capital_loss_deduction)
+  }
+
+  default 0
+}
+
+# Breakdown of carryover by character (short-term vs long-term)
+# Per Section 1212(b)(1)-(2): Character is preserved
+
+# Short-term loss carryover generated
+variable short_term_loss_carryover_generated {
+  entity TaxUnit
+  period Year
+  dtype Money
+  unit "USD"
+  label "Short-Term Loss Carryover Generated"
+  description "ST capital loss carryover to future years per 26 USC Section 1212(b)(1)"
+  reference "26 USC Section 1212(b)(1)"
+
+  formula {
+    # Per Section 1212(b)(1): ST loss carryover = net STCL reduced by:
+    # (a) the net LTCG (if any), plus
+    # (b) the amount allowed as deduction
+
+    let net_stcl = net_short_term_capital_loss
+    let net_ltcg = net_long_term_capital_gain
+    let deduction = capital_loss_deduction
+
+    # First, net STCL is reduced by any net LTCG
+    let after_ltcg_offset = max(0, net_stcl - net_ltcg)
+
+    # Then reduced by the amount deducted (up to limit)
+    # But only if there's no net LTCG (otherwise LTCG absorbed the deduction)
+    if net_ltcg > 0 then
+      # LTCG present - deduction comes from combined net loss
+      return after_ltcg_offset
+    else
+      # No LTCG - ST loss was used for deduction first
+      return max(0, net_stcl - deduction)
+  }
+
+  default 0
+}
+
+# Long-term loss carryover generated
+variable long_term_loss_carryover_generated {
+  entity TaxUnit
+  period Year
+  dtype Money
+  unit "USD"
+  label "Long-Term Loss Carryover Generated"
+  description "LT capital loss carryover to future years per 26 USC Section 1212(b)(2)"
+  reference "26 USC Section 1212(b)(2)"
+
+  formula {
+    # Per Section 1212(b)(2): LT loss carryover = net LTCL reduced by:
+    # (a) the net STCG (if any), plus
+    # (b) the excess of amount allowed as deduction over net STCL
+
+    let net_ltcl = net_long_term_capital_loss
+    let net_stcg = net_short_term_capital_gain
+    let net_stcl = net_short_term_capital_loss
+    let deduction = capital_loss_deduction
+
+    # First, net LTCL is reduced by any net STCG
+    let after_stcg_offset = max(0, net_ltcl - net_stcg)
+
+    # Then reduced by excess deduction (after STCL absorbs deduction first)
+    let excess_deduction = max(0, deduction - net_stcl)
+
+    return max(0, after_stcg_offset - excess_deduction)
+  }
+
+  default 0
+}
+
+# =============================================================================
+# Summary Variables for Schedule D Integration
+# =============================================================================
+
+# Total capital gain (for inclusion in AGI)
+# Positive = net gain, Negative = net loss (up to limit)
+variable capital_gain_or_loss_for_agi {
+  entity TaxUnit
+  period Year
+  dtype Money
+  unit "USD"
+  label "Capital Gain or Loss for AGI"
+  description "Net capital gain or allowable loss for AGI calculation"
+  reference (
+    "26 USC Section 1222",
+    "26 USC Section 1211(b)"
+  )
+
+  formula {
+    if capital_gain_net_income > 0 then
+      # Net gain - fully included
+      return capital_gain_net_income
+    else
+      # Net loss - limited to deduction amount (as negative)
+      return -capital_loss_deduction
+  }
+
+  default 0
+}
+
+# Indicator: Has net capital gain eligible for preferential rates
+variable has_net_capital_gain {
+  entity TaxUnit
+  period Year
+  dtype Bool
+  label "Has Net Capital Gain"
+  description "Taxpayer has net capital gain eligible for preferential rates"
+  reference "26 USC Section 1222(11)"
+
+  formula {
+    return net_capital_gain > 0
+  }
+
+  default false
+}
+
+# Indicator: Has capital loss carryover to next year
+variable has_capital_loss_carryover {
+  entity TaxUnit
+  period Year
+  dtype Bool
+  label "Has Capital Loss Carryover"
+  description "Taxpayer has unused capital loss to carry forward"
+  reference "26 USC Section 1212(b)"
+
+  formula {
+    return capital_loss_carryover_generated > 0
+  }
+
+  default false
+}

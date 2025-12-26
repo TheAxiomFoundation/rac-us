@@ -1,0 +1,249 @@
+# Tests for 26 USC Section 213 - Medical Expense Deduction
+
+variable: medical_expense_deduction
+tax_year: 2024
+
+test_cases:
+  # ==========================================================================
+  # Basic 7.5% Floor Calculations
+  # ==========================================================================
+
+  - name: "Medical expenses exceed 7.5% floor"
+    description: "Deduction for expenses above 7.5% of AGI"
+    inputs:
+      filing_status: single
+      adjusted_gross_income: 50000
+      medical_expenses: 5000
+    expected:
+      # Floor = $50,000 * 7.5% = $3,750
+      # Deduction = $5,000 - $3,750 = $1,250
+      medical_expense_deduction: 1250
+    citations:
+      - "26 USC 213(a): 7.5% floor"
+      - "CAA 2021 Section 9041"
+
+  - name: "Medical expenses at exactly 7.5% of AGI"
+    description: "No deduction when expenses equal floor"
+    inputs:
+      filing_status: joint
+      adjusted_gross_income: 100000
+      medical_expenses: 7500
+    expected:
+      # Floor = $100,000 * 7.5% = $7,500
+      # Deduction = $7,500 - $7,500 = $0
+      medical_expense_deduction: 0
+    citations:
+      - "26 USC 213(a): must EXCEED 7.5%"
+
+  - name: "Medical expenses below 7.5% floor"
+    description: "No deduction when under floor"
+    inputs:
+      filing_status: single
+      adjusted_gross_income: 80000
+      medical_expenses: 5000
+    expected:
+      # Floor = $80,000 * 7.5% = $6,000
+      # $5,000 < $6,000, no deduction
+      medical_expense_deduction: 0
+    citations:
+      - "26 USC 213(a): expenses must exceed floor"
+
+  # ==========================================================================
+  # High Medical Expenses
+  # ==========================================================================
+
+  - name: "Large medical expenses, modest income"
+    description: "Significant deduction when medical costs are high"
+    inputs:
+      filing_status: single
+      adjusted_gross_income: 40000
+      medical_expenses: 15000
+    expected:
+      # Floor = $40,000 * 7.5% = $3,000
+      # Deduction = $15,000 - $3,000 = $12,000
+      medical_expense_deduction: 12000
+    citations:
+      - "26 USC 213(a)"
+
+  - name: "Catastrophic medical expenses"
+    description: "Very high medical costs"
+    inputs:
+      filing_status: joint
+      adjusted_gross_income: 75000
+      medical_expenses: 50000
+    expected:
+      # Floor = $75,000 * 7.5% = $5,625
+      # Deduction = $50,000 - $5,625 = $44,375
+      medical_expense_deduction: 44375
+    citations:
+      - "26 USC 213(a)"
+
+  # ==========================================================================
+  # Insurance Reimbursements
+  # ==========================================================================
+
+  - name: "Partially reimbursed medical expenses"
+    description: "Only unreimbursed portion counts"
+    inputs:
+      filing_status: single
+      adjusted_gross_income: 60000
+      medical_expenses: 12000
+      medical_insurance_reimbursement: 5000
+    expected:
+      # Qualifying = $12,000 - $5,000 = $7,000
+      # Floor = $60,000 * 7.5% = $4,500
+      # Deduction = $7,000 - $4,500 = $2,500
+      qualifying_medical_expenses: 7000
+      medical_expense_deduction: 2500
+    citations:
+      - "26 USC 213(a): not compensated by insurance"
+      - "IRS Publication 502"
+
+  - name: "Fully reimbursed by insurance"
+    description: "No deduction if insurance covers all"
+    inputs:
+      filing_status: joint
+      adjusted_gross_income: 100000
+      medical_expenses: 8000
+      medical_insurance_reimbursement: 8000
+    expected:
+      qualifying_medical_expenses: 0
+      medical_expense_deduction: 0
+    citations:
+      - "26 USC 213(a): not compensated by insurance"
+
+  # ==========================================================================
+  # Various Income Levels
+  # ==========================================================================
+
+  - name: "Low income, high relative medical costs"
+    description: "Floor is lower for lower income"
+    inputs:
+      filing_status: head_of_household
+      adjusted_gross_income: 25000
+      medical_expenses: 4000
+    expected:
+      # Floor = $25,000 * 7.5% = $1,875
+      # Deduction = $4,000 - $1,875 = $2,125
+      medical_expense_deduction: 2125
+    citations:
+      - "26 USC 213(a)"
+
+  - name: "High income, high absolute floor"
+    description: "7.5% of high income means high floor"
+    inputs:
+      filing_status: joint
+      adjusted_gross_income: 500000
+      medical_expenses: 30000
+    expected:
+      # Floor = $500,000 * 7.5% = $37,500
+      # $30,000 < $37,500, no deduction
+      medical_expense_deduction: 0
+    citations:
+      - "26 USC 213(a): 7.5% floor scales with income"
+
+  - name: "High income with deduction"
+    description: "High earner with very high medical expenses"
+    inputs:
+      filing_status: joint
+      adjusted_gross_income: 300000
+      medical_expenses: 50000
+    expected:
+      # Floor = $300,000 * 7.5% = $22,500
+      # Deduction = $50,000 - $22,500 = $27,500
+      medical_expense_deduction: 27500
+    citations:
+      - "26 USC 213(a)"
+
+  # ==========================================================================
+  # Edge Cases
+  # ==========================================================================
+
+  - name: "Zero medical expenses"
+    description: "No deduction with no expenses"
+    inputs:
+      filing_status: single
+      adjusted_gross_income: 50000
+      medical_expenses: 0
+    expected:
+      medical_expense_deduction: 0
+
+  - name: "Zero AGI"
+    description: "Floor is zero when AGI is zero"
+    inputs:
+      filing_status: single
+      adjusted_gross_income: 0
+      medical_expenses: 3000
+    expected:
+      # Floor = $0 * 7.5% = $0
+      # Deduction = $3,000 - $0 = $3,000
+      medical_expense_deduction: 3000
+    citations:
+      - "26 USC 213(a): floor is percentage of AGI"
+
+  - name: "Negative AGI treated as zero floor"
+    description: "Net operating loss scenario"
+    inputs:
+      filing_status: single
+      adjusted_gross_income: -10000
+      medical_expenses: 5000
+    expected:
+      # AGI floor cannot be negative
+      # Floor = $0
+      # Deduction = $5,000
+      medical_expense_deduction: 5000
+    citations:
+      - "26 USC 213(a)"
+
+  # ==========================================================================
+  # Long-Term Care Premiums
+  # ==========================================================================
+
+  - name: "Long-term care premiums included"
+    description: "LTC premiums count as medical expenses"
+    inputs:
+      filing_status: single
+      adjusted_gross_income: 60000
+      medical_expenses: 3000
+      long_term_care_premiums: 2000
+    expected:
+      # Qualifying = $3,000 + $2,000 = $5,000
+      # Floor = $60,000 * 7.5% = $4,500
+      # Deduction = $5,000 - $4,500 = $500
+      qualifying_medical_expenses: 5000
+      medical_expense_deduction: 500
+    citations:
+      - "26 USC 213(d)(1)(D): long-term care services"
+      - "26 USC 213(d)(10): premium limits by age"
+
+  # ==========================================================================
+  # Historical Test Cases - Different Floor Periods
+  # ==========================================================================
+
+  - name: "2017 TCJA retroactive 7.5% floor"
+    tax_year: 2017
+    description: "TCJA lowered floor to 7.5% for 2017-2018"
+    inputs:
+      filing_status: single
+      adjusted_gross_income: 50000
+      medical_expenses: 5000
+    expected:
+      # Floor = $50,000 * 7.5% = $3,750
+      medical_expense_deduction: 1250
+    citations:
+      - "TCJA Section 11027: 7.5% for 2017-2018"
+
+  - name: "2016 age-based floor (under 65)"
+    tax_year: 2016
+    description: "Pre-TCJA 10% floor for under-65"
+    inputs:
+      filing_status: single
+      adjusted_gross_income: 50000
+      medical_expenses: 6000
+      taxpayer_age: 50
+    expected:
+      # Floor = $50,000 * 10% = $5,000
+      # Deduction = $6,000 - $5,000 = $1,000
+      medical_expense_deduction: 1000
+    citations:
+      - "ACA Section 9013: 10% floor (pre-TCJA)"

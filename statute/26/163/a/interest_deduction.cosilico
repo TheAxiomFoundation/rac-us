@@ -1,0 +1,46 @@
+# 26 USC 163(a) - Interest Deduction
+#
+# "(a) General rule.-- There shall be allowed as a deduction all interest
+#      paid or accrued within the taxable year on indebtedness."
+#
+# Subject to various limitations:
+# - 163(d): Investment interest limited to net investment income
+# - 163(h): Personal interest NOT deductible, except qualified residence interest
+# - 163(j): Business interest limitations (not modeled here)
+
+module statute.26.163.a
+version "2024.1"
+
+references {
+  qualified_residence_interest: statute/26/163/h/qualified_residence_interest
+  deductible_investment_interest: statute/26/163/d/deductible_investment_interest
+  mortgage_points: inputs/mortgage_points_paid
+}
+
+variable interest_deduction {
+  entity TaxUnit
+  period Year
+  dtype Money
+  unit "USD"
+  label "Interest Deduction"
+  description "Total deductible interest for itemized deductions per 26 USC 163"
+  reference (
+    "26 USC 163(a)",
+    "26 USC 163(d)",
+    "26 USC 163(h)",
+    "IRS Publication 936"
+  )
+
+  formula {
+    # Deductible interest consists of:
+    # 1. Qualified residence interest (mortgage interest within limits)
+    # 2. Investment interest (limited to net investment income)
+    # 3. Mortgage points (if meeting requirements)
+
+    return qualified_residence_interest +
+           deductible_investment_interest +
+           mortgage_points
+  }
+
+  default 0
+}

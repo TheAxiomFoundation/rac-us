@@ -1,0 +1,96 @@
+# 26 USC Section 243 - Dividends Received Deduction Parameters
+#
+# The DRD reduces the effective tax on inter-corporate dividends.
+#
+# Sources:
+# - 26 USC 243 - Dividends received by corporations
+# - TCJA Section 13002 - Reduced percentages effective 2018
+# - IRS Publication 542 - Corporations
+
+# Deduction percentages by ownership level
+
+# Less than 20% ownership (portfolio investments)
+deduction_rate_portfolio:
+  description: "DRD percentage for less than 20% ownership"
+  unit: rate
+  values:
+    # Historical rates
+    1987-01-01: 0.70  # 70%
+    # TCJA reduced rate
+    2018-01-01: 0.50  # 50%
+  citations:
+    - "26 USC 243(a)(1): Less than 20% ownership"
+    - "TCJA Section 13002(a)(1): Reduced from 70% to 50%"
+
+# 20% to less than 80% ownership
+deduction_rate_20_percent:
+  description: "DRD percentage for 20% to less than 80% ownership"
+  unit: rate
+  values:
+    1987-01-01: 0.80  # 80%
+    # TCJA reduced rate
+    2018-01-01: 0.65  # 65%
+  citations:
+    - "26 USC 243(c)(1): 20% or more ownership"
+    - "TCJA Section 13002(a)(2): Reduced from 80% to 65%"
+
+# 80%+ ownership (affiliated group)
+deduction_rate_affiliated:
+  description: "DRD percentage for 80% or more ownership (affiliated)"
+  unit: rate
+  values:
+    1987-01-01: 1.00  # 100% - no change under TCJA
+  citations:
+    - "26 USC 243(a)(3): Affiliated group members"
+    - "26 USC 243(b)(1): Definition of affiliated group"
+
+# Ownership thresholds
+ownership_threshold_20_percent:
+  description: "Threshold for increased DRD rate"
+  unit: rate
+  values:
+    1987-01-01: 0.20  # 20%
+  citations:
+    - "26 USC 243(c)(2): 20% ownership test"
+
+ownership_threshold_affiliated:
+  description: "Threshold for affiliated group (100% DRD)"
+  unit: rate
+  values:
+    1987-01-01: 0.80  # 80%
+  citations:
+    - "26 USC 243(b)(2): 80% vote and value test"
+
+# Holding period requirement
+holding_period_required:
+  description: "Minimum holding period for DRD eligibility"
+  unit: days
+  values:
+    1987-01-01: 46
+  citations:
+    - "26 USC 246(c)(1)(A): 46-day holding period"
+
+holding_period_window:
+  description: "Window for measuring holding period"
+  unit: days
+  values:
+    1987-01-01: 91  # 45 days before + 45 days after ex-dividend date
+  citations:
+    - "26 USC 246(c)(1)(A): 91-day period"
+
+# Preferred stock special rule
+holding_period_preferred:
+  description: "Extended holding period for preferred stock dividends"
+  unit: days
+  values:
+    1987-01-01: 91  # 90 days + 1
+  citations:
+    - "26 USC 246(c)(2): 91 days for preferred dividends in arrears"
+
+holding_period_window_preferred:
+  description: "Window for preferred stock holding period"
+  unit: days
+  values:
+    1987-01-01: 181  # 90 + 90 + 1
+  citations:
+    - "26 USC 246(c)(2): 181-day period for preferred"

@@ -1,0 +1,78 @@
+# 26 USC 21(b) - Applicable Credit Rate
+#
+# "(b) APPLICABLE PERCENTAGE DEFINED. -- For purposes of subsection (a), the term
+# 'applicable percentage' means 35 percent reduced (but not below 20 percent) by
+# 1 percentage point for each $2,000 (or fraction thereof) by which the taxpayer's
+# adjusted gross income for the taxable year exceeds $15,000."
+#
+# ARPA 2021 (P.L. 117-2, Sec. 9632):
+# - Increased maximum rate to 50%
+# - Raised AGI threshold to $125,000
+# - Phased down to 20% at AGI $185,000 (1% per $2,000)
+# - Complete phase-out above $438,000
+
+# Maximum credit rate (starting rate for low-income taxpayers)
+maximum_rate:
+  description: "Maximum credit rate for taxpayers with AGI at or below threshold"
+  unit: /1
+  values:
+    1976-01-01: 0.20  # Original rate
+    1982-01-01: 0.30  # Economic Recovery Tax Act 1981
+    2003-01-01: 0.35  # Jobs and Growth Tax Relief Reconciliation Act 2003
+    2021-01-01: 0.50  # ARPA 2021 temporary increase
+    2022-01-01: 0.35  # Reverted to permanent law
+  citations:
+    - "26 USC 21(b)(1): 35 percent"
+    - "P.L. 117-2 Sec. 9632(a): 50 percent for 2021"
+
+# Minimum credit rate (floor)
+minimum_rate:
+  description: "Floor credit rate after phase-down"
+  unit: /1
+  values:
+    1976-01-01: 0.20
+  citations:
+    - "26 USC 21(b): reduced (but not below 20 percent)"
+
+# AGI threshold where phase-down begins
+phase_down_threshold:
+  description: "AGI at which credit rate begins to decrease"
+  unit: currency-USD
+  values:
+    1976-01-01: 10000
+    1982-01-01: 10000
+    2003-01-01: 15000
+    2021-01-01: 125000  # ARPA 2021 temporary
+    2022-01-01: 15000   # Reverted
+  citations:
+    - "26 USC 21(b): by which adjusted gross income exceeds $15,000"
+    - "P.L. 117-2 Sec. 9632(a)(2): $125,000 for 2021"
+
+# Rate reduction per income increment
+phase_down_rate:
+  description: "Percentage point reduction per income increment above threshold"
+  unit: /1
+  values:
+    1976-01-01: 0.01  # 1 percentage point
+  citations:
+    - "26 USC 21(b): by 1 percentage point"
+
+# Income increment for rate reduction
+phase_down_increment:
+  description: "Income increment at which rate decreases by 1 percentage point"
+  unit: currency-USD
+  values:
+    1976-01-01: 2000
+  citations:
+    - "26 USC 21(b): for each $2,000 (or fraction thereof)"
+
+# ARPA 2021: Secondary phase-down from 20% to 0%
+# For AGI $400,000-$438,000, credit phases out completely
+arpa_complete_phaseout_threshold:
+  description: "AGI at which credit completely phases out (ARPA 2021 only)"
+  unit: currency-USD
+  values:
+    2021-01-01: 400000
+    2022-01-01: .inf   # No complete phaseout in permanent law
+  citations:
+    - "P.L. 117-2 Sec. 9632(b)(2): complete phaseout above $400,000"

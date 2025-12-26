@@ -1,0 +1,334 @@
+# Tests for 26 USC Section 219 - IRA Deductions
+#
+# Test categories:
+# 1. Contribution limits (age-based)
+# 2. Phase-out for active participants
+# 3. Spousal IRA rules
+# 4. Edge cases
+
+variable: ira_deduction
+tax_year: 2024
+
+test_cases:
+  # ==========================================
+  # Basic Contribution Limit Tests
+  # ==========================================
+
+  - name: "Under 50, full deduction, no employer plan"
+    description: "Taxpayer under 50 with earned income, no employer plan coverage"
+    inputs:
+      age: 35
+      filing_status: single
+      earned_income: 75000
+      adjusted_gross_income: 75000
+      traditional_ira_contributions: 7000
+      is_active_retirement_plan_participant: false
+    expected:
+      ira_contribution_limit: 7000
+      ira_deduction: 7000
+    citations:
+      - "26 USC 219(b)(1)(A): deductible amount $7,000 for 2024"
+      - "26 USC 219(g): no phase-out if not active participant"
+
+  - name: "Age 50+, catch-up contribution allowed"
+    description: "Taxpayer 50+ can contribute extra $1,000"
+    inputs:
+      age: 55
+      filing_status: single
+      earned_income: 80000
+      adjusted_gross_income: 80000
+      traditional_ira_contributions: 8000
+      is_active_retirement_plan_participant: false
+    expected:
+      ira_contribution_limit: 8000
+      ira_deduction: 8000
+    citations:
+      - "26 USC 219(b)(5)(B): $1,000 catch-up for age 50+"
+
+  - name: "Contribution exceeds limit"
+    description: "Deduction limited to maximum allowable"
+    inputs:
+      age: 40
+      filing_status: single
+      earned_income: 100000
+      adjusted_gross_income: 100000
+      traditional_ira_contributions: 10000
+      is_active_retirement_plan_participant: false
+    expected:
+      ira_contribution_limit: 7000
+      ira_deduction: 7000
+    citations:
+      - "26 USC 219(b)(1): cannot deduct more than limit"
+
+  - name: "Low earned income limits deduction"
+    description: "Deduction limited to compensation"
+    inputs:
+      age: 30
+      filing_status: single
+      earned_income: 3000
+      adjusted_gross_income: 3000
+      traditional_ira_contributions: 7000
+      is_active_retirement_plan_participant: false
+    expected:
+      ira_compensation_limit: 3000
+      ira_deduction: 3000
+    citations:
+      - "26 USC 219(b)(1)(B): cannot exceed compensation"
+
+  - name: "No earned income, no deduction"
+    description: "Must have earned income to deduct IRA contributions"
+    inputs:
+      age: 45
+      filing_status: single
+      earned_income: 0
+      adjusted_gross_income: 50000  # All investment income
+      traditional_ira_contributions: 7000
+      is_active_retirement_plan_participant: false
+    expected:
+      ira_deduction: 0
+    citations:
+      - "26 USC 219(b)(1)(B): compensation requirement"
+
+  # ==========================================
+  # Phase-out Tests - Single Filers
+  # ==========================================
+
+  - name: "Single, active participant, below phase-out"
+    description: "Single filer with employer plan, AGI below $77,000"
+    inputs:
+      age: 40
+      filing_status: single
+      earned_income: 70000
+      adjusted_gross_income: 70000
+      traditional_ira_contributions: 7000
+      is_active_retirement_plan_participant: true
+    expected:
+      ira_phaseout_ratio: 0
+      ira_deduction: 7000
+    citations:
+      - "26 USC 219(g)(2)(A)(ii): phase-out starts at $77,000 for single"
+
+  - name: "Single, active participant, in phase-out range"
+    description: "Single filer with employer plan, AGI $82,000 (halfway through)"
+    inputs:
+      age: 40
+      filing_status: single
+      earned_income: 82000
+      adjusted_gross_income: 82000
+      traditional_ira_contributions: 7000
+      is_active_retirement_plan_participant: true
+    expected:
+      ira_phaseout_ratio: 0.5
+      ira_deduction: 3500  # 50% reduction, rounded up to nearest $10
+    citations:
+      - "26 USC 219(g)(2)(A): proportional phase-out"
+      - "26 USC 219(g)(2)(C): round to nearest $10"
+
+  - name: "Single, active participant, above phase-out"
+    description: "Single filer with employer plan, AGI above $87,000"
+    inputs:
+      age: 40
+      filing_status: single
+      earned_income: 95000
+      adjusted_gross_income: 95000
+      traditional_ira_contributions: 7000
+      is_active_retirement_plan_participant: true
+    expected:
+      ira_phaseout_ratio: 1
+      ira_deduction: 0
+    citations:
+      - "26 USC 219(g)(2)(A)(ii): full phase-out above $87,000"
+
+  # ==========================================
+  # Phase-out Tests - Joint Filers
+  # ==========================================
+
+  - name: "MFJ, contributor covered, below phase-out"
+    description: "Joint filer where contributor has employer plan, AGI below $123,000"
+    inputs:
+      age: 45
+      filing_status: joint
+      earned_income: 100000
+      adjusted_gross_income: 115000
+      traditional_ira_contributions: 7000
+      is_active_retirement_plan_participant: true
+      spouse_is_active_retirement_plan_participant: false
+    expected:
+      ira_phaseout_ratio: 0
+      ira_deduction: 7000
+    citations:
+      - "26 USC 219(g)(3)(B)(i): phase-out starts at $123,000 for MFJ"
+
+  - name: "MFJ, contributor covered, in phase-out"
+    description: "Joint filer where contributor has plan, AGI $133,000"
+    inputs:
+      age: 45
+      filing_status: joint
+      earned_income: 120000
+      adjusted_gross_income: 133000
+      traditional_ira_contributions: 7000
+      is_active_retirement_plan_participant: true
+      spouse_is_active_retirement_plan_participant: false
+    expected:
+      ira_phaseout_ratio: 0.5
+      ira_deduction: 3500
+    citations:
+      - "26 USC 219(g)(3)(B)(i): $20,000 phase-out range"
+
+  - name: "MFJ, contributor covered, above phase-out"
+    description: "Joint filer where contributor has plan, AGI above $143,000"
+    inputs:
+      age: 45
+      filing_status: joint
+      earned_income: 150000
+      adjusted_gross_income: 150000
+      traditional_ira_contributions: 7000
+      is_active_retirement_plan_participant: true
+      spouse_is_active_retirement_plan_participant: false
+    expected:
+      ira_phaseout_ratio: 1
+      ira_deduction: 0
+    citations:
+      - "26 USC 219(g)(3)(B)(i): full phase-out above $143,000"
+
+  # ==========================================
+  # Phase-out Tests - Spouse Covered Only
+  # ==========================================
+
+  - name: "MFJ, only spouse covered, below phase-out"
+    description: "Joint filer where only spouse has employer plan, AGI below $230,000"
+    inputs:
+      age: 42
+      filing_status: joint
+      earned_income: 80000
+      adjusted_gross_income: 220000
+      traditional_ira_contributions: 7000
+      is_active_retirement_plan_participant: false
+      spouse_is_active_retirement_plan_participant: true
+    expected:
+      ira_phaseout_ratio: 0
+      ira_deduction: 7000
+    citations:
+      - "26 USC 219(g)(7): higher phase-out when only spouse covered"
+
+  - name: "MFJ, only spouse covered, in phase-out"
+    description: "Joint filer where only spouse has plan, AGI $235,000"
+    inputs:
+      age: 42
+      filing_status: joint
+      earned_income: 80000
+      adjusted_gross_income: 235000
+      traditional_ira_contributions: 7000
+      is_active_retirement_plan_participant: false
+      spouse_is_active_retirement_plan_participant: true
+    expected:
+      ira_phaseout_ratio: 0.5
+      ira_deduction: 3500
+    citations:
+      - "26 USC 219(g)(7): $10,000 phase-out range"
+
+  - name: "MFJ, only spouse covered, above phase-out"
+    description: "Joint filer where only spouse has plan, AGI above $240,000"
+    inputs:
+      age: 42
+      filing_status: joint
+      earned_income: 80000
+      adjusted_gross_income: 250000
+      traditional_ira_contributions: 7000
+      is_active_retirement_plan_participant: false
+      spouse_is_active_retirement_plan_participant: true
+    expected:
+      ira_phaseout_ratio: 1
+      ira_deduction: 0
+    citations:
+      - "26 USC 219(g)(7): full phase-out above $240,000"
+
+  # ==========================================
+  # MFS Phase-out Tests
+  # ==========================================
+
+  - name: "MFS, active participant, any income"
+    description: "MFS filers have very narrow phase-out range"
+    inputs:
+      age: 40
+      filing_status: married_filing_separately
+      earned_income: 50000
+      adjusted_gross_income: 50000
+      traditional_ira_contributions: 7000
+      is_active_retirement_plan_participant: true
+    expected:
+      ira_phaseout_ratio: 1
+      ira_deduction: 0
+    citations:
+      - "26 USC 219(g)(2)(A)(ii): MFS phase-out $0-$10,000"
+
+  - name: "MFS, active participant, very low AGI"
+    description: "MFS with AGI in narrow phase-out range"
+    inputs:
+      age: 40
+      filing_status: married_filing_separately
+      earned_income: 5000
+      adjusted_gross_income: 5000
+      traditional_ira_contributions: 5000
+      is_active_retirement_plan_participant: true
+    expected:
+      ira_phaseout_ratio: 0.5
+      ira_deduction: 2500
+    citations:
+      - "26 USC 219(g)(2)(A)(ii): MFS phase-out $0-$10,000"
+
+  # ==========================================
+  # No Employer Plan Coverage Tests
+  # ==========================================
+
+  - name: "Neither spouse covered by employer plan"
+    description: "No phase-out when neither spouse has employer plan"
+    inputs:
+      age: 55
+      filing_status: joint
+      earned_income: 300000
+      adjusted_gross_income: 300000
+      traditional_ira_contributions: 8000
+      is_active_retirement_plan_participant: false
+      spouse_is_active_retirement_plan_participant: false
+    expected:
+      ira_phaseout_applies: false
+      ira_phaseout_ratio: 0
+      ira_deduction: 8000
+    citations:
+      - "26 USC 219(g)(1): phase-out only if individual or spouse is active participant"
+
+  # ==========================================
+  # SECURE Act Tests (No Age Limit)
+  # ==========================================
+
+  - name: "Age 75, still allowed to contribute"
+    description: "SECURE Act removed age 70-1/2 limit"
+    inputs:
+      age: 75
+      filing_status: single
+      earned_income: 25000
+      adjusted_gross_income: 25000
+      traditional_ira_contributions: 8000
+      is_active_retirement_plan_participant: false
+    expected:
+      ira_contribution_limit: 8000
+      ira_deduction: 8000
+    citations:
+      - "SECURE Act Section 107: repealed 26 USC 219(d)(1) age limit"
+      - "26 USC 219(b)(5)(B): catch-up still applies"
+
+  - name: "Age 80, contribution based on earned income"
+    description: "Very elderly taxpayer with part-time work"
+    inputs:
+      age: 80
+      filing_status: single
+      earned_income: 5000
+      adjusted_gross_income: 30000
+      traditional_ira_contributions: 5000
+      is_active_retirement_plan_participant: false
+    expected:
+      ira_deduction: 5000
+    citations:
+      - "SECURE Act: no age limit for contributions"
+      - "26 USC 219(b)(1)(B): limited to compensation"

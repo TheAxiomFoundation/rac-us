@@ -1,0 +1,29 @@
+# 26 USC Section 11(a) - Corporations Subject to Tax
+#
+# "(a) Corporations in general.—A tax is hereby imposed for each taxable year
+# on the taxable income of every corporation."
+#
+# This section establishes which entities are subject to corporate income tax.
+# C corporations are taxed under Section 11.
+# S corporations, partnerships, and other pass-throughs are NOT subject to Section 11.
+
+module statute.26.11.a
+version "2024.1"
+
+variable is_subject_to_corporate_tax {
+  entity Corporation
+  period Year
+  dtype Boolean
+  label "Subject to Corporate Income Tax"
+  description "Whether entity is subject to tax under 26 USC 11"
+  reference "26 USC 11(a)"
+
+  formula {
+    # Only C corporations are subject to corporate income tax
+    # S corporations: exempt per 26 USC 1363(a)
+    # Partnerships: exempt per 26 USC 701
+    # Sole proprietorships: taxed at individual level
+
+    return entity_type == C_CORPORATION
+  }
+}

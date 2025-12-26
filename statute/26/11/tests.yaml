@@ -1,0 +1,121 @@
+# Tests for 26 USC Section 11 - Tax Imposed on Corporations
+#
+# Sources:
+# - 26 USC 11(a): Corporations subject to tax
+# - 26 USC 11(b): Amount of tax (flat 21% post-TCJA)
+# - IRS Instructions for Form 1120
+# - Tax Foundation: "The Tax Cuts and Jobs Act"
+
+variable: corporate_income_tax
+tax_year: 2024
+
+test_cases:
+  # Basic flat rate calculations (post-TCJA)
+  - name: "Small corporation, positive taxable income"
+    description: "21% flat rate applies to all taxable income"
+    inputs:
+      entity_type: c_corporation
+      taxable_income: 100000
+    expected:
+      corporate_income_tax: 21000
+    citations:
+      - "26 USC 11(b): 21% of taxable income"
+      - "TCJA Section 13001: Flat 21% rate effective 2018"
+
+  - name: "Large corporation, positive taxable income"
+    inputs:
+      entity_type: c_corporation
+      taxable_income: 10000000
+    expected:
+      corporate_income_tax: 2100000
+    citations:
+      - "26 USC 11(b): 21% flat rate regardless of income level"
+
+  - name: "Zero taxable income"
+    inputs:
+      entity_type: c_corporation
+      taxable_income: 0
+    expected:
+      corporate_income_tax: 0
+    citations:
+      - "26 USC 11(a): Tax on taxable income"
+
+  - name: "Negative taxable income (net operating loss)"
+    description: "No tax when taxable income is negative"
+    inputs:
+      entity_type: c_corporation
+      taxable_income: -50000
+    expected:
+      corporate_income_tax: 0
+    citations:
+      - "26 USC 11(a): Tax on taxable income (cannot be negative)"
+
+  - name: "Corporation with fractional taxable income"
+    inputs:
+      entity_type: c_corporation
+      taxable_income: 123456.78
+    expected:
+      corporate_income_tax: 25925.92  # 123456.78 * 0.21
+    citations:
+      - "26 USC 11(b): 21% of taxable income"
+
+  # Pre-TCJA graduated rate tests (historical)
+  - name: "Pre-TCJA: $50,000 taxable income (15% bracket)"
+    tax_year: 2017
+    inputs:
+      entity_type: c_corporation
+      taxable_income: 50000
+    expected:
+      corporate_income_tax: 7500
+    citations:
+      - "26 USC 11(b)(1) (pre-TCJA): 15% on first $50,000"
+
+  - name: "Pre-TCJA: $75,000 taxable income (15%/25% brackets)"
+    tax_year: 2017
+    inputs:
+      entity_type: c_corporation
+      taxable_income: 75000
+    expected:
+      corporate_income_tax: 13750  # 7500 + (25000 * 0.25)
+    citations:
+      - "26 USC 11(b)(1) (pre-TCJA): 15% on first $50,000, 25% on next $25,000"
+
+  - name: "Pre-TCJA: $100,000 taxable income (15%/25%/34% brackets)"
+    tax_year: 2017
+    inputs:
+      entity_type: c_corporation
+      taxable_income: 100000
+    expected:
+      corporate_income_tax: 22250  # 7500 + 6250 + 8500
+    citations:
+      - "26 USC 11(b)(1) (pre-TCJA): 15%/25%/34% graduated rates"
+
+  - name: "Pre-TCJA: $10,000,000 taxable income (35% top rate)"
+    tax_year: 2017
+    inputs:
+      entity_type: c_corporation
+      taxable_income: 10000000
+    expected:
+      corporate_income_tax: 3400000  # Flat 35% (bubbles eliminated at this level)
+    citations:
+      - "26 USC 11(b)(1) (pre-TCJA): 35% rate plus bubble elimination"
+
+  # Entity type tests
+  - name: "S-Corporation not subject to corporate tax"
+    description: "S-Corps are pass-through entities"
+    inputs:
+      entity_type: s_corporation
+      taxable_income: 100000
+    expected:
+      corporate_income_tax: 0
+    citations:
+      - "26 USC 1363(a): S corporations not subject to Section 11"
+
+  - name: "Partnership not subject to corporate tax"
+    inputs:
+      entity_type: partnership
+      taxable_income: 100000
+    expected:
+      corporate_income_tax: 0
+    citations:
+      - "26 USC 701: Partners taxed individually"

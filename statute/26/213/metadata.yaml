@@ -1,0 +1,61 @@
+# Encoding Metadata for 26 USC Section 213 (Medical Expenses)
+
+encoding:
+  created: 2024-12-25
+  updated: 2024-12-25
+  status: initial
+  encoded_by: claude-opus-4.5
+
+variable:
+  name: medical_expense_deduction
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+
+coverage:
+  tax_years: [2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025]
+  notes: |
+    Floor history:
+    - 7.5% of AGI (2013-2016 for age 65+, 10% for others)
+    - 10% of AGI (2017-2018, then TCJA retroactively lowered)
+    - 7.5% of AGI (2017-2018 under TCJA Section 11027)
+    - 7.5% of AGI (2019-2020 under Further Consolidated Appropriations Act)
+    - 7.5% of AGI (2021+ permanently under CAA 2021)
+
+sources:
+  statute:
+    - citation: "26 USC 213"
+      title: "Medical, dental, etc., expenses"
+      sections:
+        - a: Allowance of deduction
+        - d: Definitions
+
+  guidance:
+    - citation: "IRS Publication 502"
+      title: "Medical and Dental Expenses"
+      source: https://www.irs.gov/publications/p502
+
+architecture:
+  description: |
+    Medical expense deduction structure:
+
+    1. QUALIFYING EXPENSES (213(d))
+       - Medical and dental care for taxpayer, spouse, dependents
+       - Insurance premiums (not employer-paid)
+       - Long-term care (with limits)
+       - Transportation for medical care
+       - NOT: cosmetic surgery (unless for injury/disease)
+       - NOT: amounts compensated by insurance
+
+    2. FLOOR CALCULATION (213(a))
+       - Deduction = Medical Expenses - (AGI * floor_rate)
+       - Floor rate: 7.5% of AGI (permanently after CAA 2021)
+
+    3. LIMITATION
+       - Cannot deduct more than actual expenses paid
+       - Must reduce by insurance reimbursements
+
+  formula_structure: |
+    medical_expense_deduction = max(0,
+      qualifying_medical_expenses - (AGI * 0.075)
+    )

@@ -1,0 +1,40 @@
+# 26 USC Section 11 - Tax Imposed on Corporations
+#
+# Historical rates and current flat rate
+#
+# Sources:
+# - 26 USC 11(b) - Amount of tax
+# - TCJA Section 13001 - 21% flat rate effective 2018
+# - IRS Publication 542 - Corporations
+
+# Post-TCJA flat rate (2018+)
+flat_rate:
+  description: "Corporate income tax rate (flat)"
+  unit: rate
+  values:
+    2018-01-01: 0.21
+  citations:
+    - "26 USC 11(b): 21 percent of taxable income"
+    - "TCJA Section 13001: effective for tax years beginning after 2017"
+
+# Pre-TCJA graduated rates (1993-2017)
+# Brackets: 15% to $50k, 25% to $75k, 34% to $10M, 35% above
+# With "bubble" rates: 5% additional on $100k-$335k, 3% additional on $15M-$18.33M
+graduated_brackets:
+  description: "Pre-TCJA graduated corporate tax brackets"
+  unit: currency-USD
+  values:
+    1993-01-01:
+      - { threshold: 0, rate: 0.15 }
+      - { threshold: 50000, rate: 0.25 }
+      - { threshold: 75000, rate: 0.34 }
+      - { threshold: 100000, rate: 0.39 }      # Bubble: 34% + 5% to recapture lower brackets
+      - { threshold: 335000, rate: 0.34 }      # Back to 34%
+      - { threshold: 10000000, rate: 0.35 }
+      - { threshold: 15000000, rate: 0.38 }    # Bubble: 35% + 3% to eliminate benefit
+      - { threshold: 18333333, rate: 0.35 }    # Back to flat 35%
+    # Expired 2018-01-01 (replaced by flat_rate)
+  citations:
+    - "26 USC 11(b)(1)(A)-(D) (pre-TCJA): Graduated rates"
+    - "26 USC 11(b)(1)(B)(ii): 5% surtax on income $100k-$335k"
+    - "26 USC 11(b)(1)(D)(ii): 3% surtax on income $15M-$18.33M"

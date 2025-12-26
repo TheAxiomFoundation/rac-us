@@ -1,0 +1,309 @@
+# 26 USC Section 243 - Dividends Received by Corporations
+#
+# "(a) GENERAL RULE.—In the case of a corporation, there shall be allowed as
+# a deduction an amount equal to the following percentages of the amount
+# received as dividends from a domestic corporation which is subject to
+# taxation under this chapter:
+#   (1) 50 percent, in the case of dividends other than dividends described
+#       in paragraph (2) or (3);
+#   (2) 100 percent, in the case of dividends received by a small business
+#       investment company;
+#   (3) 100 percent, in the case of qualifying dividends [from affiliates]."
+#
+# (c) INCREASED PERCENTAGE.—In the case of any dividend received from a
+#     20-percent owned corporation, subsection (a)(1) shall be applied by
+#     substituting "65 percent" for "50 percent".
+
+module statute.26.243.a
+version "2024.1"
+
+references {
+  # Parameters
+  deduction_rate_portfolio: statute/26/243/parameters/deduction_rate_portfolio
+  deduction_rate_20_percent: statute/26/243/parameters/deduction_rate_20_percent
+  deduction_rate_affiliated: statute/26/243/parameters/deduction_rate_affiliated
+  ownership_threshold_20_percent: statute/26/243/parameters/ownership_threshold_20_percent
+  ownership_threshold_affiliated: statute/26/243/parameters/ownership_threshold_affiliated
+  holding_period_required: statute/26/243/parameters/holding_period_required
+
+  # Cross-references
+  is_subject_to_corporate_tax: statute/26/11/a/is_subject_to_corporate_tax
+}
+
+# Inputs
+variable dividends_received {
+  entity Corporation
+  period Year
+  dtype Money
+  unit "USD"
+  label "Dividends Received"
+  description "Total dividends received from domestic corporations"
+  reference "26 USC 243(a)"
+
+  input { }
+  default 0
+}
+
+variable dividends_from_less_than_20_pct {
+  entity Corporation
+  period Year
+  dtype Money
+  unit "USD"
+  label "Dividends from Less Than 20% Owned Corporations"
+  description "Dividends from corporations where recipient owns less than 20%"
+  reference "26 USC 243(a)(1)"
+
+  input { }
+  default 0
+}
+
+variable dividends_from_20_to_80_pct {
+  entity Corporation
+  period Year
+  dtype Money
+  unit "USD"
+  label "Dividends from 20-80% Owned Corporations"
+  description "Dividends from corporations where recipient owns 20% to less than 80%"
+  reference "26 USC 243(c)"
+
+  input { }
+  default 0
+}
+
+variable dividends_from_affiliates {
+  entity Corporation
+  period Year
+  dtype Money
+  unit "USD"
+  label "Dividends from Affiliated Corporations"
+  description "Dividends from 80%+ owned corporations (affiliated group)"
+  reference "26 USC 243(a)(3)"
+
+  input { }
+  default 0
+}
+
+variable ownership_percentage {
+  entity Corporation
+  period Year
+  dtype Percentage
+  label "Ownership Percentage"
+  description "Percentage of voting stock owned in dividend-paying corporation"
+  reference "26 USC 243(c)(2)"
+
+  input { }
+  default 0
+}
+
+variable holding_period_days {
+  entity Corporation
+  period Year
+  dtype Integer
+  label "Stock Holding Period"
+  description "Days stock was held during 91-day period around ex-dividend date"
+  reference "26 USC 246(c)"
+
+  input { }
+  default 365  # Assume held long enough if not specified
+}
+
+variable taxable_income_before_drd {
+  entity Corporation
+  period Year
+  dtype Money
+  unit "USD"
+  label "Taxable Income Before DRD"
+  description "Taxable income computed without dividends received deduction"
+  reference "26 USC 246(b)"
+
+  input { }
+  default null  # If null, no taxable income limitation applies
+}
+
+variable debt_financed_percentage {
+  entity Corporation
+  period Year
+  dtype Percentage
+  label "Debt-Financed Percentage"
+  description "Percentage of stock that is debt-financed"
+  reference "26 USC 246A"
+
+  input { }
+  default 0
+}
+
+variable payor_is_tax_exempt {
+  entity Corporation
+  period Year
+  dtype Boolean
+  label "Payor is Tax-Exempt"
+  description "Whether dividend-paying corporation is tax-exempt"
+  reference "26 USC 246(a)(1)"
+
+  input { }
+  default false
+}
+
+variable payor_is_foreign {
+  entity Corporation
+  period Year
+  dtype Boolean
+  label "Payor is Foreign"
+  description "Whether dividend-paying corporation is foreign"
+  reference "26 USC 243"
+
+  input { }
+  default false
+}
+
+# Determine applicable DRD rate based on ownership
+variable drd_rate {
+  entity Corporation
+  period Year
+  dtype Rate
+  label "DRD Rate"
+  description "Applicable dividends received deduction percentage"
+  reference "26 USC 243"
+
+  formula {
+    if ownership_percentage >= ownership_threshold_affiliated then
+      return deduction_rate_affiliated
+    else if ownership_percentage >= ownership_threshold_20_percent then
+      return deduction_rate_20_percent
+    else
+      return deduction_rate_portfolio
+  }
+}
+
+# Calculate DRD from simple single-tier ownership
+variable drd_simple {
+  entity Corporation
+  period Year
+  dtype Money
+  unit "USD"
+  label "Simple DRD"
+  description "DRD for single ownership tier"
+
+  formula {
+    return dividends_received * drd_rate
+  }
+}
+
+# Calculate DRD from multiple ownership tiers
+variable drd_by_tier {
+  entity Corporation
+  period Year
+  dtype Money
+  unit "USD"
+  label "DRD by Tier"
+  description "DRD calculated separately for each ownership tier"
+
+  formula {
+    let tier_1 = dividends_from_less_than_20_pct * deduction_rate_portfolio
+    let tier_2 = dividends_from_20_to_80_pct * deduction_rate_20_percent
+    let tier_3 = dividends_from_affiliates * deduction_rate_affiliated
+
+    return tier_1 + tier_2 + tier_3
+  }
+}
+
+# Check holding period requirement
+variable meets_holding_period {
+  entity Corporation
+  period Year
+  dtype Boolean
+  label "Meets Holding Period"
+  description "Whether 46-day holding period requirement is met"
+  reference "26 USC 246(c)"
+
+  formula {
+    return holding_period_days >= holding_period_required
+  }
+}
+
+# Calculate tentative DRD
+variable tentative_drd {
+  entity Corporation
+  period Year
+  dtype Money
+  unit "USD"
+  label "Tentative DRD"
+  description "DRD before limitations"
+
+  formula {
+    # Must be a C corporation
+    if not is_subject_to_corporate_tax then
+      return 0
+
+    # No DRD for tax-exempt or foreign payors
+    if payor_is_tax_exempt or payor_is_foreign then
+      return 0
+
+    # Must meet holding period
+    if not meets_holding_period then
+      return 0
+
+    # Use tiered calculation if available, otherwise simple
+    let total_tiered = dividends_from_less_than_20_pct +
+                       dividends_from_20_to_80_pct +
+                       dividends_from_affiliates
+
+    if total_tiered > 0 then
+      return drd_by_tier
+    else
+      return drd_simple
+  }
+}
+
+# Apply debt-financed reduction (Section 246A)
+variable drd_after_debt_reduction {
+  entity Corporation
+  period Year
+  dtype Money
+  unit "USD"
+  label "DRD After Debt-Financed Reduction"
+  description "DRD reduced for debt-financed portfolio stock"
+  reference "26 USC 246A"
+
+  formula {
+    if debt_financed_percentage <= 0 then
+      return tentative_drd
+
+    # Reduce DRD by debt-financed percentage
+    let reduction = tentative_drd * debt_financed_percentage
+    return tentative_drd - reduction
+  }
+}
+
+# Apply taxable income limitation (Section 246(b))
+variable dividends_received_deduction {
+  entity Corporation
+  period Year
+  dtype Money
+  unit "USD"
+  label "Dividends Received Deduction"
+  description "Final DRD after all limitations"
+  reference "26 USC 243"
+
+  formula {
+    let drd = drd_after_debt_reduction
+
+    # Taxable income limitation
+    if taxable_income_before_drd is null then
+      return drd
+
+    # If already in NOL, limitation doesn't apply
+    if taxable_income_before_drd <= 0 then
+      return drd
+
+    # DRD cannot create an NOL (generally)
+    # Limitation = DRD rate * taxable income
+    let ti_limited_drd = drd_rate * taxable_income_before_drd
+
+    # If DRD would create an NOL, limit it
+    if drd > taxable_income_before_drd then
+      return min(drd, ti_limited_drd)
+    else
+      return drd
+  }
+}

@@ -1,0 +1,79 @@
+# 26 USC Section 219(b) - Maximum Amount of Deduction
+#
+# "(1) In General.--The amount allowable as a deduction under subsection (a)
+#      to any individual for any taxable year shall not exceed the lesser of--
+#      (A) the deductible amount, or
+#      (B) an amount equal to the compensation includible in the individual's
+#          gross income for such taxable year."
+#
+# "(2) Special rule for employer contributions under simplified employee pensions."
+#
+# "(3) Deductible Amount.--For purposes of paragraph (1)(A)--
+#      (A) In general.--The deductible amount shall be determined in accordance
+#          with the following table:
+#          For taxable years     The deductible
+#          beginning in:         amount is:
+#          2002 through 2004     $3,000
+#          2005 through 2007     $4,000
+#          2008 and thereafter   $5,000"
+#
+# Note: SECURE 2.0 Act increased limits. 2024 limit is $7,000 (indexed).
+
+deductible_amount:
+  description: "Maximum IRA contribution that may be deducted"
+  unit: currency-USD
+  indexing:
+    method: cpi-u
+    base_year: 2008
+    round_to: 500
+  values:
+    2002-01-01: 3000
+    2005-01-01: 4000
+    2008-01-01: 5000
+    2009-01-01: 5000
+    2010-01-01: 5000
+    2011-01-01: 5000
+    2012-01-01: 5000
+    2013-01-01: 5500
+    2014-01-01: 5500
+    2015-01-01: 5500
+    2016-01-01: 5500
+    2017-01-01: 5500
+    2018-01-01: 5500
+    2019-01-01: 6000
+    2020-01-01: 6000
+    2021-01-01: 6000
+    2022-01-01: 6000
+    2023-01-01: 6500
+    2024-01-01: 7000
+    2025-01-01: 7000
+  citations:
+    - "26 USC 219(b)(1)(A): deductible amount limit"
+    - "26 USC 219(b)(5): indexed for inflation"
+    - "Rev. Proc. 2023-34 Section 3.15: $7,000 for 2024"
+
+# 26 USC 219(b)(5)(B) - Catch-up contributions for individuals 50+
+#
+# "(B) Catch-up contributions.--In the case of an individual who has attained
+#      the age of 50 before the close of the taxable year, the deductible amount
+#      for such taxable year shall be increased by the applicable amount."
+#
+# Applicable amount is $1,000 for 2006 and thereafter (not indexed).
+
+catch_up_amount:
+  description: "Additional IRA contribution limit for individuals age 50+"
+  unit: currency-USD
+  values:
+    2002-01-01: 500
+    2006-01-01: 1000
+  citations:
+    - "26 USC 219(b)(5)(B): catch-up contributions"
+    - "IRC provides $1,000 catch-up for age 50+"
+
+catch_up_age:
+  description: "Age at which catch-up contributions are allowed"
+  unit: years
+  values:
+    2002-01-01: 50
+  citations:
+    - "26 USC 219(b)(5)(B): attained age of 50"

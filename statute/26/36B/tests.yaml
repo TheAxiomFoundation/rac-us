@@ -1,0 +1,516 @@
+# Tests for 26 USC 36B - Premium Tax Credit
+#
+# These test cases verify the Premium Tax Credit calculation including:
+# - Applicable percentage by FPL bracket (26 USC 36B(b)(3)(A))
+# - Income eligibility (26 USC 36B(c)(1)(A))
+# - Filing status requirements (26 USC 36B(c)(1)(C))
+# - Premium assistance credit calculation (26 USC 36B(b))
+# - Advance payment reconciliation (26 USC 36B(f))
+#
+# Key parameters for 2024 (IRA enhanced):
+# - FPL single: $15,060
+# - FPL additional person: $5,380
+# - Applicable percentage: 0% at 100-150% FPL, up to 8.5% at 400%+ FPL
+# - No cliff at 400% FPL under IRA
+
+variable: premium_tax_credit
+tax_year: 2024
+
+test_cases:
+  # ============================================================================
+  # APPLICABLE PERCENTAGE BY FPL BRACKET
+  # 26 USC 36B(b)(3)(A) with IRA enhanced rates
+  # ============================================================================
+
+  - name: "100% FPL - 0% contribution"
+    description: "At 100% FPL, applicable percentage is 0% under IRA"
+    inputs:
+      household_income: 15060  # 100% FPL for single
+      filing_status: single
+      ptc_household_size: 1
+      slcsp_premium: 6000
+      ptc_coverage_months: 12
+    expected:
+      household_income_pct_fpl: 1.00
+      applicable_percentage: 0.0000
+      expected_contribution: 0
+      premium_tax_credit: 6000
+    citations:
+      - "26 USC 36B(b)(3)(A): 0% at 100% FPL under IRA"
+      - "P.L. 117-169 Section 12001"
+
+  - name: "125% FPL - 0% contribution (within 100-150% bracket)"
+    description: "At 125% FPL, still 0% contribution under IRA"
+    inputs:
+      household_income: 18825  # 125% FPL for single (15060 * 1.25)
+      filing_status: single
+      ptc_household_size: 1
+      slcsp_premium: 6000
+      ptc_coverage_months: 12
+    expected:
+      household_income_pct_fpl: 1.25
+      applicable_percentage: 0.0000
+      expected_contribution: 0
+      premium_tax_credit: 6000
+    citations:
+      - "26 USC 36B(b)(3)(A): 0% throughout 100-150% FPL under IRA"
+
+  - name: "150% FPL - boundary between 0% and sliding scale"
+    description: "At exactly 150% FPL, contribution is still 0%"
+    inputs:
+      household_income: 22590  # 150% FPL for single
+      filing_status: single
+      ptc_household_size: 1
+      slcsp_premium: 6000
+      ptc_coverage_months: 12
+    expected:
+      household_income_pct_fpl: 1.50
+      applicable_percentage: 0.0000
+      expected_contribution: 0
+      premium_tax_credit: 6000
+    citations:
+      - "26 USC 36B(b)(3)(A): 0% up to 150% FPL"
+
+  - name: "175% FPL - 1% contribution (midpoint of 150-200% bracket)"
+    description: "Linear interpolation between 0% at 150% FPL and 2% at 200% FPL"
+    inputs:
+      household_income: 26355  # 175% FPL for single (15060 * 1.75)
+      filing_status: single
+      ptc_household_size: 1
+      slcsp_premium: 6000
+      ptc_coverage_months: 12
+    expected:
+      household_income_pct_fpl: 1.75
+      applicable_percentage: 0.0100  # 1% (midpoint of 0% to 2%)
+      expected_contribution: 264  # 26355 * 0.01 = 263.55, rounded
+      premium_tax_credit: 5736  # 6000 - 264
+    citations:
+      - "26 USC 36B(b)(3)(A): linear interpolation within bracket"
+
+  - name: "200% FPL - 2% contribution"
+    description: "At 200% FPL, contribution reaches 2%"
+    inputs:
+      household_income: 30120  # 200% FPL for single
+      filing_status: single
+      ptc_household_size: 1
+      slcsp_premium: 6000
+      ptc_coverage_months: 12
+    expected:
+      household_income_pct_fpl: 2.00
+      applicable_percentage: 0.0200
+      expected_contribution: 602  # 30120 * 0.02
+      premium_tax_credit: 5398  # 6000 - 602
+    citations:
+      - "26 USC 36B(b)(3)(A): 2% at 200% FPL"
+
+  - name: "250% FPL - 4% contribution"
+    description: "At 250% FPL, contribution is 4%"
+    inputs:
+      household_income: 37650  # 250% FPL for single
+      filing_status: single
+      ptc_household_size: 1
+      slcsp_premium: 6000
+      ptc_coverage_months: 12
+    expected:
+      household_income_pct_fpl: 2.50
+      applicable_percentage: 0.0400
+      expected_contribution: 1506  # 37650 * 0.04
+      premium_tax_credit: 4494  # 6000 - 1506
+    citations:
+      - "26 USC 36B(b)(3)(A): 4% at 250% FPL"
+
+  - name: "300% FPL - 6% contribution"
+    description: "At 300% FPL, contribution is 6%"
+    inputs:
+      household_income: 45180  # 300% FPL for single
+      filing_status: single
+      ptc_household_size: 1
+      slcsp_premium: 6000
+      ptc_coverage_months: 12
+    expected:
+      household_income_pct_fpl: 3.00
+      applicable_percentage: 0.0600
+      expected_contribution: 2711  # 45180 * 0.06
+      premium_tax_credit: 3289  # 6000 - 2711
+    citations:
+      - "26 USC 36B(b)(3)(A): 6% at 300% FPL"
+
+  - name: "400% FPL - 8.5% contribution"
+    description: "At 400% FPL, contribution is 8.5%"
+    inputs:
+      household_income: 60240  # 400% FPL for single
+      filing_status: single
+      ptc_household_size: 1
+      slcsp_premium: 8000
+      ptc_coverage_months: 12
+    expected:
+      household_income_pct_fpl: 4.00
+      applicable_percentage: 0.0850
+      expected_contribution: 5120  # 60240 * 0.085
+      premium_tax_credit: 2880  # 8000 - 5120
+    citations:
+      - "26 USC 36B(b)(3)(A): 8.5% at 400% FPL under IRA"
+
+  - name: "500% FPL - 8.5% contribution (IRA removed cliff)"
+    description: "Above 400% FPL, still eligible at 8.5% under IRA"
+    inputs:
+      household_income: 75300  # 500% FPL for single
+      filing_status: single
+      ptc_household_size: 1
+      slcsp_premium: 10000
+      ptc_coverage_months: 12
+    expected:
+      household_income_pct_fpl: 5.00
+      applicable_percentage: 0.0850
+      expected_contribution: 6401  # 75300 * 0.085
+      premium_tax_credit: 3599  # 10000 - 6401
+    citations:
+      - "26 USC 36B(b)(3)(A): IRA removed 400% FPL cliff"
+      - "P.L. 117-169 Section 12001: 8.5% cap above 400% FPL"
+
+  # ============================================================================
+  # INCOME ELIGIBILITY
+  # 26 USC 36B(c)(1)(A)
+  # ============================================================================
+
+  - name: "Below 100% FPL - ineligible"
+    description: "Those below 100% FPL are not eligible (may qualify for Medicaid)"
+    inputs:
+      household_income: 14000  # Below 100% FPL
+      filing_status: single
+      ptc_household_size: 1
+      slcsp_premium: 6000
+      ptc_coverage_months: 12
+    expected:
+      household_income_pct_fpl: 0.93  # 14000 / 15060
+      ptc_income_eligible: false
+      premium_tax_credit: 0
+    citations:
+      - "26 USC 36B(c)(1)(A)(i): income must be at least 100% FPL"
+
+  - name: "At exactly 100% FPL - eligible"
+    description: "Taxpayers at exactly 100% FPL are eligible"
+    inputs:
+      household_income: 15060  # Exactly 100% FPL
+      filing_status: single
+      ptc_household_size: 1
+      slcsp_premium: 6000
+      ptc_coverage_months: 12
+    expected:
+      household_income_pct_fpl: 1.00
+      ptc_income_eligible: true
+      premium_tax_credit: 6000
+    citations:
+      - "26 USC 36B(c)(1)(A)(i): at least 100% FPL"
+
+  # ============================================================================
+  # FILING STATUS REQUIREMENTS
+  # 26 USC 36B(c)(1)(C)
+  # ============================================================================
+
+  - name: "Married filing separately - ineligible"
+    description: "MFS filing status disqualifies from PTC (with exceptions)"
+    inputs:
+      household_income: 30000
+      filing_status: separate
+      ptc_household_size: 1
+      slcsp_premium: 6000
+      ptc_coverage_months: 12
+    expected:
+      ptc_filing_status_eligible: false
+      is_applicable_taxpayer: false
+      premium_tax_credit: 0
+    citations:
+      - "26 USC 36B(c)(1)(C): MFS generally ineligible"
+
+  - name: "Single filer - eligible"
+    description: "Single filing status is eligible"
+    inputs:
+      household_income: 30000
+      filing_status: single
+      ptc_household_size: 1
+      slcsp_premium: 6000
+      ptc_coverage_months: 12
+    expected:
+      ptc_filing_status_eligible: true
+      is_applicable_taxpayer: true
+    citations:
+      - "26 USC 36B(c)(1)(C): single filers eligible"
+
+  - name: "Married filing jointly - eligible"
+    description: "MFJ filing status is eligible"
+    inputs:
+      household_income: 50000
+      filing_status: joint
+      ptc_household_size: 2
+      slcsp_premium: 8000
+      ptc_coverage_months: 12
+    expected:
+      ptc_filing_status_eligible: true
+      is_applicable_taxpayer: true
+    citations:
+      - "26 USC 36B(c)(1)(C): joint filers eligible"
+
+  - name: "Head of household - eligible"
+    description: "Head of household filing status is eligible"
+    inputs:
+      household_income: 35000
+      filing_status: head_of_household
+      ptc_household_size: 2
+      slcsp_premium: 7000
+      ptc_coverage_months: 12
+    expected:
+      ptc_filing_status_eligible: true
+      is_applicable_taxpayer: true
+    citations:
+      - "26 USC 36B(c)(1)(C): head of household eligible"
+
+  # ============================================================================
+  # HOUSEHOLD SIZE AND FPL CALCULATIONS
+  # 26 USC 36B(d)(1) and 36B(d)(3)
+  # ============================================================================
+
+  - name: "Family of 4 at 200% FPL"
+    description: "FPL scales with household size"
+    inputs:
+      household_income: 62400  # 200% FPL for family of 4
+      filing_status: joint
+      ptc_household_size: 4
+      slcsp_premium: 15000
+      ptc_coverage_months: 12
+    expected:
+      # FPL for 4: 15060 + (3 * 5380) = 15060 + 16140 = 31200
+      ptc_federal_poverty_level: 31200
+      household_income_pct_fpl: 2.00  # 62400 / 31200
+      applicable_percentage: 0.0200
+      expected_contribution: 1248  # 62400 * 0.02
+      premium_tax_credit: 13752  # 15000 - 1248
+    citations:
+      - "26 USC 36B(d)(3): FPL adjusted for household size"
+      - "HHS Poverty Guidelines 2024"
+
+  - name: "Single person with 1 dependent"
+    description: "Household size includes dependents"
+    inputs:
+      household_income: 40880  # 200% FPL for 2-person household
+      filing_status: head_of_household
+      ptc_household_size: 2
+      slcsp_premium: 9000
+      ptc_coverage_months: 12
+    expected:
+      # FPL for 2: 15060 + 5380 = 20440
+      ptc_federal_poverty_level: 20440
+      household_income_pct_fpl: 2.00  # 40880 / 20440
+      applicable_percentage: 0.0200
+      expected_contribution: 818  # 40880 * 0.02
+      premium_tax_credit: 8182  # 9000 - 818
+    citations:
+      - "26 USC 36B(d)(1): household includes dependents"
+
+  # ============================================================================
+  # COVERAGE MONTHS
+  # 26 USC 36B(b)(1) and 36B(c)(2)
+  # ============================================================================
+
+  - name: "Partial year coverage - 6 months"
+    description: "Credit prorated for coverage months"
+    inputs:
+      household_income: 30120  # 200% FPL
+      filing_status: single
+      ptc_household_size: 1
+      slcsp_premium: 6000
+      ptc_coverage_months: 6  # Only covered 6 months
+    expected:
+      household_income_pct_fpl: 2.00
+      applicable_percentage: 0.0200
+      expected_contribution: 602
+      # Annual max credit = 6000 - 602 = 5398
+      # Prorated: 5398 * 6/12 = 2699
+      premium_tax_credit: 2699
+    citations:
+      - "26 USC 36B(b)(1): sum of coverage months"
+      - "26 USC 36B(c)(2): coverage month definition"
+
+  - name: "No coverage months"
+    description: "No credit if no coverage months"
+    inputs:
+      household_income: 30120
+      filing_status: single
+      ptc_household_size: 1
+      slcsp_premium: 6000
+      ptc_coverage_months: 0
+    expected:
+      premium_tax_credit: 0
+    citations:
+      - "26 USC 36B(b)(1): credit based on coverage months"
+
+  # ============================================================================
+  # CREDIT CALCULATION EDGE CASES
+  # 26 USC 36B(b)(2)
+  # ============================================================================
+
+  - name: "Expected contribution exceeds benchmark"
+    description: "Credit cannot be negative"
+    inputs:
+      household_income: 80000  # High income
+      filing_status: single
+      ptc_household_size: 1
+      slcsp_premium: 5000  # Low benchmark premium
+      ptc_coverage_months: 12
+    expected:
+      applicable_percentage: 0.0850
+      expected_contribution: 6800  # 80000 * 0.085
+      # Credit = max(0, 5000 - 6800) = 0
+      premium_tax_credit: 0
+    citations:
+      - "26 USC 36B(b)(2): credit = benchmark - contribution, not below 0"
+
+  - name: "Zero benchmark premium"
+    description: "No credit if no benchmark premium"
+    inputs:
+      household_income: 30000
+      filing_status: single
+      ptc_household_size: 1
+      slcsp_premium: 0
+      ptc_coverage_months: 12
+    expected:
+      premium_tax_credit: 0
+    citations:
+      - "26 USC 36B(b)(3)(B): credit based on SLCSP premium"
+
+  # ============================================================================
+  # ADVANCE PAYMENT RECONCILIATION
+  # 26 USC 36B(f)
+  # ============================================================================
+
+  - name: "Advance payments match actual credit"
+    description: "No adjustment when advance equals actual"
+    inputs:
+      household_income: 30120
+      filing_status: single
+      ptc_household_size: 1
+      slcsp_premium: 6000
+      ptc_coverage_months: 12
+      advance_ptc: 5398  # Matches expected credit
+    expected:
+      premium_tax_credit: 5398
+      net_ptc_adjustment: 0
+      excess_advance_ptc_repayment: 0
+      additional_ptc_refund: 0
+    citations:
+      - "26 USC 36B(f): reconciliation of advance payments"
+
+  - name: "Advance payments less than actual - additional refund"
+    description: "Taxpayer receives additional credit on return"
+    inputs:
+      household_income: 30120
+      filing_status: single
+      ptc_household_size: 1
+      slcsp_premium: 6000
+      ptc_coverage_months: 12
+      advance_ptc: 4000  # Less than actual credit
+    expected:
+      premium_tax_credit: 5398
+      net_ptc_adjustment: 1398  # 5398 - 4000
+      excess_advance_ptc_repayment: 0
+      additional_ptc_refund: 1398
+    citations:
+      - "26 USC 36B(f): additional credit if advance < actual"
+
+  - name: "Advance payments exceed actual - repayment required"
+    description: "Taxpayer must repay excess advance"
+    inputs:
+      household_income: 40000  # Higher income than expected
+      filing_status: single
+      ptc_household_size: 1
+      slcsp_premium: 6000
+      ptc_coverage_months: 12
+      advance_ptc: 5000  # Based on lower estimated income
+    expected:
+      # At ~265% FPL: applicable pct ~4.6%
+      # Expected contribution: 40000 * 0.046 = 1840
+      # Actual credit: 6000 - 1840 = 4160
+      premium_tax_credit: 4160
+      net_ptc_adjustment: -840  # 4160 - 5000
+      excess_advance_ptc_repayment: 840
+      additional_ptc_refund: 0
+    citations:
+      - "26 USC 36B(f)(2): repayment of excess advance"
+
+  # ============================================================================
+  # COMBINED ELIGIBILITY TESTS
+  # ============================================================================
+
+  - name: "Fully eligible family - all requirements met"
+    description: "Family of 4 at 250% FPL with full year coverage"
+    inputs:
+      household_income: 78000  # ~250% FPL for family of 4
+      filing_status: joint
+      ptc_household_size: 4
+      slcsp_premium: 20000
+      ptc_coverage_months: 12
+      is_tax_unit_dependent: false
+    expected:
+      ptc_federal_poverty_level: 31200
+      household_income_pct_fpl: 2.50
+      ptc_filing_status_eligible: true
+      ptc_income_eligible: true
+      ptc_not_dependent: true
+      is_applicable_taxpayer: true
+      applicable_percentage: 0.0400
+      expected_contribution: 3120  # 78000 * 0.04
+      premium_tax_credit: 16880  # 20000 - 3120
+    citations:
+      - "26 USC 36B: all eligibility requirements"
+
+  - name: "Claimed as dependent - ineligible"
+    description: "Cannot claim PTC if claimed as dependent"
+    inputs:
+      household_income: 25000
+      filing_status: single
+      ptc_household_size: 1
+      slcsp_premium: 6000
+      ptc_coverage_months: 12
+      is_tax_unit_dependent: true
+    expected:
+      ptc_not_dependent: false
+      is_applicable_taxpayer: false
+      premium_tax_credit: 0
+    citations:
+      - "26 USC 36B(c)(1)(D): cannot be claimed as dependent"
+
+  # ============================================================================
+  # EDGE CASES - HIGH INCOME UNDER IRA
+  # ============================================================================
+
+  - name: "Very high income - 600% FPL"
+    description: "IRA allows credit at any income level above 400%"
+    inputs:
+      household_income: 90360  # 600% FPL for single
+      filing_status: single
+      ptc_household_size: 1
+      slcsp_premium: 12000
+      ptc_coverage_months: 12
+    expected:
+      household_income_pct_fpl: 6.00
+      applicable_percentage: 0.0850  # Capped at 8.5%
+      expected_contribution: 7681  # 90360 * 0.085
+      premium_tax_credit: 4319  # 12000 - 7681
+    citations:
+      - "P.L. 117-169: No cliff under IRA - 8.5% cap applies"
+
+  - name: "1000% FPL - still eligible under IRA"
+    description: "No upper income limit under IRA through 2025"
+    inputs:
+      household_income: 150600  # 1000% FPL for single
+      filing_status: single
+      ptc_household_size: 1
+      slcsp_premium: 20000
+      ptc_coverage_months: 12
+    expected:
+      household_income_pct_fpl: 10.00
+      applicable_percentage: 0.0850
+      expected_contribution: 12801  # 150600 * 0.085
+      premium_tax_credit: 7199  # 20000 - 12801
+    citations:
+      - "P.L. 117-169 Section 12001: IRA removed income cliff"

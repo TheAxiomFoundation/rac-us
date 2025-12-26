@@ -1,16 +1,29 @@
-# Encoding Metadata for 26 USC § 63 (Standard Deduction)
+# Encoding Metadata for 26 USC Section 63 (Taxable Income Defined)
 
 encoding:
   created: 2024-12-23
-  updated: 2024-12-24
+  updated: 2024-12-25
   status: validated
   encoded_by: claude-opus-4.5
 
-variable:
-  name: standard_deduction
-  entity: TaxUnit
-  period: Year
-  dtype: Money
+variables:
+  - name: taxable_income
+    entity: TaxUnit
+    period: Year
+    dtype: Money
+    path: a/taxable_income.cosilico
+
+  - name: standard_deduction
+    entity: TaxUnit
+    period: Year
+    dtype: Money
+    path: c/standard_deduction.cosilico
+
+  - name: total_itemized_deductions
+    entity: TaxUnit
+    period: Year
+    dtype: Money
+    path: d/itemized_deductions.cosilico
 
 coverage:
   tax_years: [2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025]
@@ -26,14 +39,44 @@ coverage:
 
 sources:
   statute:
-    - citation: "26 USC § 63"
+    - citation: "26 USC 63"
       title: "Taxable income defined"
       path: ./
+      sections:
+        - a: Taxable income in general
+        - b: Individuals who do not itemize
+        - c: Standard deduction
+        - d: Itemized deductions defined
+        - e: Election to itemize
+        - f: Additional amounts for aged and blind
       files:
-        - c/2/basic_amounts.yaml   # Basic deduction by filing status
-        - c/5/parameters.yaml      # Dependent limitation
-        - f/1/aged_amount.yaml     # Additional for aged
-        - f/2/blind_amount.yaml    # Additional for blind
+        - a/taxable_income.cosilico       # Main taxable income computation
+        - c/2/basic_amounts.yaml          # Basic deduction by filing status
+        - c/5/parameters.yaml             # Dependent limitation
+        - d/itemized_deductions.cosilico  # Total itemized deductions
+        - f/1/aged_amount.yaml            # Additional for aged
+        - f/2/blind_amount.yaml           # Additional for blind
+
+  related_sections:
+    - citation: "26 USC 163"
+      title: "Interest deduction"
+      path: ../163/
+      component: "interest_deduction"
+
+    - citation: "26 USC 164"
+      title: "State and local taxes (SALT)"
+      path: ../164/
+      component: "salt_deduction"
+
+    - citation: "26 USC 170"
+      title: "Charitable contributions"
+      path: ../170/
+      component: "charitable_deduction"
+
+    - citation: "26 USC 213"
+      title: "Medical expenses"
+      path: ../213/
+      component: "medical_expense_deduction"
 
   guidance:
     - citation: "Rev. Proc. 2023-34"
@@ -43,38 +86,49 @@ sources:
 
 architecture:
   description: |
-    Three-layer architecture separating law from implementation:
+    Section 63 defines taxable income as AGI minus deductions:
 
-    1. STATUTE layer (statute/26/63/)
-       - c/2/basic_amounts.yaml: Basic deduction by filing status
-       - c/5/parameters.yaml: Dependent limitation parameters
-       - f/1/aged_amount.yaml: Additional for aged (65+)
-       - f/2/blind_amount.yaml: Additional for blind
+    1. TAXABLE INCOME (63(a))
+       taxable_income = AGI - deductions_from_agi - personal_exemptions
 
-    2. GUIDANCE layer (irs/rev-proc-2023-34/)
-       - standard-deduction-2024.yaml: TY 2024 inflation-adjusted values
+    2. DEDUCTIONS FROM AGI
+       deductions_from_agi = max(standard_deduction, total_itemized_deductions)
+       (Unless ineligible for standard deduction - 63(c)(6))
 
-    3. TESTS layer (statute/26/63/)
-       - c/tests.yaml: Basic deduction and dependent tests
-       - f/tests.yaml: Additional amounts for aged/blind tests
+    3. STANDARD DEDUCTION (63(c))
+       - Basic amount by filing status (63(c)(2))
+       - Dependent limitation (63(c)(5))
+       - Additional for aged/blind (63(f))
+       - Zero if ineligible (63(c)(6))
+
+    4. ITEMIZED DEDUCTIONS (63(d))
+       - Medical expenses (213) - exceeding 7.5% AGI
+       - SALT (164) - capped at $10K (TCJA)
+       - Mortgage interest (163) - limited by debt amount
+       - Charitable (170) - AGI percentage limits
+       - Casualty losses (165) - disaster areas only
 
   formula_structure: |
-    For non-dependents:
-      basic_amount(filing_status)
-      + additional_aged(age >= 65, married) × count(aged_members)
-      + additional_blind(is_blind, married) × count(blind_members)
+    taxable_income =
+      adjusted_gross_income
+      - max(standard_deduction, total_itemized_deductions)
+      - personal_exemption  # Zero under TCJA 2018-2025
 
-    For dependents (§ 63(c)(5)):
+    Standard deduction (non-dependent):
+      basic_amount(filing_status)
+      + additional_aged * count(aged_65_plus)
+      + additional_blind * count(blind_persons)
+
+    Standard deduction (dependent):
       min(
-        max(
-          dependent_minimum,
-          earned_income + dependent_earned_addon
-        ),
+        max(dependent_minimum, earned_income + addon),
         basic_amount(filing_status)
       )
       + additional amounts (if applicable)
 
-    Zero if (§ 63(c)(6)):
-      - Married filing separately and spouse itemizes
-      - Nonresident alien
-      - Short tax year due to change in accounting period
+    Total itemized deductions:
+      medical_expense_deduction +     # Section 213
+      salt_deduction +                 # Section 164
+      interest_deduction +             # Section 163
+      charitable_deduction +           # Section 170
+      casualty_loss_deduction          # Section 165

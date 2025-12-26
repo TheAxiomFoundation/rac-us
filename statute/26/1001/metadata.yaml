@@ -1,0 +1,321 @@
+# Encoding Metadata for 26 USC Sections 1001-1016 - Capital Gains and Losses
+#
+# This encoding implements the core capital gains tax rules from Subchapter O
+# of the Internal Revenue Code (Part I - Determination of Amount of and
+# Recognition of Gain or Loss, and Part II - Basis Rules).
+
+encoding:
+  created: 2024-12-25
+  updated: 2024-12-25
+  status: implemented
+  encoded_by: claude-opus-4.5
+  version: "1.0"
+
+scope:
+  title: 26
+  subchapter: O
+  parts: [I, II]
+  sections: [1001, 1011, 1012, 1014, 1015, 1016]
+  related_sections: [1, 1211, 1212, 1222, 1223, 1411]
+
+# =============================================================================
+# File Structure
+# =============================================================================
+
+files:
+  - path: capital_gains.cosilico
+    description: |
+      Core gain/loss determination per Section 1001(a).
+      Implements: Amount Realized - Adjusted Basis = Gain/Loss
+    sections_covered:
+      - "1001(a): Computation of gain or loss"
+      - "1001(b): Amount realized"
+      - "1001(c): Recognition of gain or loss"
+      - "1011: Adjusted basis for determining gain or loss"
+      - "1012: Basis of property - cost"
+      - "1014: Basis of property acquired from decedent"
+      - "1015: Basis of property acquired by gift"
+      - "1016: Adjustments to basis"
+    key_variables:
+      - realized_gain_loss
+      - amount_realized
+      - adjusted_basis
+      - recognized_gain_loss
+      - short_term_capital_gain
+      - short_term_capital_loss
+      - long_term_capital_gain
+      - long_term_capital_loss
+
+  - path: holding_period.cosilico
+    description: |
+      Holding period classification for short-term vs long-term treatment.
+      Implements tacking rules for substituted basis property.
+    sections_covered:
+      - "1222(1)-(4): Short-term/Long-term definitions"
+      - "1223(1): Substituted basis tacking"
+      - "1223(2): Gift property tacking"
+      - "1223(9): Inherited property (always long-term)"
+    key_variables:
+      - is_long_term_asset
+      - is_short_term_asset
+      - holding_period_days
+      - effective_holding_period_days
+
+  - path: netting.cosilico
+    description: |
+      Capital gain/loss netting rules and loss limitation.
+      Implements Schedule D ordering and $3,000 loss limit.
+    sections_covered:
+      - "1222(5)-(6): Net short-term capital gain/loss"
+      - "1222(7)-(8): Net long-term capital gain/loss"
+      - "1222(9)-(11): Capital gain net income, net capital loss, net capital gain"
+      - "1211(b): Capital loss limitation ($3,000/$1,500)"
+      - "1212(b): Capital loss carryover"
+    key_variables:
+      - net_short_term_capital_gain
+      - net_short_term_capital_loss
+      - net_long_term_capital_gain
+      - net_long_term_capital_loss
+      - net_capital_gain
+      - capital_loss_deduction
+      - capital_loss_carryover_generated
+
+  - path: preferential_rates.cosilico
+    description: |
+      Integration with Section 1(h) preferential rates and NIIT.
+      Connects capital gains to 0%/15%/20%/25%/28% rate structure.
+    sections_covered:
+      - "1(h): Maximum capital gains rate"
+      - "1(h)(4): Collectibles (28%)"
+      - "1(h)(6): Unrecaptured Section 1250 gain (25%)"
+      - "1(h)(11): Qualified dividend income"
+      - "1411: Net Investment Income Tax (3.8%)"
+    key_variables:
+      - adjusted_net_capital_gain
+      - total_capital_gains_tax
+      - collectibles_gain_tax
+      - section_1250_gain_tax
+      - niit_on_capital_gains
+
+  - path: parameters.yaml
+    description: |
+      Statutory rates and limits for capital gains taxation.
+      Includes fixed rates (not inflation-adjusted) and thresholds.
+    parameters:
+      - preferential_rate_zero: 0%
+      - preferential_rate_fifteen: 15%
+      - preferential_rate_twenty: 20%
+      - collectibles_rate: 28%
+      - section_1250_rate: 25%
+      - capital_loss_limit: $3,000
+      - capital_loss_limit_mfs: $1,500
+      - niit_rate: 3.8%
+      - qsbs_exclusion_rate: 50%/75%/100%
+
+  - path: tests.yaml
+    description: |
+      Comprehensive test cases covering all capital gains scenarios.
+      Includes IRS Publication 544/550 examples and Schedule D scenarios.
+
+# =============================================================================
+# Coverage Details
+# =============================================================================
+
+coverage:
+  tax_years: [2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025]
+  notes: |
+    This encoding covers the core capital gains rules that apply to most
+    individual taxpayers. The implementation follows the Schedule D
+    calculation flow.
+
+    Key coverage:
+    - Basic gain/loss determination (amount realized - adjusted basis)
+    - Cost basis, inherited basis (stepped-up), gift basis (carryover)
+    - Holding period classification (>1 year = long-term)
+    - Netting rules (ST vs LT, then combine)
+    - Loss limitation ($3,000/$1,500 per year)
+    - Loss carryforward (indefinite, character preserved)
+    - Preferential rates (0%/15%/20% based on income)
+    - Special rates (28% collectibles, 25% Section 1250)
+    - NIIT integration (3.8% above threshold)
+
+# =============================================================================
+# Not Implemented
+# =============================================================================
+
+not_implemented:
+  - provision: "Section 1031"
+    description: "Like-kind exchanges"
+    reason: "Complex deferred recognition rules; separate encoding needed"
+
+  - provision: "Section 1033"
+    description: "Involuntary conversions"
+    reason: "Requires tracking of replacement property"
+
+  - provision: "Section 121"
+    description: "Sale of principal residence exclusion"
+    reason: "Encoded separately in Section 121 module"
+
+  - provision: "Section 1091"
+    description: "Wash sale rules"
+    reason: "Requires 61-day window tracking"
+
+  - provision: "Section 1259"
+    description: "Constructive sales"
+    reason: "Complex financial product rules"
+
+  - provision: "Section 1260"
+    description: "Gains from constructive ownership transactions"
+    reason: "Derivatives and financial engineering rules"
+
+  - provision: "Section 1256"
+    description: "Section 1256 contracts (60/40 rule)"
+    reason: "Futures and options special treatment"
+
+  - provision: "Installment sales"
+    description: "Section 453 installment method"
+    reason: "Multi-year recognition timing"
+
+# =============================================================================
+# Dependencies
+# =============================================================================
+
+dependencies:
+  - path: statute/26/1/filing_status
+    description: "Filing status for loss limit determination"
+
+  - path: statute/26/1/h
+    description: "Section 1(h) preferential rate calculation (already implemented)"
+
+  - path: statute/26/63/c
+    description: "Taxable income for bracket determination"
+
+  - path: statute/26/1411
+    description: "Net Investment Income Tax"
+
+# =============================================================================
+# Sources
+# =============================================================================
+
+sources:
+  statutes:
+    - citation: "26 USC Section 1001"
+      title: "Determination of amount of and recognition of gain or loss"
+
+    - citation: "26 USC Section 1011"
+      title: "Adjusted basis for determining gain or loss"
+
+    - citation: "26 USC Section 1012"
+      title: "Basis of property - cost"
+
+    - citation: "26 USC Section 1014"
+      title: "Basis of property acquired from a decedent"
+
+    - citation: "26 USC Section 1015"
+      title: "Basis of property acquired by gifts"
+
+    - citation: "26 USC Section 1016"
+      title: "Adjustments to basis"
+
+    - citation: "26 USC Section 1211"
+      title: "Limitation on capital losses"
+
+    - citation: "26 USC Section 1212"
+      title: "Capital loss carrybacks and carryovers"
+
+    - citation: "26 USC Section 1222"
+      title: "Other terms relating to capital gains and losses"
+
+    - citation: "26 USC Section 1223"
+      title: "Holding period of property"
+
+  guidance:
+    - citation: "IRS Publication 544"
+      title: "Sales and Other Dispositions of Assets"
+      url: "https://www.irs.gov/pub/irs-pdf/p544.pdf"
+
+    - citation: "IRS Publication 550"
+      title: "Investment Income and Expenses"
+      url: "https://www.irs.gov/pub/irs-pdf/p550.pdf"
+
+    - citation: "Schedule D (Form 1040)"
+      title: "Capital Gains and Losses"
+      url: "https://www.irs.gov/pub/irs-pdf/f1040sd.pdf"
+
+    - citation: "Schedule D Instructions"
+      title: "Instructions for Schedule D"
+      url: "https://www.irs.gov/pub/irs-pdf/i1040sd.pdf"
+
+    - citation: "Rev. Proc. 2023-34"
+      title: "Inflation adjustments for TY 2024"
+      section: "Section 3.10 (Capital gains rate thresholds)"
+
+# =============================================================================
+# Validation
+# =============================================================================
+
+validation:
+  pe_variables:
+    - capital_gain_net_income
+    - net_capital_gain
+    - capital_gains_tax
+
+  external_calculators:
+    - name: "IRS EITC Assistant"
+      url: "https://www.irs.gov/credits-deductions/individuals/earned-income-tax-credit/use-the-eitc-assistant"
+      note: "For investment income disqualification only"
+
+    - name: "TurboTax"
+      note: "Commercial tax software comparison"
+
+    - name: "H&R Block"
+      note: "Commercial tax software comparison"
+
+  tolerance_dollars: 1
+  notes: |
+    Validation compares against expected calculations for:
+    - Basic gain/loss computation
+    - Netting order correctness
+    - Loss limitation application
+    - Preferential rate bracket placement
+    - NIIT threshold application
+
+# =============================================================================
+# Architecture Notes
+# =============================================================================
+
+architecture:
+  description: |
+    The capital gains encoding follows the Schedule D calculation flow:
+
+    1. **Per-Asset Calculation** (capital_gains.cosilico)
+       - Each asset: gain/loss = amount realized - adjusted basis
+       - Classify by holding period (ST vs LT)
+
+    2. **Aggregation** (capital_gains.cosilico)
+       - Sum all ST gains, ST losses, LT gains, LT losses
+
+    3. **Netting** (netting.cosilico)
+       - Net ST gains vs ST losses -> Net STCG or Net STCL
+       - Net LT gains vs LT losses -> Net LTCG or Net LTCL
+       - Combine: Net capital gain or Net capital loss
+
+    4. **Loss Limitation** (netting.cosilico)
+       - If net loss: limited to $3,000 ($1,500 MFS)
+       - Excess carries forward
+
+    5. **Rate Application** (preferential_rates.cosilico)
+       - Net capital gain (LTCG portion): 0%/15%/20% rates
+       - Collectibles: 28% rate
+       - Section 1250: 25% rate
+       - All gains: +3.8% NIIT if above threshold
+
+  entity_model: |
+    - Asset: Individual capital asset with basis, holding period
+    - TaxUnit: Aggregation level for tax calculation
+    - Filing status affects: loss limit, rate thresholds, NIIT threshold
+
+  cross_references:
+    - Section 1(h) already implemented in statute/26/1/h/
+    - Section 1222(11) net_capital_gain definition exists in statute/26/1222/11/
+    - NIIT (Section 1411) referenced but full implementation separate

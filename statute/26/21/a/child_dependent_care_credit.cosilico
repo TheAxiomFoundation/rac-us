@@ -1,0 +1,111 @@
+# 26 USC 21 - Child and Dependent Care Credit
+#
+# "(a) ALLOWANCE OF CREDIT. --
+#   (1) IN GENERAL. -- In the case of an individual who maintains a household which
+#       includes as a member one or more qualifying individuals (as defined in
+#       subsection (b)(1)), there shall be allowed as a credit against the tax
+#       imposed by this chapter for the taxable year an amount equal to the
+#       applicable percentage of the employment-related expenses (as defined in
+#       subsection (b)(2)) paid by such individual during the taxable year."
+#
+# Credit = Applicable Percentage x min(Actual Expenses, Expense Limit, Earned Income Limit)
+#
+# Key components:
+#   - 21(b)(1): Qualifying individual definition
+#   - 21(b)(2): Employment-related expenses definition
+#   - 21(b): Applicable percentage (35% to 20% based on AGI)
+#   - 21(c): Dollar limit on expenses ($3,000 / $6,000)
+#   - 21(d): Earned income limitation
+
+module statute.26.21.a
+version "2024.1"
+
+references {
+  # Number of qualifying individuals
+  num_cdcc_qualifying_individuals: statute/26/21/e/num_qualifying_individuals#num_cdcc_qualifying_individuals
+
+  # Applicable percentage (credit rate)
+  cdcc_applicable_percentage: statute/26/21/b/applicable_percentage#cdcc_applicable_percentage
+
+  # Expense limits
+  cdcc_maximum_expense_limit: statute/26/21/c/expense_limit#cdcc_maximum_expense_limit
+  cdcc_earned_income_limit: statute/26/21/d/earned_income_limit#cdcc_earned_income_limit
+
+  # Actual employment-related expenses paid (input)
+  cdcc_expenses_paid: statute/26/21/a/inputs#cdcc_expenses_paid
+
+  # Tax liability (for nonrefundable limitation)
+  tax_liability_before_credits: statute/26/26/a/tax_liability_before_credits#tax_liability_before_credits
+
+  # Refundability parameter
+  is_refundable: statute/26/21/a/refundability#is_refundable
+}
+
+# Intermediate: Creditable expenses after all limitations
+variable cdcc_creditable_expenses {
+  entity TaxUnit
+  period Year
+  dtype Money
+  unit "USD"
+  label "CDCC Creditable Expenses"
+  description "Employment-related expenses eligible for credit after all limitations"
+  reference (
+    "26 USC 21(c): Dollar limit based on qualifying individuals",
+    "26 USC 21(d): Earned income limitation"
+  )
+
+  formula {
+    # No qualifying individuals = no credit
+    if num_cdcc_qualifying_individuals == 0 then
+      return 0
+
+    # Apply all limitations: actual expenses, statutory limit, earned income limit
+    return min(cdcc_expenses_paid, cdcc_maximum_expense_limit, cdcc_earned_income_limit)
+  }
+}
+
+# The credit amount before tax liability limitation
+variable cdcc_tentative_credit {
+  entity TaxUnit
+  period Year
+  dtype Money
+  unit "USD"
+  label "CDCC Tentative Credit"
+  description "Child and Dependent Care Credit before tax liability limitation"
+  reference "26 USC 21(a): applicable percentage of employment-related expenses"
+
+  formula {
+    return cdcc_creditable_expenses * cdcc_applicable_percentage
+  }
+}
+
+# The final Child and Dependent Care Credit
+variable child_dependent_care_credit {
+  entity TaxUnit
+  period Year
+  dtype Money
+  unit "USD"
+  label "Child and Dependent Care Credit"
+  description "Credit for employment-related expenses for care of qualifying individuals per 26 USC 21"
+  reference (
+    "26 USC 21(a): credit = applicable percentage x creditable expenses",
+    "26 USC 21(g) (ARPA 2021): refundable for 2021"
+  )
+
+  formula {
+    let tentative = cdcc_tentative_credit
+
+    # ARPA 2021 made the credit refundable for 2021
+    if is_refundable then
+      return tentative
+
+    # Otherwise, credit is limited to tax liability (nonrefundable)
+    return min(tentative, tax_liability_before_credits)
+  }
+
+  defined_for {
+    num_cdcc_qualifying_individuals > 0
+  }
+
+  default 0
+}

@@ -1,0 +1,206 @@
+# 26 USC Section 179(a) - Election to Expense Certain Depreciable Business Assets
+#
+# "(a) TREATMENT AS EXPENSES.—A taxpayer may elect to treat the cost of any
+# section 179 property as an expense which is not chargeable to capital account.
+# Any cost so treated shall be allowed as a deduction for the taxable year in
+# which the section 179 property is placed in service."
+#
+# This provides immediate expensing rather than capitalizing and depreciating.
+#
+# Key limitations:
+# - Section 179(b)(1): Maximum dollar limitation ($1,220,000 for 2024)
+# - Section 179(b)(2): Phaseout when total investment exceeds threshold
+# - Section 179(b)(3): Taxable income limitation
+# - Section 179(b)(5): Special SUV limitation
+
+module statute.26.179.a
+version "2024.1"
+
+references {
+  # Parameters
+  maximum_deduction: statute/26/179/parameters/maximum_deduction
+  phaseout_threshold: statute/26/179/parameters/phaseout_threshold
+  phaseout_rate: statute/26/179/parameters/phaseout_rate
+  suv_limitation: statute/26/179/parameters/suv_limitation
+  suv_weight_threshold: statute/26/179/parameters/suv_weight_threshold
+}
+
+# Input: Section 179 property placed in service
+variable section_179_property_placed_in_service {
+  entity Business
+  period Year
+  dtype Money
+  unit "USD"
+  label "Section 179 Property Placed in Service"
+  description "Cost of qualifying Section 179 property placed in service during the year"
+  reference "26 USC 179(d)"
+
+  input {
+    # Must be tangible personal property used in trade/business
+    # Includes equipment, machinery, vehicles, certain improvements
+  }
+
+  default 0
+}
+
+# Input: SUV property (over 6,000 lbs)
+variable suv_property_placed_in_service {
+  entity Business
+  period Year
+  dtype Money
+  unit "USD"
+  label "SUV Property Placed in Service"
+  description "Cost of sport utility vehicles over 6,000 lbs gross weight"
+  reference "26 USC 179(b)(5)"
+
+  input {
+    # Vehicles over 6,000 lbs gross vehicle weight
+    # Subject to $30,500 limitation (2024)
+  }
+
+  default 0
+}
+
+# Input: Total cost of all Section 179 property (for phaseout)
+variable total_cost_of_section_179_property {
+  entity Business
+  period Year
+  dtype Money
+  unit "USD"
+  label "Total Cost of Section 179 Property"
+  description "Total cost of all Section 179 property for phaseout calculation"
+  reference "26 USC 179(b)(2)"
+
+  input {
+    # Total of all Section 179 property placed in service
+    # Used to determine phaseout
+  }
+
+  default 0
+}
+
+# Input: Taxable income before Section 179
+variable taxable_income_before_179 {
+  entity Business
+  period Year
+  dtype Money
+  unit "USD"
+  label "Taxable Income Before Section 179"
+  description "Taxable income from active trade or business before Section 179 deduction"
+  reference "26 USC 179(b)(3)"
+
+  input {
+    # Active trade or business income
+    # Used for taxable income limitation
+  }
+
+  default 0
+}
+
+# Prior year carryforward
+variable section_179_carryforward_prior {
+  entity Business
+  period Year
+  dtype Money
+  unit "USD"
+  label "Section 179 Carryforward from Prior Year"
+  description "Disallowed Section 179 amount carried forward from prior year"
+  reference "26 USC 179(b)(3)(B)"
+
+  input { }
+
+  default 0
+}
+
+# Calculate available deduction after phaseout
+variable section_179_available_after_phaseout {
+  entity Business
+  period Year
+  dtype Money
+  unit "USD"
+  label "Section 179 Available After Phaseout"
+  description "Maximum deduction available after applying investment phaseout"
+  reference "26 USC 179(b)(2)"
+
+  formula {
+    # Start with maximum
+    let max_available = maximum_deduction
+
+    # Calculate phaseout reduction
+    let excess_investment = max(0, total_cost_of_section_179_property - phaseout_threshold)
+    let phaseout_reduction = excess_investment * phaseout_rate
+
+    # Available after phaseout (cannot go below zero)
+    return max(0, max_available - phaseout_reduction)
+  }
+}
+
+# Calculate SUV-limited amount
+variable section_179_after_suv_limit {
+  entity Business
+  period Year
+  dtype Money
+  unit "USD"
+  label "Section 179 After SUV Limitation"
+  description "Elected amount after applying SUV limitation"
+  reference "26 USC 179(b)(5)"
+
+  formula {
+    # Non-SUV property: full amount up to available
+    let non_suv_property = section_179_property_placed_in_service - suv_property_placed_in_service
+    let non_suv_elected = min(non_suv_property, section_179_available_after_phaseout)
+
+    # SUV property: capped at SUV limitation
+    let suv_elected = min(suv_property_placed_in_service, suv_limitation)
+
+    # Remaining availability for SUV after non-SUV
+    let remaining_available = section_179_available_after_phaseout - non_suv_elected
+    let suv_allowed = min(suv_elected, remaining_available)
+
+    return non_suv_elected + suv_allowed
+  }
+}
+
+# Calculate Section 179 deduction (with taxable income limit)
+variable section_179_deduction {
+  entity Business
+  period Year
+  dtype Money
+  unit "USD"
+  label "Section 179 Deduction"
+  description "Section 179 expensing deduction for the taxable year"
+  reference "26 USC 179(a)"
+
+  formula {
+    # Total tentative deduction (current year + carryforward)
+    let tentative = section_179_after_suv_limit + section_179_carryforward_prior
+
+    # Limited by taxable income from active trade or business
+    let taxable_limit = max(0, taxable_income_before_179)
+
+    # Deduction is lesser of tentative or taxable income limit
+    return min(tentative, taxable_limit)
+  }
+}
+
+# Calculate carryforward to next year
+variable section_179_carryforward {
+  entity Business
+  period Year
+  dtype Money
+  unit "USD"
+  label "Section 179 Carryforward"
+  description "Disallowed Section 179 amount to carry forward to next year"
+  reference "26 USC 179(b)(3)(B)"
+
+  formula {
+    # Total tentative deduction
+    let tentative = section_179_after_suv_limit + section_179_carryforward_prior
+
+    # Amount disallowed due to taxable income limitation
+    let taxable_limit = max(0, taxable_income_before_179)
+    let disallowed = max(0, tentative - taxable_limit)
+
+    return disallowed
+  }
+}

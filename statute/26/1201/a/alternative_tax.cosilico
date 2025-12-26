@@ -1,0 +1,112 @@
+# 26 USC Section 1201(a) - Alternative Tax for Corporations
+#
+# "(a) GENERAL RULE.—If for any taxable year a corporation has a net capital gain
+# and any rate of tax imposed by section 11, 511, or 831(a) or (b) (whichever is
+# applicable) exceeds 35 percent, then, in lieu of any such tax, there is hereby
+# imposed a tax... computed as provided in paragraph (1), (2), or (3)."
+#
+# NOTE: Post-TCJA (2018+), the regular corporate rate is 21%, which is lower than
+# the 35% alternative rate, making Section 1201 effectively obsolete. The section
+# remains in the Code but provides no tax benefit.
+#
+# Historical context:
+# - Pre-TCJA: Corporations faced graduated rates up to 35%, with bubble rates
+#   reaching 39% for some income levels. Section 1201 capped capital gains at 35%.
+# - Post-TCJA: Flat 21% rate applies to all corporate income, including capital gains.
+
+module statute.26.1201.a
+version "2024.1"
+
+references {
+  net_capital_gain: statute/26/1222/net_capital_gain
+  corporate_income_tax: statute/26/11/b/corporate_income_tax
+  alternative_rate: statute/26/1201/parameters/alternative_rate
+  flat_rate: statute/26/11/parameters/flat_rate
+  graduated_brackets: statute/26/11/parameters/graduated_brackets
+  is_subject_to_corporate_tax: statute/26/11/a/is_subject_to_corporate_tax
+}
+
+variable uses_section_1201 {
+  entity Corporation
+  period Year
+  dtype Boolean
+  label "Uses Section 1201 Alternative Tax"
+  description "Whether corporation benefits from Section 1201 capital gains alternative tax"
+  reference "26 USC 1201(a)"
+
+  formula {
+    # Only C corporations can use Section 1201
+    if not is_subject_to_corporate_tax then
+      return false
+
+    # Must have net capital gain
+    if net_capital_gain <= 0 then
+      return false
+
+    # Post-TCJA: Regular rate (21%) is always lower than alternative (35%)
+    if tax_year >= 2018 then
+      return false
+
+    # Pre-TCJA: Compare regular tax vs Section 1201 tax
+    let regular_tax = compute_regular_tax()
+    let section_1201_tax = compute_section_1201_tax()
+
+    return section_1201_tax < regular_tax
+  }
+}
+
+variable section_1201_tax {
+  entity Corporation
+  period Year
+  dtype Money
+  unit "USD"
+  label "Section 1201 Tax Amount"
+  description "Tax computed under Section 1201 alternative method"
+  reference "26 USC 1201(a)(1)"
+
+  formula {
+    if not is_subject_to_corporate_tax then
+      return 0
+
+    # Post-TCJA: Always use regular tax
+    if tax_year >= 2018 then
+      return 0
+
+    # Pre-TCJA calculation:
+    # Tax = (Regular tax on ordinary income) + (35% of net capital gain)
+    let ordinary_income = taxable_income - net_capital_gain
+
+    # Compute tax on ordinary income using graduated brackets
+    let tax_on_ordinary = compute_graduated_tax(ordinary_income, graduated_brackets)
+
+    # Add 35% alternative rate on capital gains
+    let tax_on_gains = net_capital_gain * alternative_rate
+
+    return tax_on_ordinary + tax_on_gains
+  }
+}
+
+variable corporate_capital_gains_alternative_tax {
+  entity Corporation
+  period Year
+  dtype Money
+  unit "USD"
+  label "Corporate Income Tax (with Section 1201 consideration)"
+  description "Final corporate tax applying Section 1201 if beneficial"
+  reference "26 USC 1201"
+
+  formula {
+    if not is_subject_to_corporate_tax then
+      return 0
+
+    # Post-TCJA: Use regular 21% tax (Section 1201 never beneficial)
+    if tax_year >= 2018 then
+      return corporate_income_tax
+
+    # Pre-TCJA: Use lower of regular tax or Section 1201 tax
+    if uses_section_1201 then
+      return section_1201_tax
+    else
+      return corporate_income_tax
+  }
+}

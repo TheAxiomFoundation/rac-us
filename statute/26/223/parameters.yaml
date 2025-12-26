@@ -1,0 +1,242 @@
+# 26 USC Section 223 - Health Savings Account Parameters
+#
+# Annual limits indexed for inflation under IRC 223(g).
+# Values published annually by IRS in Revenue Procedures.
+
+description: "Parameters for Health Savings Accounts under IRC Section 223"
+reference: "26 USC 223, Rev. Proc. 2023-22, Rev. Proc. 2024-25"
+
+# =============================================================================
+# Section 223(b)(2) - Contribution Limits
+# =============================================================================
+contribution_limits:
+  description: "Maximum annual HSA contributions"
+  reference: "26 USC 223(b)(2)"
+
+  self_only:
+    description: "Maximum contribution for self-only HDHP coverage"
+    unit: USD
+    period: year
+    values:
+      - date: 2019-01-01
+        value: 3500
+        reference: "Rev. Proc. 2018-30"
+      - date: 2020-01-01
+        value: 3550
+        reference: "Rev. Proc. 2019-25"
+      - date: 2021-01-01
+        value: 3600
+        reference: "Rev. Proc. 2020-32"
+      - date: 2022-01-01
+        value: 3650
+        reference: "Rev. Proc. 2021-25"
+      - date: 2023-01-01
+        value: 3850
+        reference: "Rev. Proc. 2022-24"
+      - date: 2024-01-01
+        value: 4150
+        reference: "Rev. Proc. 2023-22"
+      - date: 2025-01-01
+        value: 4300
+        reference: "Rev. Proc. 2024-25"
+
+  family:
+    description: "Maximum contribution for family HDHP coverage"
+    unit: USD
+    period: year
+    values:
+      - date: 2019-01-01
+        value: 7000
+        reference: "Rev. Proc. 2018-30"
+      - date: 2020-01-01
+        value: 7100
+        reference: "Rev. Proc. 2019-25"
+      - date: 2021-01-01
+        value: 7200
+        reference: "Rev. Proc. 2020-32"
+      - date: 2022-01-01
+        value: 7300
+        reference: "Rev. Proc. 2021-25"
+      - date: 2023-01-01
+        value: 7750
+        reference: "Rev. Proc. 2022-24"
+      - date: 2024-01-01
+        value: 8300
+        reference: "Rev. Proc. 2023-22"
+      - date: 2025-01-01
+        value: 8550
+        reference: "Rev. Proc. 2024-25"
+
+# =============================================================================
+# Section 223(b)(3) - Catch-up Contributions
+# =============================================================================
+catch_up:
+  description: "Additional contribution amount for age 55+"
+  reference: "26 USC 223(b)(3)"
+
+  amount:
+    description: "Additional catch-up contribution allowed"
+    unit: USD
+    period: year
+    values:
+      - date: 2004-01-01
+        value: 500
+        reference: "Medicare Modernization Act of 2003"
+      - date: 2005-01-01
+        value: 600
+        reference: "26 USC 223(b)(3)(B)"
+      - date: 2006-01-01
+        value: 700
+        reference: "26 USC 223(b)(3)(B)"
+      - date: 2007-01-01
+        value: 800
+        reference: "26 USC 223(b)(3)(B)"
+      - date: 2008-01-01
+        value: 900
+        reference: "26 USC 223(b)(3)(B)"
+      - date: 2009-01-01
+        value: 1000
+        reference: "26 USC 223(b)(3)(B)"
+      # Remains at $1,000 - not indexed
+
+  age_threshold:
+    description: "Age at which catch-up contributions are allowed"
+    unit: years
+    values:
+      - date: 2004-01-01
+        value: 55
+
+# =============================================================================
+# Section 223(c)(2) - HDHP Requirements
+# =============================================================================
+hdhp_requirements:
+  description: "High Deductible Health Plan minimum and maximum thresholds"
+  reference: "26 USC 223(c)(2)"
+
+  minimum_deductible:
+    self_only:
+      description: "Minimum annual deductible for self-only HDHP"
+      unit: USD
+      period: year
+      values:
+        - date: 2019-01-01
+          value: 1350
+          reference: "Rev. Proc. 2018-30"
+        - date: 2020-01-01
+          value: 1400
+          reference: "Rev. Proc. 2019-25"
+        - date: 2021-01-01
+          value: 1400
+          reference: "Rev. Proc. 2020-32"
+        - date: 2022-01-01
+          value: 1400
+          reference: "Rev. Proc. 2021-25"
+        - date: 2023-01-01
+          value: 1500
+          reference: "Rev. Proc. 2022-24"
+        - date: 2024-01-01
+          value: 1600
+          reference: "Rev. Proc. 2023-22"
+        - date: 2025-01-01
+          value: 1650
+          reference: "Rev. Proc. 2024-25"
+
+    family:
+      description: "Minimum annual deductible for family HDHP"
+      unit: USD
+      period: year
+      values:
+        - date: 2019-01-01
+          value: 2700
+          reference: "Rev. Proc. 2018-30"
+        - date: 2020-01-01
+          value: 2800
+          reference: "Rev. Proc. 2019-25"
+        - date: 2021-01-01
+          value: 2800
+          reference: "Rev. Proc. 2020-32"
+        - date: 2022-01-01
+          value: 2800
+          reference: "Rev. Proc. 2021-25"
+        - date: 2023-01-01
+          value: 3000
+          reference: "Rev. Proc. 2022-24"
+        - date: 2024-01-01
+          value: 3200
+          reference: "Rev. Proc. 2023-22"
+        - date: 2025-01-01
+          value: 3300
+          reference: "Rev. Proc. 2024-25"
+
+  maximum_out_of_pocket:
+    self_only:
+      description: "Maximum out-of-pocket expenses for self-only HDHP"
+      unit: USD
+      period: year
+      values:
+        - date: 2019-01-01
+          value: 6750
+          reference: "Rev. Proc. 2018-30"
+        - date: 2020-01-01
+          value: 6900
+          reference: "Rev. Proc. 2019-25"
+        - date: 2021-01-01
+          value: 7000
+          reference: "Rev. Proc. 2020-32"
+        - date: 2022-01-01
+          value: 7050
+          reference: "Rev. Proc. 2021-25"
+        - date: 2023-01-01
+          value: 7500
+          reference: "Rev. Proc. 2022-24"
+        - date: 2024-01-01
+          value: 8050
+          reference: "Rev. Proc. 2023-22"
+        - date: 2025-01-01
+          value: 8300
+          reference: "Rev. Proc. 2024-25"
+
+    family:
+      description: "Maximum out-of-pocket expenses for family HDHP"
+      unit: USD
+      period: year
+      values:
+        - date: 2019-01-01
+          value: 13500
+          reference: "Rev. Proc. 2018-30"
+        - date: 2020-01-01
+          value: 13800
+          reference: "Rev. Proc. 2019-25"
+        - date: 2021-01-01
+          value: 14000
+          reference: "Rev. Proc. 2020-32"
+        - date: 2022-01-01
+          value: 14100
+          reference: "Rev. Proc. 2021-25"
+        - date: 2023-01-01
+          value: 15000
+          reference: "Rev. Proc. 2022-24"
+        - date: 2024-01-01
+          value: 16100
+          reference: "Rev. Proc. 2023-22"
+        - date: 2025-01-01
+          value: 16600
+          reference: "Rev. Proc. 2024-25"
+
+# =============================================================================
+# Section 223(f)(4) - Additional Tax Rate
+# =============================================================================
+additional_tax:
+  description: "Additional tax on non-qualified distributions"
+  reference: "26 USC 223(f)(4)"
+
+  rate:
+    description: "Penalty rate on non-qualified HSA distributions"
+    unit: percent
+    values:
+      - date: 2004-01-01
+        value: 10
+        reference: "Medicare Modernization Act of 2003"
+      - date: 2011-01-01
+        value: 20
+        reference: "Affordable Care Act Section 9004"

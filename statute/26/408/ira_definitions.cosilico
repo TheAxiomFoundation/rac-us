@@ -1,0 +1,133 @@
+# 26 USC Section 408 - Individual Retirement Accounts
+#
+# Section 408 defines what constitutes an Individual Retirement Account (IRA)
+# and the requirements for IRA trustees/custodians.
+#
+# "(a) Individual retirement account.--For purposes of this section, the term
+#      'individual retirement account' means a trust created or organized in
+#      the United States for the exclusive benefit of an individual or his
+#      beneficiaries..."
+#
+# Key requirements under 408(a):
+#   (1) Written governing instrument
+#   (2) Trustee must be bank, insurance company, or IRS-approved entity
+#   (3) No commingling except with other IRA funds
+#   (4) Beneficiary interest is nonforfeitable
+#   (5) Assets cannot be invested in life insurance
+#   (6) Assets cannot be invested in collectibles (with exceptions)
+#
+# "(d) Tax treatment of distributions.--
+#      (1) In general.--Except as otherwise provided... any amount paid or
+#          distributed out of an individual retirement plan shall be included
+#          in gross income by the payee or distributee."
+#
+# "(o) Roth IRAs.--" (Separate treatment in 408A)
+
+module statute.26.408
+version "2024.1"
+
+# These are primarily definitional variables that categorize account types
+# and establish baseline rules for IRA taxation.
+
+# Input: Amount held in traditional IRA
+variable traditional_ira_balance {
+  entity Person
+  period Year
+  dtype Money
+  unit "USD"
+  label "Traditional IRA Balance"
+  description "Total balance in traditional IRA accounts"
+  reference "26 USC 408(a)"
+
+  # Input variable - account balance
+}
+
+# Input: Distributions from traditional IRA during year
+variable traditional_ira_distribution {
+  entity Person
+  period Year
+  dtype Money
+  unit "USD"
+  label "Traditional IRA Distribution"
+  description "Amounts distributed from traditional IRA during the year"
+  reference "26 USC 408(d)(1)"
+
+  # Input variable - 1099-R Box 1
+}
+
+# 408(d)(1): Traditional IRA distributions are generally taxable
+variable taxable_ira_distribution {
+  entity Person
+  period Year
+  dtype Money
+  unit "USD"
+  label "Taxable IRA Distribution"
+  description "Portion of IRA distribution includible in gross income"
+  reference "26 USC 408(d)(1)"
+
+  formula {
+    # Simplified: assume all distributions are taxable
+    # Full implementation would track basis from nondeductible contributions
+    # under 408(d)(1) recovery of basis rules
+    return traditional_ira_distribution
+  }
+}
+
+# 408(d)(3): Rollover rules - distributions not taxable if rolled over
+variable ira_rollover_amount {
+  entity Person
+  period Year
+  dtype Money
+  unit "USD"
+  label "IRA Rollover Amount"
+  description "Amount of IRA distribution rolled over within 60 days"
+  reference "26 USC 408(d)(3)"
+
+  # Input variable - must be rolled over within 60 days
+}
+
+# 408(d)(4): Contributions returned as excess
+variable ira_excess_contribution_returned {
+  entity Person
+  period Year
+  dtype Money
+  unit "USD"
+  label "Excess IRA Contributions Returned"
+  description "Excess contributions (and earnings) returned before tax filing deadline"
+  reference "26 USC 408(d)(4)"
+
+  # Input variable - timely returned excess contributions
+}
+
+# 408(a)(6): RMD requirements (Required Minimum Distributions)
+# SECURE Act changed RMD age from 70-1/2 to 72, SECURE 2.0 to 73
+variable rmd_applicable_age {
+  entity Person
+  period Year
+  dtype Integer
+  label "RMD Applicable Age"
+  description "Age at which required minimum distributions must begin"
+  reference "26 USC 408(a)(6), 401(a)(9)"
+
+  formula {
+    # SECURE 2.0 increased RMD age effective 2023
+    # Born 1951-1959: Age 73
+    # Born 1960+: Age 75 (effective 2033)
+    # Simplified: use 73 for 2024+
+    return 73
+  }
+}
+
+# Whether individual has reached RMD age
+variable is_rmd_age {
+  entity Person
+  period Year
+  dtype Boolean
+  label "Reached RMD Age"
+  description "Whether individual must take required minimum distributions"
+  reference "26 USC 408(a)(6)"
+
+  formula {
+    return age >= rmd_applicable_age
+  }
+}

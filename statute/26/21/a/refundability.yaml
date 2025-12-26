@@ -1,0 +1,19 @@
+# 26 USC 21(g) - Credit Refundability (ARPA 2021 Temporary)
+#
+# Prior to ARPA 2021, the credit was nonrefundable (limited to tax liability).
+# P.L. 117-2, Section 9631(c) made the credit refundable for 2021 only.
+#
+# "(g) CREDIT MADE REFUNDABLE. -- In the case of a taxable year beginning in 2021,
+# the credit determined under subsection (a) shall be treated as a credit allowed
+# under subpart C (and not this subpart)."
+
+is_refundable:
+  description: "Whether the Child and Dependent Care Credit is refundable"
+  unit: bool
+  values:
+    1976-01-01: false  # Nonrefundable credit
+    2021-01-01: true   # ARPA 2021 made it refundable for 2021
+    2022-01-01: false  # Reverted to nonrefundable
+  citations:
+    - "26 USC 21: Credit against tax (nonrefundable under subpart A)"
+    - "P.L. 117-2 Sec. 9631(c): treated as credit allowed under subpart C"

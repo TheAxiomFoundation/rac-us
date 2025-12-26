@@ -1,0 +1,242 @@
+# 26 USC Sections 1001-1016 Capital Gains and Losses - Parameters
+#
+# This file contains statutory rates and limits for capital gains taxation.
+# Many of these values are fixed in statute (not inflation-adjusted).
+#
+# Sources:
+# - 26 USC Section 1(h) - Capital gains rates
+# - 26 USC Section 1211(b) - Capital loss limitation
+# - 26 USC Section 1202 - QSBS exclusion
+# - 26 USC Section 1411 - Net Investment Income Tax
+# - Rev. Proc. 2023-34 - Inflation-adjusted amounts for 2024
+
+reference: "26 USC Sections 1001-1016, 1(h), 1211, 1411"
+description: Capital gains tax rates, limitations, and thresholds
+last_updated: 2024-12-25
+
+# =============================================================================
+# Section 1222 - Holding Period Threshold
+# =============================================================================
+
+long_term_holding_period_months:
+  description: "Months asset must be held to qualify as long-term capital gain"
+  unit: months
+  values:
+    1942-01-01: 12  # More than 1 year (12 months)
+  citations:
+    - "26 USC Section 1222(3): Long-term = held more than 1 year"
+
+# =============================================================================
+# Section 1(h) - Preferential Capital Gains Rates
+# =============================================================================
+
+preferential_rate_zero:
+  description: "0% preferential rate for capital gains in lowest income bracket"
+  unit: rate
+  values:
+    2003-01-01: 0.00  # Jobs and Growth Tax Relief Reconciliation Act of 2003
+  citations:
+    - "26 USC Section 1(h)(1)(B)"
+    - "Jobs and Growth Tax Relief Reconciliation Act of 2003, Pub.L. 108-27"
+
+preferential_rate_fifteen:
+  description: "15% preferential rate for capital gains in middle income bracket"
+  unit: rate
+  values:
+    2003-01-01: 0.15
+  citations:
+    - "26 USC Section 1(h)(1)(C)"
+    - "Jobs and Growth Tax Relief Reconciliation Act of 2003"
+
+preferential_rate_twenty:
+  description: "20% preferential rate for capital gains in highest income bracket"
+  unit: rate
+  values:
+    # Pre-2013: 15% maximum rate
+    2003-01-01: 0.15
+    # Post-ATRA: 20% rate for taxpayers in 39.6%/37% bracket
+    2013-01-01: 0.20
+  citations:
+    - "26 USC Section 1(h)(1)(D)"
+    - "American Taxpayer Relief Act of 2012, Pub.L. 112-240"
+
+# =============================================================================
+# Section 1(h)(4) - Collectibles Rate
+# =============================================================================
+
+collectibles_rate:
+  description: "Maximum tax rate on gain from collectibles (28%)"
+  unit: rate
+  values:
+    1997-05-07: 0.28
+  citations:
+    - "26 USC Section 1(h)(4)"
+    - "Taxpayer Relief Act of 1997, Pub.L. 105-34"
+  notes: |
+    Collectibles include:
+    - Works of art
+    - Rugs or antiques
+    - Metals or gems
+    - Stamps or coins
+    - Alcoholic beverages
+    - Any other tangible personal property specified by Secretary
+
+# =============================================================================
+# Section 1(h)(6) - Unrecaptured Section 1250 Gain Rate
+# =============================================================================
+
+section_1250_rate:
+  description: "Maximum tax rate on unrecaptured Section 1250 gain (depreciation recapture on real estate)"
+  unit: rate
+  values:
+    1997-05-07: 0.25
+  citations:
+    - "26 USC Section 1(h)(6)"
+    - "Taxpayer Relief Act of 1997"
+  notes: |
+    Applies to gain attributable to depreciation previously taken on
+    depreciable real property (buildings). The 25% rate applies to the
+    portion of gain representing straight-line depreciation; Section 1250
+    recapture (accelerated depreciation) is taxed as ordinary income.
+
+# =============================================================================
+# Section 1202 - QSBS Exclusion
+# =============================================================================
+
+qsbs_exclusion_rate:
+  description: "Percentage of qualified small business stock gain excludable"
+  unit: rate
+  values:
+    # Original QSBS exclusion
+    1993-08-10: 0.50  # 50% exclusion
+    # Enhanced for acquisitions 2/18/2009 - 9/27/2010
+    2009-02-18: 0.75  # 75% exclusion
+    # 100% exclusion for stock acquired after 9/27/2010
+    2010-09-28: 1.00  # 100% exclusion
+  citations:
+    - "26 USC Section 1202(a)"
+    - "Revenue Reconciliation Act of 1993"
+    - "American Recovery and Reinvestment Act of 2009"
+    - "Creating Small Business Jobs Act of 2010"
+
+qsbs_max_excludable:
+  description: "Maximum QSBS gain excludable per issuer"
+  unit: currency-USD
+  values:
+    1993-08-10: 10000000  # Greater of $10M or 10x basis
+  citations:
+    - "26 USC Section 1202(b)(1)"
+  notes: |
+    The excludable gain is the greater of:
+    (1) $10,000,000 reduced by previously excluded gain, or
+    (2) 10 times the aggregate adjusted basis of QSBS disposed of during the year
+
+# =============================================================================
+# Section 1211(b) - Capital Loss Limitation
+# =============================================================================
+
+capital_loss_limit:
+  description: "Maximum capital loss deductible against ordinary income per year"
+  unit: currency-USD
+  values:
+    # Historical limits
+    1942-01-01: 1000
+    1970-01-01: 1000
+    1977-01-01: 2000
+    1978-01-01: 3000  # Current limit (not inflation-adjusted)
+  citations:
+    - "26 USC Section 1211(b)(1)"
+  notes: |
+    This limit is NOT adjusted for inflation. It has remained at $3,000
+    since 1978. Unused capital losses carry forward indefinitely per
+    Section 1212(b).
+
+capital_loss_limit_mfs:
+  description: "Capital loss limit for married filing separately"
+  unit: currency-USD
+  values:
+    1978-01-01: 1500  # Half of regular limit
+  citations:
+    - "26 USC Section 1211(b)(1)"
+  notes: |
+    MFS filers get half the regular limit. This is one of the "marriage
+    penalties" in the code.
+
+# =============================================================================
+# Section 1411 - Net Investment Income Tax (NIIT)
+# =============================================================================
+
+niit_rate:
+  description: "Net Investment Income Tax rate"
+  unit: rate
+  values:
+    2013-01-01: 0.038  # 3.8%
+  citations:
+    - "26 USC Section 1411(a)(1)"
+    - "Health Care and Education Reconciliation Act of 2010, Pub.L. 111-152"
+
+niit_threshold_single:
+  description: "NIIT threshold for single filers (not inflation-adjusted)"
+  unit: currency-USD
+  values:
+    2013-01-01: 200000
+  citations:
+    - "26 USC Section 1411(b)(1)"
+
+niit_threshold_joint:
+  description: "NIIT threshold for married filing jointly"
+  unit: currency-USD
+  values:
+    2013-01-01: 250000
+  citations:
+    - "26 USC Section 1411(b)(1)"
+
+niit_threshold_mfs:
+  description: "NIIT threshold for married filing separately"
+  unit: currency-USD
+  values:
+    2013-01-01: 125000
+  citations:
+    - "26 USC Section 1411(b)(2)"
+
+niit_threshold_hoh:
+  description: "NIIT threshold for head of household (same as single)"
+  unit: currency-USD
+  values:
+    2013-01-01: 200000
+  citations:
+    - "26 USC Section 1411(b)(1)"
+  notes: |
+    Head of household uses the same threshold as single filers, not the
+    MFJ threshold. This is unusual - most provisions give HOH a threshold
+    between single and MFJ.
+
+# =============================================================================
+# Section 1(h) Rate Thresholds - 2024 (Inflation-Adjusted)
+# =============================================================================
+# Note: These thresholds are in statute/26/1/h/thresholds_2024.yaml
+# Cross-reference provided here for completeness
+
+zero_pct_threshold_2024:
+  description: "0% capital gains rate upper threshold (2024)"
+  unit: currency-USD
+  cross_reference: "statute/26/1/h/thresholds_2024.yaml#zero_percent_max"
+  values:
+    single: 47025
+    married_filing_jointly: 94050
+    head_of_household: 63000
+    married_filing_separately: 47025
+  citations:
+    - "Rev. Proc. 2023-34, Section 3.10"
+
+fifteen_pct_threshold_2024:
+  description: "15% capital gains rate upper threshold (2024)"
+  unit: currency-USD
+  cross_reference: "statute/26/1/h/thresholds_2024.yaml#fifteen_percent_max"
+  values:
+    single: 518900
+    married_filing_jointly: 583750
+    head_of_household: 551350
+    married_filing_separately: 291850
+  citations:
+    - "Rev. Proc. 2023-34, Section 3.10"

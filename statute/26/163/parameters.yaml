@@ -1,0 +1,95 @@
+# 26 USC Section 163 - Interest Deduction Parameters
+#
+# Time-varying parameters for interest deductions, particularly
+# qualified residence interest limits modified by TCJA.
+
+description: "Parameters for interest deductions under IRC Section 163"
+reference: "26 USC 163"
+
+# =============================================================================
+# Section 163(h)(3) - Qualified Residence Interest
+# =============================================================================
+qualified_residence:
+  description: "Parameters for home mortgage interest deduction"
+  reference: "26 USC 163(h)(3), TCJA Section 11043"
+
+  # Acquisition indebtedness limit - 163(h)(3)(B)(ii)
+  acquisition_debt_limit:
+    description: "Maximum acquisition indebtedness for qualified residence interest"
+    unit: USD
+    values:
+      # Pre-TCJA: $1,000,000 ($500,000 MFS)
+      - date: 1987-10-14
+        value: 1000000
+        reference: "26 USC 163(h)(3)(B)(ii) as enacted"
+      # TCJA: $750,000 ($375,000 MFS) for debt incurred after 12/15/2017
+      - date: 2017-12-16
+        value: 750000
+        reference: "TCJA Section 11043(a), P.L. 115-97"
+      # Note: Reverts to $1M after 2025 unless extended
+    notes: |
+      Grandfathering rule: Debt incurred on or before 12/15/2017 uses
+      the $1M limit. New debt after that date uses $750K.
+      MFS taxpayers get half the limit.
+
+  acquisition_debt_limit_mfs:
+    description: "Acquisition debt limit for married filing separately"
+    unit: USD
+    values:
+      - date: 1987-10-14
+        value: 500000
+      - date: 2017-12-16
+        value: 375000
+        reference: "TCJA Section 11043(a)"
+
+  # Home equity indebtedness - 163(h)(3)(C)
+  home_equity_debt_limit:
+    description: "Maximum home equity indebtedness (pre-TCJA, suspended 2018-2025)"
+    unit: USD
+    values:
+      - date: 1987-10-14
+        value: 100000
+        reference: "26 USC 163(h)(3)(C)(ii)"
+      # TCJA suspends home equity interest deduction 2018-2025
+      # (unless proceeds used for home improvement)
+      - date: 2018-01-01
+        value: 0
+        reference: "TCJA Section 11043(c) - suspended"
+      # Reverts after 2025
+      - date: 2026-01-01
+        value: 100000
+        reference: "TCJA sunset"
+
+  home_equity_debt_limit_mfs:
+    description: "Home equity debt limit for married filing separately"
+    unit: USD
+    values:
+      - date: 1987-10-14
+        value: 50000
+      - date: 2018-01-01
+        value: 0
+        reference: "TCJA suspension"
+      - date: 2026-01-01
+        value: 50000
+
+# =============================================================================
+# Section 163(d) - Investment Interest
+# =============================================================================
+investment_interest:
+  description: "Investment interest limitation parameters"
+  reference: "26 USC 163(d)"
+
+  # Note: Investment interest is limited to net investment income
+  # Excess carries forward indefinitely
+  # No specific dollar thresholds - limitation is by formula
+
+  notes: |
+    Investment interest deduction is limited to net investment income.
+    Net investment income = investment income - investment expenses
+
+    Investment income includes:
+    - Interest
+    - Short-term capital gains
+    - Dividend income (if taxpayer elects to treat as investment income)
+
+    Excess investment interest carries forward to future tax years.

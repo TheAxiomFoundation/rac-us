@@ -1,0 +1,140 @@
+# Tests for 26 USC Section 1201 - Alternative Tax for Corporations (Capital Gains)
+#
+# NOTE: Section 1201 historically provided a preferential 35% rate on capital gains
+# for corporations. However, post-TCJA (2018+), the corporate tax rate is 21%,
+# which is lower than the historical 35% capital gains rate, making Section 1201
+# effectively obsolete for most planning purposes.
+#
+# Post-2017: The 21% regular corporate rate applies to all income including capital gains.
+# Pre-TCJA: Corporations could elect 35% tax on capital gains vs graduated rates.
+#
+# Sources:
+# - 26 USC 1201(a) - Alternative tax on capital gains
+# - TCJA Section 13001 - 21% flat corporate rate
+# - IRS Publication 542 - Corporations
+
+variable: corporate_capital_gains_alternative_tax
+tax_year: 2024
+
+test_cases:
+  # Post-TCJA (2018+): Section 1201 is effectively moot
+  - name: "Post-TCJA: No alternative tax benefit (21% < 35%)"
+    description: "Regular 21% rate is always lower than 1201 rate"
+    inputs:
+      entity_type: c_corporation
+      ordinary_income: 500000
+      net_capital_gain: 200000
+      taxable_income: 700000
+    expected:
+      # Regular tax = 21% of $700k = $147k
+      # Section 1201 tax would be higher (35% rate historically)
+      # So regular tax applies
+      uses_section_1201: false
+      corporate_income_tax: 147000
+    citations:
+      - "26 USC 1201(a): Alternative tax on capital gains"
+      - "26 USC 11(b): 21% flat rate renders 1201 moot"
+
+  - name: "Post-TCJA: Large capital gain, no 1201 benefit"
+    inputs:
+      entity_type: c_corporation
+      ordinary_income: 100000
+      net_capital_gain: 5000000
+      taxable_income: 5100000
+    expected:
+      uses_section_1201: false
+      corporate_income_tax: 1071000  # 21% of $5.1M
+    citations:
+      - "21% rate applies to all corporate income post-TCJA"
+
+  # Pre-TCJA historical tests (Section 1201 could provide benefit)
+  - name: "Pre-TCJA: High bracket corporation with capital gain"
+    description: "Section 1201 provided 35% cap on capital gains"
+    tax_year: 2017
+    inputs:
+      entity_type: c_corporation
+      ordinary_income: 200000
+      net_capital_gain: 500000
+      taxable_income: 700000
+    expected:
+      # Without 1201: Graduated rates on $700k
+      # Tax on $335k at graduated rates, rest at flat 34%
+      # With 1201: Tax on ordinary at graduated, gains at 35%
+      regular_tax: 238000  # Approximate graduated rates
+      section_1201_tax: 236750  # Tax on $200k ordinary + 35% * $500k capital
+      uses_section_1201: true  # Lower tax with 1201
+      corporate_income_tax: 236750
+    citations:
+      - "26 USC 1201(a)(1) (pre-TCJA): 35% alternative rate"
+
+  - name: "Pre-TCJA: Small corporation - no 1201 benefit"
+    description: "Graduated rates lower than 35% for small corps"
+    tax_year: 2017
+    inputs:
+      entity_type: c_corporation
+      ordinary_income: 50000
+      net_capital_gain: 25000
+      taxable_income: 75000
+    expected:
+      # Regular tax: 15% on $50k + 25% on $25k = $7,500 + $6,250 = $13,750
+      # 1201 tax: 15% on $50k + 35% on $25k = $7,500 + $8,750 = $16,250
+      # Regular tax is lower
+      regular_tax: 13750
+      section_1201_tax: 16250
+      uses_section_1201: false
+      corporate_income_tax: 13750
+    citations:
+      - "26 USC 1201: 35% alternative only beneficial when graduated > 35%"
+
+  - name: "Pre-TCJA: Corporation in 34% bracket"
+    description: "35% > 34%, so 1201 not beneficial"
+    tax_year: 2017
+    inputs:
+      entity_type: c_corporation
+      ordinary_income: 80000
+      net_capital_gain: 20000
+      taxable_income: 100000
+    expected:
+      # Regular: graduated rates result in 22,250 on $100k
+      # 1201: Tax on $80k ordinary + 35% * $20k = $18,850 + $7,000 = $25,850
+      # Regular is lower
+      uses_section_1201: false
+      corporate_income_tax: 22250
+    citations:
+      - "34% graduated rate < 35% alternative rate"
+
+  # Edge cases
+  - name: "No capital gains"
+    inputs:
+      entity_type: c_corporation
+      ordinary_income: 1000000
+      net_capital_gain: 0
+      taxable_income: 1000000
+    expected:
+      uses_section_1201: false
+      corporate_income_tax: 210000  # 21% of $1M
+    citations:
+      - "Section 1201 only applies to capital gains"
+
+  - name: "Only capital gains income"
+    inputs:
+      entity_type: c_corporation
+      ordinary_income: 0
+      net_capital_gain: 1000000
+      taxable_income: 1000000
+    expected:
+      uses_section_1201: false
+      corporate_income_tax: 210000  # 21% of $1M
+    citations:
+      - "21% rate applies regardless of income character"
+
+  - name: "S-Corporation - not subject to Section 1201"
+    inputs:
+      entity_type: s_corporation
+      ordinary_income: 500000
+      net_capital_gain: 500000
+    expected:
+      uses_section_1201: false
+      corporate_income_tax: 0  # Pass-through
+    citations:
+      - "S-Corps pass through gains to shareholders"

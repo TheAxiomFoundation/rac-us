@@ -1,0 +1,422 @@
+# 26 USC Sections 1001-1016 - Capital Gains and Losses (Primary Calculation)
+#
+# Section 1001(a): "The gain from the sale or other disposition of property shall
+# be the excess of the amount realized therefrom over the adjusted basis..."
+#
+# Section 1001(c): "Except as otherwise provided in this subtitle, the entire
+# amount of the gain or loss, determined under this section, on the sale or
+# exchange shall be recognized."
+#
+# This file implements the core capital gains determination under Section 1001:
+#   - Gain/Loss = Amount Realized - Adjusted Basis
+#   - Recognition rules (default: full recognition)
+#   - Integration with holding period for ST/LT classification
+#
+# Related provisions:
+#   - Section 1011: Adjusted basis for determining gain or loss
+#   - Section 1012: Basis of property - cost basis
+#   - Section 1014: Basis of property acquired from a decedent (stepped-up)
+#   - Section 1015: Basis of property acquired by gift (carryover)
+#   - Section 1016: Adjustments to basis
+#
+# For preferential rates on LTCG, see Section 1(h) (statute/26/1/h/)
+
+module statute.26.1001
+version "2024.1"
+
+references {
+  # Holding period classification
+  is_long_term_asset: statute/26/1001/holding_period
+
+  # Netting rules
+  net_short_term_capital_gain_loss: statute/26/1001/netting
+  net_long_term_capital_gain_loss: statute/26/1001/netting
+  net_capital_gain: statute/26/1001/netting
+
+  # Special asset types
+  is_collectible_gain: statute/26/1001/special_assets
+  is_section_1250_gain: statute/26/1001/special_assets
+  is_qsbs_gain: statute/26/1001/special_assets
+
+  # Filing status for certain limitations
+  filing_status: statute/26/1/filing_status
+
+  # NIIT calculation (Section 1411)
+  net_investment_income_tax: statute/26/1411/niit
+}
+
+parameters {
+  # Capital loss limitation per Section 1211(b)
+  capital_loss_limit: 1001/parameters#capital_loss_limit
+  capital_loss_limit_mfs: 1001/parameters#capital_loss_limit_mfs
+
+  # Collectibles rate per Section 1(h)(4)
+  collectibles_rate: 1001/parameters#collectibles_rate
+
+  # Unrecaptured Section 1250 gain rate per Section 1(h)(6)
+  section_1250_rate: 1001/parameters#section_1250_rate
+
+  # QSBS exclusion per Section 1202
+  qsbs_exclusion_pct: 1001/parameters#qsbs_exclusion_rate
+  qsbs_max_excludable_per_issuer: 1001/parameters#qsbs_max_excludable
+}
+
+# =============================================================================
+# Section 1001(a) - Gain or Loss Determination
+# =============================================================================
+
+# Per-asset capital gain or loss
+# This is the fundamental calculation: Amount Realized - Adjusted Basis
+variable realized_gain_loss {
+  entity Asset
+  period Year
+  dtype Money
+  unit "USD"
+  label "Realized Gain or Loss"
+  description "Gain or loss realized on disposition of capital asset per 26 USC Section 1001(a)"
+  reference "26 USC Section 1001(a)"
+
+  formula {
+    # Gain = amount realized - adjusted basis
+    # If negative, it's a loss
+    return amount_realized - adjusted_basis
+  }
+}
+
+# Amount realized from sale/exchange
+# Per Section 1001(b): "The amount realized from the sale or other disposition
+# of property shall be the sum of any money received plus the fair market value
+# of the property (other than money) received."
+variable amount_realized {
+  entity Asset
+  period Year
+  dtype Money
+  unit "USD"
+  label "Amount Realized"
+  description "Amount realized from sale or disposition per 26 USC Section 1001(b)"
+  reference "26 USC Section 1001(b)"
+
+  # Input variable - cash plus FMV of property received
+  # Net of selling expenses (commissions, etc.)
+}
+
+# Adjusted basis in the asset
+# Per Section 1011: "The adjusted basis for determining the gain or loss from
+# the sale or other disposition of property... shall be the basis (determined
+# under section 1012, 1014, 1015, or other applicable sections of this subpart)
+# adjusted as provided in section 1016."
+variable adjusted_basis {
+  entity Asset
+  period Year
+  dtype Money
+  unit "USD"
+  label "Adjusted Basis"
+  description "Adjusted basis for gain/loss determination per 26 USC Sections 1011-1016"
+  reference (
+    "26 USC Section 1011",
+    "26 USC Section 1012",
+    "26 USC Section 1016"
+  )
+
+  formula {
+    # Start with original cost basis (Section 1012)
+    # Adjustments per Section 1016:
+    # - Add: Capital improvements
+    # - Subtract: Depreciation allowed or allowable
+    # - Subtract: Casualty losses claimed
+    # - Add: Certain taxes and carrying charges
+    return original_basis + capital_improvements - depreciation_claimed - casualty_losses_claimed
+  }
+}
+
+# Original cost basis per Section 1012
+variable original_basis {
+  entity Asset
+  period Year
+  dtype Money
+  unit "USD"
+  label "Original Cost Basis"
+  description "Original cost basis per 26 USC Section 1012"
+  reference "26 USC Section 1012"
+
+  # Input variable - purchase price plus acquisition costs
+}
+
+# Capital improvements added to basis per Section 1016(a)(1)
+variable capital_improvements {
+  entity Asset
+  period Year
+  dtype Money
+  unit "USD"
+  label "Capital Improvements"
+  description "Expenditures properly chargeable to capital account per 26 USC Section 1016(a)(1)"
+  reference "26 USC Section 1016(a)(1)"
+
+  default 0
+}
+
+# Depreciation claimed, reducing basis per Section 1016(a)(2)
+variable depreciation_claimed {
+  entity Asset
+  period Year
+  dtype Money
+  unit "USD"
+  label "Depreciation Claimed"
+  description "Depreciation allowed or allowable per 26 USC Section 1016(a)(2)"
+  reference "26 USC Section 1016(a)(2)"
+
+  default 0
+}
+
+# Casualty losses claimed, reducing basis per Section 1016(a)(1)
+variable casualty_losses_claimed {
+  entity Asset
+  period Year
+  dtype Money
+  unit "USD"
+  label "Casualty Losses Claimed"
+  description "Casualty losses previously claimed per 26 USC Section 1016(a)(1)"
+  reference "26 USC Section 1016(a)(1)"
+
+  default 0
+}
+
+# =============================================================================
+# Section 1001(c) - Recognition of Gain or Loss
+# =============================================================================
+
+# Recognized gain or loss (default: full recognition)
+# Section 1001(c) provides that gain/loss is fully recognized unless
+# another provision provides for nonrecognition (e.g., Section 1031)
+variable recognized_gain_loss {
+  entity Asset
+  period Year
+  dtype Money
+  unit "USD"
+  label "Recognized Gain or Loss"
+  description "Gain or loss recognized for tax purposes per 26 USC Section 1001(c)"
+  reference "26 USC Section 1001(c)"
+
+  formula {
+    # Default: full recognition
+    # Exceptions (not fully implemented here):
+    # - Section 1031: Like-kind exchanges
+    # - Section 1033: Involuntary conversions
+    # - Section 121: Sale of principal residence exclusion
+    # - Section 1202: QSBS exclusion
+
+    if is_qsbs_gain then
+      # QSBS exclusion per Section 1202 (up to 100% for stock acquired after 9/27/2010)
+      let exclusion = min(realized_gain_loss * qsbs_exclusion_pct, qsbs_max_excludable_per_issuer)
+      return max(0, realized_gain_loss - exclusion)
+    else
+      return realized_gain_loss
+  }
+}
+
+# =============================================================================
+# Aggregation to TaxUnit Level
+# =============================================================================
+
+# Short-term capital gain (positive recognized gain, held <= 1 year)
+variable short_term_capital_gain {
+  entity TaxUnit
+  period Year
+  dtype Money
+  unit "USD"
+  label "Short-Term Capital Gain"
+  description "Aggregate short-term capital gains (assets held 1 year or less) per 26 USC Section 1222(1)"
+  reference "26 USC Section 1222(1)"
+
+  formula {
+    # Sum of all positive recognized gains on short-term assets
+    return sum_over_assets(
+      where: recognized_gain_loss > 0 and not is_long_term_asset,
+      of: recognized_gain_loss
+    )
+  }
+
+  default 0
+}
+
+# Short-term capital loss (negative recognized gain, held <= 1 year)
+variable short_term_capital_loss {
+  entity TaxUnit
+  period Year
+  dtype Money
+  unit "USD"
+  label "Short-Term Capital Loss"
+  description "Aggregate short-term capital losses (assets held 1 year or less) per 26 USC Section 1222(2)"
+  reference "26 USC Section 1222(2)"
+
+  formula {
+    # Sum of all negative recognized gains on short-term assets (as positive number)
+    return sum_over_assets(
+      where: recognized_gain_loss < 0 and not is_long_term_asset,
+      of: abs(recognized_gain_loss)
+    )
+  }
+
+  default 0
+}
+
+# Long-term capital gain (positive recognized gain, held > 1 year)
+variable long_term_capital_gain {
+  entity TaxUnit
+  period Year
+  dtype Money
+  unit "USD"
+  label "Long-Term Capital Gain"
+  description "Aggregate long-term capital gains (assets held more than 1 year) per 26 USC Section 1222(3)"
+  reference "26 USC Section 1222(3)"
+
+  formula {
+    # Sum of all positive recognized gains on long-term assets
+    return sum_over_assets(
+      where: recognized_gain_loss > 0 and is_long_term_asset,
+      of: recognized_gain_loss
+    )
+  }
+
+  default 0
+}
+
+# Long-term capital loss (negative recognized gain, held > 1 year)
+variable long_term_capital_loss {
+  entity TaxUnit
+  period Year
+  dtype Money
+  unit "USD"
+  label "Long-Term Capital Loss"
+  description "Aggregate long-term capital losses (assets held more than 1 year) per 26 USC Section 1222(4)"
+  reference "26 USC Section 1222(4)"
+
+  formula {
+    # Sum of all negative recognized gains on long-term assets (as positive number)
+    return sum_over_assets(
+      where: recognized_gain_loss < 0 and is_long_term_asset,
+      of: abs(recognized_gain_loss)
+    )
+  }
+
+  default 0
+}
+
+# =============================================================================
+# Stepped-Up Basis (Section 1014)
+# =============================================================================
+
+# Basis of property acquired from decedent
+# Section 1014(a)(1): "the basis of property in the hands of a person acquiring
+# the property from a decedent... shall... be the fair market value of the
+# property at the date of the decedent's death."
+variable inherited_property_basis {
+  entity Asset
+  period Year
+  dtype Money
+  unit "USD"
+  label "Inherited Property Basis"
+  description "Stepped-up basis for property acquired from decedent per 26 USC Section 1014(a)"
+  reference "26 USC Section 1014(a)(1)"
+
+  formula {
+    if is_inherited_property then
+      return fmv_at_date_of_death  # Stepped-up to FMV at death
+    else
+      return original_basis  # Standard cost basis
+  }
+}
+
+# Indicator for inherited property
+variable is_inherited_property {
+  entity Asset
+  period Year
+  dtype Bool
+  label "Inherited Property Indicator"
+  description "Property acquired from a decedent per Section 1014"
+  reference "26 USC Section 1014(b)"
+
+  # Input variable
+  default false
+}
+
+# Fair market value at date of death
+variable fmv_at_date_of_death {
+  entity Asset
+  period Year
+  dtype Money
+  unit "USD"
+  label "FMV at Date of Death"
+  description "Fair market value of inherited property at decedent's death"
+  reference "26 USC Section 1014(a)(1)"
+
+  # Input variable
+  default 0
+}
+
+# =============================================================================
+# Carryover Basis for Gifts (Section 1015)
+# =============================================================================
+
+# Basis of property acquired by gift
+# Section 1015(a): "If the property was acquired by gift after December 31, 1920,
+# the basis shall be the same as it would be in the hands of the donor..."
+variable gifted_property_basis {
+  entity Asset
+  period Year
+  dtype Money
+  unit "USD"
+  label "Gifted Property Basis"
+  description "Carryover basis for property acquired by gift per 26 USC Section 1015"
+  reference "26 USC Section 1015(a)"
+
+  formula {
+    if is_gifted_property then
+      # Carryover basis from donor
+      # Special rule: for losses, basis is lesser of donor's basis or FMV at gift date
+      if realized_gain_loss < 0 then
+        return min(donor_basis, fmv_at_gift_date)
+      else
+        return donor_basis
+    else
+      return original_basis
+  }
+}
+
+# Indicator for gifted property
+variable is_gifted_property {
+  entity Asset
+  period Year
+  dtype Bool
+  label "Gifted Property Indicator"
+  description "Property acquired by gift per Section 1015"
+  reference "26 USC Section 1015(a)"
+
+  default false
+}
+
+# Donor's basis in gifted property
+variable donor_basis {
+  entity Asset
+  period Year
+  dtype Money
+  unit "USD"
+  label "Donor Basis"
+  description "Donor's adjusted basis in gifted property"
+  reference "26 USC Section 1015(a)"
+
+  default 0
+}
+
+# FMV at gift date (for loss property rule)
+variable fmv_at_gift_date {
+  entity Asset
+  period Year
+  dtype Money
+  unit "USD"
+  label "FMV at Gift Date"
+  description "Fair market value at date of gift"
+  reference "26 USC Section 1015(a)"
+
+  default 0
+}

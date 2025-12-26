@@ -1,0 +1,206 @@
+# Tests for 26 USC Section 163 - Interest Deduction
+
+variable: interest_deduction
+tax_year: 2024
+
+test_cases:
+  # ==========================================================================
+  # Qualified Residence Interest (163(h)) - TCJA Rules
+  # ==========================================================================
+
+  - name: "Mortgage under TCJA limit"
+    description: "Mortgage interest fully deductible when debt under $750K"
+    inputs:
+      filing_status: single
+      mortgage_interest: 15000
+      acquisition_debt_amount: 500000
+      mortgage_originated_before_12_16_2017: false
+    expected:
+      qualified_residence_interest: 15000
+      interest_deduction: 15000
+    citations:
+      - "26 USC 163(h)(3)(B)(ii) as amended by TCJA"
+      - "TCJA Section 11043(a)"
+
+  - name: "Mortgage at TCJA limit"
+    description: "Mortgage interest fully deductible at exactly $750K debt"
+    inputs:
+      filing_status: joint
+      mortgage_interest: 30000
+      acquisition_debt_amount: 750000
+      mortgage_originated_before_12_16_2017: false
+    expected:
+      qualified_residence_interest: 30000
+      interest_deduction: 30000
+    citations:
+      - "TCJA Section 11043(a): $750,000 limit"
+
+  - name: "Mortgage over TCJA limit - partial deduction"
+    description: "Interest pro-rated when debt exceeds $750K (TCJA)"
+    inputs:
+      filing_status: joint
+      mortgage_interest: 40000
+      acquisition_debt_amount: 1000000
+      mortgage_originated_before_12_16_2017: false
+    expected:
+      # $40,000 * ($750,000 / $1,000,000) = $30,000
+      qualified_residence_interest: 30000
+      interest_deduction: 30000
+    citations:
+      - "TCJA Section 11043(a): pro-rata limitation"
+      - "IRS Publication 936"
+
+  - name: "Grandfathered pre-TCJA mortgage at $1M"
+    description: "Pre-TCJA debt uses old $1M limit"
+    inputs:
+      filing_status: joint
+      mortgage_interest: 40000
+      acquisition_debt_amount: 1000000
+      mortgage_originated_before_12_16_2017: true
+    expected:
+      qualified_residence_interest: 40000
+      interest_deduction: 40000
+    citations:
+      - "TCJA Section 11043(c): grandfathering rule"
+      - "Pre-TCJA 26 USC 163(h)(3)(B)(ii)"
+
+  - name: "Married filing separately - half limit"
+    description: "MFS gets $375K limit instead of $750K"
+    inputs:
+      filing_status: married_separate
+      mortgage_interest: 20000
+      acquisition_debt_amount: 500000
+      mortgage_originated_before_12_16_2017: false
+    expected:
+      # $20,000 * ($375,000 / $500,000) = $15,000
+      qualified_residence_interest: 15000
+      interest_deduction: 15000
+    citations:
+      - "26 USC 163(h)(3)(B)(ii): half for MFS"
+      - "TCJA Section 11043(a)"
+
+  # ==========================================================================
+  # Investment Interest (163(d))
+  # ==========================================================================
+
+  - name: "Investment interest under net investment income"
+    description: "Full deduction when interest <= NII"
+    inputs:
+      filing_status: single
+      investment_interest_expense: 3000
+      investment_income: 5000
+      investment_expenses: 500
+    expected:
+      net_investment_income: 4500
+      deductible_investment_interest: 3000
+      investment_interest_carryforward: 0
+    citations:
+      - "26 USC 163(d)(1): limited to NII"
+      - "26 USC 163(d)(4): NII definition"
+
+  - name: "Investment interest exceeds NII - carryforward"
+    description: "Excess carries forward when interest > NII"
+    inputs:
+      filing_status: single
+      investment_interest_expense: 10000
+      investment_income: 6000
+      investment_expenses: 1000
+    expected:
+      net_investment_income: 5000
+      deductible_investment_interest: 5000
+      investment_interest_carryforward: 5000
+    citations:
+      - "26 USC 163(d)(1): limited to NII"
+      - "26 USC 163(d)(2): carryforward"
+
+  - name: "Investment interest with prior carryforward"
+    description: "Current year + carryforward limited together"
+    inputs:
+      filing_status: joint
+      investment_interest_expense: 4000
+      investment_income: 8000
+      investment_expenses: 500
+      investment_interest_carryforward_prior: 3000
+    expected:
+      net_investment_income: 7500
+      deductible_investment_interest: 7000  # All of $4K + $3K carryforward
+      investment_interest_carryforward: 0
+    citations:
+      - "26 USC 163(d)(2): carryforward treated as current year"
+
+  - name: "Zero net investment income"
+    description: "No deduction when NII is zero"
+    inputs:
+      filing_status: single
+      investment_interest_expense: 5000
+      investment_income: 1000
+      investment_expenses: 2000
+    expected:
+      net_investment_income: 0  # max(0, 1000 - 2000)
+      deductible_investment_interest: 0
+      investment_interest_carryforward: 5000
+    citations:
+      - "26 USC 163(d)(4): NII cannot be negative"
+
+  # ==========================================================================
+  # Combined Interest Deduction
+  # ==========================================================================
+
+  - name: "Mortgage plus investment interest"
+    description: "Combined deduction from multiple sources"
+    inputs:
+      filing_status: joint
+      mortgage_interest: 18000
+      acquisition_debt_amount: 600000
+      mortgage_originated_before_12_16_2017: false
+      investment_interest_expense: 2000
+      investment_income: 3000
+      investment_expenses: 0
+      mortgage_points_paid: 1500
+    expected:
+      qualified_residence_interest: 18000
+      net_investment_income: 3000
+      deductible_investment_interest: 2000
+      interest_deduction: 21500  # 18000 + 2000 + 1500
+    citations:
+      - "26 USC 163(a): all deductible interest"
+
+  - name: "No deductible interest"
+    description: "Zero when no qualifying interest"
+    inputs:
+      filing_status: single
+      mortgage_interest: 0
+      investment_interest_expense: 0
+    expected:
+      interest_deduction: 0
+
+  # ==========================================================================
+  # Historical / Edge Cases
+  # ==========================================================================
+
+  - name: "Pre-TCJA grandfathered $1.2M mortgage"
+    description: "Even pre-TCJA, limit was $1M"
+    inputs:
+      filing_status: joint
+      mortgage_interest: 48000
+      acquisition_debt_amount: 1200000
+      mortgage_originated_before_12_16_2017: true
+    expected:
+      # $48,000 * ($1,000,000 / $1,200,000) = $40,000
+      qualified_residence_interest: 40000
+      interest_deduction: 40000
+    citations:
+      - "Pre-TCJA 26 USC 163(h)(3)(B)(ii): $1M limit"
+
+  - name: "Small mortgage fully deductible"
+    description: "Modest mortgage under all limits"
+    inputs:
+      filing_status: head_of_household
+      mortgage_interest: 8000
+      acquisition_debt_amount: 250000
+      mortgage_originated_before_12_16_2017: false
+    expected:
+      qualified_residence_interest: 8000
+      interest_deduction: 8000
+    citations:
+      - "26 USC 163(h)(3): fully deductible under limit"

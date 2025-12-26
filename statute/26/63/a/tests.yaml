@@ -1,0 +1,247 @@
+# Tests for 26 USC Section 63(a) - Taxable Income
+
+variable: taxable_income
+tax_year: 2024
+
+test_cases:
+  # ==========================================================================
+  # Basic Taxable Income Calculations
+  # ==========================================================================
+
+  - name: "Single filer with standard deduction"
+    description: "Basic taxable income calculation"
+    inputs:
+      filing_status: single
+      adjusted_gross_income: 75000
+      age: 35
+    expected:
+      standard_deduction: 14600
+      takes_standard_deduction: true
+      deductions_from_agi: 14600
+      taxable_income: 60400  # $75K - $14.6K
+    citations:
+      - "26 USC 63(b): AGI minus standard deduction"
+
+  - name: "Married filing jointly with standard deduction"
+    description: "Joint filers using standard deduction"
+    inputs:
+      filing_status: joint
+      adjusted_gross_income: 150000
+      age: 40
+      spouse_age: 38
+    expected:
+      standard_deduction: 29200
+      takes_standard_deduction: true
+      deductions_from_agi: 29200
+      taxable_income: 120800  # $150K - $29.2K
+    citations:
+      - "26 USC 63(b)"
+
+  - name: "Head of household with standard deduction"
+    description: "HOH filer using standard deduction"
+    inputs:
+      filing_status: head_of_household
+      adjusted_gross_income: 60000
+      age: 42
+    expected:
+      standard_deduction: 21900
+      deductions_from_agi: 21900
+      taxable_income: 38100  # $60K - $21.9K
+    citations:
+      - "26 USC 63(c)(2)(B): HOH standard deduction"
+
+  # ==========================================================================
+  # Itemized Deduction Cases
+  # ==========================================================================
+
+  - name: "Itemizer with high deductions"
+    description: "Taxpayer benefits from itemizing"
+    inputs:
+      filing_status: single
+      adjusted_gross_income: 100000
+      mortgage_interest: 15000
+      acquisition_debt_amount: 400000
+      salt_taxes_paid: 9000
+      charitable_cash_public_charity: 5000
+    expected:
+      standard_deduction: 14600
+      total_itemized_deductions: 29000
+      takes_standard_deduction: false
+      deductions_from_agi: 29000
+      taxable_income: 71000  # $100K - $29K
+    citations:
+      - "26 USC 63(a): itemized deductions"
+      - "26 USC 63(e): election to itemize"
+
+  - name: "Joint filers itemizing"
+    description: "Married couple with significant itemized deductions"
+    inputs:
+      filing_status: joint
+      adjusted_gross_income: 250000
+      mortgage_interest: 25000
+      acquisition_debt_amount: 600000
+      salt_taxes_paid: 15000  # Capped at $10K
+      charitable_cash_public_charity: 20000
+      medical_expenses: 25000  # -> $25K - 7.5%*$250K = $6,250
+    expected:
+      standard_deduction: 29200
+      medical_expense_deduction: 6250
+      interest_deduction: 25000
+      salt_deduction: 10000
+      charitable_deduction: 20000
+      total_itemized_deductions: 61250
+      takes_standard_deduction: false
+      taxable_income: 188750  # $250K - $61.25K
+    citations:
+      - "26 USC 63(a)"
+
+  # ==========================================================================
+  # Additional Standard Deduction (Age/Blindness)
+  # ==========================================================================
+
+  - name: "Senior single filer (65+)"
+    description: "Additional deduction for age"
+    inputs:
+      filing_status: single
+      adjusted_gross_income: 50000
+      age: 67
+    expected:
+      # Basic: $14,600 + Additional aged single: $1,950 = $16,550
+      standard_deduction: 16550
+      deductions_from_agi: 16550
+      taxable_income: 33450  # $50K - $16.55K
+    citations:
+      - "26 USC 63(f)(1): additional for aged"
+
+  - name: "Both spouses 65+"
+    description: "Both get additional aged deduction"
+    inputs:
+      filing_status: joint
+      adjusted_gross_income: 100000
+      age: 68
+      spouse_age: 66
+    expected:
+      # Basic: $29,200 + 2 × $1,550 (married aged) = $32,300
+      standard_deduction: 32300
+      taxable_income: 67700  # $100K - $32.3K
+    citations:
+      - "26 USC 63(f)(1): additional for aged (married)"
+
+  - name: "Blind single filer"
+    description: "Additional deduction for blindness"
+    inputs:
+      filing_status: single
+      adjusted_gross_income: 45000
+      age: 50
+      is_blind: true
+    expected:
+      # Basic: $14,600 + Additional blind single: $1,950 = $16,550
+      standard_deduction: 16550
+      taxable_income: 28450
+    citations:
+      - "26 USC 63(f)(2): additional for blind"
+
+  # ==========================================================================
+  # Low Income / Edge Cases
+  # ==========================================================================
+
+  - name: "AGI below standard deduction"
+    description: "Taxable income cannot be negative"
+    inputs:
+      filing_status: single
+      adjusted_gross_income: 10000
+      age: 25
+    expected:
+      standard_deduction: 14600
+      deductions_from_agi: 14600
+      taxable_income: 0  # max(0, $10K - $14.6K) = 0
+    citations:
+      - "26 USC 63: taxable income cannot be negative"
+
+  - name: "Zero AGI"
+    description: "No income results in zero taxable income"
+    inputs:
+      filing_status: single
+      adjusted_gross_income: 0
+    expected:
+      taxable_income: 0
+
+  - name: "Very high income"
+    description: "High earner with standard deduction"
+    inputs:
+      filing_status: joint
+      adjusted_gross_income: 1000000
+      age: 55
+      spouse_age: 53
+    expected:
+      standard_deduction: 29200
+      taxable_income: 970800  # $1M - $29.2K
+    citations:
+      - "26 USC 63(b)"
+
+  # ==========================================================================
+  # Dependent Taxpayers
+  # ==========================================================================
+
+  - name: "Dependent with no earned income"
+    description: "Dependent limited to minimum standard deduction"
+    inputs:
+      filing_status: single
+      adjusted_gross_income: 2000  # Unearned income
+      earned_income: 0
+      is_dependent: true
+      age: 16
+    expected:
+      standard_deduction: 1300  # Minimum for dependents
+      taxable_income: 700  # $2K - $1.3K
+    citations:
+      - "26 USC 63(c)(5)(A): dependent minimum"
+
+  - name: "Dependent with earned income"
+    description: "Dependent's deduction based on earned income"
+    inputs:
+      filing_status: single
+      adjusted_gross_income: 8000
+      earned_income: 8000
+      is_dependent: true
+      age: 17
+    expected:
+      # max(1300, 8000 + 450) = 8450, capped at 14600
+      standard_deduction: 8450
+      taxable_income: 0  # $8K - $8.45K, capped at 0
+    citations:
+      - "26 USC 63(c)(5)(A): earned income + $450"
+
+  # ==========================================================================
+  # Ineligible for Standard Deduction
+  # ==========================================================================
+
+  - name: "MFS spouse itemizes"
+    description: "Must itemize when MFS and spouse itemizes"
+    inputs:
+      filing_status: married_separate
+      adjusted_gross_income: 80000
+      mortgage_interest: 6000
+      salt_taxes_paid: 4000
+      spouse_itemizes: true
+    expected:
+      standard_deduction: 0  # Ineligible
+      total_itemized_deductions: 10000
+      deductions_from_agi: 10000
+      taxable_income: 70000  # $80K - $10K
+    citations:
+      - "26 USC 63(c)(6)(A): zero if spouse itemizes"
+
+  - name: "Nonresident alien"
+    description: "NRA ineligible for standard deduction"
+    inputs:
+      filing_status: single
+      adjusted_gross_income: 50000
+      mortgage_interest: 3000
+      is_nonresident_alien: true
+    expected:
+      standard_deduction: 0
+      total_itemized_deductions: 3000
+      taxable_income: 47000  # $50K - $3K
+    citations:
+      - "26 USC 63(c)(6)(B): zero for NRA"

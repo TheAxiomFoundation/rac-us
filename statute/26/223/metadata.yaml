@@ -1,0 +1,135 @@
+# 26 USC Section 223 - Health Savings Accounts
+#
+# Enacted by the Medicare Prescription Drug, Improvement,
+# and Modernization Act of 2003 (P.L. 108-173)
+
+title: "Health Savings Accounts"
+section: "26 USC 223"
+enacted: 2003-12-08
+effective: 2004-01-01
+
+description: |
+  Section 223 establishes Health Savings Accounts (HSAs), which are
+  tax-advantaged accounts for individuals covered by High Deductible
+  Health Plans (HDHPs). HSAs provide a triple tax benefit:
+
+  1. Contributions are deductible above-the-line (223(a))
+  2. Earnings grow tax-free (223(e))
+  3. Distributions for qualified medical expenses are tax-free (223(f))
+
+  Key eligibility requirements:
+  - Must be covered by a qualifying HDHP (223(c)(1))
+  - Cannot be enrolled in Medicare (223(b)(7))
+  - Cannot be claimed as a dependent (223(b)(6))
+  - Cannot have disqualifying non-HDHP coverage (223(c)(1)(A)(ii))
+
+subsections:
+  a:
+    title: "Deduction allowed"
+    description: "Above-the-line deduction for HSA contributions"
+
+  b:
+    title: "Limitations"
+    description: "Contribution limits, catch-up contributions, employer contributions"
+    subsections:
+      1:
+        title: "In general"
+        description: "Deduction limited to sum of monthly limitations"
+      2:
+        title: "Monthly limitation"
+        description: "Self-only ($4,150) and family ($8,300) limits for 2024"
+      3:
+        title: "Additional contributions for individuals 55 or older"
+        description: "Extra $1,000 catch-up contribution"
+      4:
+        title: "Coordination with employer contributions"
+        description: "Employer contributions count toward limit"
+      5:
+        title: "Special rule for married individuals"
+        description: "Family coverage rules for spouses"
+      6:
+        title: "Denial of deduction to dependents"
+        description: "No deduction if claimed as dependent"
+      7:
+        title: "Medicare eligible individuals"
+        description: "No contributions once enrolled in Medicare"
+
+  c:
+    title: "Definitions and special rules"
+    description: "Eligible individual, HDHP, permitted insurance"
+    subsections:
+      1:
+        title: "Eligible individual"
+        description: "Coverage requirements and exclusions"
+      2:
+        title: "High deductible health plan"
+        description: "Minimum deductible and maximum OOP requirements"
+      3:
+        title: "Permitted insurance"
+        description: "Coverage types that don't disqualify HDHP eligibility"
+
+  d:
+    title: "Health savings account"
+    description: "Trust requirements and qualified medical expenses"
+    subsections:
+      1:
+        title: "In general"
+        description: "Trust or custodial account requirements"
+      2:
+        title: "Qualified medical expenses"
+        description: "Medical expenses defined in 213(d)"
+
+  e:
+    title: "Tax treatment of accounts"
+    description: "Tax-exempt trust, contributions, reporting"
+
+  f:
+    title: "Tax treatment of distributions"
+    description: "Qualified distributions, additional tax on non-qualified"
+    subsections:
+      1:
+        title: "Amounts used for qualified medical expenses"
+        description: "Tax-free distributions"
+      2:
+        title: "Amounts included in gross income"
+        description: "Non-qualified distributions taxable"
+      4:
+        title: "Additional tax on distributions not used for qualified medical expenses"
+        description: "20% penalty (exceptions for 65+, disabled, death)"
+
+references:
+  statute:
+    - title: "26 USC 223"
+      url: "https://www.law.cornell.edu/uscode/text/26/223"
+    - title: "26 USC 62(a)(12)"
+      url: "https://www.law.cornell.edu/uscode/text/26/62"
+      description: "Above-the-line deduction reference"
+    - title: "26 USC 213(d)"
+      url: "https://www.law.cornell.edu/uscode/text/26/213"
+      description: "Qualified medical expenses definition"
+
+  guidance:
+    - title: "Rev. Proc. 2023-22"
+      url: "https://www.irs.gov/pub/irs-drop/rp-23-22.pdf"
+      description: "2024 HSA/HDHP limits"
+    - title: "Rev. Proc. 2024-25"
+      url: "https://www.irs.gov/pub/irs-drop/rp-24-25.pdf"
+      description: "2025 HSA/HDHP limits"
+    - title: "IRS Publication 969"
+      url: "https://www.irs.gov/publications/p969"
+      description: "Health Savings Accounts and Other Tax-Favored Health Plans"
+
+related_sections:
+  - section: "26 USC 106(d)"
+    description: "Employer contributions excluded from income"
+  - section: "26 USC 4973(g)"
+    description: "Excise tax on excess contributions"
+  - section: "26 USC 4975(c)(6)"
+    description: "Prohibited transaction exemption"
+
+files:
+  - hsa_deduction.cosilico
+  - contribution_limits.cosilico
+  - hdhp_requirements.cosilico
+  - parameters.yaml
+  - tests.yaml

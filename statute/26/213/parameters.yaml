@@ -1,0 +1,109 @@
+# 26 USC Section 213 - Medical Expense Deduction Parameters
+#
+# Time-varying parameters for medical expense deduction,
+# particularly the AGI floor percentage.
+
+description: "Parameters for medical expense deduction under IRC Section 213"
+reference: "26 USC 213"
+
+# =============================================================================
+# Section 213(a) - AGI Floor
+# =============================================================================
+agi_floor:
+  description: "Percentage of AGI subtracted from medical expenses"
+  reference: "26 USC 213(a), TCJA Section 11027, CAA 2021"
+
+  rate:
+    description: "AGI floor rate for medical expense deduction"
+    unit: fraction
+    values:
+      # Original ACA rate: 10% (phased in)
+      - date: 2013-01-01
+        value: 0.10
+        reference: "ACA Section 9013: 10% floor"
+        notes: "10% for under-65; 7.5% for 65+ through 2016"
+
+      # TCJA retroactively lowered to 7.5% for 2017-2018
+      - date: 2017-01-01
+        value: 0.075
+        reference: "TCJA Section 11027, P.L. 115-97"
+
+      # Extended through 2020 by Taxpayer Certainty Act
+      - date: 2019-01-01
+        value: 0.075
+        reference: "Further Consolidated Appropriations Act 2020, Section 103"
+
+      # Made permanent by CAA 2021
+      - date: 2021-01-01
+        value: 0.075
+        reference: "CAA 2021 Section 9041: permanent 7.5%"
+
+  # Historical rate for seniors (2013-2016)
+  rate_age_65_plus:
+    description: "AGI floor rate for taxpayers 65+ (2013-2016 only)"
+    unit: fraction
+    values:
+      - date: 2013-01-01
+        value: 0.075
+        reference: "ACA: 7.5% for 65+ through 2016"
+      - date: 2017-01-01
+        value: 0.075
+        reference: "TCJA: same rate for all ages"
+
+# =============================================================================
+# Section 213(d)(10) - Long-Term Care Insurance Limits
+# =============================================================================
+long_term_care:
+  description: "Premium limits for long-term care insurance by age"
+  reference: "26 USC 213(d)(10), Rev. Proc. 2023-34"
+
+  # These limits are indexed for inflation annually
+  age_40_or_less:
+    description: "LTC premium limit for age 40 and under"
+    unit: USD
+    values:
+      - date: 2023-01-01
+        value: 480
+      - date: 2024-01-01
+        value: 470
+        reference: "Rev. Proc. 2023-34"
+
+  age_41_to_50:
+    description: "LTC premium limit for ages 41-50"
+    unit: USD
+    values:
+      - date: 2023-01-01
+        value: 890
+      - date: 2024-01-01
+        value: 880
+        reference: "Rev. Proc. 2023-34"
+
+  age_51_to_60:
+    description: "LTC premium limit for ages 51-60"
+    unit: USD
+    values:
+      - date: 2023-01-01
+        value: 1790
+      - date: 2024-01-01
+        value: 1760
+        reference: "Rev. Proc. 2023-34"
+
+  age_61_to_70:
+    description: "LTC premium limit for ages 61-70"
+    unit: USD
+    values:
+      - date: 2023-01-01
+        value: 4770
+      - date: 2024-01-01
+        value: 4710
+        reference: "Rev. Proc. 2023-34"
+
+  age_over_70:
+    description: "LTC premium limit for over age 70"
+    unit: USD
+    values:
+      - date: 2023-01-01
+        value: 5960
+      - date: 2024-01-01
+        value: 5880
+        reference: "Rev. Proc. 2023-34"

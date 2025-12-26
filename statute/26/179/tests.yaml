@@ -1,0 +1,258 @@
+# Tests for 26 USC Section 179 - Election to Expense Certain Depreciable Business Assets
+#
+# Section 179 allows businesses to immediately deduct the full cost of qualifying
+# property rather than depreciating it over time.
+#
+# 2024 Limits (Rev. Proc. 2023-34):
+#   - Maximum deduction: $1,220,000
+#   - Investment threshold (phaseout begins): $3,050,000
+#   - Dollar-for-dollar reduction above threshold
+#
+# Sources:
+# - 26 USC 179 - Election to expense
+# - IRS Publication 946 - How to Depreciate Property
+# - Rev. Proc. 2023-34 (2024 inflation adjustments)
+# - Rev. Proc. 2024-40 (2025 inflation adjustments)
+
+variable: section_179_deduction
+tax_year: 2024
+
+test_cases:
+  # Basic Section 179 deduction (below phaseout)
+  - name: "Simple case: Equipment purchase below limits"
+    description: "Full 179 deduction when below investment threshold"
+    inputs:
+      section_179_property_placed_in_service: 100000
+      total_cost_of_section_179_property: 100000
+      taxable_income_before_179: 200000
+    expected:
+      section_179_deduction: 100000
+    citations:
+      - "26 USC 179(a): Allows expense deduction"
+      - "26 USC 179(b)(1): $1,220,000 maximum (2024)"
+
+  - name: "Maximum deduction at limit"
+    description: "Deduction capped at $1,220,000 maximum"
+    inputs:
+      section_179_property_placed_in_service: 2000000
+      total_cost_of_section_179_property: 2000000
+      taxable_income_before_179: 3000000
+    expected:
+      section_179_deduction: 1220000  # Capped at maximum
+    citations:
+      - "26 USC 179(b)(1): $1,220,000 maximum for 2024"
+
+  - name: "Exactly at maximum"
+    inputs:
+      section_179_property_placed_in_service: 1220000
+      total_cost_of_section_179_property: 1220000
+      taxable_income_before_179: 2000000
+    expected:
+      section_179_deduction: 1220000
+    citations:
+      - "26 USC 179(b)(1): Full maximum allowed"
+
+  # Phaseout calculations
+  - name: "Phaseout: $100k over threshold"
+    description: "Dollar-for-dollar reduction above $3,050,000"
+    inputs:
+      section_179_property_placed_in_service: 500000
+      total_cost_of_section_179_property: 3150000  # $100k over threshold
+      taxable_income_before_179: 1000000
+    expected:
+      # Maximum $1,220,000 reduced by ($3,150,000 - $3,050,000) = $100,000
+      # Available: $1,120,000
+      # Elected amount: $500,000 (less than available)
+      section_179_deduction: 500000
+    citations:
+      - "26 USC 179(b)(2): Dollar-for-dollar phaseout"
+
+  - name: "Phaseout: Maximum reduced"
+    description: "Electing maximum but phaseout applies"
+    inputs:
+      section_179_property_placed_in_service: 1220000
+      total_cost_of_section_179_property: 3300000  # $250k over threshold
+      taxable_income_before_179: 2000000
+    expected:
+      # Maximum $1,220,000 reduced by $250,000 = $970,000 available
+      section_179_deduction: 970000
+    citations:
+      - "26 USC 179(b)(2): Phaseout reduces available amount"
+
+  - name: "Phaseout: Completely phased out"
+    description: "Investment exceeds full phaseout threshold"
+    inputs:
+      section_179_property_placed_in_service: 500000
+      # Full phaseout at: $3,050,000 + $1,220,000 = $4,270,000
+      total_cost_of_section_179_property: 4500000
+      taxable_income_before_179: 1000000
+    expected:
+      section_179_deduction: 0
+    citations:
+      - "26 USC 179(b)(2): Fully phased out above threshold"
+
+  - name: "Phaseout: Exactly at full phaseout"
+    inputs:
+      section_179_property_placed_in_service: 500000
+      total_cost_of_section_179_property: 4270000  # 3050000 + 1220000
+      taxable_income_before_179: 1000000
+    expected:
+      section_179_deduction: 0
+    citations:
+      - "26 USC 179(b)(2): Zero available at full phaseout"
+
+  # Taxable income limitation
+  - name: "Taxable income limitation"
+    description: "Deduction limited by taxable business income"
+    inputs:
+      section_179_property_placed_in_service: 500000
+      total_cost_of_section_179_property: 500000
+      taxable_income_before_179: 300000
+    expected:
+      section_179_deduction: 300000  # Limited by taxable income
+      section_179_carryforward: 200000  # Excess carries forward
+    citations:
+      - "26 USC 179(b)(3)(A): Taxable income limitation"
+      - "26 USC 179(b)(3)(B): Carryforward of disallowed amount"
+
+  - name: "Taxable income exactly matches elected amount"
+    inputs:
+      section_179_property_placed_in_service: 200000
+      total_cost_of_section_179_property: 200000
+      taxable_income_before_179: 200000
+    expected:
+      section_179_deduction: 200000
+      section_179_carryforward: 0
+    citations:
+      - "26 USC 179(b)(3): Full deduction allowed"
+
+  - name: "Zero taxable income"
+    description: "No deduction when no taxable income"
+    inputs:
+      section_179_property_placed_in_service: 100000
+      total_cost_of_section_179_property: 100000
+      taxable_income_before_179: 0
+    expected:
+      section_179_deduction: 0
+      section_179_carryforward: 100000
+    citations:
+      - "26 USC 179(b)(3)(A): Taxable income limitation"
+
+  - name: "Negative taxable income"
+    inputs:
+      section_179_property_placed_in_service: 100000
+      total_cost_of_section_179_property: 100000
+      taxable_income_before_179: -50000
+    expected:
+      section_179_deduction: 0
+      section_179_carryforward: 100000
+    citations:
+      - "26 USC 179(b)(3): Deduction cannot create/increase loss"
+
+  # Historical parameter tests
+  - name: "2023 limits"
+    tax_year: 2023
+    inputs:
+      section_179_property_placed_in_service: 1160000  # 2023 max
+      total_cost_of_section_179_property: 1160000
+      taxable_income_before_179: 2000000
+    expected:
+      section_179_deduction: 1160000
+    citations:
+      - "26 USC 179(b)(1): $1,160,000 maximum for 2023"
+      - "Rev. Proc. 2022-38"
+
+  - name: "2025 limits"
+    tax_year: 2025
+    inputs:
+      section_179_property_placed_in_service: 1250000
+      total_cost_of_section_179_property: 1250000
+      taxable_income_before_179: 2000000
+    expected:
+      section_179_deduction: 1250000  # 2025 maximum (projected)
+    citations:
+      - "Rev. Proc. 2024-40: 2025 inflation adjustments"
+
+  # Combined phaseout and taxable income limitation
+  - name: "Both phaseout and income limit apply"
+    inputs:
+      section_179_property_placed_in_service: 800000
+      total_cost_of_section_179_property: 3550000  # $500k over threshold
+      taxable_income_before_179: 400000
+    expected:
+      # Phaseout: $1,220,000 - $500,000 = $720,000 available
+      # Elected: $800,000 but limited to $720,000 available
+      # Then limited by $400,000 taxable income
+      section_179_deduction: 400000
+      section_179_carryforward: 320000  # ($720,000 - $400,000)
+    citations:
+      - "26 USC 179(b)(2)-(3): Both limitations apply"
+
+  # Qualifying property tests
+  - name: "Non-qualifying property"
+    description: "Only Section 179 property qualifies"
+    inputs:
+      section_179_property_placed_in_service: 0
+      non_section_179_property: 500000
+      taxable_income_before_179: 1000000
+    expected:
+      section_179_deduction: 0
+    citations:
+      - "26 USC 179(d): Definition of section 179 property"
+
+  - name: "Partial qualifying property"
+    description: "Some property qualifies, some does not"
+    inputs:
+      section_179_property_placed_in_service: 300000
+      non_section_179_property: 200000
+      total_cost_of_section_179_property: 300000
+      taxable_income_before_179: 1000000
+    expected:
+      section_179_deduction: 300000  # Only qualifying amount
+    citations:
+      - "26 USC 179(d): Only qualifying property deductible"
+
+  # SUV limitation (Section 179(b)(5))
+  - name: "SUV limitation applies"
+    description: "Sport utility vehicles have lower limit"
+    inputs:
+      section_179_property_placed_in_service: 60000
+      suv_property_placed_in_service: 60000  # SUV over 6,000 lbs GVW
+      total_cost_of_section_179_property: 60000
+      taxable_income_before_179: 100000
+    expected:
+      # SUV limit is $30,500 for 2024
+      section_179_deduction: 30500
+    citations:
+      - "26 USC 179(b)(5): $30,500 SUV limitation (2024)"
+
+  - name: "SUV within limitation"
+    inputs:
+      suv_property_placed_in_service: 25000
+      total_cost_of_section_179_property: 25000
+      taxable_income_before_179: 100000
+    expected:
+      section_179_deduction: 25000  # Under limit, full amount
+    citations:
+      - "26 USC 179(b)(5): SUV below limitation threshold"
+
+  # Edge cases
+  - name: "Zero property placed in service"
+    inputs:
+      section_179_property_placed_in_service: 0
+      total_cost_of_section_179_property: 0
+      taxable_income_before_179: 100000
+    expected:
+      section_179_deduction: 0
+    citations:
+      - "No qualifying property, no deduction"
+
+  - name: "Very large business"
+    inputs:
+      section_179_property_placed_in_service: 2000000
+      total_cost_of_section_179_property: 2000000
+      taxable_income_before_179: 50000000
+    expected:
+      section_179_deduction: 1220000  # Capped at maximum
+    citations:
+      - "26 USC 179(b)(1): Maximum deduction cap"

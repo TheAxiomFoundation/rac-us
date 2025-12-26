@@ -1,0 +1,94 @@
+# 26 USC Section 219(b) - Maximum Amount of Deduction
+#
+# "(1) In General.--The amount allowable as a deduction under subsection (a)
+#      to any individual for any taxable year shall not exceed the lesser of--
+#      (A) the deductible amount, or
+#      (B) an amount equal to the compensation includible in the individual's
+#          gross income for such taxable year."
+#
+# Note: Post-SECURE Act, there is no age limit for contributions.
+
+module statute.26.219.b
+version "2024.1"
+
+parameters {
+  # From contribution_limits.yaml
+  deductible_amount: 7000     # 2024 base limit
+  catch_up_amount: 1000       # Additional for age 50+
+  catch_up_age: 50
+}
+
+references {
+  earned_income: statute/26/32/c/2/A/earned_income
+  age: core/demographics/age
+}
+
+# Input: Traditional IRA contributions made by individual
+variable traditional_ira_contributions {
+  entity Person
+  period Year
+  dtype Money
+  unit "USD"
+  label "Traditional IRA Contributions"
+  description "Contributions made to traditional IRA during the tax year"
+  reference "26 USC 219(a)"
+
+  # Input variable - provided by taxpayer
+}
+
+# 219(b)(1)(A): The deductible amount, including catch-up
+variable ira_contribution_limit {
+  entity Person
+  period Year
+  dtype Money
+  unit "USD"
+  label "IRA Contribution Limit"
+  description "Maximum allowable IRA contribution including catch-up for age 50+"
+  reference "26 USC 219(b)(1)(A), 219(b)(5)(B)"
+
+  formula {
+    let base_limit = deductible_amount
+
+    # 219(b)(5)(B): Add catch-up for age 50+
+    if age >= catch_up_age {
+      return base_limit + catch_up_amount
+    }
+    return base_limit
+  }
+}
+
+# 219(b)(1)(B): Compensation-based limit
+variable ira_compensation_limit {
+  entity Person
+  period Year
+  dtype Money
+  unit "USD"
+  label "IRA Compensation Limit"
+  description "IRA contribution limit based on compensation"
+  reference "26 USC 219(b)(1)(B)"
+
+  formula {
+    # Cannot contribute more than earned income
+    # Note: 219(f)(1) allows spousal contributions using spouse's compensation
+    return max(0, earned_income)
+  }
+}
+
+# 219(b)(1): Maximum deductible contribution before phase-out
+variable ira_max_deductible_contribution {
+  entity Person
+  period Year
+  dtype Money
+  unit "USD"
+  label "Maximum Deductible IRA Contribution"
+  description "Lesser of contribution limit or compensation"
+  reference "26 USC 219(b)(1)"
+
+  formula {
+    # The lesser of (A) deductible amount or (B) compensation
+    let limit = min(ira_contribution_limit, ira_compensation_limit)
+
+    # Cannot deduct more than actually contributed
+    return min(traditional_ira_contributions, limit)
+  }
+}
