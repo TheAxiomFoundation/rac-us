@@ -8,14 +8,11 @@
 # This is an actual cost deduction with no federal cap
 # (though some states may impose caps)
 
-variable snap_dependent_care_deduction {
-  entity Household
-  period Month
-  dtype Money
+entity Household
+period Month
+dtype Money
 
-  formula {
-    # § 2014(e)(3): Actual dependent care costs necessary for work/training
-    # Includes child care, care for elderly/disabled dependents
-    return dependent_care_expenses
-  }
-}
+formula:
+  # § 2014(e)(3): Actual dependent care costs necessary for work/training
+  # Includes child care, care for elderly/disabled dependents
+  return dependent_care_expenses

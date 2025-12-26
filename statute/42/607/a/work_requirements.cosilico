@@ -14,88 +14,72 @@
 # require tracking employment history, participation hours, and sanctions.
 # This encoding captures the RULES, not enforcement.
 
-references {
+imports:
   work_rate: statute/42/607/parameters/minimum_participation_rate
   hours_per_week: statute/42/607/parameters/hours_per_week
   countable_activities: statute/42/607/d/work_activities
-}
 
 # 607(a)(1): All families participation rate requirement
 # States must achieve minimum participation rate or face grant reduction
-variable tanf_state_participation_rate_all_families {
-  entity State
-  period FederalFiscalYear  # Oct 1 - Sep 30
-  dtype Rate
+entity State
+period FederalFiscalYear  # Oct 1 - Sep 30
+dtype Rate
 
-  # NOTE: This is a state-level aggregate, not individual calculation
-  # Tracked here for completeness but not used in individual eligibility
-  documentation {
-    Minimum participation rates by fiscal year:
-    - FY 1997-2002: Ramped from 25% to 50%
-    - FY 2003+: 50%
+# NOTE: This is a state-level aggregate, not individual calculation
+# Tracked here for completeness but not used in individual eligibility
+documentation {
+Minimum participation rates by fiscal year:
+- FY 1997-2002: Ramped from 25% to 50%
+- FY 2003+: 50%
 
-    Caseload reduction credit may reduce effective requirement.
-  }
-}
+Caseload reduction credit may reduce effective requirement.
 
 # 607(a)(2): Two-parent families participation rate
 # Higher requirement for two-parent families
-variable tanf_state_participation_rate_two_parent {
-  entity State
-  period FederalFiscalYear
-  dtype Rate
+entity State
+period FederalFiscalYear
+dtype Rate
 
-  documentation {
-    Two-parent family rates:
-    - FY 1997-1999: Ramped from 75% to 90%
-    - FY 2000+: 90%
-  }
-}
+documentation {
+Two-parent family rates:
+- FY 1997-1999: Ramped from 75% to 90%
+- FY 2000+: 90%
 
 # 607(c): Required hours of participation
 # Individual must participate in work activities for minimum hours
-variable tanf_weekly_hours_requirement {
-  entity Person
-  period Week
-  dtype Integer
+entity Person
+period Week
+dtype Integer
 
-  formula {
-    # 607(c)(1)(A): Single parent or head of household with child under 6
-    if tanf_head_of_household and has_child_under_6 then
-      return work_activities_hours_reduced  # 20 hours/week
+formula:
+  # 607(c)(1)(A): Single parent or head of household with child under 6
+  if tanf_head_of_household and has_child_under_6 then
+  return work_activities_hours_reduced  # 20 hours/week
 
-    # 607(c)(1)(B): General requirement - single parent families
-    if tanf_head_of_household then
-      return work_activities_hours_single_parent  # 30 hours/week
+  # 607(c)(1)(B): General requirement - single parent families
+  if tanf_head_of_household then
+  return work_activities_hours_single_parent  # 30 hours/week
 
-    # 607(c)(2): Two-parent families
-    if tanf_two_parent_family then
-      return work_activities_hours_two_parent  # 35 hours/week (55 if child care)
+  # 607(c)(2): Two-parent families
+  if tanf_two_parent_family then
+  return work_activities_hours_two_parent  # 35 hours/week (55 if child care)
 
-    return 0
-  }
-}
+  return 0
 
 # 607(c)(1)(A)(ii): Teen parent school attendance
 # Minor custodial parents must attend school or education program
-variable tanf_teen_parent_education_required {
-  entity Person
-  period Month
-  dtype Boolean
+entity Person
+period Month
+dtype Boolean
 
-  formula {
-    return age < 20 and has_child and not has_high_school_diploma
-  }
-}
+formula:
+  return age < 20 and has_child and not has_high_school_diploma
 
 # 607(c)(2)(C): Child care exemption for two-parent families
 # Exemption from increased hours if child care unavailable
-variable tanf_child_care_exemption {
-  entity Family
-  period Month
-  dtype Boolean
+entity Family
+period Month
+dtype Boolean
 
-  formula {
-    return has_child_under_6 and child_care_unavailable
-  }
-}
+formula:
+  return has_child_under_6 and child_care_unavailable

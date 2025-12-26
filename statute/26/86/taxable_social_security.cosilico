@@ -16,155 +16,132 @@
 # - 86(b): Combined income definition (modified AGI + 50% benefits)
 # - 86(c): Base amounts by filing status
 
-module statute.26.86
-version "2024.1"
-
-parameters {
-  # Base amounts for Tier 1 (50% inclusion) - 86(c)(1)
+parameters:
+# Base amounts for Tier 1 (50% inclusion) - 86(c)(1)
   base_amount_single: statute/26/86/c/base_amount_single
   base_amount_joint: statute/26/86/c/base_amount_joint
   base_amount_mfs: statute/26/86/c/base_amount_mfs
 
-  # Adjusted base amounts for Tier 2 (85% inclusion) - 86(c)(2)
+# Adjusted base amounts for Tier 2 (85% inclusion) - 86(c)(2)
   adjusted_base_amount_single: statute/26/86/c/adjusted_base_amount_single
   adjusted_base_amount_joint: statute/26/86/c/adjusted_base_amount_joint
 
-  # Tier 1 and Tier 2 rates
+# Tier 1 and Tier 2 rates
   tier1_rate: 0.50  # 50% of benefits
   tier2_rate: 0.85  # Up to 85% of benefits
-}
 
-references {
-  # Combined income from Section 86(b)
+imports:
+# Combined income from Section 86(b)
   combined_income: statute/26/86/b/combined_income_for_ss_taxability
 
-  # Total Social Security benefits received
+# Total Social Security benefits received
   tax_unit_social_security: statute/26/86/tax_unit_social_security
 
-  # Filing status for threshold determination
+# Filing status for threshold determination
   filing_status: statute/26/1/filing_status
-}
 
 # Get base amount based on filing status per 86(c)(1)
-function get_base_amount(filing_status: FilingStatus) -> Money {
-  match filing_status {
-    SINGLE => base_amount_single
-    HEAD_OF_HOUSEHOLD => base_amount_single
-    MARRIED_FILING_JOINTLY => base_amount_joint
-    QUALIFYING_WIDOW => base_amount_joint
-    MARRIED_FILING_SEPARATELY => base_amount_mfs
-  }
-}
+
+function get_base_amount(filing_status: FilingStatus) -> Money:
+match filing_status {
+SINGLE => base_amount_single
+HEAD_OF_HOUSEHOLD => base_amount_single
+MARRIED_FILING_JOINTLY => base_amount_joint
+QUALIFYING_WIDOW => base_amount_joint
+MARRIED_FILING_SEPARATELY => base_amount_mfs
 
 # Get adjusted base amount based on filing status per 86(c)(2)
-function get_adjusted_base_amount(filing_status: FilingStatus) -> Money {
-  match filing_status {
-    SINGLE => adjusted_base_amount_single
-    HEAD_OF_HOUSEHOLD => adjusted_base_amount_single
-    MARRIED_FILING_JOINTLY => adjusted_base_amount_joint
-    QUALIFYING_WIDOW => adjusted_base_amount_joint
-    MARRIED_FILING_SEPARATELY => 0  # No adjusted base for MFS
-  }
-}
+
+function get_adjusted_base_amount(filing_status: FilingStatus) -> Money:
+match filing_status {
+SINGLE => adjusted_base_amount_single
+HEAD_OF_HOUSEHOLD => adjusted_base_amount_single
+MARRIED_FILING_JOINTLY => adjusted_base_amount_joint
+QUALIFYING_WIDOW => adjusted_base_amount_joint
+MARRIED_FILING_SEPARATELY => 0  # No adjusted base for MFS
 
 # Tier 1 taxable amount - up to 50% of benefits
-variable tier1_taxable_social_security {
-  entity TaxUnit
-  period Year
-  dtype Money
-  unit "USD"
-  label "Tier 1 Taxable Social Security"
-  description "Amount taxable under 50% tier per 86(a)(1)"
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Tier 1 Taxable Social Security"
+description "Amount taxable under 50% tier per 86(a)(1)"
 
-  formula {
-    let base_amount = get_base_amount(filing_status)
-    let excess = max(0, combined_income - base_amount)
+formula:
+  base_amount = get_base_amount(filing_status)
+  excess = max(0, combined_income - base_amount)
 
-    # Lesser of 50% of benefits or 50% of excess over base
-    let half_benefits = tier1_rate * tax_unit_social_security
-    let half_excess = tier1_rate * excess
+  # Lesser of 50% of benefits or 50% of excess over base
+  half_benefits = tier1_rate * tax_unit_social_security
+  half_excess = tier1_rate * excess
 
-    return min(half_benefits, half_excess)
-  }
+  return min(half_benefits, half_excess)
 
-  defined_for {
-    tax_unit_social_security > 0
-  }
+defined_for:
+  tax_unit_social_security > 0
 
-  default 0
-}
+default 0
 
 # Tier 2 additional taxable amount - brings total up to 85%
-variable tier2_additional_taxable_social_security {
-  entity TaxUnit
-  period Year
-  dtype Money
-  unit "USD"
-  label "Tier 2 Additional Taxable Social Security"
-  description "Additional amount taxable under 85% tier per 86(a)(2)"
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Tier 2 Additional Taxable Social Security"
+description "Additional amount taxable under 85% tier per 86(a)(2)"
 
-  formula {
-    let adjusted_base = get_adjusted_base_amount(filing_status)
+formula:
+  adjusted_base = get_adjusted_base_amount(filing_status)
 
-    # For MFS living together, adjusted_base is 0 so all excess counts
-    let excess_over_adjusted = max(0, combined_income - adjusted_base)
+  # For MFS living together, adjusted_base is 0 so all excess counts
+  excess_over_adjusted = max(0, combined_income - adjusted_base)
 
-    # Additional 35% (85% - 50%) of excess over adjusted base
-    let additional_rate = tier2_rate - tier1_rate  # 0.35
-    let tier2_portion = additional_rate * excess_over_adjusted
+  # Additional 35% (85% - 50%) of excess over adjusted base
+  additional_rate = tier2_rate - tier1_rate  # 0.35
+  tier2_portion = additional_rate * excess_over_adjusted
 
-    # Total taxable cannot exceed 85% of benefits
-    let max_total = tier2_rate * tax_unit_social_security
-    let max_tier2 = max_total - tier1_taxable_social_security
+  # Total taxable cannot exceed 85% of benefits
+  max_total = tier2_rate * tax_unit_social_security
+  max_tier2 = max_total - tier1_taxable_social_security
 
-    return min(tier2_portion, max(0, max_tier2))
-  }
+  return min(tier2_portion, max(0, max_tier2))
 
-  defined_for {
-    tax_unit_social_security > 0
-  }
+defined_for:
+  tax_unit_social_security > 0
 
-  default 0
-}
+default 0
 
 # Total taxable Social Security benefits
-variable taxable_social_security {
-  entity TaxUnit
-  period Year
-  dtype Money
-  unit "USD"
-  label "Taxable Social Security Benefits"
-  description "Total Social Security benefits included in gross income per 26 USC Section 86"
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Taxable Social Security Benefits"
+description "Total Social Security benefits included in gross income per 26 USC Section 86"
 
-  formula {
-    let total = tier1_taxable_social_security + tier2_additional_taxable_social_security
+formula:
+  total = tier1_taxable_social_security + tier2_additional_taxable_social_security
 
-    # Never more than 85% of benefits
-    let max_taxable = tier2_rate * tax_unit_social_security
+  # Never more than 85% of benefits
+  max_taxable = tier2_rate * tax_unit_social_security
 
-    return min(total, max_taxable)
-  }
+  return min(total, max_taxable)
 
-  defined_for {
-    tax_unit_social_security > 0
-  }
+defined_for:
+  tax_unit_social_security > 0
 
-  default 0
-}
+default 0
 
 # Fraction of benefits that is taxable (for display/analysis)
-variable social_security_taxable_fraction {
-  entity TaxUnit
-  period Year
-  dtype Rate
-  unit "percentage"
-  label "Taxable Fraction of Social Security"
-  description "Portion of Social Security benefits included in taxable income"
+entity TaxUnit
+period Year
+dtype Rate
+unit "percentage"
+label "Taxable Fraction of Social Security"
+description "Portion of Social Security benefits included in taxable income"
 
-  formula {
-    if tax_unit_social_security <= 0 {
-      return 0
-    }
-    return taxable_social_security / tax_unit_social_security
-  }
-}
+formula:
+  if tax_unit_social_security <= 0 then
+  return 0
+  return taxable_social_security / tax_unit_social_security

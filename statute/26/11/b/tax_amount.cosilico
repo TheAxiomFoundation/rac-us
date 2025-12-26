@@ -7,58 +7,50 @@
 # Pre-TCJA (1993-2017): Graduated rates from 15% to 35% with "bubble" rates
 # to recapture benefits of lower brackets for high-income corporations.
 
-module statute.26.11.b
-version "2024.1"
-
-references {
+imports:
   flat_rate: statute/26/11/parameters/flat_rate
   graduated_brackets: statute/26/11/parameters/graduated_brackets
   is_subject_to_corporate_tax: statute/26/11/a/is_subject_to_corporate_tax
-}
 
-variable corporate_income_tax {
-  entity Corporation
-  period Year
-  dtype Money
-  unit "USD"
-  label "Corporate Income Tax"
-  description "Federal corporate income tax under 26 USC 11"
+entity Corporation
+period Year
+dtype Money
+unit "USD"
+label "Corporate Income Tax"
+description "Federal corporate income tax under 26 USC 11"
 
-  formula {
-    # Only C corporations pay corporate income tax
-    if not is_subject_to_corporate_tax then
-      return 0
+formula:
+  # Only C corporations pay corporate income tax
+  if not is_subject_to_corporate_tax then
+  return 0
 
-    # No tax on zero or negative income
-    if taxable_income <= 0 then
-      return 0
+  # No tax on zero or negative income
+  if taxable_income <= 0 then
+  return 0
 
-    # Post-TCJA: flat 21% rate
-    if tax_year >= 2018 then
-      return taxable_income * flat_rate
+  # Post-TCJA: flat 21% rate
+  if tax_year >= 2018 then
+  return taxable_income * flat_rate
 
-    # Pre-TCJA: graduated rates with bubbles
-    return compute_graduated_tax(taxable_income, graduated_brackets)
-  }
-}
+  # Pre-TCJA: graduated rates with bubbles
+  return compute_graduated_tax(taxable_income, graduated_brackets)
 
 # Helper function for pre-TCJA graduated rate calculation
-function compute_graduated_tax(income, brackets) {
-  let tax = 0
-  let remaining = income
 
-  for i in 0..len(brackets) - 1 {
-    let bracket = brackets[i]
-    let next_threshold = if i < len(brackets) - 1 then brackets[i + 1].threshold else infinity
+function compute_graduated_tax(income, brackets):
+let tax = 0
+let remaining = income
 
-    let bracket_income = min(remaining, next_threshold - bracket.threshold)
-    if bracket_income > 0 then
-      tax = tax + (bracket_income * bracket.rate)
-      remaining = remaining - bracket_income
+for i in 0..len(brackets) - 1 {
+let bracket = brackets[i]
+let next_threshold = if i < len(brackets) - 1 then brackets[i + 1].threshold else infinity
 
-    if remaining <= 0 then
-      break
-  }
+let bracket_income = min(remaining, next_threshold - bracket.threshold)
+if bracket_income > 0 then
+tax = tax + (bracket_income * bracket.rate)
+remaining = remaining - bracket_income
 
-  return tax
-}
+if remaining <= 0 then
+break
+
+return tax

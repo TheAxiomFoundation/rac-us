@@ -12,82 +12,69 @@
 #   SSI = FBR - countable income
 #   Subject to living arrangement reductions per 42 USC 1382(a)(2)(A)
 
-module statute.42.1382
-version "2024.1"
-
-references {
-  # Eligibility components
+imports:
+# Eligibility components
   is_ssi_categorical_eligible: statute/42/1382/a/age_requirement/is_ssi_categorical_eligible
   is_ssi_resource_eligible: statute/42/1382/a/resource_test/is_ssi_resource_eligible
   is_ssi_citizenship_eligible: statute/42/1382/a/citizenship/is_ssi_citizenship_eligible
   is_ssi_residency_eligible: statute/42/1382/a/citizenship/is_ssi_residency_eligible
 
-  # Income components
+# Income components
   ssi_countable_income: statute/42/1382a/income_exclusions/ssi_countable_income
 
-  # Benefit components
+# Benefit components
   applicable_fbr: statute/42/1382/b/federal_benefit_rate/applicable_fbr
   federal_benefit_rate: statute/42/1382/b/federal_benefit_rate/federal_benefit_rate
-}
 
 # Income eligibility - countable income must not exceed FBR
-variable is_ssi_income_eligible {
-  entity Person
-  period Month
-  dtype Boolean
-  label "SSI income eligibility"
-  description "Countable income does not exceed FBR per 42 USC 1382(a)"
+entity Person
+period Month
+dtype Boolean
+label "SSI income eligibility"
+description "Countable income does not exceed FBR per 42 USC 1382(a)"
 
-  formula {
-    return ssi_countable_income <= federal_benefit_rate
-  }
+formula:
+  return ssi_countable_income <= federal_benefit_rate
 
-  default false
-}
+default false
 
 # Overall SSI eligibility
-variable is_ssi_eligible {
-  entity Person
-  period Month
-  dtype Boolean
-  label "SSI eligibility"
-  description "All SSI eligibility requirements met per 42 USC 1382"
-    "42 USC 1382(a)",
-    "42 USC 1382c"
+entity Person
+period Month
+dtype Boolean
+label "SSI eligibility"
+description "All SSI eligibility requirements met per 42 USC 1382"
+"42 USC 1382(a)",
+"42 USC 1382c"
 
-  formula {
-    # All requirements must be met
-    return is_ssi_categorical_eligible
-       and is_ssi_resource_eligible
-       and is_ssi_citizenship_eligible
-       and is_ssi_residency_eligible
-       and is_ssi_income_eligible
-  }
+formula:
+  # All requirements must be met
+  return is_ssi_categorical_eligible
+  and is_ssi_resource_eligible
+  and is_ssi_citizenship_eligible
+  and is_ssi_residency_eligible
+  and is_ssi_income_eligible
 
-  default false
-}
+default false
 
 # SSI benefit amount
-variable ssi {
-  entity Person
-  period Month
-  dtype Money
-  unit "USD"
-  label "Supplemental Security Income"
-  description "Monthly SSI payment per 42 USC 1382(b)"
-    "42 USC 1382(b)",
-    "42 USC 1382a"
+entity Person
+period Month
+dtype Money
+unit "USD"
+label "Supplemental Security Income"
+description "Monthly SSI payment per 42 USC 1382(b)"
+"42 USC 1382(b)",
+"42 USC 1382a"
 
-  formula {
-    if not is_ssi_eligible then
-      return 0
+formula:
+  if not is_ssi_eligible then
+  return 0
 
-    # SSI = applicable FBR - countable income
-    let benefit = applicable_fbr - ssi_countable_income
+  # SSI = applicable FBR - countable income
+  benefit = applicable_fbr - ssi_countable_income
 
-    # Benefit cannot be negative
-    return max(0, benefit)
-  }
+  # Benefit cannot be negative
+  return max(0, benefit)
 
-  default 0
-}
+default 0

@@ -5,13 +5,10 @@
 # Deduction for child support payments made by a household member
 # to a child not living in the household.
 
-variable snap_child_support_deduction {
-  entity Household
-  period Month
-  dtype Money
+entity Household
+period Month
+dtype Money
 
-  formula {
-    # § 2014(e)(4): Legally obligated child support payments actually made
-    return child_support_paid
-  }
-}
+formula:
+  # § 2014(e)(4): Legally obligated child support payments actually made
+  return child_support_paid

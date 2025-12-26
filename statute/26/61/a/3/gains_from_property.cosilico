@@ -3,16 +3,11 @@
 # Gross income includes "gains derived from dealings in property."
 # This includes capital gains from sale of stocks, real estate, etc.
 
-module statute.26.61.a.3
-version "2024.1"
-
-variable gains_from_property {
-  entity Person
-  period Year
-  dtype Money
-  unit "USD"
-  label "Gains from Property"
-  description "Gains derived from dealings in property including capital gains"
-  # Input from CPS: CAP_VAL (capital gains/losses)
-  # Note: Can be negative (capital losses)
-}
+entity Person
+period Year
+dtype Money
+unit "USD"
+label "Gains from Property"
+description "Gains derived from dealings in property including capital gains"
+# Input from CPS: CAP_VAL (capital gains/losses)
+# Note: Can be negative (capital losses)

@@ -13,17 +13,12 @@
 # - State and local government bonds
 # - Private activity bonds meeting requirements
 
-module statute.26.103
-version "2024.1"
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Tax-Exempt Interest Income"
+description "Interest from state and local bonds excluded from gross income under 26 USC §103, but counted for EITC investment income test"
 
-variable tax_exempt_interest {
-  entity TaxUnit
-  period Year
-  dtype Money
-  unit "USD"
-  label "Tax-Exempt Interest Income"
-  description "Interest from state and local bonds excluded from gross income under 26 USC §103, but counted for EITC investment income test"
-
-  # Input: Amount from Form 1040 line 2a (tax-exempt interest).
-  # This is reported for informational purposes even though not taxable.
-}
+# Input: Amount from Form 1040 line 2a (tax-exempt interest).
+# This is reported for informational purposes even though not taxable.

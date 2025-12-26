@@ -6,27 +6,20 @@
 #      as a deduction only if verified under regulations prescribed by the
 #      Secretary."
 
-module statute.26.170.a
-version "2024.1"
-
-references {
+imports:
   charitable_deduction_before_carryforward: statute/26/170/b/charitable_deduction_before_carryforward
   charitable_carryforward_used: statute/26/170/b/charitable_carryforward_used
-}
 
-variable charitable_deduction {
-  entity TaxUnit
-  period Year
-  dtype Money
-  unit "USD"
-  label "Charitable Contribution Deduction"
-  description "Total deductible charitable contributions for itemized deductions per 26 USC 170(a)"
-    "IRS Publication 526"
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Charitable Contribution Deduction"
+description "Total deductible charitable contributions for itemized deductions per 26 USC 170(a)"
+"IRS Publication 526"
 
-  formula {
-    # Total deduction = current year + carryforward used
-    return charitable_deduction_before_carryforward + charitable_carryforward_used
-  }
+formula:
+  # Total deduction = current year + carryforward used
+  return charitable_deduction_before_carryforward + charitable_carryforward_used
 
-  default 0
-}
+default 0

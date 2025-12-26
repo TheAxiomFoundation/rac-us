@@ -19,56 +19,48 @@
 # - Suspends home equity interest deduction entirely (unless used for
 #   home acquisition or improvement)
 
-module statute.26.163.h
-version "2024.1"
-
-references {
+imports:
   filing_status: statute/26/1/filing_status
   mortgage_interest_paid: inputs/mortgage_interest
   acquisition_debt: inputs/acquisition_debt_amount
   home_equity_debt: inputs/home_equity_debt_amount
   debt_incurred_before_tcja: inputs/mortgage_originated_before_12_16_2017
   home_equity_used_for_improvement: inputs/home_equity_used_for_home_improvement
-}
 
-parameters {
+parameters:
   p: statute/26/163/parameters/qualified_residence
-}
 
-variable qualified_residence_interest {
-  entity TaxUnit
-  period Year
-  dtype Money
-  unit "USD"
-  label "Qualified Residence Interest Deduction"
-  description "Deductible interest on qualified residence per 26 USC 163(h)"
-    "TCJA Section 11043",
-    "IRS Publication 936"
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Qualified Residence Interest Deduction"
+description "Deductible interest on qualified residence per 26 USC 163(h)"
+"TCJA Section 11043",
+"IRS Publication 936"
 
-  formula {
-    # Determine applicable acquisition debt limit
-    let is_mfs = filing_status == "married_separate"
+formula:
+  # Determine applicable acquisition debt limit
+  is_mfs = filing_status == "married_separate"
 
-    # Use pre-TCJA limit ($1M) for grandfathered debt
-    let pre_tcja_limit = is_mfs ? 500000 : 1000000
-    let tcja_limit = is_mfs ? p.acquisition_debt_limit_mfs : p.acquisition_debt_limit
+  # Use pre-TCJA limit ($1M) for grandfathered debt
+  pre_tcja_limit = is_mfs ? 500000 : 1000000
+  tcja_limit = is_mfs ? p.acquisition_debt_limit_mfs : p.acquisition_debt_limit
 
-    let applicable_limit = debt_incurred_before_tcja ? pre_tcja_limit : tcja_limit
+  applicable_limit = debt_incurred_before_tcja ? pre_tcja_limit : tcja_limit
 
-    # Calculate deductible acquisition interest
-    let acquisition_ratio = min(1, applicable_limit / max(1, acquisition_debt))
-    let acquisition_interest = mortgage_interest_paid * acquisition_ratio
+  # Calculate deductible acquisition interest
+  acquisition_ratio = min(1, applicable_limit / max(1, acquisition_debt))
+  acquisition_interest = mortgage_interest_paid * acquisition_ratio
 
-    # Home equity interest: only deductible if used for home improvement (TCJA)
-    let home_equity_limit = is_mfs ? p.home_equity_debt_limit_mfs : p.home_equity_debt_limit
-    let he_deductible = home_equity_used_for_improvement and home_equity_limit > 0
-    let home_equity_ratio = he_deductible ? min(1, home_equity_limit / max(1, home_equity_debt)) : 0
-    let home_equity_interest = mortgage_interest_paid * home_equity_ratio
+  # Home equity interest: only deductible if used for home improvement (TCJA)
+  home_equity_limit = is_mfs ? p.home_equity_debt_limit_mfs : p.home_equity_debt_limit
+  he_deductible = home_equity_used_for_improvement and home_equity_limit > 0
+  home_equity_ratio = he_deductible ? min(1, home_equity_limit / max(1, home_equity_debt)) : 0
+  home_equity_interest = mortgage_interest_paid * home_equity_ratio
 
-    # Note: In practice, mortgage interest is usually just acquisition debt
-    # Home equity is tracked separately
-    return acquisition_interest
-  }
+  # Note: In practice, mortgage interest is usually just acquisition debt
+  # Home equity is tracked separately
+  return acquisition_interest
 
-  default 0
-}
+default 0

@@ -13,38 +13,31 @@
 # - Section 213: Medical expenses (exceeding 7.5% of AGI)
 # - Section 165: Casualty and theft losses (disaster areas only under TCJA)
 
-module statute.26.63.d
-version "2024.1"
-
-references {
-  # Individual itemized deductions from their sections
+imports:
+# Individual itemized deductions from their sections
   interest_deduction: statute/26/163/a/interest_deduction
   salt_deduction: statute/26/164/b/salt_deduction
   charitable_deduction: statute/26/170/a/charitable_deduction
   medical_expense_deduction: statute/26/213/a/medical_expense_deduction
   casualty_loss_deduction: statute/26/165/h/casualty_loss_deduction
-}
 
-variable total_itemized_deductions {
-  entity TaxUnit
-  period Year
-  dtype Money
-  unit "USD"
-  label "Total Itemized Deductions"
-  description "Sum of allowable itemized deductions per 26 USC 63(d)"
-    "IRS Schedule A",
-    "IRS Publication 17"
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Total Itemized Deductions"
+description "Sum of allowable itemized deductions per 26 USC 63(d)"
+"IRS Schedule A",
+"IRS Publication 17"
 
-  formula {
-    # Sum all itemized deduction components
-    let medical = medical_expense_deduction      # 213: Exceeds 7.5% AGI
-    let salt = salt_deduction                     # 164: Capped at $10K (TCJA)
-    let interest = interest_deduction             # 163: Mortgage + investment
-    let charity = charitable_deduction            # 170: Subject to AGI limits
-    let casualty = casualty_loss_deduction        # 165: Disaster areas only (TCJA)
+formula:
+  # Sum all itemized deduction components
+  medical = medical_expense_deduction      # 213: Exceeds 7.5% AGI
+  salt = salt_deduction                     # 164: Capped at $10K (TCJA)
+  interest = interest_deduction             # 163: Mortgage + investment
+  charity = charitable_deduction            # 170: Subject to AGI limits
+  casualty = casualty_loss_deduction        # 165: Disaster areas only (TCJA)
 
-    return medical + salt + interest + charity + casualty
-  }
+  return medical + salt + interest + charity + casualty
 
-  default 0
-}
+default 0

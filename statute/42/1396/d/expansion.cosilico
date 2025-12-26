@@ -24,24 +24,20 @@
 #
 # As of 2024: 40 states + DC have adopted expansion
 
-module statute.42.1396.d.expansion
-version "2024.1"
-
-references {
-  # Income methodology
+imports:
+# Income methodology
   magi_income_pct_fpl_after_disregard: statute/42/1396/b/income_methodology/magi_income_pct_fpl_after_disregard
   magi_household_size: statute/42/1396/b/income_methodology/magi_household_size
 
-  # Income limits
+# Income limits
   income_limit_expansion_adult: statute/42/1396/income_limits/expansion_adult
 
-  # Age thresholds
+# Age thresholds
   age_child_max: statute/42/1396/age_thresholds/child_max
   age_elderly_min: statute/42/1396/age_thresholds/elderly_min
 
-  # State expansion status
+# State expansion status
   state_has_expansion: statute/42/1396/expansion_status/adopted
-}
 
 # =============================================================================
 # ACA EXPANSION ELIGIBILITY COMPONENTS
@@ -49,170 +45,152 @@ references {
 # =============================================================================
 
 # Age requirement: 19-64 (42 USC 1396a(k)(2)(A))
-variable expansion_age_eligible {
-  entity Person
-  period Month
-  dtype Boolean
-  label "Expansion adult age eligible"
-  description "Age 19-64 for ACA expansion per 42 USC 1396a(k)(2)(A)"
+entity Person
+period Month
+dtype Boolean
+label "Expansion adult age eligible"
+description "Age 19-64 for ACA expansion per 42 USC 1396a(k)(2)(A)"
 
-  formula {
-    # Must be at least 19 (not under 19)
-    if age < age_child_max then
-      return false
+formula:
+  # Must be at least 19 (not under 19)
+  if age < age_child_max then
+  return false
 
-    # Must be under 65 (not Medicare aged)
-    if age >= age_elderly_min then
-      return false
+  # Must be under 65 (not Medicare aged)
+  if age >= age_elderly_min then
+  return false
 
-    return true
-  }
+  return true
 
-  default false
-}
+default false
 
 # Not otherwise categorically eligible (42 USC 1396a(k)(2)(C))
-variable expansion_not_otherwise_eligible {
-  entity Person
-  period Month
-  dtype Boolean
-  label "Not in other mandatory group"
-  description "Not eligible through other mandatory Medicaid categories"
+entity Person
+period Month
+dtype Boolean
+label "Not in other mandatory group"
+description "Not eligible through other mandatory Medicaid categories"
 
-  formula {
-    # Expansion adults are a residual category for those not:
-    # - Pregnant (covered under higher limits per 1396a(a)(10)(A)(i)(III))
-    # - Disabled/blind (SSI pathway per 1396a(a)(10)(A)(i)(II))
-    # - Aged (Medicare eligible, separate pathways)
-    # - Parent/caretaker (Section 1931 per 1396u-1, but expansion covers them too)
+formula:
+  # Expansion adults are a residual category for those not:
+  # - Pregnant (covered under higher limits per 1396a(a)(10)(A)(i)(III))
+  # - Disabled/blind (SSI pathway per 1396a(a)(10)(A)(i)(II))
+  # - Aged (Medicare eligible, separate pathways)
+  # - Parent/caretaker (Section 1931 per 1396u-1, but expansion covers them too)
 
-    # Pregnant women have separate, often higher, income limits
-    if is_pregnant then
-      return false
+  # Pregnant women have separate, often higher, income limits
+  if is_pregnant then
+  return false
 
-    # SSI recipients are categorically eligible (separate pathway)
-    if receives_ssi then
-      return false
+  # SSI recipients are categorically eligible (separate pathway)
+  if receives_ssi then
+  return false
 
-    return true
-  }
+  return true
 
-  default true
-}
+default true
 
 # Not entitled to Medicare (42 USC 1396a(k)(2)(D))
-variable expansion_not_medicare {
-  entity Person
-  period Month
-  dtype Boolean
-  label "Not Medicare entitled"
-  description "Not entitled to or enrolled in Medicare Parts A or B"
+entity Person
+period Month
+dtype Boolean
+label "Not Medicare entitled"
+description "Not entitled to or enrolled in Medicare Parts A or B"
 
-  formula {
-    # Cannot be entitled to Medicare Part A or enrolled in Part B
-    # Dual eligibles have separate pathways
-    if is_entitled_medicare_a then
-      return false
+formula:
+  # Cannot be entitled to Medicare Part A or enrolled in Part B
+  # Dual eligibles have separate pathways
+  if is_entitled_medicare_a then
+  return false
 
-    if is_enrolled_medicare_b then
-      return false
+  if is_enrolled_medicare_b then
+  return false
 
-    return true
-  }
+  return true
 
-  default true
-}
+default true
 
 # State has adopted ACA expansion
-variable expansion_available_in_state {
-  entity Person
-  period Month
-  dtype Boolean
-  label "Expansion available in state"
-  description "State has adopted ACA Medicaid expansion"
-    "42 USC 1396a(a)(10)(A)(i)(VIII)",
-    "NFIB v. Sebelius, 567 U.S. 519 (2012)"
+entity Person
+period Month
+dtype Boolean
+label "Expansion available in state"
+description "State has adopted ACA Medicaid expansion"
+"42 USC 1396a(a)(10)(A)(i)(VIII)",
+"NFIB v. Sebelius, 567 U.S. 519 (2012)"
 
-  formula {
-    # After NFIB v. Sebelius (2012), expansion is optional for states
-    # As of 2024: 40 states + DC have adopted
-    # Non-expansion states: AL, FL, GA, KS, MS, SC, TN, TX, WI, WY
-    return state_has_expansion
-  }
+formula:
+  # After NFIB v. Sebelius (2012), expansion is optional for states
+  # As of 2024: 40 states + DC have adopted
+  # Non-expansion states: AL, FL, GA, KS, MS, SC, TN, TX, WI, WY
+  return state_has_expansion
 
-  default false
-}
+default false
 
 # Income eligibility for expansion adults
-variable expansion_income_eligible {
-  entity Person
-  period Month
-  dtype Boolean
-  label "Expansion income eligible"
-  description "Income at or below 133% FPL (138% with disregard)"
-    "42 USC 1396a(k)(2)(E)",
-    "42 CFR 435.603(d)(4)"
+entity Person
+period Month
+dtype Boolean
+label "Expansion income eligible"
+description "Income at or below 133% FPL (138% with disregard)"
+"42 USC 1396a(k)(2)(E)",
+"42 CFR 435.603(d)(4)"
 
-  formula {
-    # Get household income as % FPL after 5% disregard
-    let income_pct = household.magi_income_pct_fpl_after_disregard
+formula:
+  # Get household income as % FPL after 5% disregard
+  income_pct = household.magi_income_pct_fpl_after_disregard
 
-    # Statutory limit is 133% FPL per 42 USC 1396a(k)(2)(E)
-    # With 5% disregard per 42 CFR 435.603(d)(4), effective limit is 138% FPL
-    let limit = income_limit_expansion_adult
+  # Statutory limit is 133% FPL per 42 USC 1396a(k)(2)(E)
+  # With 5% disregard per 42 CFR 435.603(d)(4), effective limit is 138% FPL
+  limit = income_limit_expansion_adult
 
-    # If limit is 0, expansion not available
-    if limit <= 0 then
-      return false
+  # If limit is 0, expansion not available
+  if limit <= 0 then
+  return false
 
-    return income_pct <= limit
-  }
+  return income_pct <= limit
 
-  default false
-}
+default false
 
 # =============================================================================
 # OVERALL EXPANSION ELIGIBILITY
 # =============================================================================
 
 # ACA expansion adult eligibility (combined)
-variable medicaid_expansion_eligible {
-  entity Person
-  period Month
-  dtype Boolean
-  label "ACA expansion eligible"
-  description "Eligible for Medicaid under ACA expansion per 42 USC 1396a(a)(10)(A)(i)(VIII)"
-    "42 USC 1396a(a)(10)(A)(i)(VIII)",
-    "42 USC 1396a(k)(2)"
+entity Person
+period Month
+dtype Boolean
+label "ACA expansion eligible"
+description "Eligible for Medicaid under ACA expansion per 42 USC 1396a(a)(10)(A)(i)(VIII)"
+"42 USC 1396a(a)(10)(A)(i)(VIII)",
+"42 USC 1396a(k)(2)"
 
-  formula {
-    # All requirements must be met
+formula:
+  # All requirements must be met
 
-    # Must be in a state that adopted expansion
-    if not expansion_available_in_state then
-      return false
+  # Must be in a state that adopted expansion
+  if not expansion_available_in_state then
+  return false
 
-    # Must meet age requirement (19-64)
-    if not expansion_age_eligible then
-      return false
+  # Must meet age requirement (19-64)
+  if not expansion_age_eligible then
+  return false
 
-    # Must not be in other mandatory category
-    if not expansion_not_otherwise_eligible then
-      return false
+  # Must not be in other mandatory category
+  if not expansion_not_otherwise_eligible then
+  return false
 
-    # Must not be Medicare entitled
-    if not expansion_not_medicare then
-      return false
+  # Must not be Medicare entitled
+  if not expansion_not_medicare then
+  return false
 
-    # Must meet income requirement
-    if not expansion_income_eligible then
-      return false
+  # Must meet income requirement
+  if not expansion_income_eligible then
+  return false
 
-    return true
-  }
+  return true
 
-  default false
-}
+default false
 
 # =============================================================================
 # PARENT/CARETAKER RELATIVES UNDER EXPANSION
@@ -221,36 +199,33 @@ variable medicaid_expansion_eligible {
 # =============================================================================
 
 # Parent/caretaker eligibility (ACA expansion or Section 1931)
-variable parent_caretaker_eligible {
-  entity Person
-  period Month
-  dtype Boolean
-  label "Parent/caretaker eligible"
-  description "Parent eligibility via expansion or Section 1931"
-    "42 USC 1396u-1",
-    "42 USC 1396a(a)(10)(A)(i)(VIII)"
+entity Person
+period Month
+dtype Boolean
+label "Parent/caretaker eligible"
+description "Parent eligibility via expansion or Section 1931"
+"42 USC 1396u-1",
+"42 USC 1396a(a)(10)(A)(i)(VIII)"
 
-  formula {
-    # Must be a parent or caretaker relative
-    if not is_parent_or_caretaker then
-      return false
+formula:
+  # Must be a parent or caretaker relative
+  if not is_parent_or_caretaker then
+  return false
 
-    # Must have a dependent child in household
-    if not has_dependent_child then
-      return false
+  # Must have a dependent child in household
+  if not has_dependent_child then
+  return false
 
-    # In expansion states: covered under expansion at 133% FPL
-    if expansion_available_in_state then
-      return expansion_income_eligible
+  # In expansion states: covered under expansion at 133% FPL
+  if expansion_available_in_state then
+  return expansion_income_eligible
 
-    # In non-expansion states: Section 1931 with state-specific limits
-    # These limits are often very low (17-100% FPL pre-ACA)
-    # State-specific implementation needed
-    return false
-  }
+  # In non-expansion states: Section 1931 with state-specific limits
+  # These limits are often very low (17-100% FPL pre-ACA)
+  # State-specific implementation needed
+  return false
 
-  default false
-}
+default false
 
 # =============================================================================
 # EXPANSION GROUP CATEGORY
@@ -258,28 +233,25 @@ variable parent_caretaker_eligible {
 # =============================================================================
 
 # Expansion group classification
-variable medicaid_expansion_category {
-  entity Person
-  period Month
-  dtype Category  # newly_eligible, parent_caretaker, not_applicable
-  label "Expansion category"
-  description "Type of ACA expansion eligibility"
+entity Person
+period Month
+dtype Category  # newly_eligible, parent_caretaker, not_applicable
+label "Expansion category"
+description "Type of ACA expansion eligibility"
 
-  formula {
-    # Parents/caretakers: special category for FMAP purposes
-    if is_parent_or_caretaker and has_dependent_child then
-      if medicaid_expansion_eligible then
-        return "parent_caretaker"
+formula:
+  # Parents/caretakers: special category for FMAP purposes
+  if is_parent_or_caretaker and has_dependent_child then
+  if medicaid_expansion_eligible then
+  return "parent_caretaker"
 
-    # Newly eligible adults (childless adults, etc.)
-    if medicaid_expansion_eligible then
-      return "newly_eligible"
+  # Newly eligible adults (childless adults, etc.)
+  if medicaid_expansion_eligible then
+  return "newly_eligible"
 
-    return "not_applicable"
-  }
+  return "not_applicable"
 
-  default "not_applicable"
-}
+default "not_applicable"
 
 # =============================================================================
 # FEDERAL MATCHING RATE (FMAP) IMPLICATIONS
@@ -288,25 +260,22 @@ variable medicaid_expansion_category {
 
 # Enhanced FMAP eligibility
 # Newly eligible adults get enhanced federal matching (90% as of 2020+)
-variable qualifies_for_enhanced_fmap {
-  entity Person
-  period Month
-  dtype Boolean
-  label "Qualifies for enhanced FMAP"
-  description "Eligible for enhanced federal match under expansion"
+entity Person
+period Month
+dtype Boolean
+label "Qualifies for enhanced FMAP"
+description "Eligible for enhanced federal match under expansion"
 
-  formula {
-    # Only newly eligible adults (not parents in pre-expansion states)
-    # get the enhanced federal match rate
-    if not medicaid_expansion_eligible then
-      return false
+formula:
+  # Only newly eligible adults (not parents in pre-expansion states)
+  # get the enhanced federal match rate
+  if not medicaid_expansion_eligible then
+  return false
 
-    let category = medicaid_expansion_category
+  category = medicaid_expansion_category
 
-    # 42 USC 1396d(y)(1): "newly eligible individual"
-    # Does NOT include those who would have been eligible pre-expansion
-    return category == "newly_eligible"
-  }
+  # 42 USC 1396d(y)(1): "newly eligible individual"
+  # Does NOT include those who would have been eligible pre-expansion
+  return category == "newly_eligible"
 
-  default false
-}
+default false

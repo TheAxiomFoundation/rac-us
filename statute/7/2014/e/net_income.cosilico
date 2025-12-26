@@ -8,74 +8,67 @@
 #   (5) Medical expenses over $35 (elderly/disabled only)
 #   (6) Excess shelter (shelter costs - 50% adjusted income)
 
-references {
+imports:
   earned_income_deduction_rate: statute/7/2014/e/1/earned_income_deduction_rate
   standard_deduction: statute/7/2014/e/1/standard_deduction
   shelter_deduction_cap: statute/7/2014/e/6/shelter_deduction_cap
   snap_dependent_care_deduction: statute/7/2014/e/3/snap_dependent_care_deduction
   snap_child_support_deduction: statute/7/2014/e/4/snap_child_support_deduction
   snap_medical_expense_deduction: statute/7/2014/e/5/snap_medical_expense_deduction
-}
 
-variable snap_net_income {
-  entity Household
-  period Month
-  dtype Money
+entity Household
+period Month
+dtype Money
 
-  formula {
-    # Step 1: § 2014(e)(1) - Earned income deduction (20%)
-    let earned_deduction = earned_income * earned_income_deduction_rate
+formula:
+  # Step 1: § 2014(e)(1) - Earned income deduction (20%)
+  earned_deduction = earned_income * earned_income_deduction_rate
 
-    # Step 2: § 2014(e)(1) - Standard deduction (by household size)
-    let std_deduction = standard_deduction[household_size]
+  # Step 2: § 2014(e)(1) - Standard deduction (by household size)
+  std_deduction = standard_deduction[household_size]
 
-    # Step 3: § 2014(e)(3) - Dependent care deduction
-    let care_deduction = snap_dependent_care_deduction
+  # Step 3: § 2014(e)(3) - Dependent care deduction
+  care_deduction = snap_dependent_care_deduction
 
-    # Step 4: § 2014(e)(4) - Child support payments
-    let support_deduction = snap_child_support_deduction
+  # Step 4: § 2014(e)(4) - Child support payments
+  support_deduction = snap_child_support_deduction
 
-    # Step 5: § 2014(e)(5) - Medical expenses (elderly/disabled only)
-    let medical_deduction = snap_medical_expense_deduction
+  # Step 5: § 2014(e)(5) - Medical expenses (elderly/disabled only)
+  medical_deduction = snap_medical_expense_deduction
 
-    # Adjusted income before shelter
-    let pre_shelter_deductions = earned_deduction + std_deduction + care_deduction + support_deduction + medical_deduction
-    let adjusted_income = max(0, gross_income - pre_shelter_deductions)
+  # Adjusted income before shelter
+  pre_shelter_deductions = earned_deduction + std_deduction + care_deduction + support_deduction + medical_deduction
+  adjusted_income = max(0, gross_income - pre_shelter_deductions)
 
-    # Step 6: § 2014(e)(6) - Excess shelter deduction
-    let shelter_deduction = snap_shelter_deduction
+  # Step 6: § 2014(e)(6) - Excess shelter deduction
+  shelter_deduction = snap_shelter_deduction
 
-    return max(0, adjusted_income - shelter_deduction)
-  }
-}
+  return max(0, adjusted_income - shelter_deduction)
 
-variable snap_shelter_deduction {
-  entity Household
-  period Month
-  dtype Money
+entity Household
+period Month
+dtype Money
 
-  formula {
-    # Calculate income after all deductions except shelter
-    let earned_deduction = earned_income * earned_income_deduction_rate
-    let std_deduction = standard_deduction[household_size]
-    let pre_shelter_deductions = earned_deduction + std_deduction
-      + snap_dependent_care_deduction
-      + snap_child_support_deduction
-      + snap_medical_expense_deduction
+formula:
+  # Calculate income after all deductions except shelter
+  earned_deduction = earned_income * earned_income_deduction_rate
+  std_deduction = standard_deduction[household_size]
+  pre_shelter_deductions = earned_deduction + std_deduction
+  + snap_dependent_care_deduction
+  + snap_child_support_deduction
+  + snap_medical_expense_deduction
 
-    let adjusted = max(0, gross_income - pre_shelter_deductions)
+  adjusted = max(0, gross_income - pre_shelter_deductions)
 
-    # § 2014(e)(6)(A): Excess shelter = shelter costs - 50% adjusted income
-    let excess = shelter_costs - (adjusted * 0.5)
+  # § 2014(e)(6)(A): Excess shelter = shelter costs - 50% adjusted income
+  excess = shelter_costs - (adjusted * 0.5)
 
-    if excess <= 0 then
-      return 0
+  if excess <= 0 then
+  return 0
 
-    # § 2014(e)(6)(B): Cap for non-elderly/disabled households
-    # § 2014(e)(6)(C): No cap for elderly/disabled households
-    if has_elderly_disabled then
-      return excess
+  # § 2014(e)(6)(B): Cap for non-elderly/disabled households
+  # § 2014(e)(6)(C): No cap for elderly/disabled households
+  if has_elderly_disabled then
+  return excess
 
-    return min(excess, shelter_deduction_cap)
-  }
-}
+  return min(excess, shelter_deduction_cap)

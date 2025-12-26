@@ -13,11 +13,8 @@
 #   (b)(2) - Eligibility (categorical or income-based)
 #   (b)(5) - Benefit targeting (highest energy burden, vulnerable populations)
 
-module statute.42.8624
-version "2024.1"
-
-references {
-  # Eligibility components
+imports:
+# Eligibility components
   liheap_eligible: statute/42/8624/b/eligibility/liheap_eligible
   liheap_income_eligible: statute/42/8624/b/eligibility/liheap_income_eligible
   liheap_categorically_eligible: statute/42/8624/b/eligibility/liheap_categorically_eligible
@@ -25,30 +22,28 @@ references {
   liheap_heating_eligible: statute/42/8624/b/eligibility/liheap_heating_eligible
   liheap_cooling_eligible: statute/42/8624/b/eligibility/liheap_cooling_eligible
 
-  # Benefit components
+# Benefit components
   liheap: statute/42/8624/c/benefit_calculation/liheap
   liheap_energy_burden: statute/42/8624/c/benefit_calculation/liheap_energy_burden
   liheap_heating_assistance: statute/42/8624/c/benefit_calculation/liheap_heating_assistance
   liheap_cooling_assistance: statute/42/8624/c/benefit_calculation/liheap_cooling_assistance
-}
 
 # Export main eligibility and benefit variables
 exports {
-  # Primary outputs
-  liheap_eligible
-  liheap
+# Primary outputs
+liheap_eligible
+liheap
 
-  # Eligibility details
-  liheap_income_eligible
-  liheap_categorically_eligible
+# Eligibility details
+liheap_income_eligible
+liheap_categorically_eligible
 
-  # Assistance types
-  liheap_heating_eligible
-  liheap_cooling_eligible
-  liheap_heating_assistance
-  liheap_cooling_assistance
+# Assistance types
+liheap_heating_eligible
+liheap_cooling_eligible
+liheap_heating_assistance
+liheap_cooling_assistance
 
-  # Targeting
-  liheap_energy_burden
-  liheap_vulnerable_household
-}
+# Targeting
+liheap_energy_burden
+liheap_vulnerable_household

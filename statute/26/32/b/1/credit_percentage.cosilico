@@ -1,10 +1,8 @@
 # 26 USC §32(b)(1) - Credit Percentage
 # Loaded from credit_percentage.yaml
 
-variable credit_percentage {
-  entity TaxUnit
-  period Year
-  dtype Rate
-  # Parameter: varies by num_qualifying_children
-  # 0: 7.65%, 1: 34%, 2: 40%, 3+: 45%
-}
+entity TaxUnit
+period Year
+dtype Rate
+# Parameter: varies by num_qualifying_children
+# 0: 7.65%, 1: 34%, 2: 40%, 3+: 45%

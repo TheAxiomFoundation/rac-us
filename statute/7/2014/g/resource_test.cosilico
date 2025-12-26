@@ -8,45 +8,38 @@
 # Excludes: home, household goods, one vehicle (up to fair market value limit),
 # retirement accounts, and certain income-producing property.
 
-references {
+imports:
   resource_limit: statute/7/2014/g/resource_limit
   resource_limit_elderly_disabled: statute/7/2014/g/resource_limit_elderly_disabled
-}
 
-variable snap_resource_eligible {
-  entity Household
-  period Month
-  dtype Boolean
+entity Household
+period Month
+dtype Boolean
 
-  formula {
-    # § 2014(g)(1)(B): Higher limit for elderly/disabled households
-    let limit = has_elderly_disabled
-      ? resource_limit_elderly_disabled
-      : resource_limit
+formula:
+  # § 2014(g)(1)(B): Higher limit for elderly/disabled households
+  limit = has_elderly_disabled
+  ? resource_limit_elderly_disabled
+  : resource_limit
 
-    return countable_resources <= limit
-  }
-}
+  return countable_resources <= limit
 
 # Helper variable to calculate countable resources
 # Excludes: home, household goods, one vehicle (up to FMV limit),
 # retirement accounts, and certain other exempt resources
-variable snap_countable_resources {
-  entity Household
-  period Month
-  dtype Money
+entity Household
+period Month
+dtype Money
 
-  formula {
-    # Start with total liquid assets
-    let liquid = bank_accounts + cash_on_hand
+formula:
+  # Start with total liquid assets
+  liquid = bank_accounts + cash_on_hand
 
-    # Add non-exempt financial assets
-    let financial = stocks + bonds + other_financial_assets
+  # Add non-exempt financial assets
+  financial = stocks + bonds + other_financial_assets
 
-    # Vehicle equity above exclusion (if applicable)
-    # Per § 2014(g)(2)(B), one vehicle is excluded up to fair market value limit
-    let vehicle_excess = max(0, vehicle_fair_market_value - vehicle_fair_market_value_exclusion)
+  # Vehicle equity above exclusion (if applicable)
+  # Per § 2014(g)(2)(B), one vehicle is excluded up to fair market value limit
+  vehicle_excess = max(0, vehicle_fair_market_value - vehicle_fair_market_value_exclusion)
 
-    return liquid + financial + vehicle_excess
-  }
-}
+  return liquid + financial + vehicle_excess

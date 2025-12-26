@@ -9,19 +9,14 @@
 # losses). If there is a net capital loss, it does not reduce other
 # components of disqualified income.
 
-module statute.26.1222.11
-version "2024.1"
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Capital Gain Net Income"
+description "Net capital gains (gains minus losses) per 26 USC §1222(11), counted for EITC investment income test"
 
-variable capital_gain_net_income {
-  entity TaxUnit
-  period Year
-  dtype Money
-  unit "USD"
-  label "Capital Gain Net Income"
-  description "Net capital gains (gains minus losses) per 26 USC §1222(11), counted for EITC investment income test"
-
-  # Input: From Schedule D, the excess of capital gains over capital losses.
-  # If losses exceed gains, this is zero for EITC purposes (cannot reduce
-  # other disqualified income). Includes both short-term and long-term
-  # capital gains.
-}
+# Input: From Schedule D, the excess of capital gains over capital losses.
+# If losses exceed gains, this is zero for EITC purposes (cannot reduce
+# other disqualified income). Includes both short-term and long-term
+# capital gains.

@@ -4,17 +4,12 @@
 # These are expenses for the care of a qualifying individual that enable the
 # taxpayer to be gainfully employed.
 
-module statute.26.21.a
-version "2024.1"
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "CDCC Expenses Paid"
+description "Employment-related child/dependent care expenses paid during the year"
 
-variable cdcc_expenses_paid {
-  entity TaxUnit
-  period Year
-  dtype Money
-  unit "USD"
-  label "CDCC Expenses Paid"
-  description "Employment-related child/dependent care expenses paid during the year"
-
-  # Input variable - no formula
-  default 0
-}
+# Input variable - no formula
+default 0

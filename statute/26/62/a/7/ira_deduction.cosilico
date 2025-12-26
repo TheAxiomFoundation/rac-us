@@ -17,157 +17,129 @@
 #   - MFJ (only spouse covered): $230,000 - $240,000 MAGI
 #   - MFS: $0 - $10,000 MAGI
 
-module statute.26.62.a.7
-version "2024.1"
-
-parameters {
-  # Regular contribution limit
+parameters:
+# Regular contribution limit
   contribution_limit: 7000  # 2024
 
-  # Catch-up contribution for age 50+
+# Catch-up contribution for age 50+
   catch_up_amount: 1000
 
-  # Age at which catch-up contributions allowed
+# Age at which catch-up contributions allowed
   catch_up_age: 50
 
-  # Phase-out thresholds when covered by employer plan - Single
+# Phase-out thresholds when covered by employer plan - Single
   phaseout_single_start: 77000
   phaseout_single_end: 87000
 
-  # Phase-out thresholds when covered by employer plan - MFJ (contributor covered)
+# Phase-out thresholds when covered by employer plan - MFJ (contributor covered)
   phaseout_joint_start: 123000
   phaseout_joint_end: 143000
 
-  # Phase-out thresholds when only spouse is covered - MFJ
+# Phase-out thresholds when only spouse is covered - MFJ
   phaseout_spouse_covered_start: 230000
   phaseout_spouse_covered_end: 240000
 
-  # Phase-out for MFS when either spouse is covered
+# Phase-out for MFS when either spouse is covered
   phaseout_mfs_start: 0
   phaseout_mfs_end: 10000
-}
 
-references {
+imports:
   filing_status: statute/26/1/filing_status
-}
 
-variable traditional_ira_contributions {
-  entity Person
-  period Year
-  dtype Money
-  unit "USD"
-  label "Traditional IRA Contributions"
-  description "Contributions made to traditional IRA during the tax year"
+entity Person
+period Year
+dtype Money
+unit "USD"
+label "Traditional IRA Contributions"
+description "Contributions made to traditional IRA during the tax year"
 
-  # Input variable - amount contributed by taxpayer
-}
+# Input variable - amount contributed by taxpayer
 
-variable has_retirement_plan_at_work {
-  entity Person
-  period Year
-  dtype Boolean
-  label "Covered by Employer Retirement Plan"
-  description "Whether the individual is an active participant in an employer retirement plan"
+entity Person
+period Year
+dtype Boolean
+label "Covered by Employer Retirement Plan"
+description "Whether the individual is an active participant in an employer retirement plan"
 
-  # Input variable - determines whether phase-out applies
-}
+# Input variable - determines whether phase-out applies
 
-variable ira_contribution_limit {
-  entity Person
-  period Year
-  dtype Money
-  unit "USD"
-  label "IRA Contribution Limit"
-  description "Maximum allowable IRA contribution including catch-up"
+entity Person
+period Year
+dtype Money
+unit "USD"
+label "IRA Contribution Limit"
+description "Maximum allowable IRA contribution including catch-up"
 
-  formula {
-    let base_limit = contribution_limit
+formula:
+  base_limit = contribution_limit
 
-    # Add catch-up contribution if age 50 or older
-    if age >= catch_up_age {
-      return base_limit + catch_up_amount
-    }
-    return base_limit
-  }
-}
+  # Add catch-up contribution if age 50 or older
+  if age >= catch_up_age {
+  return base_limit + catch_up_amount
+return base_limit
 
-variable ira_deduction_before_phaseout {
-  entity Person
-  period Year
-  dtype Money
-  unit "USD"
-  label "IRA Deduction Before Phase-out"
-  description "IRA deduction amount before applying income phase-out"
+entity Person
+period Year
+dtype Money
+unit "USD"
+label "IRA Deduction Before Phase-out"
+description "IRA deduction amount before applying income phase-out"
 
-  formula {
-    # Cannot deduct more than contributed or the annual limit
-    return min(traditional_ira_contributions, ira_contribution_limit)
-  }
-}
+formula:
+  # Cannot deduct more than contributed or the annual limit
+  return min(traditional_ira_contributions, ira_contribution_limit)
 
-variable ira_phaseout_ratio {
-  entity Person
-  period Year
-  dtype Rate
-  label "IRA Deduction Phase-out Ratio"
-  description "Ratio of IRA deduction that is phased out based on income"
+entity Person
+period Year
+dtype Rate
+label "IRA Deduction Phase-out Ratio"
+description "Ratio of IRA deduction that is phased out based on income"
 
-  formula {
-    # If not covered by employer plan (and spouse not covered for joint),
-    # no phase-out applies
-    if not has_retirement_plan_at_work {
-      # Check if spouse is covered (for joint filers)
-      # Simplified: if neither covered, no phase-out
-      return 0
-    }
+formula:
+  # If not covered by employer plan (and spouse not covered for joint),
+  # no phase-out applies
+  if not has_retirement_plan_at_work {
+  # Check if spouse is covered (for joint filers)
+  # Simplified: if neither covered, no phase-out
+  return 0
 
-    # Determine phase-out range based on filing status
-    let start = phaseout_single_start
-    let end = phaseout_single_end
+# Determine phase-out range based on filing status
+let start = phaseout_single_start
+let end = phaseout_single_end
 
-    # Note: Actual implementation would use tax unit's MAGI
-    # This is simplified for demonstration
-    let magi = adjusted_gross_income  # Circular reference - would need MAGI
+# Note: Actual implementation would use tax unit's MAGI
+# This is simplified for demonstration
+let magi = adjusted_gross_income  # Circular reference - would need MAGI
 
-    if magi <= start {
-      return 0  # No phase-out
-    }
-    if magi >= end {
-      return 1  # Fully phased out
-    }
+if magi <= start {
+return 0  # No phase-out
+if magi >= end {
+return 1  # Fully phased out
 
-    # Proportional phase-out
-    return (magi - start) / (end - start)
-  }
-}
+# Proportional phase-out
+return (magi - start) / (end - start)
 
-variable ira_deduction {
-  entity Person
-  period Year
-  dtype Money
-  unit "USD"
-  label "IRA Deduction"
-  description "Above-the-line deduction for traditional IRA contributions"
+entity Person
+period Year
+dtype Money
+unit "USD"
+label "IRA Deduction"
+description "Above-the-line deduction for traditional IRA contributions"
 
-  formula {
-    let base_deduction = ira_deduction_before_phaseout
-    let phaseout = ira_phaseout_ratio
+formula:
+  base_deduction = ira_deduction_before_phaseout
+  phaseout = ira_phaseout_ratio
 
-    # Apply phase-out
-    return base_deduction * (1 - phaseout)
-  }
-}
+  # Apply phase-out
+  return base_deduction * (1 - phaseout)
 
 # Tax unit level aggregation
-variable ira_deduction_total {
-  entity TaxUnit
-  period Year
-  dtype Money
-  unit "USD"
-  label "Total IRA Deduction"
-  description "Combined IRA deduction for tax unit"
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Total IRA Deduction"
+description "Combined IRA deduction for tax unit"
 
-  formula {
-    return sum(members.ira_deduction)
-  }
-}
+formula:
+  return sum(members.ira_deduction)

@@ -7,26 +7,19 @@
 #
 # Note: Amount is $2,000 for 2018-2025 per TCJA.
 
-module statute.26.24.a.1
-version "2024.1"
-
-references {
-  # Number of qualifying children
+imports:
+# Number of qualifying children
   num_ctc_qualifying_children: statute/26/24/c/3/num_qualifying_children
 
-  # Credit amount per child
+# Credit amount per child
   credit_per_child: statute/26/24/a/credit_amount#credit_per_child
-}
 
-variable child_tax_credit_amount {
-  entity TaxUnit
-  period Year
-  dtype Money
-  unit "USD"
-  label "CTC Amount Before Phase-Out"
-  description "Total Child Tax Credit amount before phase-out reduction per 26 USC § 24(a)"
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "CTC Amount Before Phase-Out"
+description "Total Child Tax Credit amount before phase-out reduction per 26 USC § 24(a)"
 
-  formula {
-    return num_ctc_qualifying_children * credit_per_child
-  }
-}
+formula:
+  return num_ctc_qualifying_children * credit_per_child

@@ -14,82 +14,69 @@
 #
 # Note: Personal exemptions suspended 2018-2025 by TCJA Section 11041.
 
-module statute.26.63.a
-version "2024.1"
-
-references {
+imports:
   adjusted_gross_income: statute/26/62/a/adjusted_gross_income
   standard_deduction: statute/26/63/c/standard_deduction
   total_itemized_deductions: statute/26/63/d/total_itemized_deductions
   personal_exemption: statute/26/151/personal_exemption
-}
 
-variable deductions_from_agi {
-  entity TaxUnit
-  period Year
-  dtype Money
-  unit "USD"
-  label "Deductions from AGI"
-  description "Greater of standard or itemized deductions per 26 USC 63"
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Deductions from AGI"
+description "Greater of standard or itemized deductions per 26 USC 63"
 
-  formula {
-    # § 63(e): Election to itemize
-    # Taxpayer takes larger of standard or itemized deductions
-    # (unless ineligible for standard deduction)
+formula:
+  # § 63(e): Election to itemize
+  # Taxpayer takes larger of standard or itemized deductions
+  # (unless ineligible for standard deduction)
 
-    let std = standard_deduction
-    let itemized = total_itemized_deductions
+  std = standard_deduction
+  itemized = total_itemized_deductions
 
-    # Note: If standard_deduction is 0 (ineligible), must itemize
-    if std == 0 then
-      return itemized
+  # Note: If standard_deduction is 0 (ineligible), must itemize
+  if std == 0 then
+  return itemized
 
-    # Otherwise take the larger
-    return max(std, itemized)
-  }
+  # Otherwise take the larger
+  return max(std, itemized)
 
-  default 0
-}
+default 0
 
-variable takes_standard_deduction {
-  entity TaxUnit
-  period Year
-  dtype Boolean
-  label "Takes Standard Deduction"
-  description "Whether taxpayer uses standard vs itemized deduction"
+entity TaxUnit
+period Year
+dtype Boolean
+label "Takes Standard Deduction"
+description "Whether taxpayer uses standard vs itemized deduction"
 
-  formula {
-    # Taxpayer takes standard if:
-    # 1. Eligible for standard deduction, AND
-    # 2. Standard deduction >= itemized deductions
+formula:
+  # Taxpayer takes standard if:
+  # 1. Eligible for standard deduction, AND
+  # 2. Standard deduction >= itemized deductions
 
-    let std = standard_deduction
-    let itemized = total_itemized_deductions
+  std = standard_deduction
+  itemized = total_itemized_deductions
 
-    return std > 0 and std >= itemized
-  }
+  return std > 0 and std >= itemized
 
-  default true
-}
+default true
 
-variable taxable_income {
-  entity TaxUnit
-  period Year
-  dtype Money
-  unit "USD"
-  label "Taxable Income"
-  description "Adjusted gross income minus deductions per 26 USC 63"
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Taxable Income"
+description "Adjusted gross income minus deductions per 26 USC 63"
 
-  formula {
-    let agi = adjusted_gross_income
-    let deductions = deductions_from_agi
+formula:
+  agi = adjusted_gross_income
+  deductions = deductions_from_agi
 
-    # Personal exemption (suspended 2018-2025 by TCJA Section 11041)
-    let exemptions = personal_exemption
+  # Personal exemption (suspended 2018-2025 by TCJA Section 11041)
+  exemptions = personal_exemption
 
-    # Taxable income cannot be negative
-    return max(0, agi - deductions - exemptions)
-  }
+  # Taxable income cannot be negative
+  return max(0, agi - deductions - exemptions)
 
-  default 0
-}
+default 0

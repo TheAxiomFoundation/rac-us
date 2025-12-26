@@ -23,18 +23,17 @@
 # Note: Residency requirement is implemented but WIC explicitly prohibits
 # durational residency requirements (must only be physically present in state).
 
-references {
-  # Categorical eligibility
+imports:
+# Categorical eligibility
   wic_category: statute/42/1786/d/1/wic_category
   is_wic_categorical_eligible: statute/42/1786/d/1/is_wic_categorical_eligible
 
-  # Income eligibility
+# Income eligibility
   is_wic_person_income_eligible: statute/42/1786/d/2/is_wic_person_income_eligible
   is_wic_income_eligible: statute/42/1786/d/2/is_wic_income_eligible
 
-  # Adjunctive eligibility
+# Adjunctive eligibility
   is_wic_adjunctively_eligible: statute/42/1786/d/3/is_wic_adjunctively_eligible
-}
 
 # =============================================================================
 # RESIDENCY ELIGIBILITY
@@ -42,18 +41,15 @@ references {
 # residency requirements allowed
 # =============================================================================
 
-variable is_wic_residency_eligible {
-  entity Person
-  period Month
-  dtype Boolean
+entity Person
+period Month
+dtype Boolean
 
-  formula {
-    # 42 USC 1786(d)(3) prohibits durational residency requirements
-    # Person must only be physically present in the state where applying
-    # This is typically captured by is_us_resident at federal level
-    return is_us_resident
-  }
-}
+formula:
+  # 42 USC 1786(d)(3) prohibits durational residency requirements
+  # Person must only be physically present in the state where applying
+  # This is typically captured by is_us_resident at federal level
+  return is_us_resident
 
 # =============================================================================
 # NUTRITIONAL RISK
@@ -61,96 +57,81 @@ variable is_wic_residency_eligible {
 # Cannot be modeled - assumed met for modeling purposes
 # =============================================================================
 
-variable is_wic_nutritional_risk_eligible {
-  entity Person
-  period Month
-  dtype Boolean
+entity Person
+period Month
+dtype Boolean
 
-  formula {
-    # Nutritional risk must be determined by a "competent professional
-    # authority" through:
-    # - Anthropometric measurements (height, weight, head circumference)
-    # - Biochemical data (blood tests for anemia, lead)
-    # - Clinical data (medical history)
-    # - Dietary assessment
-    #
-    # Cannot be modeled computationally. In practice, the vast majority
-    # (>90%) of applicants who meet categorical and income requirements
-    # are found to have at least one nutritional risk factor.
-    #
-    # For modeling purposes, we assume nutritional risk is met.
-    return true
-  }
-}
+formula:
+  # Nutritional risk must be determined by a "competent professional
+  # authority" through:
+  # - Anthropometric measurements (height, weight, head circumference)
+  # - Biochemical data (blood tests for anemia, lead)
+  # - Clinical data (medical history)
+  # - Dietary assessment
+  #
+  # Cannot be modeled computationally. In practice, the vast majority
+  # (>90%) of applicants who meet categorical and income requirements
+  # are found to have at least one nutritional risk factor.
+  #
+  # For modeling purposes, we assume nutritional risk is met.
+  return true
 
 # =============================================================================
 # COMBINED ELIGIBILITY DETERMINATION
 # =============================================================================
 
 # Main WIC eligibility determination
-variable wic_eligible {
-  entity Person
-  period Month
-  dtype Boolean
+entity Person
+period Month
+dtype Boolean
 
-  formula {
-    # 42 USC 1786(d): All requirements must be met
+formula:
+  # 42 USC 1786(d): All requirements must be met
 
-    # (1) Categorical eligibility - must be pregnant, postpartum,
-    #     breastfeeding woman, infant, or child under 5
-    if not is_wic_categorical_eligible then
-      return false
+  # (1) Categorical eligibility - must be pregnant, postpartum,
+  #     breastfeeding woman, infant, or child under 5
+  if not is_wic_categorical_eligible then
+  return false
 
-    # (2) Income eligibility - either standard (185% FPL) or adjunctive
-    #     (SNAP/TANF/Medicaid participation)
-    if not is_wic_person_income_eligible then
-      return false
+  # (2) Income eligibility - either standard (185% FPL) or adjunctive
+  #     (SNAP/TANF/Medicaid participation)
+  if not is_wic_person_income_eligible then
+  return false
 
-    # (3) Residency - must be physically present in state
-    if not is_wic_residency_eligible then
-      return false
+  # (3) Residency - must be physically present in state
+  if not is_wic_residency_eligible then
+  return false
 
-    # (4) Nutritional risk - assumed met for modeling
-    if not is_wic_nutritional_risk_eligible then
-      return false
+  # (4) Nutritional risk - assumed met for modeling
+  if not is_wic_nutritional_risk_eligible then
+  return false
 
-    return true
-  }
-}
+  return true
 
 # Alternative name for compatibility
-variable is_wic_eligible {
-  entity Person
-  period Month
-  dtype Boolean
+entity Person
+period Month
+dtype Boolean
 
-  formula {
-    return wic_eligible
-  }
-}
+formula:
+  return wic_eligible
 
 # =============================================================================
 # HOUSEHOLD ELIGIBILITY SUMMARY
 # =============================================================================
 
 # Count of WIC-eligible persons in household
-variable wic_eligible_count {
-  entity Household
-  period Month
-  dtype Integer
+entity Household
+period Month
+dtype Integer
 
-  formula {
-    return sum(members.wic_eligible)
-  }
-}
+formula:
+  return sum(members.wic_eligible)
 
 # Whether household has any WIC-eligible member
-variable household_has_wic_eligible_member {
-  entity Household
-  period Month
-  dtype Boolean
+entity Household
+period Month
+dtype Boolean
 
-  formula {
-    return wic_eligible_count > 0
-  }
-}
+formula:
+  return wic_eligible_count > 0

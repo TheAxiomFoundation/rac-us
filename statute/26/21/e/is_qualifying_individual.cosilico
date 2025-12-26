@@ -8,37 +8,30 @@
 #   (3) the spouse of the taxpayer, if the spouse is physically or mentally
 #       incapable of caring for himself or herself..."
 
-module statute.26.21.e
-version "2024.1"
-
-references {
-  # Person-level characteristics
+imports:
+# Person-level characteristics
   age: statute/26/152/person/age
   is_dependent: statute/26/152/c/is_dependent
   is_disabled: statute/26/152/person/is_disabled
   is_tax_unit_spouse: statute/26/1/person/is_tax_unit_spouse
 
-  # Parameters
+# Parameters
   child_age_limit: statute/26/21/e/qualifying_individual#child_age_limit
-}
 
-variable is_cdcc_qualifying_individual {
-  entity Person
-  period Year
-  dtype Bool
-  label "Is CDCC Qualifying Individual"
-  description "Whether person qualifies for purposes of Child and Dependent Care Credit per 26 USC 21(b)"
+entity Person
+period Year
+dtype Bool
+label "Is CDCC Qualifying Individual"
+description "Whether person qualifies for purposes of Child and Dependent Care Credit per 26 USC 21(b)"
 
-  formula {
-    # Category 1: Dependent child under age 13
-    let is_qualifying_child = is_dependent and age < child_age_limit
+formula:
+  # Category 1: Dependent child under age 13
+  is_qualifying_child = is_dependent and age < child_age_limit
 
-    # Category 2: Disabled dependent
-    let is_qualifying_disabled_dependent = is_dependent and is_disabled
+  # Category 2: Disabled dependent
+  is_qualifying_disabled_dependent = is_dependent and is_disabled
 
-    # Category 3: Disabled spouse
-    let is_qualifying_disabled_spouse = is_tax_unit_spouse and is_disabled
+  # Category 3: Disabled spouse
+  is_qualifying_disabled_spouse = is_tax_unit_spouse and is_disabled
 
-    return is_qualifying_child or is_qualifying_disabled_dependent or is_qualifying_disabled_spouse
-  }
-}
+  return is_qualifying_child or is_qualifying_disabled_dependent or is_qualifying_disabled_spouse

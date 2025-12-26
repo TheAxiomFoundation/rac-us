@@ -18,88 +18,72 @@
 # - Also applies to self-employment income per 26 USC 1401(b)(2)
 # - Enacted by Affordable Care Act (2010), effective 2013
 
-module statute.26.3101.b.2
-version "2024.1"
-
 # Filing status values per 26 USC 1
 enum FilingStatus {
-  SINGLE
-  JOINT
-  SEPARATE
-  HEAD_OF_HOUSEHOLD
-  SURVIVING_SPOUSE
-}
+SINGLE
+JOINT
+SEPARATE
+HEAD_OF_HOUSEHOLD
+SURVIVING_SPOUSE
 
-references {
-  # Wages subject to Medicare tax per 3121(a)
+imports:
+# Wages subject to Medicare tax per 3121(a)
   irs_employment_income: statute/26/3121/a/irs_employment_income
 
-  # Taxable self-employment income per 1401(b)(2)
+# Taxable self-employment income per 1401(b)(2)
   taxable_self_employment_income: statute/26/1401/taxable_self_employment_income
 
-  # Filing status for threshold determination
+# Filing status for threshold determination
   filing_status: statute/26/1/filing_status
-}
 
-parameters {
-  # Load rates and thresholds from parameters.yaml
+parameters:
+# Load rates and thresholds from parameters.yaml
   additional_rate: statute/26/3101/parameters.yaml#additional_rate
   threshold_joint: statute/26/3101/parameters.yaml#additional_threshold_joint
   threshold_separate: statute/26/3101/parameters.yaml#additional_threshold_separate
   threshold_single: statute/26/3101/parameters.yaml#additional_threshold_single
-}
 
 # Combined wages and SE income for Additional Medicare Tax
-variable medicare_wages {
-  entity TaxUnit
-  period Year
-  dtype Money
-  unit "USD"
-  label "Medicare Wages"
-  description "Combined wages and SE income subject to Additional Medicare Tax"
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Medicare Wages"
+description "Combined wages and SE income subject to Additional Medicare Tax"
 
-  formula {
-    # Both wages and self-employment income are subject to the tax
-    let total_wages = sum(members, irs_employment_income)
-    let total_se = sum(members, taxable_self_employment_income)
+formula:
+  # Both wages and self-employment income are subject to the tax
+  total_wages = sum(members, irs_employment_income)
+  total_se = sum(members, taxable_self_employment_income)
 
-    return total_wages + total_se
-  }
-}
+  return total_wages + total_se
 
 # Filing-status-based threshold
-variable additional_medicare_tax_threshold {
-  entity TaxUnit
-  period Year
-  dtype Money
-  unit "USD"
-  label "Additional Medicare Tax Threshold"
-  description "Income threshold for Additional Medicare Tax based on filing status"
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Additional Medicare Tax Threshold"
+description "Income threshold for Additional Medicare Tax based on filing status"
 
-  formula {
-    # (A) Joint return = $250k
-    # (B) Married filing separately = $125k
-    # (C) Any other case = $200k (Single, HOH, Surviving Spouse)
-    return match filing_status {
-      case JOINT => threshold_joint
-      case SEPARATE => threshold_separate
-      else => threshold_single
-    }
-  }
-}
+formula:
+  # (A) Joint return = $250k
+  # (B) Married filing separately = $125k
+  # (C) Any other case = $200k (Single, HOH, Surviving Spouse)
+  return match filing_status {
+  case JOINT => threshold_joint
+  case SEPARATE => threshold_separate
+  else => threshold_single
 
-variable additional_medicare_tax {
-  entity TaxUnit
-  period Year
-  dtype Money
-  unit "USD"
-  label "Additional Medicare Tax"
-  description "0.9% additional Medicare tax on wages above threshold per 26 USC 3101(b)(2)"
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Additional Medicare Tax"
+description "0.9% additional Medicare tax on wages above threshold per 26 USC 3101(b)(2)"
 
-  formula {
-    # Tax applies only to wages exceeding threshold
-    let excess_wages = max(0, medicare_wages - additional_medicare_tax_threshold)
+formula:
+  # Tax applies only to wages exceeding threshold
+  excess_wages = max(0, medicare_wages - additional_medicare_tax_threshold)
 
-    return additional_rate * excess_wages
-  }
-}
+  return additional_rate * excess_wages

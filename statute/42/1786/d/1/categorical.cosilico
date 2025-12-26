@@ -12,85 +12,72 @@
 # (14) "postpartum women" - up to 6 months after pregnancy terminates
 #      (extended to 1 year if breastfeeding)
 
-references {
+imports:
   infant_max_years: statute/42/1786/age/infant_max_years
   child_max_years: statute/42/1786/age/child_max_years
   postpartum_max_months_non_breastfeeding: statute/42/1786/postpartum/max_months_non_breastfeeding
   postpartum_max_months_breastfeeding: statute/42/1786/postpartum/max_months_breastfeeding
-}
 
 # =============================================================================
 # CATEGORICAL DETERMINATION
 # =============================================================================
 
 # Determine which WIC category applies to each person
-variable wic_category {
-  entity Person
-  period Month
-  dtype Category  # pregnant_woman, breastfeeding_woman, postpartum_woman, infant, child, none
+entity Person
+period Month
+dtype Category  # pregnant_woman, breastfeeding_woman, postpartum_woman, infant, child, none
 
-  formula {
-    # 42 USC 1786(b)(3): Breastfeeding women - up to 1 year postpartum
-    # Takes priority over postpartum since it has longer eligibility period
-    if is_breastfeeding and months_postpartum < postpartum_max_months_breastfeeding then
-      return "breastfeeding_woman"
+formula:
+  # 42 USC 1786(b)(3): Breastfeeding women - up to 1 year postpartum
+  # Takes priority over postpartum since it has longer eligibility period
+  if is_breastfeeding and months_postpartum < postpartum_max_months_breastfeeding then
+  return "breastfeeding_woman"
 
-    # 42 USC 1786(d)(1): Pregnant women
-    if is_pregnant then
-      return "pregnant_woman"
+  # 42 USC 1786(d)(1): Pregnant women
+  if is_pregnant then
+  return "pregnant_woman"
 
-    # 42 USC 1786(b)(14): Postpartum women - up to 6 months after pregnancy ends
-    if is_postpartum and months_postpartum < postpartum_max_months_non_breastfeeding then
-      return "postpartum_woman"
+  # 42 USC 1786(b)(14): Postpartum women - up to 6 months after pregnancy ends
+  if is_postpartum and months_postpartum < postpartum_max_months_non_breastfeeding then
+  return "postpartum_woman"
 
-    # 42 USC 1786(b)(6): Infants - under 1 year of age
-    if age < infant_max_years then
-      return "infant"
+  # 42 USC 1786(b)(6): Infants - under 1 year of age
+  if age < infant_max_years then
+  return "infant"
 
-    # 42 USC 1786(b)(4): Children - 1 through 4 years (up to 5th birthday)
-    if age >= infant_max_years and age < child_max_years then
-      return "child"
+  # 42 USC 1786(b)(4): Children - 1 through 4 years (up to 5th birthday)
+  if age >= infant_max_years and age < child_max_years then
+  return "child"
 
-    # No WIC category applies
-    return "none"
-  }
-}
+  # No WIC category applies
+  return "none"
 
 # Categorical eligibility determination
-variable is_wic_categorical_eligible {
-  entity Person
-  period Month
-  dtype Boolean
+entity Person
+period Month
+dtype Boolean
 
-  formula {
-    # Person must be in one of the qualifying categories
-    let category = wic_category
-    return category != "none"
-  }
-}
+formula:
+  # Person must be in one of the qualifying categories
+  category = wic_category
+  return category != "none"
 
 # Check if person is a WIC-eligible woman category
-variable is_wic_woman_category {
-  entity Person
-  period Month
-  dtype Boolean
+entity Person
+period Month
+dtype Boolean
 
-  formula {
-    let category = wic_category
-    return category == "pregnant_woman" or
-           category == "breastfeeding_woman" or
-           category == "postpartum_woman"
-  }
-}
+formula:
+  category = wic_category
+  return category == "pregnant_woman" or
+  category == "breastfeeding_woman" or
+  category == "postpartum_woman"
 
 # Check if person is a WIC-eligible infant or child
-variable is_wic_infant_or_child_category {
-  entity Person
-  period Month
-  dtype Boolean
+entity Person
+period Month
+dtype Boolean
 
-  formula {
-    let category = wic_category
-    return category == "infant" or category == "child"
-  }
-}
+formula:
+  category = wic_category
+  return category == "infant" or category == "child"

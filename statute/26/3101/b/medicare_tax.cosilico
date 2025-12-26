@@ -12,50 +12,39 @@
 # - Employer pays matching 1.45% under 26 USC 3111(b)
 # - Combined rate: 2.9% (employee + employer)
 
-module statute.26.3101.b.1
-version "2024.1"
-
-references {
-  # Wages subject to FICA per 3121(a)
+imports:
+# Wages subject to FICA per 3121(a)
   irs_employment_income: statute/26/3121/a/irs_employment_income
 
-  # Self-employment income subject to SE tax per 1401(b)
+# Self-employment income subject to SE tax per 1401(b)
   taxable_self_employment_income: statute/26/1401/taxable_self_employment_income
-}
 
-parameters {
-  # Load rates from parameters.yaml
+parameters:
+# Load rates from parameters.yaml
   employee_rate: statute/26/3101/parameters.yaml#employee_rate
-}
 
 # Employee Medicare tax on wages
-variable employee_medicare_tax {
-  entity Person
-  period Year
-  dtype Money
-  unit "USD"
-  label "Employee Medicare Tax"
-  description "Employee share of Medicare (HI) tax at 1.45% of wages per 26 USC 3101(b)(1)"
+entity Person
+period Year
+dtype Money
+unit "USD"
+label "Employee Medicare Tax"
+description "Employee share of Medicare (HI) tax at 1.45% of wages per 26 USC 3101(b)(1)"
 
-  formula {
-    # Medicare tax applies to ALL wages - no cap unlike Social Security
-    return irs_employment_income * employee_rate
-  }
-}
+formula:
+  # Medicare tax applies to ALL wages - no cap unlike Social Security
+  return irs_employment_income * employee_rate
 
 # Total Medicare tax withheld (employee share only, for W-2 purposes)
 # Note: Employer share is reported separately under 3111(b)
-variable medicare_tax_withheld {
-  entity Person
-  period Year
-  dtype Money
-  unit "USD"
-  label "Medicare Tax Withheld"
-  description "Total Medicare tax withheld from wages (employee share) per 26 USC 3101(b)"
+entity Person
+period Year
+dtype Money
+unit "USD"
+label "Medicare Tax Withheld"
+description "Total Medicare tax withheld from wages (employee share) per 26 USC 3101(b)"
 
-  formula {
-    # Base Medicare tax (1.45%)
-    # Additional Medicare Tax (0.9% above threshold) is handled in 3101/b/2
-    return employee_medicare_tax
-  }
-}
+formula:
+  # Base Medicare tax (1.45%)
+  # Additional Medicare Tax (0.9% above threshold) is handled in 3101/b/2
+  return employee_medicare_tax

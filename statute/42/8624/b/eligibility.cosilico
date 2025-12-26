@@ -14,148 +14,118 @@
 #      (i) 150 percent of the poverty level for such State; or
 #      (ii) 60 percent of the State median income"
 
-module statute.42.8624.b
-version "2024.1"
-
-references {
+imports:
   fpl_percentage: statute/42/8624/income_eligibility/fpl_percentage
   smi_percentage: statute/42/8624/income_eligibility/smi_percentage
   fpl_by_household_size: statute/42/8624/fpl_by_household_size
   state_median_income: statute/42/8624/state_median_income
   elderly_age_threshold: statute/42/8624/vulnerable_populations/elderly_age_threshold
   young_child_age_threshold: statute/42/8624/vulnerable_populations/young_child_age_threshold
-}
 
 # Calculate 150% FPL threshold for household
-variable liheap_fpl_limit {
-  entity Household
-  period Year
-  dtype Money
-  unit "USD"
-  label "LIHEAP FPL income limit"
-  description "150% of Federal Poverty Level for household size per 42 USC 8624(b)(2)(B)(i)"
+entity Household
+period Year
+dtype Money
+unit "USD"
+label "LIHEAP FPL income limit"
+description "150% of Federal Poverty Level for household size per 42 USC 8624(b)(2)(B)(i)"
 
-  formula {
-    let base_fpl = fpl_by_household_size[1]
-    let additional_per_person = fpl_by_household_size["additional_per_person"]
-    let extra_members = max(0, household_size - 1)
+formula:
+  base_fpl = fpl_by_household_size[1]
+  additional_per_person = fpl_by_household_size["additional_per_person"]
+  extra_members = max(0, household_size - 1)
 
-    let fpl = base_fpl + (additional_per_person * extra_members)
-    return fpl * fpl_percentage
-  }
-}
+  fpl = base_fpl + (additional_per_person * extra_members)
+  return fpl * fpl_percentage
 
 # Calculate 60% SMI threshold for household
-variable liheap_smi_limit {
-  entity Household
-  period Year
-  dtype Money
-  unit "USD"
-  label "LIHEAP SMI income limit"
-  description "60% of State Median Income for household size per 42 USC 8624(b)(2)(B)(ii)"
+entity Household
+period Year
+dtype Money
+unit "USD"
+label "LIHEAP SMI income limit"
+description "60% of State Median Income for household size per 42 USC 8624(b)(2)(B)(ii)"
 
-  formula {
-    # SMI varies by state and household size
-    let base_smi = state_median_income[household_size]
-    return base_smi * smi_percentage
-  }
-}
+formula:
+  # SMI varies by state and household size
+  base_smi = state_median_income[household_size]
+  return base_smi * smi_percentage
 
 # Income eligibility - household income under greater of 150% FPL or 60% SMI
-variable liheap_income_eligible {
-  entity Household
-  period Year
-  dtype Boolean
-  label "LIHEAP income eligibility"
-  description "Household income at or below greater of 150% FPL or 60% SMI per 42 USC 8624(b)(2)(B)"
+entity Household
+period Year
+dtype Boolean
+label "LIHEAP income eligibility"
+description "Household income at or below greater of 150% FPL or 60% SMI per 42 USC 8624(b)(2)(B)"
 
-  formula {
-    # Use the greater of 150% FPL or 60% SMI as limit
-    let income_limit = max(liheap_fpl_limit, liheap_smi_limit)
-    return annual_gross_income <= income_limit
-  }
+formula:
+  # Use the greater of 150% FPL or 60% SMI as limit
+  income_limit = max(liheap_fpl_limit, liheap_smi_limit)
+  return annual_gross_income <= income_limit
 
-  default false
-}
+default false
 
 # Categorical eligibility from participation in other programs
-variable liheap_categorically_eligible {
-  entity Household
-  period Year
-  dtype Boolean
-  label "LIHEAP categorical eligibility"
-  description "Automatic eligibility from receiving SNAP, SSI, TANF, or veterans benefits per 42 USC 8624(b)(2)(A)"
+entity Household
+period Year
+dtype Boolean
+label "LIHEAP categorical eligibility"
+description "Automatic eligibility from receiving SNAP, SSI, TANF, or veterans benefits per 42 USC 8624(b)(2)(A)"
 
-  formula {
-    # 42 USC 8624(b)(2)(A): Receipt of certain benefits confers eligibility
-    return receives_snap or receives_ssi or receives_tanf or receives_veterans_pension
-  }
+formula:
+  # 42 USC 8624(b)(2)(A): Receipt of certain benefits confers eligibility
+  return receives_snap or receives_ssi or receives_tanf or receives_veterans_pension
 
-  default false
-}
+default false
 
 # Vulnerable household determination for priority/targeting
-variable liheap_vulnerable_household {
-  entity Household
-  period Year
-  dtype Boolean
-  label "LIHEAP vulnerable household"
-  description "Household with elderly, disabled, or young children for priority targeting per 42 USC 8624(b)(5)(A)"
+entity Household
+period Year
+dtype Boolean
+label "LIHEAP vulnerable household"
+description "Household with elderly, disabled, or young children for priority targeting per 42 USC 8624(b)(5)(A)"
 
-  formula {
-    # Priority populations per 42 USC 8624(b)(5)(A)
-    return has_elderly_member or has_disabled_member or has_young_children
-  }
+formula:
+  # Priority populations per 42 USC 8624(b)(5)(A)
+  return has_elderly_member or has_disabled_member or has_young_children
 
-  default false
-}
+default false
 
 # Heating assistance eligibility
-variable liheap_heating_eligible {
-  entity Household
-  period Year
-  dtype Boolean
-  label "LIHEAP heating assistance eligibility"
-  description "Eligible for home heating assistance per 42 USC 8624(b)(1)(A)"
+entity Household
+period Year
+dtype Boolean
+label "LIHEAP heating assistance eligibility"
+description "Eligible for home heating assistance per 42 USC 8624(b)(1)(A)"
 
-  formula {
-    # Must be overall LIHEAP eligible and in heating season
-    return liheap_eligible and is_heating_season
-  }
+formula:
+  # Must be overall LIHEAP eligible and in heating season
+  return liheap_eligible and is_heating_season
 
-  default false
-}
+default false
 
 # Cooling assistance eligibility
-variable liheap_cooling_eligible {
-  entity Household
-  period Year
-  dtype Boolean
-  label "LIHEAP cooling assistance eligibility"
-  description "Eligible for home cooling assistance per 42 USC 8624(b)(1)(B)"
+entity Household
+period Year
+dtype Boolean
+label "LIHEAP cooling assistance eligibility"
+description "Eligible for home cooling assistance per 42 USC 8624(b)(1)(B)"
 
-  formula {
-    # Must be overall LIHEAP eligible and in cooling season
-    return liheap_eligible and is_cooling_season
-  }
+formula:
+  # Must be overall LIHEAP eligible and in cooling season
+  return liheap_eligible and is_cooling_season
 
-  default false
-}
+default false
 
 # Overall LIHEAP eligibility
-variable liheap_eligible {
-  entity Household
-  period Year
-  dtype Boolean
-  label "LIHEAP eligibility"
-  description "Overall LIHEAP eligibility per 42 USC 8624(b)(2)"
-    "42 USC 8624(b)(2)(A)",
-    "42 USC 8624(b)(2)(B)"
+entity Household
+period Year
+dtype Boolean
+label "LIHEAP eligibility"
+description "Overall LIHEAP eligibility per 42 USC 8624(b)(2)"
 
-  formula {
-    # Eligible if categorically eligible OR meets income limit
-    return liheap_categorically_eligible or liheap_income_eligible
-  }
+formula:
+  # Eligible if categorically eligible OR meets income limit
+  return liheap_categorically_eligible or liheap_income_eligible
 
-  default false
-}
+default false

@@ -16,103 +16,83 @@
 # This encodes the RULE structure for reference. Actual enforcement requires
 # tracking benefit receipt history over 60+ months.
 
-references {
+imports:
   federal_time_limit_months: statute/42/607/parameters/federal_time_limit
   hardship_exemption_pct: statute/42/607/parameters/hardship_exemption_rate
-}
 
 # 608(a)(7)(A): Federal 60-month time limit
 # This is the maximum federal participation, states may be stricter
-variable tanf_federal_time_limit_months {
-  entity Person
-  period None  # Statutory constant
-  dtype Integer
+entity Person
+period None  # Statutory constant
+dtype Integer
 
-  formula {
-    return federal_time_limit_months  # 60 months
-  }
-}
+formula:
+  return federal_time_limit_months  # 60 months
 
 # 608(a)(7)(C): Hardship exemption
 # States may exempt up to 20% of caseload due to hardship
-variable tanf_hardship_exempt {
-  entity Person
-  period Month
-  dtype Boolean
+entity Person
+period Month
+dtype Boolean
 
-  formula {
-    # Exemption determined by state based on:
-    # - Domestic violence
-    # - Disability (recipient or family member)
-    # - Other state-defined hardship
+formula:
+  # Exemption determined by state based on:
+  # - Domestic violence
+  # - Disability (recipient or family member)
+  # - Other state-defined hardship
 
-    # NOTE: Cannot simulate - requires individual hardship determination
-    # This is a placeholder for state override
-    return hardship_exemption_claimed
-  }
-}
+  # NOTE: Cannot simulate - requires individual hardship determination
+  # This is a placeholder for state override
+  return hardship_exemption_claimed
 
 # 608(a)(7)(D): Minor child exception
 # Time limit does not apply to minor children
-variable tanf_minor_child_time_limit_exempt {
-  entity Person
-  period Month
-  dtype Boolean
+entity Person
+period Month
+dtype Boolean
 
-  formula {
-    return age < 18
-  }
-}
+formula:
+  return age < 18
 
 # 608(a)(7)(E): Domestic violence waiver (Family Violence Option)
 # States may temporarily waive time limits for DV victims
-variable tanf_domestic_violence_exempt {
-  entity Person
-  period Month
-  dtype Boolean
+entity Person
+period Month
+dtype Boolean
 
-  formula {
-    # States electing FVO under 602(a)(7) may waive requirements
-    # Cannot simulate - requires individual DV determination
-    return domestic_violence_waiver_claimed
-  }
-}
+formula:
+  # States electing FVO under 602(a)(7) may waive requirements
+  # Cannot simulate - requires individual DV determination
+  return domestic_violence_waiver_claimed
 
 # Cumulative months of TANF receipt
 # NOTE: Simulation limitation - cannot track across time
-variable tanf_months_received {
-  entity Person
-  period Month
-  dtype Integer
+entity Person
+period Month
+dtype Integer
 
-  formula {
-    # In real implementation, this would sum all prior months
-    # For point-in-time simulation, this must be input data
-    return tanf_months_received_input
-  }
+formula:
+  # In real implementation, this would sum all prior months
+  # For point-in-time simulation, this must be input data
+  return tanf_months_received_input
 
-  documentation {
-    This variable requires historical data to compute.
-    In microsimulation, it must be provided as input or estimated
-    from survey data on TANF receipt duration.
-  }
-}
+documentation {
+This variable requires historical data to compute.
+In microsimulation, it must be provided as input or estimated
+from survey data on TANF receipt duration.
 
 # Has person exceeded federal time limit?
-variable tanf_time_limit_exceeded {
-  entity Person
-  period Month
-  dtype Boolean
+entity Person
+period Month
+dtype Boolean
 
-  formula {
-    # Minor children exempt
-    if tanf_minor_child_time_limit_exempt then
-      return false
+formula:
+  # Minor children exempt
+  if tanf_minor_child_time_limit_exempt then
+  return false
 
-    # Hardship exemptions
-    if tanf_hardship_exempt or tanf_domestic_violence_exempt then
-      return false
+  # Hardship exemptions
+  if tanf_hardship_exempt or tanf_domestic_violence_exempt then
+  return false
 
-    return tanf_months_received >= tanf_federal_time_limit_months
-  }
-}
+  return tanf_months_received >= tanf_federal_time_limit_months

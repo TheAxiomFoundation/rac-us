@@ -12,133 +12,114 @@
 # - Tax-exempt interest from private activity bonds (Section 57(a)(5))
 # - Accelerated depreciation (Section 57(a)(6)-(7))
 
-module statute.26.57
-version "2024.1"
-
-references {
-  # Tax-exempt interest from private activity bonds
+imports:
+# Tax-exempt interest from private activity bonds
   private_activity_bond_interest: statute/26/103/private_activity_bond_interest
 
-  # Depletion from minerals
+# Depletion from minerals
   percentage_depletion: statute/26/613/percentage_depletion
   cost_depletion: statute/26/612/cost_depletion
 
-  # Intangible drilling and development costs
+# Intangible drilling and development costs
   idc_deduction: statute/26/263/c/intangible_drilling_costs
   idc_amortization: statute/26/263/c/idc_amortization_amount
 
-  # Depreciation differences
+# Depreciation differences
   regular_depreciation: statute/26/167/depreciation
   amt_depreciation: statute/26/168/amt_depreciation
-}
 
 # --- Section 57(a)(1) - Depletion ---
 
-variable preference_depletion {
-  entity TaxUnit
-  period Year
-  dtype Money
-  unit "USD"
-  label "AMT Preference - Depletion"
-  description "Excess depletion over cost depletion per Section 57(a)(1)"
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "AMT Preference - Depletion"
+description "Excess depletion over cost depletion per Section 57(a)(1)"
 
-  formula {
-    # The preference amount is the excess of percentage depletion over
-    # the adjusted basis of the property (cost depletion)
-    let excess = percentage_depletion - cost_depletion
-    return max(0, excess)
-  }
+formula:
+  # The preference amount is the excess of percentage depletion over
+  # the adjusted basis of the property (cost depletion)
+  excess = percentage_depletion - cost_depletion
+  return max(0, excess)
 
-  default 0
-}
+default 0
 
 # --- Section 57(a)(2) - Intangible Drilling Costs ---
 
-variable preference_idc {
-  entity TaxUnit
-  period Year
-  dtype Money
-  unit "USD"
-  label "AMT Preference - Intangible Drilling Costs"
-  description "Excess IDC over 10-year amortization per Section 57(a)(2)"
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "AMT Preference - Intangible Drilling Costs"
+description "Excess IDC over 10-year amortization per Section 57(a)(2)"
 
-  formula {
-    # IDC can be immediately expensed for regular tax but must be
-    # amortized over 10 years for AMT
-    # Preference = current year deduction minus 10-year amortization
-    let excess = idc_deduction - idc_amortization
-    return max(0, excess)
-  }
+formula:
+  # IDC can be immediately expensed for regular tax but must be
+  # amortized over 10 years for AMT
+  # Preference = current year deduction minus 10-year amortization
+  excess = idc_deduction - idc_amortization
+  return max(0, excess)
 
-  default 0
-}
+default 0
 
 # --- Section 57(a)(5) - Tax-Exempt Interest from Private Activity Bonds ---
 
-variable preference_private_activity_bond_interest {
-  entity TaxUnit
-  period Year
-  dtype Money
-  unit "USD"
-  label "AMT Preference - Private Activity Bond Interest"
-  description "Tax-exempt interest from private activity bonds per Section 57(a)(5)"
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "AMT Preference - Private Activity Bond Interest"
+description "Tax-exempt interest from private activity bonds per Section 57(a)(5)"
 
-  formula {
-    # Interest on specified private activity bonds is tax-exempt
-    # for regular tax but is a preference item for AMT
-    # Exception: bonds issued after August 7, 1986 and before 2018
-    return private_activity_bond_interest
-  }
+formula:
+  # Interest on specified private activity bonds is tax-exempt
+  # for regular tax but is a preference item for AMT
+  # Exception: bonds issued after August 7, 1986 and before 2018
+  return private_activity_bond_interest
 
-  default 0
-}
+default 0
 
 # --- Section 57(a)(7) - Depreciation (Pre-1987 Property) ---
 
-variable preference_depreciation {
-  entity TaxUnit
-  period Year
-  dtype Money
-  unit "USD"
-  label "AMT Preference - Depreciation"
-  description "Accelerated depreciation preference per Section 57(a)(7)"
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "AMT Preference - Depreciation"
+description "Accelerated depreciation preference per Section 57(a)(7)"
 
-  formula {
-    # For property placed in service before 1987, the depreciation
-    # preference is the excess of accelerated depreciation over
-    # straight-line depreciation
-    #
-    # For post-1986 property, the AMT adjustment is computed under
-    # Section 56(a)(1) instead, using 150% declining balance for
-    # tangible personal property
-    #
-    # Most taxpayers in 2024 have minimal pre-1987 property,
-    # but this captures the statutory rule
-    let excess = regular_depreciation - amt_depreciation
-    return max(0, excess)
-  }
+formula:
+  # For property placed in service before 1987, the depreciation
+  # preference is the excess of accelerated depreciation over
+  # straight-line depreciation
+  #
+  # For post-1986 property, the AMT adjustment is computed under
+  # Section 56(a)(1) instead, using 150% declining balance for
+  # tangible personal property
+  #
+  # Most taxpayers in 2024 have minimal pre-1987 property,
+  # but this captures the statutory rule
+  excess = regular_depreciation - amt_depreciation
+  return max(0, excess)
 
-  default 0
-}
+default 0
 
 # --- Total Tax Preference Items ---
 
-variable amt_preferences {
-  entity TaxUnit
-  period Year
-  dtype Money
-  unit "USD"
-  label "Total AMT Preference Items"
-  description "Sum of all tax preference items under Section 57"
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Total AMT Preference Items"
+description "Sum of all tax preference items under Section 57"
 
-  formula {
-    let depletion_pref = preference_depletion
-    let idc_pref = preference_idc
-    let bond_pref = preference_private_activity_bond_interest
-    let depreciation_pref = preference_depreciation
+formula:
+  depletion_pref = preference_depletion
+  idc_pref = preference_idc
+  bond_pref = preference_private_activity_bond_interest
+  depreciation_pref = preference_depreciation
 
-    return depletion_pref + idc_pref + bond_pref + depreciation_pref
-  }
+  return depletion_pref + idc_pref + bond_pref + depreciation_pref
 
-  default 0
-}
+default 0

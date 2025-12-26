@@ -1,9 +1,7 @@
 # 26 USC §32(b)(1) - Phaseout Percentage
 
-variable phaseout_percentage {
-  entity TaxUnit
-  period Year
-  dtype Rate
-  # Parameter: varies by num_qualifying_children
-  # 0: 7.65%, 1: 15.98%, 2: 21.06%, 3+: 21.06%
-}
+entity TaxUnit
+period Year
+dtype Rate
+# Parameter: varies by num_qualifying_children
+# 0: 7.65%, 1: 15.98%, 2: 21.06%, 3+: 21.06%

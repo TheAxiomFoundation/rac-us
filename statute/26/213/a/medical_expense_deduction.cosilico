@@ -14,70 +14,59 @@
 # - 2019-2020: Extended at 7.5%
 # - CAA 2021: Permanently 7.5%
 
-module statute.26.213.a
-version "2024.1"
-
-references {
+imports:
   adjusted_gross_income: statute/26/62/a/adjusted_gross_income
 
-  # Input amounts
+# Input amounts
   medical_expenses_paid: inputs/medical_expenses
   insurance_reimbursements: inputs/medical_insurance_reimbursement
   long_term_care_premiums: inputs/long_term_care_premiums
-}
 
-parameters {
+parameters:
   p: statute/26/213/parameters/agi_floor
   ltc: statute/26/213/parameters/long_term_care
-}
 
-variable qualifying_medical_expenses {
-  entity TaxUnit
-  period Year
-  dtype Money
-  unit "USD"
-  label "Qualifying Medical Expenses"
-  description "Medical expenses eligible for deduction per 26 USC 213(d)"
-    "IRS Publication 502"
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Qualifying Medical Expenses"
+description "Medical expenses eligible for deduction per 26 USC 213(d)"
+"IRS Publication 502"
 
-  formula {
-    # Start with gross medical expenses
-    let gross_medical = medical_expenses_paid
+formula:
+  # Start with gross medical expenses
+  gross_medical = medical_expenses_paid
 
-    # Subtract insurance reimbursements
-    let unreimbursed = gross_medical - insurance_reimbursements
+  # Subtract insurance reimbursements
+  unreimbursed = gross_medical - insurance_reimbursements
 
-    # Add long-term care premiums (subject to age limits)
-    # Note: Full LTC limit calculation would require age-based lookup
-    let total = unreimbursed + long_term_care_premiums
+  # Add long-term care premiums (subject to age limits)
+  # Note: Full LTC limit calculation would require age-based lookup
+  total = unreimbursed + long_term_care_premiums
 
-    return max(0, total)
-  }
+  return max(0, total)
 
-  default 0
-}
+default 0
 
-variable medical_expense_deduction {
-  entity TaxUnit
-  period Year
-  dtype Money
-  unit "USD"
-  label "Medical Expense Deduction"
-  description "Deductible medical expenses after AGI floor per 26 USC 213(a)"
-    "TCJA Section 11027",
-    "CAA 2021 Section 9041",
-    "IRS Publication 502"
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Medical Expense Deduction"
+description "Deductible medical expenses after AGI floor per 26 USC 213(a)"
+"TCJA Section 11027",
+"CAA 2021 Section 9041",
+"IRS Publication 502"
 
-  formula {
-    let agi = adjusted_gross_income
-    let expenses = qualifying_medical_expenses
+formula:
+  agi = adjusted_gross_income
+  expenses = qualifying_medical_expenses
 
-    # Calculate floor (7.5% of AGI permanently after CAA 2021)
-    let floor = agi * p.rate
+  # Calculate floor (7.5% of AGI permanently after CAA 2021)
+  floor = agi * p.rate
 
-    # Deduction is expenses exceeding the floor
-    return max(0, expenses - floor)
-  }
+  # Deduction is expenses exceeding the floor
+  return max(0, expenses - floor)
 
-  default 0
-}
+default 0

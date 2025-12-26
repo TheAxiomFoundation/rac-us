@@ -7,22 +7,16 @@
 # C corporations are taxed under Section 11.
 # S corporations, partnerships, and other pass-throughs are NOT subject to Section 11.
 
-module statute.26.11.a
-version "2024.1"
+entity Corporation
+period Year
+dtype Boolean
+label "Subject to Corporate Income Tax"
+description "Whether entity is subject to tax under 26 USC 11"
 
-variable is_subject_to_corporate_tax {
-  entity Corporation
-  period Year
-  dtype Boolean
-  label "Subject to Corporate Income Tax"
-  description "Whether entity is subject to tax under 26 USC 11"
+formula:
+  # Only C corporations are subject to corporate income tax
+  # S corporations: exempt per 26 USC 1363(a)
+  # Partnerships: exempt per 26 USC 701
+  # Sole proprietorships: taxed at individual level
 
-  formula {
-    # Only C corporations are subject to corporate income tax
-    # S corporations: exempt per 26 USC 1363(a)
-    # Partnerships: exempt per 26 USC 701
-    # Sole proprietorships: taxed at individual level
-
-    return entity_type == C_CORPORATION
-  }
-}
+  return entity_type == C_CORPORATION

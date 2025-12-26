@@ -4,16 +4,11 @@
 # but not limited to the enumerated items. This captures income not
 # specifically categorized elsewhere.
 
-module statute.26.61.a
-version "2024.1"
-
-variable other_income {
-  entity Person
-  period Year
-  dtype Money
-  unit "USD"
-  label "Other Income"
-  description "Miscellaneous income not categorized as wages, interest, dividends, etc."
-  # Input from CPS: OI_VAL (other income) or derived from multiple sources
-  # Includes prizes, awards, gambling winnings, etc.
-}
+entity Person
+period Year
+dtype Money
+unit "USD"
+label "Other Income"
+description "Miscellaneous income not categorized as wages, interest, dividends, etc."
+# Input from CPS: OI_VAL (other income) or derived from multiple sources
+# Includes prizes, awards, gambling winnings, etc.

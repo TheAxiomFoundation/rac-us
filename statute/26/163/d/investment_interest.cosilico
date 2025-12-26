@@ -22,65 +22,52 @@
 #          (i) investment income, over
 #          (ii) investment expenses."
 
-module statute.26.163.d
-version "2024.1"
-
-references {
+imports:
   investment_interest_paid: inputs/investment_interest_expense
   investment_income: inputs/investment_income  # Interest, dividends elected, ST gains
   investment_expenses: inputs/investment_expenses
   investment_interest_carryforward: inputs/investment_interest_carryforward_prior
-}
 
-variable net_investment_income {
-  entity TaxUnit
-  period Year
-  dtype Money
-  unit "USD"
-  label "Net Investment Income for 163(d)"
-  description "Investment income minus investment expenses per 26 USC 163(d)(4)"
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Net Investment Income for 163(d)"
+description "Investment income minus investment expenses per 26 USC 163(d)(4)"
 
-  formula {
-    return max(0, investment_income - investment_expenses)
-  }
+formula:
+  return max(0, investment_income - investment_expenses)
 
-  default 0
-}
+default 0
 
-variable deductible_investment_interest {
-  entity TaxUnit
-  period Year
-  dtype Money
-  unit "USD"
-  label "Deductible Investment Interest"
-  description "Investment interest deduction limited by net investment income per 26 USC 163(d)(1)"
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Deductible Investment Interest"
+description "Investment interest deduction limited by net investment income per 26 USC 163(d)(1)"
 
-  formula {
-    # Total investment interest includes current year + carryforward
-    let total_interest = investment_interest_paid + investment_interest_carryforward
+formula:
+  # Total investment interest includes current year + carryforward
+  total_interest = investment_interest_paid + investment_interest_carryforward
 
-    # Limited to net investment income
-    return min(total_interest, net_investment_income)
-  }
+  # Limited to net investment income
+  return min(total_interest, net_investment_income)
 
-  default 0
-}
+default 0
 
-variable investment_interest_carryforward {
-  entity TaxUnit
-  period Year
-  dtype Money
-  unit "USD"
-  label "Investment Interest Carryforward"
-  description "Disallowed investment interest carried to succeeding year per 26 USC 163(d)(2)"
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Investment Interest Carryforward"
+description "Disallowed investment interest carried to succeeding year per 26 USC 163(d)(2)"
 
-  formula {
-    let total_interest = investment_interest_paid + investment_interest_carryforward_prior
-    let deductible = min(total_interest, net_investment_income)
+formula:
+  total_interest = investment_interest_paid + investment_interest_carryforward_prior
+  deductible = min(total_interest, net_investment_income)
 
-    # Carryforward is the excess
-    return total_interest - deductible
-  }
+  # Carryforward is the excess
+  return total_interest - deductible
 
-  default 0
-}
+default 0

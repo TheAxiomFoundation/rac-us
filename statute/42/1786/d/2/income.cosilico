@@ -12,106 +12,87 @@
 # family member... participates in... [SNAP, Medicaid, or TANF]"
 # (Adjunctive eligibility handled in d/3/adjunctive.cosilico)
 
-references {
+imports:
   income_limit_pct_fpl: statute/42/1786/income/limit_pct_fpl
   fpl_monthly: statute/42/1786/fpl_monthly
   is_wic_adjunctively_eligible: statute/42/1786/d/3/is_wic_adjunctively_eligible
-}
 
 # =============================================================================
 # INCOME CALCULATION
 # =============================================================================
 
 # Calculate the applicable monthly FPL for household
-variable wic_fpl_monthly {
-  entity Household
-  period Month
-  dtype Money
+entity Household
+period Month
+dtype Money
 
-  formula {
-    # FPL based on household size
-    if household_size <= 8 then
-      return fpl_monthly.by_household_size[household_size]
+formula:
+  # FPL based on household size
+  if household_size <= 8 then
+  return fpl_monthly.by_household_size[household_size]
 
-    # For sizes > 8, add per-person amount
-    let base = fpl_monthly.by_household_size[8]
-    let additional = fpl_monthly.additional_per_person
-    let extra_members = household_size - 8
-    return base + (additional * extra_members)
-  }
-}
+  # For sizes > 8, add per-person amount
+  base = fpl_monthly.by_household_size[8]
+  additional = fpl_monthly.additional_per_person
+  extra_members = household_size - 8
+  return base + (additional * extra_members)
 
 # Calculate WIC income limit (185% of FPL)
-variable wic_income_limit {
-  entity Household
-  period Month
-  dtype Money
+entity Household
+period Month
+dtype Money
 
-  formula {
-    return wic_fpl_monthly * income_limit_pct_fpl
-  }
-}
+formula:
+  return wic_fpl_monthly * income_limit_pct_fpl
 
 # Calculate household income as percentage of FPL
-variable wic_income_pct_fpl {
-  entity Household
-  period Month
-  dtype Rate
+entity Household
+period Month
+dtype Rate
 
-  formula {
-    let fpl = wic_fpl_monthly
-    if fpl <= 0 then
-      return 0
+formula:
+  fpl = wic_fpl_monthly
+  if fpl <= 0 then
+  return 0
 
-    return household_gross_income / fpl
-  }
-}
+  return household_gross_income / fpl
 
 # =============================================================================
 # INCOME ELIGIBILITY DETERMINATION
 # =============================================================================
 
 # Standard income eligibility (without adjunctive)
-variable is_wic_standard_income_eligible {
-  entity Household
-  period Month
-  dtype Boolean
+entity Household
+period Month
+dtype Boolean
 
-  formula {
-    # 42 USC 1786(d)(2)(B): Income at or below 185% FPL
-    return household_gross_income <= wic_income_limit
-  }
-}
+formula:
+  # 42 USC 1786(d)(2)(B): Income at or below 185% FPL
+  return household_gross_income <= wic_income_limit
 
 # Combined income eligibility (standard OR adjunctive)
 # Applied at household level for WIC
-variable is_wic_income_eligible {
-  entity Household
-  period Month
-  dtype Boolean
+entity Household
+period Month
+dtype Boolean
 
-  formula {
-    # 42 USC 1786(d)(2)(C): Adjunctive eligibility from SNAP/Medicaid/TANF
-    # OR standard income eligibility
-    #
-    # If any household member has adjunctive eligibility,
-    # the household is considered income-eligible for WIC purposes
-    if any(members.is_wic_adjunctively_eligible) then
-      return true
+formula:
+  # 42 USC 1786(d)(2)(C): Adjunctive eligibility from SNAP/Medicaid/TANF
+  # OR standard income eligibility
+  #
+  # If any household member has adjunctive eligibility,
+  # the household is considered income-eligible for WIC purposes
+  if any(members.is_wic_adjunctively_eligible) then
+  return true
 
-    # Otherwise, apply standard 185% FPL test
-    return is_wic_standard_income_eligible
-  }
-}
+  # Otherwise, apply standard 185% FPL test
+  return is_wic_standard_income_eligible
 
 # Person-level income eligibility (for variable lookup)
-variable is_wic_person_income_eligible {
-  entity Person
-  period Month
-  dtype Boolean
+entity Person
+period Month
+dtype Boolean
 
-  formula {
-    # Person's income eligibility determined at household level
-    return household.is_wic_income_eligible
-  }
-}
+formula:
+  # Person's income eligibility determined at household level
+  return household.is_wic_income_eligible

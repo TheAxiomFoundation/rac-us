@@ -11,113 +11,90 @@
 #   - Family coverage: $8,300
 #   - Catch-up (age 55+): Additional $1,000
 
-module statute.26.62.a.12
-version "2024.1"
-
-parameters {
-  # Self-only HDHP coverage limit
+parameters:
+# Self-only HDHP coverage limit
   self_only_limit: 4150  # 2024
 
-  # Family HDHP coverage limit
+# Family HDHP coverage limit
   family_limit: 8300  # 2024
 
-  # Catch-up contribution for age 55+
+# Catch-up contribution for age 55+
   catch_up_amount: 1000
 
-  # Age at which catch-up contributions allowed
+# Age at which catch-up contributions allowed
   catch_up_age: 55
-}
 
-variable has_hdhp {
-  entity Person
-  period Year
-  dtype Boolean
-  label "Has High Deductible Health Plan"
-  description "Whether the individual is covered by a qualifying HDHP"
+entity Person
+period Year
+dtype Boolean
+label "Has High Deductible Health Plan"
+description "Whether the individual is covered by a qualifying HDHP"
 
-  # Input variable - must have HDHP to contribute to HSA
-}
+# Input variable - must have HDHP to contribute to HSA
 
-variable hsa_coverage_type {
-  entity Person
-  period Year
-  dtype Enum[self_only, family]
-  label "HSA Coverage Type"
-  description "Type of HDHP coverage (self-only or family)"
+entity Person
+period Year
+dtype Enum[self_only, family]
+label "HSA Coverage Type"
+description "Type of HDHP coverage (self-only or family)"
 
-  # Input variable - determines contribution limit
-}
+# Input variable - determines contribution limit
 
-variable hsa_contributions {
-  entity Person
-  period Year
-  dtype Money
-  unit "USD"
-  label "HSA Contributions"
-  description "Contributions made to HSA during the tax year"
+entity Person
+period Year
+dtype Money
+unit "USD"
+label "HSA Contributions"
+description "Contributions made to HSA during the tax year"
 
-  # Input variable - amount contributed to HSA
-}
+# Input variable - amount contributed to HSA
 
-variable hsa_contribution_limit {
-  entity Person
-  period Year
-  dtype Money
-  unit "USD"
-  label "HSA Contribution Limit"
-  description "Maximum allowable HSA contribution based on coverage type and age"
+entity Person
+period Year
+dtype Money
+unit "USD"
+label "HSA Contribution Limit"
+description "Maximum allowable HSA contribution based on coverage type and age"
 
-  formula {
-    # Must have HDHP to contribute
-    if not has_hdhp {
-      return 0
-    }
+formula:
+  # Must have HDHP to contribute
+  if not has_hdhp {
+  return 0
 
-    # Base limit depends on coverage type
-    let base_limit = 0
-    if hsa_coverage_type == self_only {
-      base_limit = self_only_limit
-    } else {
-      base_limit = family_limit
-    }
+# Base limit depends on coverage type
+let base_limit = 0
+if hsa_coverage_type == self_only {
+base_limit = self_only_limit
+} else {
+base_limit = family_limit
 
-    # Add catch-up contribution if age 55 or older
-    if age >= catch_up_age {
-      return base_limit + catch_up_amount
-    }
-    return base_limit
-  }
-}
+# Add catch-up contribution if age 55 or older
+if age >= catch_up_age {
+return base_limit + catch_up_amount
+return base_limit
 
-variable hsa_deduction {
-  entity Person
-  period Year
-  dtype Money
-  unit "USD"
-  label "HSA Deduction"
-  description "Above-the-line deduction for HSA contributions"
+entity Person
+period Year
+dtype Money
+unit "USD"
+label "HSA Deduction"
+description "Above-the-line deduction for HSA contributions"
 
-  formula {
-    # Must have HDHP
-    if not has_hdhp {
-      return 0
-    }
+formula:
+  # Must have HDHP
+  if not has_hdhp {
+  return 0
 
-    # Deduction is lesser of contributions made or the limit
-    return min(hsa_contributions, hsa_contribution_limit)
-  }
-}
+# Deduction is lesser of contributions made or the limit
+return min(hsa_contributions, hsa_contribution_limit)
 
 # Tax unit level aggregation
-variable hsa_deduction_total {
-  entity TaxUnit
-  period Year
-  dtype Money
-  unit "USD"
-  label "Total HSA Deduction"
-  description "Combined HSA deduction for tax unit"
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Total HSA Deduction"
+description "Combined HSA deduction for tax unit"
 
-  formula {
-    return sum(members.hsa_deduction)
-  }
-}
+formula:
+  return sum(members.hsa_deduction)

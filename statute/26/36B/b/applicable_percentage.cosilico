@@ -24,14 +24,11 @@
 # This determines the "expected contribution" which is subtracted from
 # the benchmark premium to calculate the credit amount.
 
-module statute.26.36B.b.3.A
-version "2024.1"
-
-references {
-  # Household income as percentage of FPL
+imports:
+# Household income as percentage of FPL
   household_income_pct_fpl: statute/26/36B/d/household_income_pct_fpl
 
-  # Applicable percentage brackets from parameters
+# Applicable percentage brackets from parameters
   bracket_1: statute/26/36B/applicable_percentage/brackets_2024/bracket_1
   bracket_2: statute/26/36B/applicable_percentage/brackets_2024/bracket_2
   bracket_3: statute/26/36B/applicable_percentage/brackets_2024/bracket_3
@@ -39,98 +36,94 @@ references {
   bracket_5: statute/26/36B/applicable_percentage/brackets_2024/bracket_5
   bracket_6: statute/26/36B/applicable_percentage/brackets_2024/bracket_6
 
-  # Maximum applicable percentage
+# Maximum applicable percentage
   max_applicable_pct: statute/26/36B/maximum_applicable_percentage
-}
 
 # =============================================================================
 # APPLICABLE PERCENTAGE CALCULATION
 # 26 USC 36B(b)(3)(A)
 # =============================================================================
 
-variable applicable_percentage {
-  entity TaxUnit
-  period Year
-  dtype Rate
-  unit "/1"
-  label "Applicable Percentage"
-  description "Percentage of income expected for premium contribution per 26 USC 36B(b)(3)(A)"
-    "P.L. 117-169 Section 12001 (IRA enhanced percentages)"
+entity TaxUnit
+period Year
+dtype Rate
+unit "/1"
+label "Applicable Percentage"
+description "Percentage of income expected for premium contribution per 26 USC 36B(b)(3)(A)"
+"P.L. 117-169 Section 12001 (IRA enhanced percentages)"
 
-  formula {
-    let income_pct = household_income_pct_fpl
+formula:
+  income_pct = household_income_pct_fpl
 
-    # Under IRA (2021-2025): Income above 400% FPL still eligible at 8.5%
-    # Below 100% FPL: No credit (Medicaid eligible in expansion states)
-    if income_pct < 1.00 then
-      return 0
+  # Under IRA (2021-2025): Income above 400% FPL still eligible at 8.5%
+  # Below 100% FPL: No credit (Medicaid eligible in expansion states)
+  if income_pct < 1.00 then
+  return 0
 
-    # Bracket 1: 100-150% FPL (0% contribution under IRA)
-    if income_pct < 1.50 then
-      return interpolate_bracket(
-        income_pct,
-        bracket_1.lower_fpl,
-        bracket_1.upper_fpl,
-        bracket_1.initial_pct,
-        bracket_1.final_pct
-      )
+  # Bracket 1: 100-150% FPL (0% contribution under IRA)
+  if income_pct < 1.50 then
+  return interpolate_bracket(
+  income_pct,
+  bracket_1.lower_fpl,
+  bracket_1.upper_fpl,
+  bracket_1.initial_pct,
+  bracket_1.final_pct
+  )
 
-    # Bracket 2: 150-200% FPL (0% to 2% under IRA)
-    if income_pct < 2.00 then
-      return interpolate_bracket(
-        income_pct,
-        bracket_2.lower_fpl,
-        bracket_2.upper_fpl,
-        bracket_2.initial_pct,
-        bracket_2.final_pct
-      )
+  # Bracket 2: 150-200% FPL (0% to 2% under IRA)
+  if income_pct < 2.00 then
+  return interpolate_bracket(
+  income_pct,
+  bracket_2.lower_fpl,
+  bracket_2.upper_fpl,
+  bracket_2.initial_pct,
+  bracket_2.final_pct
+  )
 
-    # Bracket 3: 200-250% FPL (2% to 4% under IRA)
-    if income_pct < 2.50 then
-      return interpolate_bracket(
-        income_pct,
-        bracket_3.lower_fpl,
-        bracket_3.upper_fpl,
-        bracket_3.initial_pct,
-        bracket_3.final_pct
-      )
+  # Bracket 3: 200-250% FPL (2% to 4% under IRA)
+  if income_pct < 2.50 then
+  return interpolate_bracket(
+  income_pct,
+  bracket_3.lower_fpl,
+  bracket_3.upper_fpl,
+  bracket_3.initial_pct,
+  bracket_3.final_pct
+  )
 
-    # Bracket 4: 250-300% FPL (4% to 6% under IRA)
-    if income_pct < 3.00 then
-      return interpolate_bracket(
-        income_pct,
-        bracket_4.lower_fpl,
-        bracket_4.upper_fpl,
-        bracket_4.initial_pct,
-        bracket_4.final_pct
-      )
+  # Bracket 4: 250-300% FPL (4% to 6% under IRA)
+  if income_pct < 3.00 then
+  return interpolate_bracket(
+  income_pct,
+  bracket_4.lower_fpl,
+  bracket_4.upper_fpl,
+  bracket_4.initial_pct,
+  bracket_4.final_pct
+  )
 
-    # Bracket 5: 300-400% FPL (6% to 8.5% under IRA)
-    if income_pct < 4.00 then
-      return interpolate_bracket(
-        income_pct,
-        bracket_5.lower_fpl,
-        bracket_5.upper_fpl,
-        bracket_5.initial_pct,
-        bracket_5.final_pct
-      )
+  # Bracket 5: 300-400% FPL (6% to 8.5% under IRA)
+  if income_pct < 4.00 then
+  return interpolate_bracket(
+  income_pct,
+  bracket_5.lower_fpl,
+  bracket_5.upper_fpl,
+  bracket_5.initial_pct,
+  bracket_5.final_pct
+  )
 
-    # Bracket 6: 400%+ FPL (8.5% flat under IRA - no cliff!)
-    return bracket_6.initial_pct
-  }
+  # Bracket 6: 400%+ FPL (8.5% flat under IRA - no cliff!)
+  return bracket_6.initial_pct
 
-  default 0
-}
+default 0
 
 # Helper function: Linear interpolation within bracket
 # Per 36B(b)(3)(A): "increase, on a sliding scale in a linear manner"
-function interpolate_bracket(income_pct, lower_fpl, upper_fpl, initial_pct, final_pct) {
+
+function interpolate_bracket(income_pct, lower_fpl, upper_fpl, initial_pct, final_pct):
   # Position within bracket (0 to 1)
-  let position = (income_pct - lower_fpl) / (upper_fpl - lower_fpl)
+let position = (income_pct - lower_fpl) / (upper_fpl - lower_fpl)
 
   # Linear interpolation
-  return initial_pct + position * (final_pct - initial_pct)
-}
+return initial_pct + position * (final_pct - initial_pct)
 
 # =============================================================================
 # EXPECTED CONTRIBUTION
@@ -138,32 +131,26 @@ function interpolate_bracket(income_pct, lower_fpl, upper_fpl, initial_pct, fina
 # household income for the taxable year"
 # =============================================================================
 
-variable expected_contribution {
-  entity TaxUnit
-  period Year
-  dtype Money
-  unit "USD"
-  label "Expected Premium Contribution"
-  description "Annual household income contribution toward premiums per 26 USC 36B(b)(3)(A)(ii)"
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Expected Premium Contribution"
+description "Annual household income contribution toward premiums per 26 USC 36B(b)(3)(A)(ii)"
 
-  formula {
-    let household_income = taxunit.household_income
-    let app_pct = applicable_percentage
+formula:
+  household_income = taxunit.household_income
+  app_pct = applicable_percentage
 
-    return household_income * app_pct
-  }
-}
+  return household_income * app_pct
 
 # Monthly expected contribution (for monthly reconciliation)
-variable expected_contribution_monthly {
-  entity TaxUnit
-  period Month
-  dtype Money
-  unit "USD"
-  label "Monthly Expected Premium Contribution"
-  description "Monthly portion of expected premium contribution"
+entity TaxUnit
+period Month
+dtype Money
+unit "USD"
+label "Monthly Expected Premium Contribution"
+description "Monthly portion of expected premium contribution"
 
-  formula {
-    return expected_contribution / 12
-  }
-}
+formula:
+  return expected_contribution / 12

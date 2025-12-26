@@ -3,21 +3,14 @@
 # Counts qualifying individuals in the tax unit for determining
 # the applicable expense limit per 21(c).
 
-module statute.26.21.e
-version "2024.1"
-
-references {
+imports:
   is_cdcc_qualifying_individual: statute/26/21/e/is_qualifying_individual#is_cdcc_qualifying_individual
-}
 
-variable num_cdcc_qualifying_individuals {
-  entity TaxUnit
-  period Year
-  dtype Count
-  label "Number of CDCC Qualifying Individuals"
-  description "Count of qualifying individuals for Child and Dependent Care Credit per 26 USC 21(b)"
+entity TaxUnit
+period Year
+dtype Count
+label "Number of CDCC Qualifying Individuals"
+description "Count of qualifying individuals for Child and Dependent Care Credit per 26 USC 21(b)"
 
-  formula {
-    return tax_unit.members.count(is_cdcc_qualifying_individual)
-  }
-}
+formula:
+  return tax_unit.members.count(is_cdcc_qualifying_individual)

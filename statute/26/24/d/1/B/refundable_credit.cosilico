@@ -19,131 +19,112 @@
 #
 # For 3+ children, use max(EI_amount, SS_taxes - EITC) instead of EI_amount.
 
-module statute.26.24.d.1.B
-version "2024.1"
-
-references {
-  # Tentative credit after phase-out (before tax liability limit)
+imports:
+# Tentative credit after phase-out (before tax liability limit)
   tentative_child_tax_credit: statute/26/24/a/2/tentative_credit#tentative_child_tax_credit
 
-  # Nonrefundable CTC (limited by tax liability)
+# Nonrefundable CTC (limited by tax liability)
   child_tax_credit: statute/26/24/child_tax_credit#child_tax_credit
 
-  # Number of qualifying children
+# Number of qualifying children
   num_ctc_qualifying_children: statute/26/24/c/3/num_qualifying_children#num_ctc_qualifying_children
 
-  # Earned income per Section 32 definition
+# Earned income per Section 32 definition
   earned_income: statute/26/32/c/2/A/earned_income#earned_income
 
-  # Social security taxes (for 3+ children alternative)
+# Social security taxes (for 3+ children alternative)
   social_security_taxes: statute/26/3101/social_security_taxes
 
-  # EITC (for 3+ children alternative)
+# EITC (for 3+ children alternative)
   earned_income_credit: statute/26/32/a/1/earned_income_credit#earned_income_credit
 
-  # Parameters
+# Parameters
   earned_income_threshold: statute/26/24/d/1/B/parameters#earned_income_threshold
   refundable_rate: statute/26/24/d/1/B/parameters#refundable_rate
   refundable_maximum: statute/26/24/h/5/refundable_maximum#refundable_maximum
-}
 
 # --- Section 24(d)(1)(B)(i) - Earned Income Portion ---
 
-variable actc_earned_income_portion {
-  entity TaxUnit
-  period Year
-  dtype Money
-  unit "USD"
-  label "ACTC Earned Income Portion"
-  description "15% of earned income exceeding $2,500 per Section 24(d)(1)(B)(i)"
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "ACTC Earned Income Portion"
+description "15% of earned income exceeding $2,500 per Section 24(d)(1)(B)(i)"
 
-  formula {
-    let excess_earned_income = max(0, earned_income - earned_income_threshold)
-    return refundable_rate * excess_earned_income
-  }
-}
+formula:
+  excess_earned_income = max(0, earned_income - earned_income_threshold)
+  return refundable_rate * excess_earned_income
 
 # --- Section 24(d)(1)(B)(ii) - Social Security Portion (3+ children) ---
 
-variable actc_social_security_portion {
-  entity TaxUnit
-  period Year
-  dtype Money
-  unit "USD"
-  label "ACTC Social Security Portion"
-  description "Social security taxes minus EITC per Section 24(d)(1)(B)(ii) - only for 3+ children"
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "ACTC Social Security Portion"
+description "Social security taxes minus EITC per Section 24(d)(1)(B)(ii) - only for 3+ children"
 
-  formula {
-    # Only available for taxpayers with 3 or more qualifying children
-    if num_ctc_qualifying_children < 3 then
-      return 0
+formula:
+  # Only available for taxpayers with 3 or more qualifying children
+  if num_ctc_qualifying_children < 3 then
+  return 0
 
-    # Excess of social security taxes over EITC
-    return max(0, social_security_taxes - earned_income_credit)
-  }
-}
+  # Excess of social security taxes over EITC
+  return max(0, social_security_taxes - earned_income_credit)
 
 # --- Section 24(d)(1)(B) - Limit B Amount ---
 
-variable actc_limit_b {
-  entity TaxUnit
-  period Year
-  dtype Money
-  unit "USD"
-  label "ACTC Limit B"
-  description "The greater of earned income portion or social security portion per Section 24(d)(1)(B)"
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "ACTC Limit B"
+description "The greater of earned income portion or social security portion per Section 24(d)(1)(B)"
 
-  formula {
-    # For 3+ children, use whichever is greater
-    # For fewer than 3 children, social_security_portion is 0
-    return max(actc_earned_income_portion, actc_social_security_portion)
-  }
-}
+formula:
+  # For 3+ children, use whichever is greater
+  # For fewer than 3 children, social_security_portion is 0
+  return max(actc_earned_income_portion, actc_social_security_portion)
 
 # --- Section 24(h)(5) - Per-Child Maximum ---
 
-variable actc_per_child_cap {
-  entity TaxUnit
-  period Year
-  dtype Money
-  unit "USD"
-  label "ACTC Per-Child Cap"
-  description "Maximum refundable amount based on number of children per Section 24(h)(5)"
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "ACTC Per-Child Cap"
+description "Maximum refundable amount based on number of children per Section 24(h)(5)"
 
-  formula {
-    return num_ctc_qualifying_children * refundable_maximum
-  }
-}
+formula:
+  return num_ctc_qualifying_children * refundable_maximum
 
 # --- Section 24(d)(1) - Additional Child Tax Credit ---
 
-variable additional_child_tax_credit {
-  entity TaxUnit
-  period Year
-  dtype Money
-  unit "USD"
-  label "Additional Child Tax Credit (Refundable)"
-  description "Refundable portion of Child Tax Credit per 26 USC Section 24(d)"
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Additional Child Tax Credit (Refundable)"
+description "Refundable portion of Child Tax Credit per 26 USC Section 24(d)"
 
-  formula {
-    # Limit A: Unused credit (tentative credit minus the nonrefundable portion used against liability)
-    # This is the amount of credit that couldn't be used because tax liability was too low
-    let unused_credit = tentative_child_tax_credit - child_tax_credit
+formula:
+  # Limit A: Unused credit (tentative credit minus the nonrefundable portion used against liability)
+  # This is the amount of credit that couldn't be used because tax liability was too low
+  unused_credit = tentative_child_tax_credit - child_tax_credit
 
-    # If no unused credit, no ACTC
-    if unused_credit <= 0 then
-      return 0
+  # If no unused credit, no ACTC
+  if unused_credit <= 0 then
+  return 0
 
-    # Limit B: Earned income/social security formula
-    let limit_b = actc_limit_b
+  # Limit B: Earned income/social security formula
+  limit_b = actc_limit_b
 
-    # Per-child cap from Section 24(h)(5)
-    let per_child_cap = actc_per_child_cap
+  # Per-child cap from Section 24(h)(5)
+  per_child_cap = actc_per_child_cap
 
-    # ACTC is the minimum of:
-    # - Unused credit (Limit A)
-    # - Earned income/SS formula (Limit B)
-    # - Per-child maximum
-    return min(unused_credit, min(limit_b, per_child_cap))
-  }
-}
+  # ACTC is the minimum of:
+  # - Unused credit (Limit A)
+  # - Earned income/SS formula (Limit B)
+  # - Per-child maximum
+  return min(unused_credit, min(limit_b, per_child_cap))

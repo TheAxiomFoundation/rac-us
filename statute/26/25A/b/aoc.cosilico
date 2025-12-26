@@ -11,176 +11,145 @@
 # The American Opportunity Credit (AOC) provides up to $2,500 per eligible
 # student for the first 4 years of post-secondary education.
 
-module statute.26.25A.b
-version "2024.1"
-
-references {
-  # Parameter lookups
+imports:
+# Parameter lookups
   first_tier_limit: statute/26/25A/b/aoc_parameters#aoc_first_tier_limit
   second_tier_limit: statute/26/25A/b/aoc_parameters#aoc_second_tier_limit
   first_tier_rate: statute/26/25A/b/aoc_parameters#aoc_first_tier_rate
   second_tier_rate: statute/26/25A/b/aoc_parameters#aoc_second_tier_rate
   maximum_credit: statute/26/25A/b/aoc_parameters#aoc_maximum_credit
 
-  # Phaseout parameters
+# Phaseout parameters
   phaseout_start_single: statute/26/25A/d/phaseout_parameters#aoc_phaseout_start_single
   phaseout_start_joint: statute/26/25A/d/phaseout_parameters#aoc_phaseout_start_joint
   phaseout_range_single: statute/26/25A/d/phaseout_parameters#aoc_phaseout_range_single
   phaseout_range_joint: statute/26/25A/d/phaseout_parameters#aoc_phaseout_range_joint
 
-  # Refundable portion parameters
+# Refundable portion parameters
   refundable_rate: statute/26/25A/i/refundable_parameters#aoc_refundable_rate
 
-  # Other sections
+# Other sections
   filing_status: statute/26/1/filing_status
   adjusted_gross_income: statute/26/62/a/adjusted_gross_income
-}
 
 # Filing status values per Section 1
 enum FilingStatus {
-  SINGLE
-  JOINT
-  SEPARATE
-  HEAD_OF_HOUSEHOLD
-  SURVIVING_SPOUSE
-}
+SINGLE
+JOINT
+SEPARATE
+HEAD_OF_HOUSEHOLD
+SURVIVING_SPOUSE
 
 # --- Per-Student Credit Calculation per § 25A(b)(1) ---
 
-variable aoc_per_student_credit {
-  entity Person
-  period Year
-  dtype Money
-  unit "USD"
-  label "AOC Per Student Credit"
-  description "American Opportunity Credit amount for a single eligible student per § 25A(b)(1)"
+entity Person
+period Year
+dtype Money
+unit "USD"
+label "AOC Per Student Credit"
+description "American Opportunity Credit amount for a single eligible student per § 25A(b)(1)"
 
-  formula {
-    # Step 1: Calculate credit based on qualified expenses
-    # 100% of first $2,000 + 25% of next $2,000
-    let first_tier = min(aoc_qualified_expenses, first_tier_limit) * first_tier_rate
-    let second_tier_expenses = max(0, min(aoc_qualified_expenses, second_tier_limit) - first_tier_limit)
-    let second_tier = second_tier_expenses * second_tier_rate
+formula:
+  # Step 1: Calculate credit based on qualified expenses
+  # 100% of first $2,000 + 25% of next $2,000
+  first_tier = min(aoc_qualified_expenses, first_tier_limit) * first_tier_rate
+  second_tier_expenses = max(0, min(aoc_qualified_expenses, second_tier_limit) - first_tier_limit)
+  second_tier = second_tier_expenses * second_tier_rate
 
-    return first_tier + second_tier
-  }
-}
+  return first_tier + second_tier
 
 # --- Phaseout Calculation per § 25A(d)(2) ---
 
-variable aoc_phaseout_threshold {
-  entity TaxUnit
-  period Year
-  dtype Money
-  unit "USD"
-  label "AOC Phaseout Threshold"
-  description "MAGI threshold where AOC phaseout begins per § 25A(d)(2)(B)(i)"
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "AOC Phaseout Threshold"
+description "MAGI threshold where AOC phaseout begins per § 25A(d)(2)(B)(i)"
 
-  formula {
-    return match filing_status {
-      case JOINT => phaseout_start_joint
-      case SURVIVING_SPOUSE => phaseout_start_joint
-      else => phaseout_start_single
-    }
-  }
-}
+formula:
+  return match filing_status {
+  case JOINT => phaseout_start_joint
+  case SURVIVING_SPOUSE => phaseout_start_joint
+  else => phaseout_start_single
 
-variable aoc_phaseout_range {
-  entity TaxUnit
-  period Year
-  dtype Money
-  unit "USD"
-  label "AOC Phaseout Range"
-  description "MAGI range over which AOC phases out per § 25A(d)(2)(B)(ii)"
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "AOC Phaseout Range"
+description "MAGI range over which AOC phases out per § 25A(d)(2)(B)(ii)"
 
-  formula {
-    return match filing_status {
-      case JOINT => phaseout_range_joint
-      case SURVIVING_SPOUSE => phaseout_range_joint
-      else => phaseout_range_single
-    }
-  }
-}
+formula:
+  return match filing_status {
+  case JOINT => phaseout_range_joint
+  case SURVIVING_SPOUSE => phaseout_range_joint
+  else => phaseout_range_single
 
-variable aoc_phaseout_ratio {
-  entity TaxUnit
-  period Year
-  dtype Rate
-  unit "rate"
-  label "AOC Phaseout Ratio"
-  description "Reduction ratio for AOC based on MAGI per § 25A(d)(2)(B)"
+entity TaxUnit
+period Year
+dtype Rate
+unit "rate"
+label "AOC Phaseout Ratio"
+description "Reduction ratio for AOC based on MAGI per § 25A(d)(2)(B)"
 
-  formula {
-    let magi = modified_adjusted_gross_income
-    let threshold = aoc_phaseout_threshold
-    let range = aoc_phaseout_range
+formula:
+  magi = modified_adjusted_gross_income
+  threshold = aoc_phaseout_threshold
+  range = aoc_phaseout_range
 
-    if magi <= threshold then
-      return 0
+  if magi <= threshold then
+  return 0
 
-    let excess = magi - threshold
-    return min(1, excess / range)
-  }
-}
+  excess = magi - threshold
+  return min(1, excess / range)
 
 # --- Total AOC for Tax Unit per § 25A(a) ---
 
-variable aoc_total_before_phaseout {
-  entity TaxUnit
-  period Year
-  dtype Money
-  unit "USD"
-  label "Total AOC Before Phaseout"
-  description "Sum of AOC for all eligible students before phaseout reduction"
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Total AOC Before Phaseout"
+description "Sum of AOC for all eligible students before phaseout reduction"
 
-  formula {
-    # Sum per-student credits for all eligible students in the tax unit
-    return sum(members.aoc_per_student_credit where members.is_aoc_eligible_student)
-  }
-}
+formula:
+  # Sum per-student credits for all eligible students in the tax unit
+  return sum(members.aoc_per_student_credit where members.is_aoc_eligible_student)
 
-variable american_opportunity_credit {
-  entity TaxUnit
-  period Year
-  dtype Money
-  unit "USD"
-  label "American Opportunity Credit"
-  description "Total AOC after phaseout reduction per 26 USC § 25A(b)"
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "American Opportunity Credit"
+description "Total AOC after phaseout reduction per 26 USC § 25A(b)"
 
-  formula {
-    let before_phaseout = aoc_total_before_phaseout
-    let reduction_ratio = aoc_phaseout_ratio
+formula:
+  before_phaseout = aoc_total_before_phaseout
+  reduction_ratio = aoc_phaseout_ratio
 
-    return before_phaseout * (1 - reduction_ratio)
-  }
+  return before_phaseout * (1 - reduction_ratio)
 
-  default 0
-}
+default 0
 
 # --- Refundable and Nonrefundable Portions per § 25A(i) ---
 
-variable aoc_refundable {
-  entity TaxUnit
-  period Year
-  dtype Money
-  unit "USD"
-  label "Refundable AOC"
-  description "40% refundable portion of AOC per § 25A(i)(1)"
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Refundable AOC"
+description "40% refundable portion of AOC per § 25A(i)(1)"
 
-  formula {
-    return american_opportunity_credit * refundable_rate
-  }
-}
+formula:
+  return american_opportunity_credit * refundable_rate
 
-variable aoc_nonrefundable {
-  entity TaxUnit
-  period Year
-  dtype Money
-  unit "USD"
-  label "Nonrefundable AOC"
-  description "60% nonrefundable portion of AOC"
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Nonrefundable AOC"
+description "60% nonrefundable portion of AOC"
 
-  formula {
-    return american_opportunity_credit * (1 - refundable_rate)
-  }
-}
+formula:
+  return american_opportunity_credit * (1 - refundable_rate)

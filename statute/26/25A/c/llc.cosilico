@@ -14,140 +14,115 @@
 # - Not refundable
 # - 20% of expenses up to $10,000
 
-module statute.26.25A.c
-version "2024.1"
-
-references {
-  # Parameter lookups
+imports:
+# Parameter lookups
   expense_limit: statute/26/25A/c/llc_parameters#llc_expense_limit
   rate: statute/26/25A/c/llc_parameters#llc_rate
   maximum_credit: statute/26/25A/c/llc_parameters#llc_maximum_credit
 
-  # Phaseout parameters
+# Phaseout parameters
   phaseout_start_single: statute/26/25A/d/phaseout_parameters#llc_phaseout_start_single
   phaseout_start_joint: statute/26/25A/d/phaseout_parameters#llc_phaseout_start_joint
   phaseout_range_single: statute/26/25A/d/phaseout_parameters#llc_phaseout_range_single
   phaseout_range_joint: statute/26/25A/d/phaseout_parameters#llc_phaseout_range_joint
 
-  # Other sections
+# Other sections
   filing_status: statute/26/1/filing_status
   adjusted_gross_income: statute/26/62/a/adjusted_gross_income
-}
 
 # Filing status values per Section 1
 enum FilingStatus {
-  SINGLE
-  JOINT
-  SEPARATE
-  HEAD_OF_HOUSEHOLD
-  SURVIVING_SPOUSE
-}
+SINGLE
+JOINT
+SEPARATE
+HEAD_OF_HOUSEHOLD
+SURVIVING_SPOUSE
 
 # --- Credit Calculation per § 25A(c)(1) ---
 
-variable llc_qualified_expenses_total {
-  entity TaxUnit
-  period Year
-  dtype Money
-  unit "USD"
-  label "LLC Qualified Expenses Total"
-  description "Total qualified tuition and related expenses for LLC per return"
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "LLC Qualified Expenses Total"
+description "Total qualified tuition and related expenses for LLC per return"
 
-  formula {
-    # Sum all qualified expenses for students not claiming AOC
-    # Note: Cannot claim both AOC and LLC for same student
-    return sum(members.llc_qualified_expenses where not members.is_aoc_eligible_student)
-  }
-}
+formula:
+  # Sum all qualified expenses for students not claiming AOC
+  # Note: Cannot claim both AOC and LLC for same student
+  return sum(members.llc_qualified_expenses where not members.is_aoc_eligible_student)
 
-variable llc_before_phaseout {
-  entity TaxUnit
-  period Year
-  dtype Money
-  unit "USD"
-  label "LLC Before Phaseout"
-  description "Lifetime Learning Credit before phaseout reduction per § 25A(c)(1)"
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "LLC Before Phaseout"
+description "Lifetime Learning Credit before phaseout reduction per § 25A(c)(1)"
 
-  formula {
-    # 20% of qualified expenses up to $10,000
-    let eligible_expenses = min(llc_qualified_expenses_total, expense_limit)
-    return eligible_expenses * rate
-  }
-}
+formula:
+  # 20% of qualified expenses up to $10,000
+  eligible_expenses = min(llc_qualified_expenses_total, expense_limit)
+  return eligible_expenses * rate
 
 # --- Phaseout Calculation per § 25A(d)(2) ---
 
-variable llc_phaseout_threshold {
-  entity TaxUnit
-  period Year
-  dtype Money
-  unit "USD"
-  label "LLC Phaseout Threshold"
-  description "MAGI threshold where LLC phaseout begins per § 25A(d)(2)(B)(i)"
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "LLC Phaseout Threshold"
+description "MAGI threshold where LLC phaseout begins per § 25A(d)(2)(B)(i)"
 
-  formula {
-    return match filing_status {
-      case JOINT => phaseout_start_joint
-      case SURVIVING_SPOUSE => phaseout_start_joint
-      else => phaseout_start_single
-    }
-  }
-}
+formula:
+  return match filing_status {
+  case JOINT => phaseout_start_joint
+  case SURVIVING_SPOUSE => phaseout_start_joint
+  else => phaseout_start_single
 
-variable llc_phaseout_range {
-  entity TaxUnit
-  period Year
-  dtype Money
-  unit "USD"
-  label "LLC Phaseout Range"
-  description "MAGI range over which LLC phases out per § 25A(d)(2)(B)(ii)"
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "LLC Phaseout Range"
+description "MAGI range over which LLC phases out per § 25A(d)(2)(B)(ii)"
 
-  formula {
-    return match filing_status {
-      case JOINT => phaseout_range_joint
-      case SURVIVING_SPOUSE => phaseout_range_joint
-      else => phaseout_range_single
-    }
-  }
-}
+formula:
+  return match filing_status {
+  case JOINT => phaseout_range_joint
+  case SURVIVING_SPOUSE => phaseout_range_joint
+  else => phaseout_range_single
 
-variable llc_phaseout_ratio {
-  entity TaxUnit
-  period Year
-  dtype Rate
-  unit "rate"
-  label "LLC Phaseout Ratio"
-  description "Reduction ratio for LLC based on MAGI per § 25A(d)(2)(B)"
+entity TaxUnit
+period Year
+dtype Rate
+unit "rate"
+label "LLC Phaseout Ratio"
+description "Reduction ratio for LLC based on MAGI per § 25A(d)(2)(B)"
 
-  formula {
-    let magi = modified_adjusted_gross_income
-    let threshold = llc_phaseout_threshold
-    let range = llc_phaseout_range
+formula:
+  magi = modified_adjusted_gross_income
+  threshold = llc_phaseout_threshold
+  range = llc_phaseout_range
 
-    if magi <= threshold then
-      return 0
+  if magi <= threshold then
+  return 0
 
-    let excess = magi - threshold
-    return min(1, excess / range)
-  }
-}
+  excess = magi - threshold
+  return min(1, excess / range)
 
 # --- Final LLC Amount ---
 
-variable lifetime_learning_credit {
-  entity TaxUnit
-  period Year
-  dtype Money
-  unit "USD"
-  label "Lifetime Learning Credit"
-  description "Lifetime Learning Credit after phaseout per 26 USC § 25A(c)"
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Lifetime Learning Credit"
+description "Lifetime Learning Credit after phaseout per 26 USC § 25A(c)"
 
-  formula {
-    let before_phaseout = llc_before_phaseout
-    let reduction_ratio = llc_phaseout_ratio
+formula:
+  before_phaseout = llc_before_phaseout
+  reduction_ratio = llc_phaseout_ratio
 
-    return before_phaseout * (1 - reduction_ratio)
-  }
+  return before_phaseout * (1 - reduction_ratio)
 
-  default 0
-}
+default 0

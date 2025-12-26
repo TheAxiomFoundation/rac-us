@@ -17,38 +17,31 @@
 # any TANF-funded benefit, even non-cash benefits like informational
 # brochures. This is handled at state level.
 
-references {
+imports:
   snap_gross_income_eligible: statute/7/2014/c/snap_gross_income_eligible
   snap_net_income_eligible: statute/7/2014/e/snap_net_income_eligible
   snap_resource_eligible: statute/7/2014/g/snap_resource_eligible
-}
 
 # Pure categorical eligibility (federal program receipt)
-variable snap_categorically_eligible {
-  entity Household
-  period Month
-  dtype Boolean
+entity Household
+period Month
+dtype Boolean
 
-  formula {
-    # § 2014(a) + § 2014(j): SSI and TANF recipients
-    return receives_ssi or receives_tanf or receives_general_assistance
-  }
-}
+formula:
+  # § 2014(a) + § 2014(j): SSI and TANF recipients
+  return receives_ssi or receives_tanf or receives_general_assistance
 
 # Main eligibility determination
-variable snap_eligible {
-  entity Household
-  period Month
-  dtype Boolean
+entity Household
+period Month
+dtype Boolean
 
-  formula {
-    # § 2014(a): Categorically eligible households bypass certain tests
-    if snap_categorically_eligible then
-      # Still must pass net income test in most states
-      # (Some states with BBCE waive this too, but federal baseline requires it)
-      return snap_net_income_eligible
+formula:
+  # § 2014(a): Categorically eligible households bypass certain tests
+  if snap_categorically_eligible then
+  # Still must pass net income test in most states
+  # (Some states with BBCE waive this too, but federal baseline requires it)
+  return snap_net_income_eligible
 
-    # Regular eligibility: must pass all three tests
-    return snap_gross_income_eligible and snap_net_income_eligible and snap_resource_eligible
-  }
-}
+  # Regular eligibility: must pass all three tests
+  return snap_gross_income_eligible and snap_net_income_eligible and snap_resource_eligible

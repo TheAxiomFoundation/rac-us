@@ -11,17 +11,12 @@
 # Exception: A nonresident alien who is married to a US citizen or resident
 # and files jointly may elect to be treated as a resident under §6013(g).
 
-module statute.26.32.c.1.D
-version "2024.1"
+entity TaxUnit
+period Year
+dtype Bool
+label "Is Nonresident Alien"
+description "Whether taxpayer is a nonresident alien not electing US tax treatment, disqualifying from EITC per 26 USC §32(c)(1)(D)"
 
-variable is_nonresident_alien {
-  entity TaxUnit
-  period Year
-  dtype Bool
-  label "Is Nonresident Alien"
-  description "Whether taxpayer is a nonresident alien not electing US tax treatment, disqualifying from EITC per 26 USC §32(c)(1)(D)"
-
-  # Input: True if individual has nonresident alien status for any part
-  # of the year and has not made an election under §6013(g) to be treated
-  # as a US resident for tax purposes.
-}
+# Input: True if individual has nonresident alien status for any part
+# of the year and has not made an election under §6013(g) to be treated
+# as a US resident for tax purposes.

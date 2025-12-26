@@ -17,69 +17,54 @@
 # For 2024, the maximum deduction is $300 per eligible educator.
 # If spouses file jointly and both are educators, each can deduct up to $300.
 
-module statute.26.62.a.2.D
-version "2024.1"
-
-parameters {
-  # Maximum educator expense deduction per person
-  # Inflation-adjusted per Section 62(d)(3)
+parameters:
+# Maximum educator expense deduction per person
+# Inflation-adjusted per Section 62(d)(3)
   max_deduction: 300  # 2024 value
-}
 
-variable is_eligible_educator {
-  entity Person
-  period Year
-  dtype Boolean
-  label "Is Eligible Educator"
-  description "Whether the individual qualifies as an eligible educator per Section 62(d)(1)"
+entity Person
+period Year
+dtype Boolean
+label "Is Eligible Educator"
+description "Whether the individual qualifies as an eligible educator per Section 62(d)(1)"
 
-  # An eligible educator is a kindergarten through grade 12 teacher,
-  # instructor, counselor, principal, or aide who works at least 900 hours
-  # during the school year.
-  # This is an input variable - determined by the taxpayer's profession
-}
+# An eligible educator is a kindergarten through grade 12 teacher,
+# instructor, counselor, principal, or aide who works at least 900 hours
+# during the school year.
+# This is an input variable - determined by the taxpayer's profession
 
-variable educator_expenses {
-  entity Person
-  period Year
-  dtype Money
-  unit "USD"
-  label "Educator Expenses Paid"
-  description "Unreimbursed educator expenses paid during the tax year"
+entity Person
+period Year
+dtype Money
+unit "USD"
+label "Educator Expenses Paid"
+description "Unreimbursed educator expenses paid during the tax year"
 
-  # Input variable - amount paid by the educator for qualifying supplies
-}
+# Input variable - amount paid by the educator for qualifying supplies
 
-variable educator_expense_deduction {
-  entity Person
-  period Year
-  dtype Money
-  unit "USD"
-  label "Educator Expense Deduction"
-  description "Above-the-line deduction for eligible educator expenses, capped at $300"
+entity Person
+period Year
+dtype Money
+unit "USD"
+label "Educator Expense Deduction"
+description "Above-the-line deduction for eligible educator expenses, capped at $300"
 
-  formula {
-    # Only eligible educators can claim this deduction
-    if not is_eligible_educator {
-      return 0
-    }
+formula:
+  # Only eligible educators can claim this deduction
+  if not is_eligible_educator {
+  return 0
 
-    # Deduction is the lesser of expenses paid or the maximum allowed
-    return min(educator_expenses, max_deduction)
-  }
-}
+# Deduction is the lesser of expenses paid or the maximum allowed
+return min(educator_expenses, max_deduction)
 
 # Tax unit level aggregation for married filing jointly
-variable educator_expense_deduction_total {
-  entity TaxUnit
-  period Year
-  dtype Money
-  unit "USD"
-  label "Total Educator Expense Deduction"
-  description "Combined educator expense deduction for tax unit (both spouses if applicable)"
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Total Educator Expense Deduction"
+description "Combined educator expense deduction for tax unit (both spouses if applicable)"
 
-  formula {
-    # Sum deductions from all members (each limited to $300)
-    return sum(members.educator_expense_deduction)
-  }
-}
+formula:
+  # Sum deductions from all members (each limited to $300)
+  return sum(members.educator_expense_deduction)

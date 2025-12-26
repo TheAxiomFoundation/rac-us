@@ -8,20 +8,17 @@
 # The AMT is designed to ensure that taxpayers who benefit from certain
 # deductions, credits, and exclusions pay at least a minimum amount of tax.
 
-module statute.26.55.a
-version "2024.1"
-
-references {
-  # AMTI computed from Section 55(b)(2)
+imports:
+# AMTI computed from Section 55(b)(2)
   amti: statute/26/55/b/2/amti#alternative_minimum_taxable_income
 
-  # Regular tax from Section 1
+# Regular tax from Section 1
   regular_tax: statute/26/1/income_tax#income_tax_before_credits
 
-  # Filing status for rate/exemption lookups
+# Filing status for rate/exemption lookups
   filing_status: statute/26/1/filing_status
 
-  # Parameters
+# Parameters
   exemption_joint: parameters/statute/26/55/d/1/exemption#exemption_joint
   exemption_single: parameters/statute/26/55/d/1/exemption#exemption_single
   exemption_mfs: parameters/statute/26/55/d/1/exemption#exemption_married_separate
@@ -37,175 +34,146 @@ references {
   amt_bracket_joint: parameters/statute/26/55/b/3/bracket#amt_bracket_joint
   amt_bracket_single: parameters/statute/26/55/b/3/bracket#amt_bracket_single
   amt_bracket_mfs: parameters/statute/26/55/b/3/bracket#amt_bracket_married_separate
-}
 
 # --- Section 55(d) - Exemption Amount ---
 
-variable amt_exemption_base {
-  entity TaxUnit
-  period Year
-  dtype Money
-  unit "USD"
-  label "AMT Base Exemption Amount"
-  description "Base exemption amount before phaseout per Section 55(d)(1)"
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "AMT Base Exemption Amount"
+description "Base exemption amount before phaseout per Section 55(d)(1)"
 
-  formula {
-    # Get base exemption based on filing status
-    # Joint filers and surviving spouses: Section 55(d)(1)(A)
-    # Single and HoH: Section 55(d)(1)(B)
-    # MFS: Section 55(d)(1)(C) - half of joint
-    match filing_status {
-      MARRIED_FILING_JOINTLY => exemption_joint
-      QUALIFYING_WIDOW => exemption_joint
-      MARRIED_FILING_SEPARATELY => exemption_mfs
-      SINGLE => exemption_single
-      HEAD_OF_HOUSEHOLD => exemption_single
-    }
-  }
-}
+formula:
+  # Get base exemption based on filing status
+  # Joint filers and surviving spouses: Section 55(d)(1)(A)
+  # Single and HoH: Section 55(d)(1)(B)
+  # MFS: Section 55(d)(1)(C) - half of joint
+  match filing_status {
+  MARRIED_FILING_JOINTLY => exemption_joint
+  QUALIFYING_WIDOW => exemption_joint
+  MARRIED_FILING_SEPARATELY => exemption_mfs
+  SINGLE => exemption_single
+  HEAD_OF_HOUSEHOLD => exemption_single
 
-variable amt_exemption_phaseout_threshold {
-  entity TaxUnit
-  period Year
-  dtype Money
-  unit "USD"
-  label "AMT Exemption Phaseout Threshold"
-  description "AMTI level at which exemption phaseout begins per Section 55(d)(2)"
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "AMT Exemption Phaseout Threshold"
+description "AMTI level at which exemption phaseout begins per Section 55(d)(2)"
 
-  formula {
-    match filing_status {
-      MARRIED_FILING_JOINTLY => phaseout_threshold_joint
-      QUALIFYING_WIDOW => phaseout_threshold_joint
-      MARRIED_FILING_SEPARATELY => phaseout_threshold_mfs
-      SINGLE => phaseout_threshold_single
-      HEAD_OF_HOUSEHOLD => phaseout_threshold_single
-    }
-  }
-}
+formula:
+  match filing_status {
+  MARRIED_FILING_JOINTLY => phaseout_threshold_joint
+  QUALIFYING_WIDOW => phaseout_threshold_joint
+  MARRIED_FILING_SEPARATELY => phaseout_threshold_mfs
+  SINGLE => phaseout_threshold_single
+  HEAD_OF_HOUSEHOLD => phaseout_threshold_single
 
-variable amt_exemption {
-  entity TaxUnit
-  period Year
-  dtype Money
-  unit "USD"
-  label "AMT Exemption Amount"
-  description "Exemption amount after phaseout per Section 55(d)"
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "AMT Exemption Amount"
+description "Exemption amount after phaseout per Section 55(d)"
 
-  formula {
-    # Get base exemption for filing status
-    let base = amt_exemption_base
-    let threshold = amt_exemption_phaseout_threshold
+formula:
+  # Get base exemption for filing status
+  base = amt_exemption_base
+  threshold = amt_exemption_phaseout_threshold
 
-    # Section 55(d)(2): Exemption reduced by 25% of AMTI over threshold
-    let excess_amti = max(0, amti - threshold)
-    let reduction = excess_amti * phaseout_rate
+  # Section 55(d)(2): Exemption reduced by 25% of AMTI over threshold
+  excess_amti = max(0, amti - threshold)
+  reduction = excess_amti * phaseout_rate
 
-    # Exemption phases out completely when reduction equals base
-    # Complete phaseout at: threshold + (4 * base_exemption)
-    return max(0, base - reduction)
-  }
-}
+  # Exemption phases out completely when reduction equals base
+  # Complete phaseout at: threshold + (4 * base_exemption)
+  return max(0, base - reduction)
 
 # --- Section 55(b)(1) - Tentative Minimum Tax ---
 
-variable amt_taxable_excess {
-  entity TaxUnit
-  period Year
-  dtype Money
-  unit "USD"
-  label "AMT Taxable Excess"
-  description "AMTI minus exemption - the base for tentative minimum tax"
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "AMT Taxable Excess"
+description "AMTI minus exemption - the base for tentative minimum tax"
 
-  formula {
-    # Taxable excess is AMTI minus exemption, but not below zero
-    max(0, amti - amt_exemption)
-  }
-}
+formula:
+  # Taxable excess is AMTI minus exemption, but not below zero
+  max(0, amti - amt_exemption)
 
-variable amt_bracket_threshold {
-  entity TaxUnit
-  period Year
-  dtype Money
-  unit "USD"
-  label "AMT Bracket Threshold"
-  description "Threshold where AMT rate increases from 26% to 28%"
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "AMT Bracket Threshold"
+description "Threshold where AMT rate increases from 26% to 28%"
 
-  formula {
-    # Section 55(b)(3): Bracket threshold varies by filing status
-    match filing_status {
-      MARRIED_FILING_JOINTLY => amt_bracket_joint
-      QUALIFYING_WIDOW => amt_bracket_joint
-      MARRIED_FILING_SEPARATELY => amt_bracket_mfs
-      SINGLE => amt_bracket_single
-      HEAD_OF_HOUSEHOLD => amt_bracket_single
-    }
-  }
-}
+formula:
+  # Section 55(b)(3): Bracket threshold varies by filing status
+  match filing_status {
+  MARRIED_FILING_JOINTLY => amt_bracket_joint
+  QUALIFYING_WIDOW => amt_bracket_joint
+  MARRIED_FILING_SEPARATELY => amt_bracket_mfs
+  SINGLE => amt_bracket_single
+  HEAD_OF_HOUSEHOLD => amt_bracket_single
 
-variable tentative_minimum_tax {
-  entity TaxUnit
-  period Year
-  dtype Money
-  unit "USD"
-  label "Tentative Minimum Tax"
-  description "TMT calculated at 26%/28% rates per Section 55(b)(1)"
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Tentative Minimum Tax"
+description "TMT calculated at 26%/28% rates per Section 55(b)(1)"
 
-  formula {
-    let taxable_excess = amt_taxable_excess
-    let bracket = amt_bracket_threshold
+formula:
+  taxable_excess = amt_taxable_excess
+  bracket = amt_bracket_threshold
 
-    # Two-bracket rate structure:
-    # 26% on taxable excess up to bracket threshold
-    # 28% on taxable excess above bracket threshold
+  # Two-bracket rate structure:
+  # 26% on taxable excess up to bracket threshold
+  # 28% on taxable excess above bracket threshold
 
-    let amount_at_26_pct = min(taxable_excess, bracket)
-    let amount_at_28_pct = max(0, taxable_excess - bracket)
+  amount_at_26_pct = min(taxable_excess, bracket)
+  amount_at_28_pct = max(0, taxable_excess - bracket)
 
-    let tax_at_26 = amount_at_26_pct * amt_rate_low
-    let tax_at_28 = amount_at_28_pct * amt_rate_high
+  tax_at_26 = amount_at_26_pct * amt_rate_low
+  tax_at_28 = amount_at_28_pct * amt_rate_high
 
-    return tax_at_26 + tax_at_28
-  }
-}
+  return tax_at_26 + tax_at_28
 
 # --- Section 55(a) - AMT Imposed ---
 
-variable alternative_minimum_tax {
-  entity TaxUnit
-  period Year
-  dtype Money
-  unit "USD"
-  label "Alternative Minimum Tax"
-  description "AMT is the excess of tentative minimum tax over regular tax per Section 55(a)"
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Alternative Minimum Tax"
+description "AMT is the excess of tentative minimum tax over regular tax per Section 55(a)"
 
-  formula {
-    # Section 55(a): AMT = max(0, TMT - regular tax)
-    # If tentative minimum tax exceeds regular tax, AMT is the difference
-    # If regular tax exceeds TMT, no AMT is owed
-    let tmt = tentative_minimum_tax
-    let reg = regular_tax
+formula:
+  # Section 55(a): AMT = max(0, TMT - regular tax)
+  # If tentative minimum tax exceeds regular tax, AMT is the difference
+  # If regular tax exceeds TMT, no AMT is owed
+  tmt = tentative_minimum_tax
+  reg = regular_tax
 
-    return max(0, tmt - reg)
-  }
+  return max(0, tmt - reg)
 
-  defined_for {
-    amti > 0
-  }
+defined_for:
+  amti > 0
 
-  default 0
-}
+default 0
 
 # --- Helper: Total Tax Including AMT ---
 
-variable total_income_tax_with_amt {
-  entity TaxUnit
-  period Year
-  dtype Money
-  unit "USD"
-  label "Total Income Tax with AMT"
-  description "Regular tax plus AMT"
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Total Income Tax with AMT"
+description "Regular tax plus AMT"
 
-  formula {
-    return regular_tax + alternative_minimum_tax
-  }
-}
+formula:
+  return regular_tax + alternative_minimum_tax

@@ -17,86 +17,72 @@
 #   - 21(c): Dollar limit on expenses ($3,000 / $6,000)
 #   - 21(d): Earned income limitation
 
-module statute.26.21.a
-version "2024.1"
-
-references {
-  # Number of qualifying individuals
+imports:
+# Number of qualifying individuals
   num_cdcc_qualifying_individuals: statute/26/21/e/num_qualifying_individuals#num_cdcc_qualifying_individuals
 
-  # Applicable percentage (credit rate)
+# Applicable percentage (credit rate)
   cdcc_applicable_percentage: statute/26/21/b/applicable_percentage#cdcc_applicable_percentage
 
-  # Expense limits
+# Expense limits
   cdcc_maximum_expense_limit: statute/26/21/c/expense_limit#cdcc_maximum_expense_limit
   cdcc_earned_income_limit: statute/26/21/d/earned_income_limit#cdcc_earned_income_limit
 
-  # Actual employment-related expenses paid (input)
+# Actual employment-related expenses paid (input)
   cdcc_expenses_paid: statute/26/21/a/inputs#cdcc_expenses_paid
 
-  # Tax liability (for nonrefundable limitation)
+# Tax liability (for nonrefundable limitation)
   tax_liability_before_credits: statute/26/26/a/tax_liability_before_credits#tax_liability_before_credits
 
-  # Refundability parameter
+# Refundability parameter
   is_refundable: statute/26/21/a/refundability#is_refundable
-}
 
 # Intermediate: Creditable expenses after all limitations
-variable cdcc_creditable_expenses {
-  entity TaxUnit
-  period Year
-  dtype Money
-  unit "USD"
-  label "CDCC Creditable Expenses"
-  description "Employment-related expenses eligible for credit after all limitations"
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "CDCC Creditable Expenses"
+description "Employment-related expenses eligible for credit after all limitations"
 
-  formula {
-    # No qualifying individuals = no credit
-    if num_cdcc_qualifying_individuals == 0 then
-      return 0
+formula:
+  # No qualifying individuals = no credit
+  if num_cdcc_qualifying_individuals == 0 then
+  return 0
 
-    # Apply all limitations: actual expenses, statutory limit, earned income limit
-    return min(cdcc_expenses_paid, cdcc_maximum_expense_limit, cdcc_earned_income_limit)
-  }
-}
+  # Apply all limitations: actual expenses, statutory limit, earned income limit
+  return min(cdcc_expenses_paid, cdcc_maximum_expense_limit, cdcc_earned_income_limit)
 
 # The credit amount before tax liability limitation
-variable cdcc_tentative_credit {
-  entity TaxUnit
-  period Year
-  dtype Money
-  unit "USD"
-  label "CDCC Tentative Credit"
-  description "Child and Dependent Care Credit before tax liability limitation"
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "CDCC Tentative Credit"
+description "Child and Dependent Care Credit before tax liability limitation"
 
-  formula {
-    return cdcc_creditable_expenses * cdcc_applicable_percentage
-  }
-}
+formula:
+  return cdcc_creditable_expenses * cdcc_applicable_percentage
 
 # The final Child and Dependent Care Credit
-variable child_dependent_care_credit {
-  entity TaxUnit
-  period Year
-  dtype Money
-  unit "USD"
-  label "Child and Dependent Care Credit"
-  description "Credit for employment-related expenses for care of qualifying individuals per 26 USC 21"
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Child and Dependent Care Credit"
+description "Credit for employment-related expenses for care of qualifying individuals per 26 USC 21"
 
-  formula {
-    let tentative = cdcc_tentative_credit
+formula:
+  tentative = cdcc_tentative_credit
 
-    # ARPA 2021 made the credit refundable for 2021
-    if is_refundable then
-      return tentative
+  # ARPA 2021 made the credit refundable for 2021
+  if is_refundable then
+  return tentative
 
-    # Otherwise, credit is limited to tax liability (nonrefundable)
-    return min(tentative, tax_liability_before_credits)
-  }
+  # Otherwise, credit is limited to tax liability (nonrefundable)
+  return min(tentative, tax_liability_before_credits)
 
-  defined_for {
-    num_cdcc_qualifying_individuals > 0
-  }
+defined_for:
+  num_cdcc_qualifying_individuals > 0
 
-  default 0
-}
+default 0

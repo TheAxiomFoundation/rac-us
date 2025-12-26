@@ -1,8 +1,6 @@
 # 26 USC §32(b)(2)(A) - Earned Income Amount
 
-variable earned_income_amount {
-  entity TaxUnit
-  period Year
-  dtype Money
-  # Parameter: varies by num_qualifying_children
-}
+entity TaxUnit
+period Year
+dtype Money
+# Parameter: varies by num_qualifying_children

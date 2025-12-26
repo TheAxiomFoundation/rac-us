@@ -13,86 +13,70 @@
 # - AOC is partially refundable (40%), LLC is entirely nonrefundable
 # - Each has separate phaseout thresholds based on MAGI
 
-module statute.26.25A.a
-version "2024.1"
-
-references {
-  # Component credits
+imports:
+# Component credits
   american_opportunity_credit: statute/26/25A/b/american_opportunity_credit
   aoc_refundable: statute/26/25A/b/aoc_refundable
   aoc_nonrefundable: statute/26/25A/b/aoc_nonrefundable
   lifetime_learning_credit: statute/26/25A/c/lifetime_learning_credit
 
-  # Other sections
+# Other sections
   adjusted_gross_income: statute/26/62/a/adjusted_gross_income
   tax_liability_before_credits: statute/26/1/income_tax
-}
 
 # --- Combined Education Credits per § 25A(a) ---
 
-variable education_credits_total {
-  entity TaxUnit
-  period Year
-  dtype Money
-  unit "USD"
-  label "Total Education Credits"
-  description "Sum of American Opportunity Credit and Lifetime Learning Credit per § 25A(a)"
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Total Education Credits"
+description "Sum of American Opportunity Credit and Lifetime Learning Credit per § 25A(a)"
 
-  formula {
-    return american_opportunity_credit + lifetime_learning_credit
-  }
-}
+formula:
+  return american_opportunity_credit + lifetime_learning_credit
 
 # --- Nonrefundable Portion ---
 
-variable education_credits_nonrefundable {
-  entity TaxUnit
-  period Year
-  dtype Money
-  unit "USD"
-  label "Nonrefundable Education Credits"
-  description "Nonrefundable portion of education credits (60% of AOC + 100% of LLC)"
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Nonrefundable Education Credits"
+description "Nonrefundable portion of education credits (60% of AOC + 100% of LLC)"
 
-  formula {
-    # 60% of AOC is nonrefundable, plus all of LLC
-    let aoc_nonref = aoc_nonrefundable
-    let llc_amount = lifetime_learning_credit
+formula:
+  # 60% of AOC is nonrefundable, plus all of LLC
+  aoc_nonref = aoc_nonrefundable
+  llc_amount = lifetime_learning_credit
 
-    # Total nonrefundable portion is limited by tax liability per § 26(a)
-    let total_nonrefundable = aoc_nonref + llc_amount
-    return min(total_nonrefundable, tax_liability_before_credits)
-  }
-}
+  # Total nonrefundable portion is limited by tax liability per § 26(a)
+  total_nonrefundable = aoc_nonref + llc_amount
+  return min(total_nonrefundable, tax_liability_before_credits)
 
 # --- Refundable Portion ---
 
-variable education_credits_refundable {
-  entity TaxUnit
-  period Year
-  dtype Money
-  unit "USD"
-  label "Refundable Education Credits"
-  description "Refundable portion of education credits (40% of AOC per § 25A(i))"
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Refundable Education Credits"
+description "Refundable portion of education credits (40% of AOC per § 25A(i))"
 
-  formula {
-    # Only AOC has a refundable portion (40%)
-    return aoc_refundable
-  }
-}
+formula:
+  # Only AOC has a refundable portion (40%)
+  return aoc_refundable
 
 # --- Final Credit Claimed ---
 
-variable education_credit {
-  entity TaxUnit
-  period Year
-  dtype Money
-  unit "USD"
-  label "Education Credit"
-  description "Total education credit claimed (nonrefundable + refundable) per 26 USC § 25A"
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Education Credit"
+description "Total education credit claimed (nonrefundable + refundable) per 26 USC § 25A"
 
-  formula {
-    return education_credits_nonrefundable + education_credits_refundable
-  }
+formula:
+  return education_credits_nonrefundable + education_credits_refundable
 
-  default 0
-}
+default 0

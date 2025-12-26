@@ -4,35 +4,31 @@
 # thrifty food plan... reduced by an amount equal to 30 per centum
 # of the household's income"
 
-imports {
+imports:
   max_allotment: statute/7/2017/a/max_allotment
   expected_contribution_rate: statute/7/2017/a/expected_contribution_rate
   minimum_benefit: statute/7/2017/a/minimum_benefit
   snap_net_income: statute/7/2014/e/snap_net_income
   snap_eligible: statute/7/2014/c/snap_eligible
-}
 
-variable snap_allotment {
-  entity Household
-  period Month
-  dtype Money
+entity Household
+period Month
+dtype Money
 
-  formula {
-    # Check eligibility first
-    if not snap_eligible then
-      return 0
+formula:
+  # Check eligibility first
+  if not snap_eligible then
+  return 0
 
-    # Get maximum allotment for household size
-    let max_benefit = max_allotment
+  # Get maximum allotment for household size
+  max_benefit = max_allotment
 
-    # § 2017(a): allotment = max - 30% of net income
-    let contribution = round(snap_net_income * expected_contribution_rate)
-    let calculated = max_benefit - contribution
+  # § 2017(a): allotment = max - 30% of net income
+  contribution = round(snap_net_income * expected_contribution_rate)
+  calculated = max_benefit - contribution
 
-    # Apply minimum benefit for 1-2 person households
-    let minimum = if household_size <= 2 then minimum_benefit else 0
-    let benefit = max(calculated, minimum)
+  # Apply minimum benefit for 1-2 person households
+  minimum = if household_size <= 2 then minimum_benefit else 0
+  benefit = max(calculated, minimum)
 
-    return max(0, min(benefit, max_benefit))
-  }
-}
+  return max(0, min(benefit, max_benefit))

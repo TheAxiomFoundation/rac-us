@@ -38,219 +38,176 @@
 #       benefits under title XVIII of the Social Security Act and for
 #       each month thereafter."
 
-module statute.26.223.b
-version "2024.1"
-
-references {
-  # HDHP requirements from Section 223(c)
+imports:
+# HDHP requirements from Section 223(c)
   hdhp_coverage_type: statute/26/223/c/hdhp_coverage_type
   is_qualifying_hdhp: statute/26/223/c/is_qualifying_hdhp
   has_disqualifying_health_coverage: statute/26/223/c/has_disqualifying_health_coverage
   is_enrolled_in_medicare: statute/26/223/c/is_enrolled_in_medicare
   can_be_claimed_as_dependent: statute/26/223/c/can_be_claimed_as_dependent
-}
 
-parameters {
-  # Annual contribution limit - self-only coverage (indexed)
-  # 2024: $4,150 per Rev. Proc. 2023-22
+parameters:
+# Annual contribution limit - self-only coverage (indexed)
+# 2024: $4,150 per Rev. Proc. 2023-22
   contribution_limit_self_only: 4150
 
-  # Annual contribution limit - family coverage (indexed)
-  # 2024: $8,300 per Rev. Proc. 2023-22
+# Annual contribution limit - family coverage (indexed)
+# 2024: $8,300 per Rev. Proc. 2023-22
   contribution_limit_family: 8300
 
-  # Catch-up contribution for age 55+ (fixed at $1,000)
+# Catch-up contribution for age 55+ (fixed at $1,000)
   catch_up_contribution: 1000
 
-  # Age threshold for catch-up contributions
+# Age threshold for catch-up contributions
   catch_up_age: 55
-}
 
 # Input variable: Individual's age at end of tax year
-variable age {
-  entity Person
-  period Year
-  dtype Integer
-  label "Age"
-  description "Individual's age at the end of the taxable year"
-}
+entity Person
+period Year
+dtype Integer
+label "Age"
+description "Individual's age at the end of the taxable year"
 
 # Input variable: Individual's own HSA contributions for the year
-variable hsa_contributions_self {
-  entity Person
-  period Year
-  dtype Money
-  unit "USD"
-  label "Own HSA Contributions"
-  description "Contributions made by the individual to their HSA"
-  default 0
-}
+entity Person
+period Year
+dtype Money
+unit "USD"
+label "Own HSA Contributions"
+description "Contributions made by the individual to their HSA"
+default 0
 
 # Input variable: Employer contributions to individual's HSA
-variable hsa_contributions_employer {
-  entity Person
-  period Year
-  dtype Money
-  unit "USD"
-  label "Employer HSA Contributions"
-  description "Contributions made by employer to individual's HSA (excluded from income)"
-  default 0
-}
+entity Person
+period Year
+dtype Money
+unit "USD"
+label "Employer HSA Contributions"
+description "Contributions made by employer to individual's HSA (excluded from income)"
+default 0
 
 # Derived: Total contributions to HSA
-variable hsa_contributions_total {
-  entity Person
-  period Year
-  dtype Money
-  unit "USD"
-  label "Total HSA Contributions"
-  description "Total contributions to HSA (self + employer)"
+entity Person
+period Year
+dtype Money
+unit "USD"
+label "Total HSA Contributions"
+description "Total contributions to HSA (self + employer)"
 
-  formula {
-    return hsa_contributions_self + hsa_contributions_employer
-  }
-}
+formula:
+  return hsa_contributions_self + hsa_contributions_employer
 
 # Derived: Months of HDHP coverage (simplified as full year if covered)
 # Full implementation would track monthly eligibility
-variable months_hdhp_coverage {
-  entity Person
-  period Year
-  dtype Integer
-  label "Months of HDHP Coverage"
-  description "Number of months individual was covered by qualifying HDHP"
-  default 12
-}
+entity Person
+period Year
+dtype Integer
+label "Months of HDHP Coverage"
+description "Number of months individual was covered by qualifying HDHP"
+default 12
 
 # Derived: Is eligible for HSA contributions?
-variable is_hsa_eligible {
-  entity Person
-  period Year
-  dtype Boolean
-  label "HSA Eligible"
-  description "Whether individual is an eligible individual for HSA purposes"
+entity Person
+period Year
+dtype Boolean
+label "HSA Eligible"
+description "Whether individual is an eligible individual for HSA purposes"
 
-  formula {
-    # Must have qualifying HDHP coverage
-    if not is_qualifying_hdhp {
-      return false
-    }
+formula:
+  # Must have qualifying HDHP coverage
+  if not is_qualifying_hdhp {
+  return false
 
-    # Cannot have disqualifying coverage
-    if has_disqualifying_health_coverage {
-      return false
-    }
+# Cannot have disqualifying coverage
+if has_disqualifying_health_coverage {
+return false
 
-    # Cannot be enrolled in Medicare - 223(b)(7)
-    if is_enrolled_in_medicare {
-      return false
-    }
+# Cannot be enrolled in Medicare - 223(b)(7)
+if is_enrolled_in_medicare {
+return false
 
-    # Cannot be claimed as dependent - 223(b)(6)
-    if can_be_claimed_as_dependent {
-      return false
-    }
+# Cannot be claimed as dependent - 223(b)(6)
+if can_be_claimed_as_dependent {
+return false
 
-    return true
-  }
-}
+return true
 
 # Derived: Is eligible for catch-up contribution?
-variable is_hsa_catch_up_eligible {
-  entity Person
-  period Year
-  dtype Boolean
-  label "HSA Catch-up Eligible"
-  description "Whether individual is eligible for HSA catch-up contribution (age 55+)"
+entity Person
+period Year
+dtype Boolean
+label "HSA Catch-up Eligible"
+description "Whether individual is eligible for HSA catch-up contribution (age 55+)"
 
-  formula {
-    return is_hsa_eligible and age >= catch_up_age
-  }
-}
+formula:
+  return is_hsa_eligible and age >= catch_up_age
 
 # Derived: Base contribution limit (before catch-up)
-variable hsa_base_contribution_limit {
-  entity Person
-  period Year
-  dtype Money
-  unit "USD"
-  label "HSA Base Contribution Limit"
-  description "Base HSA contribution limit based on coverage type"
+entity Person
+period Year
+dtype Money
+unit "USD"
+label "HSA Base Contribution Limit"
+description "Base HSA contribution limit based on coverage type"
 
-  formula {
-    if not is_hsa_eligible {
-      return 0
-    }
+formula:
+  if not is_hsa_eligible {
+  return 0
 
-    if hdhp_coverage_type == self_only {
-      return contribution_limit_self_only
-    } else if hdhp_coverage_type == family {
-      return contribution_limit_family
-    }
-    return 0
-  }
-}
+if hdhp_coverage_type == self_only {
+return contribution_limit_self_only
+} else if hdhp_coverage_type == family {
+return contribution_limit_family
+return 0
 
 # Derived: Prorated limit based on months of coverage
-variable hsa_prorated_limit {
-  entity Person
-  period Year
-  dtype Money
-  unit "USD"
-  label "HSA Prorated Contribution Limit"
-  description "HSA contribution limit prorated for partial year coverage"
+entity Person
+period Year
+dtype Money
+unit "USD"
+label "HSA Prorated Contribution Limit"
+description "HSA contribution limit prorated for partial year coverage"
 
-  formula {
-    if not is_hsa_eligible {
-      return 0
-    }
+formula:
+  if not is_hsa_eligible {
+  return 0
 
-    # Prorate based on months of coverage
-    let base = hsa_base_contribution_limit
-    let monthly_limit = base / 12
-    return monthly_limit * months_hdhp_coverage
-  }
-}
+# Prorate based on months of coverage
+let base = hsa_base_contribution_limit
+let monthly_limit = base / 12
+return monthly_limit * months_hdhp_coverage
 
 # Derived: Total contribution limit including catch-up
-variable hsa_contribution_limit {
-  entity Person
-  period Year
-  dtype Money
-  unit "USD"
-  label "HSA Contribution Limit"
-  description "Maximum allowable HSA contribution including catch-up"
+entity Person
+period Year
+dtype Money
+unit "USD"
+label "HSA Contribution Limit"
+description "Maximum allowable HSA contribution including catch-up"
 
-  formula {
-    if not is_hsa_eligible {
-      return 0
-    }
+formula:
+  if not is_hsa_eligible {
+  return 0
 
-    let base = hsa_prorated_limit
+let base = hsa_prorated_limit
 
-    # Add catch-up contribution if age 55+
-    if is_hsa_catch_up_eligible {
-      # Catch-up is also prorated based on months eligible
-      let catch_up_monthly = catch_up_contribution / 12
-      let prorated_catch_up = catch_up_monthly * months_hdhp_coverage
-      return base + prorated_catch_up
-    }
+# Add catch-up contribution if age 55+
+if is_hsa_catch_up_eligible {
+# Catch-up is also prorated based on months eligible
+let catch_up_monthly = catch_up_contribution / 12
+let prorated_catch_up = catch_up_monthly * months_hdhp_coverage
+return base + prorated_catch_up
 
-    return base
-  }
-}
+return base
 
 # Derived: Excess contributions (subject to 6% excise tax under 4973)
-variable hsa_excess_contributions {
-  entity Person
-  period Year
-  dtype Money
-  unit "USD"
-  label "HSA Excess Contributions"
-  description "Contributions exceeding the limit (subject to excise tax)"
+entity Person
+period Year
+dtype Money
+unit "USD"
+label "HSA Excess Contributions"
+description "Contributions exceeding the limit (subject to excise tax)"
 
-  formula {
-    let excess = hsa_contributions_total - hsa_contribution_limit
-    return max(0, excess)
-  }
-}
+formula:
+  excess = hsa_contributions_total - hsa_contribution_limit
+  return max(0, excess)

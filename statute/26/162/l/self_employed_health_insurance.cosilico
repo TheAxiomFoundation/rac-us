@@ -16,70 +16,54 @@
 # This is an above-the-line deduction per Section 62(a)(1) for self-employed
 # individuals' health insurance premiums.
 
-module statute.26.162.l
-version "2024.1"
-
-references {
+imports:
   self_employment_income: statute/26/1402/a/net_earnings_self_employment
-}
 
-variable self_employed_health_insurance_premiums {
-  entity Person
-  period Year
-  dtype Money
-  unit "USD"
-  label "Self-Employed Health Insurance Premiums"
-  description "Health insurance premiums paid for self-employed individual, spouse, and dependents"
+entity Person
+period Year
+dtype Money
+unit "USD"
+label "Self-Employed Health Insurance Premiums"
+description "Health insurance premiums paid for self-employed individual, spouse, and dependents"
 
-  # Input variable - amount paid for qualifying health insurance
-}
+# Input variable - amount paid for qualifying health insurance
 
-variable is_self_employed {
-  entity Person
-  period Year
-  dtype Boolean
-  label "Is Self-Employed"
-  description "Whether the individual has self-employment income"
+entity Person
+period Year
+dtype Boolean
+label "Is Self-Employed"
+description "Whether the individual has self-employment income"
 
-  formula {
-    return self_employment_income > 0
-  }
-}
+formula:
+  return self_employment_income > 0
 
-variable self_employed_health_insurance_deduction {
-  entity Person
-  period Year
-  dtype Money
-  unit "USD"
-  label "Self-Employed Health Insurance Deduction"
-  description "Above-the-line deduction for self-employed health insurance premiums"
+entity Person
+period Year
+dtype Money
+unit "USD"
+label "Self-Employed Health Insurance Deduction"
+description "Above-the-line deduction for self-employed health insurance premiums"
 
-  formula {
-    # Must be self-employed
-    if not is_self_employed {
-      return 0
-    }
+formula:
+  # Must be self-employed
+  if not is_self_employed {
+  return 0
 
-    # Deduction cannot exceed self-employment income
-    # (after the self-employment tax deduction)
-    # Simplified: use gross SE income as the limit
-    let se_income_limit = self_employment_income
+# Deduction cannot exceed self-employment income
+# (after the self-employment tax deduction)
+# Simplified: use gross SE income as the limit
+let se_income_limit = self_employment_income
 
-    # Deduction is lesser of premiums paid or SE income
-    return min(self_employed_health_insurance_premiums, se_income_limit)
-  }
-}
+# Deduction is lesser of premiums paid or SE income
+return min(self_employed_health_insurance_premiums, se_income_limit)
 
 # Tax unit level aggregation
-variable self_employed_health_insurance_deduction_total {
-  entity TaxUnit
-  period Year
-  dtype Money
-  unit "USD"
-  label "Total Self-Employed Health Insurance Deduction"
-  description "Combined self-employed health insurance deduction for tax unit"
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Total Self-Employed Health Insurance Deduction"
+description "Combined self-employed health insurance deduction for tax unit"
 
-  formula {
-    return sum(members.self_employed_health_insurance_deduction)
-  }
-}
+formula:
+  return sum(members.self_employed_health_insurance_deduction)

@@ -10,224 +10,198 @@
 #
 # The bracket thresholds are based on TAXABLE INCOME, not capital gains alone.
 
-module statute.26.1.h
-version "2024.1"
-
-references {
-  # Taxable income determines which rate brackets apply
+imports:
+# Taxable income determines which rate brackets apply
   taxable_income: statute/26/63/c/taxable_income
 
-  # Filing status determines bracket thresholds
+# Filing status determines bracket thresholds
   filing_status: statute/26/1/filing_status
 
-  # Net capital gain (long-term gains minus short-term losses)
+# Net capital gain (long-term gains minus short-term losses)
   net_capital_gain: statute/26/1222/11/net_capital_gain
 
-  # Adjusted net capital gain (for rate calculation)
+# Adjusted net capital gain (for rate calculation)
   adjusted_net_capital_gain: statute/26/1/h/3/adjusted_net_capital_gain
-}
 
-parameters {
-  # Tax rates for capital gains (fixed in statute)
+parameters:
+# Tax rates for capital gains (fixed in statute)
   rates: [0.00, 0.15, 0.20]
 
-  # Rate thresholds vary by filing status and are indexed
-  # 0% rate ceiling (upper limit where 0% applies)
+# Rate thresholds vary by filing status and are indexed
+# 0% rate ceiling (upper limit where 0% applies)
   zero_pct_single: h/thresholds_2024#zero_percent_max.single
   zero_pct_joint: h/thresholds_2024#zero_percent_max.married_filing_jointly
   zero_pct_hoh: h/thresholds_2024#zero_percent_max.head_of_household
   zero_pct_separate: h/thresholds_2024#zero_percent_max.married_filing_separately
   zero_pct_surviving: h/thresholds_2024#zero_percent_max.surviving_spouse
 
-  # 15% rate ceiling (upper limit where 15% applies; above = 20%)
+# 15% rate ceiling (upper limit where 15% applies; above = 20%)
   fifteen_pct_single: h/thresholds_2024#fifteen_percent_max.single
   fifteen_pct_joint: h/thresholds_2024#fifteen_percent_max.married_filing_jointly
   fifteen_pct_hoh: h/thresholds_2024#fifteen_percent_max.head_of_household
   fifteen_pct_separate: h/thresholds_2024#fifteen_percent_max.married_filing_separately
   fifteen_pct_surviving: h/thresholds_2024#fifteen_percent_max.surviving_spouse
-}
 
 # Helper function to get 0% rate ceiling based on filing status
-function get_zero_pct_threshold(filing_status: FilingStatus) -> Money {
-  match filing_status {
-    SINGLE => zero_pct_single
-    MARRIED_FILING_JOINTLY => zero_pct_joint
-    HEAD_OF_HOUSEHOLD => zero_pct_hoh
-    MARRIED_FILING_SEPARATELY => zero_pct_separate
-    QUALIFYING_WIDOW => zero_pct_surviving
-  }
-}
+
+function get_zero_pct_threshold(filing_status: FilingStatus) -> Money:
+match filing_status {
+SINGLE => zero_pct_single
+MARRIED_FILING_JOINTLY => zero_pct_joint
+HEAD_OF_HOUSEHOLD => zero_pct_hoh
+MARRIED_FILING_SEPARATELY => zero_pct_separate
+QUALIFYING_WIDOW => zero_pct_surviving
 
 # Helper function to get 15% rate ceiling based on filing status
-function get_fifteen_pct_threshold(filing_status: FilingStatus) -> Money {
-  match filing_status {
-    SINGLE => fifteen_pct_single
-    MARRIED_FILING_JOINTLY => fifteen_pct_joint
-    HEAD_OF_HOUSEHOLD => fifteen_pct_hoh
-    MARRIED_FILING_SEPARATELY => fifteen_pct_separate
-    QUALIFYING_WIDOW => fifteen_pct_surviving
-  }
-}
+
+function get_fifteen_pct_threshold(filing_status: FilingStatus) -> Money:
+match filing_status {
+SINGLE => fifteen_pct_single
+MARRIED_FILING_JOINTLY => fifteen_pct_joint
+HEAD_OF_HOUSEHOLD => fifteen_pct_hoh
+MARRIED_FILING_SEPARATELY => fifteen_pct_separate
+QUALIFYING_WIDOW => fifteen_pct_surviving
 
 # Net capital gain amount taxed at 0%
 # Per Section 1(h)(1)(B): 0% rate applies to the extent capital gains
 # fall within taxable income below the 0% threshold
-variable capital_gains_taxed_at_zero_pct {
-  entity TaxUnit
-  period Year
-  dtype Money
-  unit "USD"
-  label "Capital Gains Taxed at 0%"
-  description "Portion of net capital gain subject to 0% preferential rate"
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Capital Gains Taxed at 0%"
+description "Portion of net capital gain subject to 0% preferential rate"
 
-  formula {
-    zero_threshold = get_zero_pct_threshold(filing_status)
+formula:
+  zero_threshold = get_zero_pct_threshold(filing_status)
 
-    # Ordinary income is taxable income minus net capital gain
-    ordinary_income = max(0, taxable_income - net_capital_gain)
+  # Ordinary income is taxable income minus net capital gain
+  ordinary_income = max(0, taxable_income - net_capital_gain)
 
-    # Space available in 0% bracket after ordinary income
-    zero_bracket_space = max(0, zero_threshold - ordinary_income)
+  # Space available in 0% bracket after ordinary income
+  zero_bracket_space = max(0, zero_threshold - ordinary_income)
 
-    # Capital gains taxed at 0% = min(net capital gain, available space)
-    return min(net_capital_gain, zero_bracket_space)
-  }
+  # Capital gains taxed at 0% = min(net capital gain, available space)
+  return min(net_capital_gain, zero_bracket_space)
 
-  defined_for {
-    net_capital_gain > 0
-  }
+defined_for:
+  net_capital_gain > 0
 
-  default 0
-}
+default 0
 
 # Net capital gain amount taxed at 15%
 # Per Section 1(h)(1)(C): 15% rate applies to gains above 0% threshold
 # but within the 15% threshold
-variable capital_gains_taxed_at_fifteen_pct {
-  entity TaxUnit
-  period Year
-  dtype Money
-  unit "USD"
-  label "Capital Gains Taxed at 15%"
-  description "Portion of net capital gain subject to 15% preferential rate"
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Capital Gains Taxed at 15%"
+description "Portion of net capital gain subject to 15% preferential rate"
 
-  formula {
-    zero_threshold = get_zero_pct_threshold(filing_status)
-    fifteen_threshold = get_fifteen_pct_threshold(filing_status)
+formula:
+  zero_threshold = get_zero_pct_threshold(filing_status)
+  fifteen_threshold = get_fifteen_pct_threshold(filing_status)
 
-    # Ordinary income = taxable income minus net capital gain
-    ordinary_income = max(0, taxable_income - net_capital_gain)
+  # Ordinary income = taxable income minus net capital gain
+  ordinary_income = max(0, taxable_income - net_capital_gain)
 
-    # Gains already taxed at 0%
-    gains_at_zero = capital_gains_taxed_at_zero_pct
+  # Gains already taxed at 0%
+  gains_at_zero = capital_gains_taxed_at_zero_pct
 
-    # Remaining capital gains after 0% bracket
-    remaining_gains = max(0, net_capital_gain - gains_at_zero)
+  # Remaining capital gains after 0% bracket
+  remaining_gains = max(0, net_capital_gain - gains_at_zero)
 
-    # Space available in 15% bracket
-    # The 15% bracket runs from zero_threshold to fifteen_threshold
-    # Position in bracket starts where 0% bracket ended
-    bracket_start = max(ordinary_income, zero_threshold)
-    fifteen_bracket_space = max(0, fifteen_threshold - bracket_start)
+  # Space available in 15% bracket
+  # The 15% bracket runs from zero_threshold to fifteen_threshold
+  # Position in bracket starts where 0% bracket ended
+  bracket_start = max(ordinary_income, zero_threshold)
+  fifteen_bracket_space = max(0, fifteen_threshold - bracket_start)
 
-    # Capital gains taxed at 15% = min(remaining gains, available space)
-    return min(remaining_gains, fifteen_bracket_space)
-  }
+  # Capital gains taxed at 15% = min(remaining gains, available space)
+  return min(remaining_gains, fifteen_bracket_space)
 
-  defined_for {
-    net_capital_gain > 0
-  }
+defined_for:
+  net_capital_gain > 0
 
-  default 0
-}
+default 0
 
 # Net capital gain amount taxed at 20%
 # Per Section 1(h)(1)(D): 20% rate applies to gains above the 15% threshold
-variable capital_gains_taxed_at_twenty_pct {
-  entity TaxUnit
-  period Year
-  dtype Money
-  unit "USD"
-  label "Capital Gains Taxed at 20%"
-  description "Portion of net capital gain subject to 20% preferential rate"
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Capital Gains Taxed at 20%"
+description "Portion of net capital gain subject to 20% preferential rate"
 
-  formula {
-    # 20% rate applies to gains not already taxed at 0% or 15%
-    gains_at_zero = capital_gains_taxed_at_zero_pct
-    gains_at_fifteen = capital_gains_taxed_at_fifteen_pct
+formula:
+  # 20% rate applies to gains not already taxed at 0% or 15%
+  gains_at_zero = capital_gains_taxed_at_zero_pct
+  gains_at_fifteen = capital_gains_taxed_at_fifteen_pct
 
-    return max(0, net_capital_gain - gains_at_zero - gains_at_fifteen)
-  }
+  return max(0, net_capital_gain - gains_at_zero - gains_at_fifteen)
 
-  defined_for {
-    net_capital_gain > 0
-  }
+defined_for:
+  net_capital_gain > 0
 
-  default 0
-}
+default 0
 
 # Total capital gains tax
 # This is the tax on net capital gain using the preferential rates
-variable capital_gains_tax {
-  entity TaxUnit
-  period Year
-  dtype Money
-  unit "USD"
-  label "Capital Gains Tax"
-  description "Federal income tax on net capital gain at preferential rates per 26 USC Section 1(h)"
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Capital Gains Tax"
+description "Federal income tax on net capital gain at preferential rates per 26 USC Section 1(h)"
 
-  formula {
-    # Tax = sum of gains in each bracket times the bracket rate
-    tax_at_zero = capital_gains_taxed_at_zero_pct * 0.00
-    tax_at_fifteen = capital_gains_taxed_at_fifteen_pct * 0.15
-    tax_at_twenty = capital_gains_taxed_at_twenty_pct * 0.20
+formula:
+  # Tax = sum of gains in each bracket times the bracket rate
+  tax_at_zero = capital_gains_taxed_at_zero_pct * 0.00
+  tax_at_fifteen = capital_gains_taxed_at_fifteen_pct * 0.15
+  tax_at_twenty = capital_gains_taxed_at_twenty_pct * 0.20
 
-    return tax_at_zero + tax_at_fifteen + tax_at_twenty
-  }
+  return tax_at_zero + tax_at_fifteen + tax_at_twenty
 
-  defined_for {
-    net_capital_gain > 0
-  }
+defined_for:
+  net_capital_gain > 0
 
-  default 0
-}
+default 0
 
 # Vectorized version for microsimulation
-variable capital_gains_tax_vectorized {
-  entity TaxUnit
-  period Year
-  dtype Money
-  unit "USD"
-  label "Capital Gains Tax (Vectorized)"
-  description "Vectorized implementation for microsimulation"
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Capital Gains Tax (Vectorized)"
+description "Vectorized implementation for microsimulation"
 
-  formula {
-    # Get thresholds based on filing status
-    zero_threshold = get_zero_pct_threshold(filing_status)
-    fifteen_threshold = get_fifteen_pct_threshold(filing_status)
+formula:
+  # Get thresholds based on filing status
+  zero_threshold = get_zero_pct_threshold(filing_status)
+  fifteen_threshold = get_fifteen_pct_threshold(filing_status)
 
-    n = len(net_capital_gain)
+  n = len(net_capital_gain)
 
-    # Ordinary income = taxable income minus net capital gain
-    ordinary_income = maximum(0, taxable_income - net_capital_gain)
+  # Ordinary income = taxable income minus net capital gain
+  ordinary_income = maximum(0, taxable_income - net_capital_gain)
 
-    # === 0% bracket ===
-    # Space available in 0% bracket after ordinary income
-    zero_bracket_space = maximum(0, zero_threshold - ordinary_income)
-    gains_at_zero = minimum(net_capital_gain, zero_bracket_space)
+  # === 0% bracket ===
+  # Space available in 0% bracket after ordinary income
+  zero_bracket_space = maximum(0, zero_threshold - ordinary_income)
+  gains_at_zero = minimum(net_capital_gain, zero_bracket_space)
 
-    # === 15% bracket ===
-    remaining_after_zero = maximum(0, net_capital_gain - gains_at_zero)
-    bracket_start = maximum(ordinary_income, zero_threshold)
-    fifteen_bracket_space = maximum(0, fifteen_threshold - bracket_start)
-    gains_at_fifteen = minimum(remaining_after_zero, fifteen_bracket_space)
+  # === 15% bracket ===
+  remaining_after_zero = maximum(0, net_capital_gain - gains_at_zero)
+  bracket_start = maximum(ordinary_income, zero_threshold)
+  fifteen_bracket_space = maximum(0, fifteen_threshold - bracket_start)
+  gains_at_fifteen = minimum(remaining_after_zero, fifteen_bracket_space)
 
-    # === 20% bracket ===
-    gains_at_twenty = maximum(0, net_capital_gain - gains_at_zero - gains_at_fifteen)
+  # === 20% bracket ===
+  gains_at_twenty = maximum(0, net_capital_gain - gains_at_zero - gains_at_fifteen)
 
-    # Calculate tax
-    tax = gains_at_zero * 0.00 + gains_at_fifteen * 0.15 + gains_at_twenty * 0.20
+  # Calculate tax
+  tax = gains_at_zero * 0.00 + gains_at_fifteen * 0.15 + gains_at_twenty * 0.20
 
-    return tax
-  }
-}
+  return tax

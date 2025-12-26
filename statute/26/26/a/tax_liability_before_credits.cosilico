@@ -9,55 +9,45 @@
 # This variable calculates the tax liability before any credits are applied,
 # which serves as the ceiling for nonrefundable credits like the CTC.
 
-module statute.26.26.a
-version "2024.1"
-
-references {
-  # Regular income tax from Section 1
+imports:
+# Regular income tax from Section 1
   income_tax_before_credits: statute/26/1/income_tax#income_tax_before_credits
 
-  # Tentative Minimum Tax from Section 55(b)(1)
-  # Note: For most taxpayers post-TCJA, TMT is low due to high exemptions
+# Tentative Minimum Tax from Section 55(b)(1)
+# Note: For most taxpayers post-TCJA, TMT is low due to high exemptions
   tentative_minimum_tax: statute/26/55/a/amt#tentative_minimum_tax
-}
 
-variable regular_tax_liability {
-  entity TaxUnit
-  period Year
-  dtype Money
-  unit "USD"
-  label "Regular Tax Liability"
-  description "Regular tax per Section 26(b)(1) - income tax before credits"
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Regular Tax Liability"
+description "Regular tax per Section 26(b)(1) - income tax before credits"
 
-  formula {
-    # Regular tax is the income tax computed under Section 1
-    # Self-employment tax is separate and not limited by Section 26
-    return income_tax_before_credits
-  }
-}
+formula:
+  # Regular tax is the income tax computed under Section 1
+  # Self-employment tax is separate and not limited by Section 26
+  return income_tax_before_credits
 
-variable tax_liability_before_credits {
-  entity TaxUnit
-  period Year
-  dtype Money
-  unit "USD"
-  label "Tax Liability Before Credits"
-  description "Maximum amount of nonrefundable credits per Section 26(a)"
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Tax Liability Before Credits"
+description "Maximum amount of nonrefundable credits per Section 26(a)"
 
-  formula {
-    # Per Section 26(a), the credit limitation is:
-    # regular_tax - tentative_minimum_tax
-    #
-    # If AMT applies (tentative min > regular), the excess is the AMT owed
-    # and reduces the headroom for credits.
-    #
-    # For most post-TCJA taxpayers, tentative_min_tax = 0 or very small,
-    # so this equals the regular tax.
+formula:
+  # Per Section 26(a), the credit limitation is:
+  # regular_tax - tentative_minimum_tax
+  #
+  # If AMT applies (tentative min > regular), the excess is the AMT owed
+  # and reduces the headroom for credits.
+  #
+  # For most post-TCJA taxpayers, tentative_min_tax = 0 or very small,
+  # so this equals the regular tax.
 
-    let regular = regular_tax_liability
-    let tentative_min = tentative_minimum_tax
+  regular = regular_tax_liability
+  tentative_min = tentative_minimum_tax
 
-    # Credit limitation cannot be negative
-    return max(0, regular - tentative_min)
-  }
-}
+  # Credit limitation cannot be negative
+  return max(0, regular - tentative_min)

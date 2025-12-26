@@ -12,53 +12,46 @@
 #
 # ARPA 2021: Temporarily increased to 50%, threshold to $125,000
 
-module statute.26.21.b
-version "2024.1"
-
-references {
-  # AGI
+imports:
+# AGI
   adjusted_gross_income: statute/26/62/a/adjusted_gross_income
 
-  # Rate parameters
+# Rate parameters
   maximum_rate: statute/26/21/b/credit_rate#maximum_rate
   minimum_rate: statute/26/21/b/credit_rate#minimum_rate
   phase_down_threshold: statute/26/21/b/credit_rate#phase_down_threshold
   phase_down_rate: statute/26/21/b/credit_rate#phase_down_rate
   phase_down_increment: statute/26/21/b/credit_rate#phase_down_increment
   arpa_complete_phaseout_threshold: statute/26/21/b/credit_rate#arpa_complete_phaseout_threshold
-}
 
-variable cdcc_applicable_percentage {
-  entity TaxUnit
-  period Year
-  dtype Rate
-  label "CDCC Applicable Percentage"
-  description "Credit rate for Child and Dependent Care Credit per 26 USC 21(b)"
-    "P.L. 117-2 Sec. 9632: 50% for AGI <= $125,000 in 2021"
+entity TaxUnit
+period Year
+dtype Rate
+label "CDCC Applicable Percentage"
+description "Credit rate for Child and Dependent Care Credit per 26 USC 21(b)"
+"P.L. 117-2 Sec. 9632: 50% for AGI <= $125,000 in 2021"
 
-  formula {
-    let agi = adjusted_gross_income
+formula:
+  agi = adjusted_gross_income
 
-    # For ARPA 2021 complete phaseout above $400,000
-    # Note: This applies only when arpa_complete_phaseout_threshold is finite
-    if agi > arpa_complete_phaseout_threshold then
-      # Secondary phase-out from 20% to 0%
-      # AGI $400,000 to $438,000 (phasing out $50 per $1,000)
-      let excess_over_phaseout = agi - arpa_complete_phaseout_threshold
-      let phaseout_increments = ceil(excess_over_phaseout / phase_down_increment)
-      let secondary_reduction = phaseout_increments * phase_down_rate
-      return max(0, minimum_rate - secondary_reduction)
+  # For ARPA 2021 complete phaseout above $400,000
+  # Note: This applies only when arpa_complete_phaseout_threshold is finite
+  if agi > arpa_complete_phaseout_threshold then
+  # Secondary phase-out from 20% to 0%
+  # AGI $400,000 to $438,000 (phasing out $50 per $1,000)
+  excess_over_phaseout = agi - arpa_complete_phaseout_threshold
+  phaseout_increments = ceil(excess_over_phaseout / phase_down_increment)
+  secondary_reduction = phaseout_increments * phase_down_rate
+  return max(0, minimum_rate - secondary_reduction)
 
-    # Calculate excess AGI over threshold
-    let excess_agi = max(0, agi - phase_down_threshold)
+  # Calculate excess AGI over threshold
+  excess_agi = max(0, agi - phase_down_threshold)
 
-    # Number of $2,000 increments (or fraction thereof) using ceiling
-    let increments = ceil(excess_agi / phase_down_increment)
+  # Number of $2,000 increments (or fraction thereof) using ceiling
+  increments = ceil(excess_agi / phase_down_increment)
 
-    # Total rate reduction (1 percentage point per increment)
-    let rate_reduction = increments * phase_down_rate
+  # Total rate reduction (1 percentage point per increment)
+  rate_reduction = increments * phase_down_rate
 
-    # Apply reduction but floor at minimum rate
-    return max(minimum_rate, maximum_rate - rate_reduction)
-  }
-}
+  # Apply reduction but floor at minimum rate
+  return max(minimum_rate, maximum_rate - rate_reduction)

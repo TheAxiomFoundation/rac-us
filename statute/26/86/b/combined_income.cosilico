@@ -5,32 +5,24 @@
 #  (1) the modified adjusted gross income of the taxpayer for such taxable year, plus
 #  (2) one-half of the social security benefits received during the taxable year."
 
-module statute.26.86.b
-version "2024.1"
-
-parameters {
-  # The fraction of Social Security benefits included in combined income
+parameters:
+# The fraction of Social Security benefits included in combined income
   ss_fraction: statute/26/86/b/combined_income_ss_fraction
-}
 
-references {
-  # Modified AGI for Social Security taxability purposes
+imports:
+# Modified AGI for Social Security taxability purposes
   modified_agi: statute/26/86/b/modified_agi
 
-  # Total Social Security benefits received by tax unit
+# Total Social Security benefits received by tax unit
   tax_unit_social_security: statute/26/86/tax_unit_social_security
-}
 
-variable combined_income_for_ss_taxability {
-  entity TaxUnit
-  period Year
-  dtype Money
-  unit "USD"
-  label "Combined Income for Social Security Taxability"
-  description "Modified AGI plus one-half of Social Security benefits per 26 USC Section 86(b)"
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Combined Income for Social Security Taxability"
+description "Modified AGI plus one-half of Social Security benefits per 26 USC Section 86(b)"
 
-  formula {
-    # Per Section 86(b)(1), combined income = MAGI + 0.5 * SS benefits
-    return modified_agi + (ss_fraction * tax_unit_social_security)
-  }
-}
+formula:
+  # Per Section 86(b)(1), combined income = MAGI + 0.5 * SS benefits
+  return modified_agi + (ss_fraction * tax_unit_social_security)
