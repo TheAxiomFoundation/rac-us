@@ -1,0 +1,16 @@
+# 26 USC 24(d)(1)(B)(ii) - Qualifying Children Threshold for SS Excess
+#
+# "(ii) in the case of a taxpayer with 3 or more qualifying children,
+#      the excess (if any) of... the taxpayer's social security taxes...
+#      over the credit allowed under section 32"
+#
+# This is the threshold number of qualifying children required to use
+# the alternative social security excess formula for ACTC calculation.
+
+qualifying_children_ss_threshold:
+  description: "Minimum qualifying children to use social security excess formula"
+  unit: count
+  values:
+    1998-01-01: 3
+  citations:
+    - "26 USC 24(d)(1)(B)(ii): 3 or more qualifying children"

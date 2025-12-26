@@ -54,3 +54,22 @@ imputed_earned_income_monthly_two:
   citations:
     - "26 USC 129(b)(2)(B): deemed earned income for student or disabled spouse"
     - "26 USC 21(d)(2): $500 per month for 2+ qualifying individuals"
+
+# Number of months in a year for annualization
+months_per_year:
+  description: "Number of months in a year for converting monthly to annual amounts"
+  unit: count
+  values:
+    1982-01-01: 12
+  citations:
+    - "26 USC 129(b)(2)(B): monthly deemed earned income annualized"
+
+# Threshold for higher imputed amount (2+ qualifying individuals)
+qualifying_individuals_higher_imputed_threshold:
+  description: "Number of qualifying individuals to receive higher imputed earned income"
+  unit: count
+  values:
+    1982-01-01: 2
+  citations:
+    - "26 USC 21(d)(2): $500 per month for 2 or more qualifying individuals"
+    - "26 USC 129(b)(2): incorporates section 21(d)(2) by reference"

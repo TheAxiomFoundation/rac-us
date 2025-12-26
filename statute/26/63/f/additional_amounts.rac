@@ -5,6 +5,7 @@ imports:
   additional_aged_married: statute/26/63/f/1/additional_aged_married
   additional_blind_unmarried: statute/26/63/f/2/additional_blind_unmarried
   additional_blind_married: statute/26/63/f/2/additional_blind_married
+  aged_threshold: statute/26/63/f/1/aged_threshold
 
 entity TaxUnit
 period Year
@@ -19,13 +20,13 @@ formula:
   blind_amount = is_married ? additional_blind_married : additional_blind_unmarried
 
   # § 63(f)(1): Primary taxpayer aged 65+
-  primary_aged = age >= 65 ? aged_amount : 0
+  primary_aged = age >= aged_threshold ? aged_amount : 0
 
   # § 63(f)(2): Primary taxpayer blind
   primary_blind = is_blind ? blind_amount : 0
 
   # Spouse additions (joint filers only)
-  spouse_aged = (filing_status == MARRIED_FILING_JOINTLY and spouse_age >= 65) ? aged_amount : 0
+  spouse_aged = (filing_status == MARRIED_FILING_JOINTLY and spouse_age >= aged_threshold) ? aged_amount : 0
   spouse_blind_add = (filing_status == MARRIED_FILING_JOINTLY and spouse_is_blind) ? blind_amount : 0
 
   return primary_aged + primary_blind + spouse_aged + spouse_blind_add

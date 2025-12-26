@@ -42,6 +42,7 @@ imports:
   earned_income_threshold: statute/26/24/d/1/B/parameters#earned_income_threshold
   refundable_rate: statute/26/24/d/1/B/parameters#refundable_rate
   refundable_maximum: statute/26/24/h/5/refundable_maximum#refundable_maximum
+  qualifying_children_ss_threshold: statute/26/24/actc_qualifying_children_threshold#qualifying_children_ss_threshold
 
 # --- Section 24(d)(1)(B)(i) - Earned Income Portion ---
 
@@ -67,7 +68,7 @@ description "Social security taxes minus EITC per Section 24(d)(1)(B)(ii) - only
 
 formula:
   # Only available for taxpayers with 3 or more qualifying children
-  if num_ctc_qualifying_children < 3: return 0
+  if num_ctc_qualifying_children < qualifying_children_ss_threshold: return 0
 
   # Excess of social security taxes over EITC
   return max(0, social_security_taxes - earned_income_credit)

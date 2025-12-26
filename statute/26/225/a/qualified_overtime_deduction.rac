@@ -28,6 +28,15 @@ imports:
   guam_income_exclusion: statute/26/931/guam_income_exclusion
   american_samoa_income_exclusion: statute/26/933/american_samoa_income_exclusion
 
+  # Parameters
+  max_deduction_single: statute/26/225/parameters#max_deduction.single
+  max_deduction_joint: statute/26/225/parameters#max_deduction.joint
+  phaseout_threshold_single: statute/26/225/parameters#phaseout.threshold.single
+  phaseout_threshold_joint: statute/26/225/parameters#phaseout.threshold.joint
+  phaseout_income_increment: statute/26/225/parameters#phaseout.income_increment
+  phaseout_reduction_per_increment: statute/26/225/parameters#phaseout.reduction_per_increment
+  termination_final_year: statute/26/225/parameters#termination.final_year
+
 entity TaxUnit
 period Year
 dtype Money
@@ -36,8 +45,8 @@ label "Qualified Overtime Compensation Deduction"
 description "Above-the-line deduction for qualified overtime compensation per 26 USC 225"
 
 formula:
-  # Section 225(g): No deduction after 2028
-  if tax_year > 2028:
+  # Section 225(g): No deduction after the termination year
+  if tax_year > termination_final_year:
     return 0
 
   # Section 225(e): Married individuals must file jointly

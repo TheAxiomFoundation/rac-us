@@ -14,6 +14,14 @@ imports:
 # Federal parameters
   futa_wage_base: statute/26/3304/parameters/futa_wage_base
   futa_gross_tax_rate: statute/26/3304/parameters/futa_gross_tax_rate
+  futa_credit_reduction_max: statute/26/3304/parameters/futa_credit_reduction_max
+
+# Employer coverage thresholds
+  general_quarterly_wages_threshold: statute/26/3304/employer_coverage/general_quarterly_wages_threshold
+  weeks_with_employees_threshold: statute/26/3304/employer_coverage/weeks_with_employees_threshold
+  agricultural_workers_threshold: statute/26/3304/employer_coverage/agricultural_workers_threshold
+  agricultural_wages_threshold: statute/26/3304/employer_coverage/agricultural_wages_threshold
+  domestic_quarterly_wages_threshold: statute/26/3304/employer_coverage/domestic_quarterly_wages_threshold
 
 # =============================================================================
 # COVERED EMPLOYMENT (26 USC 3306(c))
@@ -70,17 +78,17 @@ description "Employer meets FUTA coverage threshold per 26 USC 3306(a)"
 formula:
   # General employer: paid $1,500+ wages in any quarter OR
   # employed 1+ person for 20+ weeks in current or prior year
-  wages_threshold_met = max_quarterly_wages >= 1500
-  employment_threshold_met = weeks_with_employees >= 20
+  wages_threshold_met = max_quarterly_wages >= general_quarterly_wages_threshold
+  employment_threshold_met = weeks_with_employees >= weeks_with_employees_threshold
 
   # Agricultural employer: 10+ workers OR $20,000+ wages
   ag_threshold_met = is_agricultural_employer and (
-  num_agricultural_workers >= 10 or
-  agricultural_wages >= 20000
+  num_agricultural_workers >= agricultural_workers_threshold or
+  agricultural_wages >= agricultural_wages_threshold
   )
 
   # Domestic employer: $1,000+ per quarter
-  domestic_threshold_met = is_domestic_employer and domestic_quarterly_wages >= 1000
+  domestic_threshold_met = is_domestic_employer and domestic_quarterly_wages >= domestic_quarterly_wages_threshold
 
   return wages_threshold_met or employment_threshold_met or ag_threshold_met or domestic_threshold_met
 
@@ -119,7 +127,7 @@ formula:
   gross_tax = taxable * futa_gross_tax_rate
 
   # Credit for state contributions (max 5.4%)
-  state_credit = min(state_ui_contributions, taxable * 0.054)
+  state_credit = min(state_ui_contributions, taxable * futa_credit_reduction_max)
 
   return max(0, gross_tax - state_credit)
 

@@ -14,6 +14,59 @@ period: Week
 dtype: Money
 
 # =============================================================================
+# EMPLOYER COVERAGE THRESHOLDS (26 USC 3306(a))
+# Thresholds for determining employer subject to FUTA
+# =============================================================================
+
+employer_coverage:
+  description: "Thresholds for employer FUTA coverage per 26 USC 3306(a)"
+
+  # General employer: quarterly wages threshold
+  general_quarterly_wages_threshold:
+    description: "Quarterly wages threshold for general employer FUTA coverage"
+    unit: currency-USD
+    values:
+      1978-01-01: 1500
+    citations:
+      - "26 USC 3306(a)(1): paid $1,500 in wages in any calendar quarter"
+
+  # General employer: weeks with employees threshold
+  weeks_with_employees_threshold:
+    description: "Weeks with employees threshold for general employer FUTA coverage"
+    unit: weeks
+    values:
+      1978-01-01: 20
+    citations:
+      - "26 USC 3306(a)(1): had an employee for some portion of a day in 20 different weeks"
+
+  # Agricultural employer: workers threshold
+  agricultural_workers_threshold:
+    description: "Number of workers threshold for agricultural employer FUTA coverage"
+    unit: count
+    values:
+      1978-01-01: 10
+    citations:
+      - "26 USC 3306(a)(2)(A): employed 10 or more individuals in agricultural labor"
+
+  # Agricultural employer: wages threshold
+  agricultural_wages_threshold:
+    description: "Wages threshold for agricultural employer FUTA coverage"
+    unit: currency-USD
+    values:
+      1978-01-01: 20000
+    citations:
+      - "26 USC 3306(a)(2)(B): paid $20,000 or more in agricultural labor"
+
+  # Domestic employer: quarterly wages threshold
+  domestic_quarterly_wages_threshold:
+    description: "Quarterly wages threshold for domestic employer FUTA coverage"
+    unit: currency-USD
+    values:
+      1994-01-01: 1000
+    citations:
+      - "26 USC 3306(a)(3): paid cash remuneration of $1,000 or more in any calendar quarter"
+
+# =============================================================================
 # FUTA WAGE BASE (26 USC 3306(b)(1))
 # Amount of wages subject to federal unemployment tax per employee per year
 # =============================================================================
@@ -191,3 +244,39 @@ combined_wage_claims_required:
     1970-08-10: true  # States must participate in combined wage arrangements
   citations:
     - "26 USC 3304(a)(9): interstate reciprocal arrangements required"
+
+# =============================================================================
+# BENEFIT COMPUTATION CONSTANTS
+# Parameters for calculating UI benefit amounts
+# =============================================================================
+
+benefit_computation:
+  description: "Parameters for UI benefit computation"
+
+  # Standard maximum weeks of benefits
+  standard_maximum_weeks:
+    description: "Standard maximum weeks of UI benefits in most states"
+    unit: weeks
+    values:
+      1939-01-01: 26
+    citations:
+      - "26 USC 3304(a)(11): state law must provide extended benefits"
+      - "Most states provide 26 weeks of regular benefits"
+
+  # Base period wages percentage cap
+  base_period_wages_cap_rate:
+    description: "Common cap on total benefits as percentage of base period wages"
+    unit: rate
+    values:
+      1939-01-01: 0.50
+    citations:
+      - "Common state practice: cap total benefits at 50% of base period wages"
+
+  # Earnings disregard rate
+  earnings_disregard_rate:
+    description: "Common earnings disregard as percentage of weekly benefit amount"
+    unit: rate
+    values:
+      1939-01-01: 0.25
+    citations:
+      - "Common state practice: allow 25% of WBA before reduction"

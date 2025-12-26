@@ -17,6 +17,7 @@ imports:
   initial_amount_single: statute/26/22/c/initial_amount#initial_amount_single
   initial_amount_joint_both: statute/26/22/c/initial_amount#initial_amount_joint_both
   initial_amount_separate: statute/26/22/c/initial_amount#initial_amount_separate
+  qualified_individuals_joint_both_threshold: statute/26/22/c/initial_amount#qualified_individuals_joint_both_threshold
 
   # Number of qualified individuals in tax unit
   num_sec22_qualified_individuals: statute/26/22/e/num_qualified_individuals#num_sec22_qualified_individuals
@@ -36,7 +37,7 @@ formula:
   if filing_status == SEPARATE: return initial_amount_separate
 
   # Joint return with both spouses qualified: $7,500
-  if filing_status == JOINT and num_sec22_qualified_individuals >= 2: return initial_amount_joint_both
+  if filing_status == JOINT and num_sec22_qualified_individuals >= qualified_individuals_joint_both_threshold: return initial_amount_joint_both
 
   # All other cases (single, HoH, surviving spouse, or joint with one qualified): $5,000
   return initial_amount_single

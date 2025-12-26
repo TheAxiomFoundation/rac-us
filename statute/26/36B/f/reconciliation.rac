@@ -44,6 +44,14 @@ imports:
   repay_cap_300_400_single: statute/26/36B/repayment_caps/300_to_400_pct_fpl/single
   repay_cap_300_400_joint: statute/26/36B/repayment_caps/300_to_400_pct_fpl/joint
 
+# FPL threshold constants
+  bracket_200_pct: statute/26/36B/fpl_thresholds/bracket_200_pct_fpl
+  bracket_300_pct: statute/26/36B/fpl_thresholds/bracket_300_pct_fpl
+  bracket_400_pct: statute/26/36B/fpl_thresholds/bracket_400_pct_fpl
+
+# No limit sentinel
+  no_repayment_cap: statute/26/36B/no_repayment_cap
+
 # =============================================================================
 # ADVANCE PREMIUM TAX CREDIT (APTC)
 # Section 1412 of ACA / 26 USC 36B(f)(1)
@@ -104,17 +112,17 @@ variable excess_aptc_repayment_cap:
     is_joint = filing_status == "joint"
 
     # No cap for income at or above 400% FPL
-    if income_pct >= 4.00:
-      return 999999999  # No limit
+    if income_pct >= bracket_400_pct:
+      return no_repayment_cap  # No limit
 
     # Cap based on income bracket and filing status
-    if income_pct < 2.00:
+    if income_pct < bracket_200_pct:
       if is_joint:
         return repay_cap_under_200_joint
       else:
         return repay_cap_under_200_single
 
-    if income_pct < 3.00:
+    if income_pct < bracket_300_pct:
       if is_joint:
         return repay_cap_200_300_joint
       else:

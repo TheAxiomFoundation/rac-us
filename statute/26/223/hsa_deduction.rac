@@ -43,6 +43,10 @@ imports:
   is_enrolled_in_medicare: statute/26/223/c/is_enrolled_in_medicare
   can_be_claimed_as_dependent: statute/26/223/c/can_be_claimed_as_dependent
 
+# Parameters
+  hsa_additional_tax_rate: statute/26/223/parameters#additional_tax.rate
+  hsa_medicare_age: statute/26/223/parameters#medicare_age
+
 # Main deduction variable - 26 USC 223(a)
 entity Person
 period Year
@@ -124,15 +128,15 @@ label "Subject to HSA Penalty"
 description "Whether non-qualified distributions are subject to 20% penalty"
 
 formula:
-  # Exceptions to 20% penalty:
+  # Exceptions to additional tax penalty:
   # - Age 65 or older (Medicare age)
   # - Disabled
   # - Death (beneficiary distributions)
-  if age >= 65:
-  return false
-if is_disabled:
-return false
-return hsa_nonqualified_distributions > 0
+  if age >= hsa_medicare_age:
+    return false
+  if is_disabled:
+    return false
+  return hsa_nonqualified_distributions > 0
 
 # Derived: Additional tax on non-qualified HSA distributions
 entity Person
@@ -144,6 +148,6 @@ description "20% additional tax on non-qualified HSA distributions"
 
 formula:
   if not is_subject_to_hsa_penalty:
-  return 0
-# 20% penalty on non-qualified distributions
-return hsa_nonqualified_distributions * 0.20
+    return 0
+  # Additional tax on non-qualified distributions (20% per ACA Section 9004)
+  return hsa_nonqualified_distributions * hsa_additional_tax_rate

@@ -195,6 +195,87 @@ applicable_percentage:
       # CLIFF: No credit above 400% FPL under original ACA
 
 # =============================================================================
+# FPL THRESHOLD CONSTANTS
+# 26 USC 36B(b)(3)(A) - Income tier boundaries as percentage of FPL
+# =============================================================================
+
+fpl_thresholds:
+  description: "Income tier boundaries as percentage of FPL per 26 USC 36B(b)(3)(A)"
+
+  # Minimum eligibility threshold (Medicaid gap)
+  minimum_eligibility_pct_fpl:
+    description: "Minimum household income to qualify for PTC (below this = Medicaid eligible)"
+    unit: rate
+    value: 1.00
+    citations:
+      - "26 USC 36B(c)(1)(A)(i): household income at least 100% FPL"
+
+  # Bracket boundary at 150% FPL
+  bracket_150_pct_fpl:
+    description: "Income threshold at 150% FPL"
+    unit: rate
+    value: 1.50
+    citations:
+      - "26 USC 36B(b)(3)(A): 150% FPL bracket boundary"
+
+  # Bracket boundary at 200% FPL
+  bracket_200_pct_fpl:
+    description: "Income threshold at 200% FPL"
+    unit: rate
+    value: 2.00
+    citations:
+      - "26 USC 36B(b)(3)(A): 200% FPL bracket boundary"
+
+  # Bracket boundary at 250% FPL
+  bracket_250_pct_fpl:
+    description: "Income threshold at 250% FPL"
+    unit: rate
+    value: 2.50
+    citations:
+      - "26 USC 36B(b)(3)(A): 250% FPL bracket boundary"
+
+  # Bracket boundary at 300% FPL
+  bracket_300_pct_fpl:
+    description: "Income threshold at 300% FPL"
+    unit: rate
+    value: 3.00
+    citations:
+      - "26 USC 36B(b)(3)(A): 300% FPL bracket boundary"
+
+  # Bracket boundary at 400% FPL (cliff under original ACA, no cliff under IRA)
+  bracket_400_pct_fpl:
+    description: "Income threshold at 400% FPL"
+    unit: rate
+    value: 4.00
+    citations:
+      - "26 USC 36B(b)(3)(A): 400% FPL bracket boundary"
+      - "26 USC 36B(c)(1)(A)(ii): 400% FPL upper limit (pre-IRA)"
+
+# =============================================================================
+# MONTHS PER YEAR CONSTANT
+# Used for converting annual to monthly amounts
+# =============================================================================
+
+months_per_year:
+  description: "Number of months in a year for prorating annual amounts"
+  unit: count
+  value: 12
+  citations:
+    - "26 USC 36B(b)(2)(A): monthly portion of credit"
+
+# =============================================================================
+# NO LIMIT SENTINEL VALUE
+# Used when income is above repayment cap threshold
+# =============================================================================
+
+no_repayment_cap:
+  description: "Sentinel value indicating no repayment cap applies (income >= 400% FPL)"
+  unit: currency-USD
+  value: 999999999
+  citations:
+    - "26 USC 36B(f)(2)(B): no cap for income at or above 400% FPL"
+
+# =============================================================================
 # INCOME ELIGIBILITY LIMITS
 # 26 USC 36B(c)(1)(A) - Applicable taxpayer definition
 # =============================================================================

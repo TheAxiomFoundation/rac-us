@@ -4,6 +4,19 @@
 # is not married and is not a surviving spouse)"
 # (Amounts indexed for inflation)
 
+# =============================================================================
+# AGE THRESHOLD
+# 26 USC § 63(f)(1) - "has attained age 65 before the close of his taxable year"
+# =============================================================================
+
+aged_threshold:
+  description: "Age threshold for additional standard deduction"
+  unit: years
+  value: 65
+  citations:
+    - "§ 63(f)(1): has attained age 65 before the close of his taxable year"
+    - "26 USC 152(c)(3): individual who has attained age 65"
+
 additional_aged_unmarried:
   description: "Additional deduction for taxpayers 65+ (single/HoH)"
   unit: currency-USD

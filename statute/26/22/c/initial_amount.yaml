@@ -36,3 +36,12 @@ initial_amount_separate:
     1984-01-01: 3750
   citations:
     - "26 USC § 22(c)(1)(C): $3,750 for married individual filing separate return"
+
+# Threshold for joint_both amount (both spouses qualified)
+qualified_individuals_joint_both_threshold:
+  description: "Minimum number of qualified individuals for joint_both amount"
+  unit: count
+  values:
+    1984-01-01: 2
+  citations:
+    - "26 USC § 22(c)(1)(B): both spouses are qualified individuals"

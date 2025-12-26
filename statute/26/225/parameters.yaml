@@ -82,3 +82,17 @@ phaseout:
         - date: 2025-01-01
           value: 300000
           reference: "26 USC 225(b)(2)(A)"
+
+# =============================================================================
+# Section 225(g) - Termination Year
+# =============================================================================
+termination:
+  description: "Last taxable year for which deduction is available"
+
+  final_year:
+    description: "Last year the deduction can be claimed"
+    unit: year
+    values:
+      - date: 2025-01-01
+        value: 2028
+        reference: "26 USC 225(g): terminates after taxable years beginning after December 31, 2028"

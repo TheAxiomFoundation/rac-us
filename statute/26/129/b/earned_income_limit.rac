@@ -34,6 +34,8 @@ imports:
 # Parameters for imputed income
   imputed_monthly_one: statute/26/129/e/parameters#imputed_earned_income_monthly_one
   imputed_monthly_two: statute/26/129/e/parameters#imputed_earned_income_monthly_two
+  months_per_year: statute/26/129/e/parameters#months_per_year
+  qualifying_individuals_higher_imputed_threshold: statute/26/129/e/parameters#qualifying_individuals_higher_imputed_threshold
 
 # Number of qualifying individuals (from section 21)
   num_cdcc_qualifying_individuals: statute/26/21/e/num_qualifying_individuals#num_cdcc_qualifying_individuals
@@ -69,8 +71,8 @@ formula:
 
   # Determine imputed income for student/disabled spouse
   # Imputed for 12 months (annual amount)
-  imputed_monthly = num_cdcc_qualifying_individuals >= 2 ? imputed_monthly_two : imputed_monthly_one
-  imputed_annual = imputed_monthly * 12
+  imputed_monthly = num_cdcc_qualifying_individuals >= qualifying_individuals_higher_imputed_threshold ? imputed_monthly_two : imputed_monthly_one
+  imputed_annual = imputed_monthly * months_per_year
 
   # If spouse is student or disabled, use higher of actual or imputed income
   spouse_earned = (spouse_is_student or spouse_is_disabled) ? max(spouse_actual_earned, imputed_annual) : spouse_actual_earned

@@ -152,6 +152,20 @@ real_estate_professional:
       This provision was added by OBRA 1993, effective for tax years
       beginning after December 31, 1993.
 
+  # Section 469(c)(7)(B)(i) - Majority services threshold
+  majority_threshold:
+    description: "Threshold for majority of services in real property trades/businesses"
+    unit: rate
+    values:
+      - date: 1994-01-01
+        value: 0.5
+        reference: "26 USC 469(c)(7)(B)(i)"
+    notes: |
+      Per 469(c)(7)(B)(i): "more than one-half of the personal services
+      performed in trades or businesses by the taxpayer during such taxable
+      year are performed in real property trades or businesses..."
+      The taxpayer must have MORE THAN 50% (not >= 50%) in real property.
+
 # =============================================================================
 # Section 469(h)(2) - Material Participation by Limited Partners
 # =============================================================================

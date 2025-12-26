@@ -33,6 +33,7 @@ imports:
 
   # Parameters
   hours_threshold: parameters#real_estate_professional.hours_threshold
+  majority_threshold: parameters#real_estate_professional.majority_threshold
 
 # =============================================================================
 # Real Property Trade or Business - Section 469(c)(7)(C)
@@ -93,7 +94,7 @@ formula:
   real_property_share = hours_in_real_property / total_hours
 
   # More than half (> 50%) must be in real property
-  return real_property_share > 0.5
+  return real_property_share > majority_threshold
 
 default false
 

@@ -13,6 +13,12 @@ imports:
 # Federal parameters
   waiting_period_weeks: statute/26/3304/parameters/waiting_period_weeks
   extended_benefits_weeks: statute/26/3304/parameters/extended_benefits_weeks
+  extended_benefits_high_unemployment_weeks: statute/26/3304/parameters/extended_benefits_high_unemployment_weeks
+
+# Benefit computation parameters
+  standard_maximum_weeks: statute/26/3304/benefit_computation/standard_maximum_weeks
+  base_period_wages_cap_rate: statute/26/3304/benefit_computation/base_period_wages_cap_rate
+  earnings_disregard_rate: statute/26/3304/benefit_computation/earnings_disregard_rate
 
 # State-specific parameters (resolved at runtime)
   state_minimum_base_period_wages: state_parameters/minimum_base_period_wages
@@ -231,7 +237,7 @@ formula:
 
   # Some states also cap at percentage of base period wages
   weeks_based = wba * max_weeks
-  wage_based = ui_base_period_wages * 0.5  # Common: 50% of BP wages
+  wage_based = ui_base_period_wages * base_period_wages_cap_rate  # Common: 50% of BP wages
 
   return min(weeks_based, wage_based)
 
@@ -267,7 +273,7 @@ formula:
   # Some states vary by wages or unemployment rate
   return state_maximum_weeks
 
-default 26
+default standard_maximum_weeks
 
 entity Person
 period Week
@@ -281,7 +287,7 @@ formula:
 
   return max(0, max_weeks - used_weeks)
 
-default 26
+default standard_maximum_weeks
 
 # =============================================================================
 # CURRENT PAYMENT
@@ -306,7 +312,7 @@ formula:
 
   # Earnings offset (varies by state)
   # Common: can earn 25-50% of WBA before reduction
-  earnings_disregard = wba * 0.25
+  earnings_disregard = wba * earnings_disregard_rate
   excess_earnings = max(0, earnings - earnings_disregard)
   reduction = excess_earnings
 
@@ -329,7 +335,7 @@ formula:
   # - State IUR >= 5% and >= 120% of prior 2 years, OR
   # - State TUR >= 6.5% (optional trigger)
 
-  regular_exhausted = ui_weeks_remaining <= 0 and weeks_claimed >= 26
+  regular_exhausted = ui_weeks_remaining <= 0 and weeks_claimed >= standard_maximum_weeks
   eb_active = state_extended_benefits_active
 
   return regular_exhausted and eb_active
@@ -345,8 +351,8 @@ description "Additional weeks available under extended benefits"
 formula:
   if not ui_extended_benefits_eligible: return 0
 
-  # Standard: 13 weeks
-  # High unemployment: 20 weeks
+  # Standard: 13 weeks per 26 USC 3304(a)(11)(A)
+  # High unemployment: 20 weeks per 26 USC 3304(a)(11)(B)
   if state_high_unemployment_period: return extended_benefits_high_unemployment_weeks
   return extended_benefits_weeks
 

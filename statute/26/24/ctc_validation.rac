@@ -4,14 +4,28 @@
 # Uses pre-computed inputs (num_qualifying_children, filing_status, etc.)
 # and applies the Section 24 formula to compute the credit amount.
 #
-# Inlined 2024 parameters (from Rev. Proc. 2023-34):
-# - Credit per child: $2,000 (TCJA)
-# - Credit per other dependent: $500 (TCJA)
-# - Refundable (ACTC) cap: $1,700 per child
-# - Phase-out thresholds: $200k single, $400k joint
-# - Phase-out rate: $50 per $1,000 over threshold
-# - Earned income threshold: $2,500
-# - Refundable rate: 15%
+# Parameters sourced from:
+# - statute/26/24/h/2/credit_amount.yaml - Credit per child
+# - statute/26/24/h/4/other_dependent_amount.yaml - Credit per other dependent
+# - statute/26/24/h/5/refundable_maximum.yaml - Refundable (ACTC) cap
+# - statute/26/24/b/1/threshold.yaml - Phase-out thresholds
+# - statute/26/24/b/2/phaseout_rate.yaml - Phase-out rate
+# - statute/26/24/ctc_phaseout_increment.yaml - Phaseout increment
+# - statute/26/24/d/1/B/parameters.yaml - Earned income threshold, refundable rate
+# - statute/26/24/actc_qualifying_children_threshold.yaml - 3+ children threshold
+
+imports:
+  # Credit amounts from parameters
+  ctc_credit_amount_param: statute/26/24/h/2/credit_amount#credit_amount
+  ctc_other_dependent_amount_param: statute/26/24/h/4/other_dependent_amount#other_dependent_amount
+  ctc_phaseout_threshold_joint_param: statute/26/24/b/1/threshold#phaseout_threshold_joint
+  ctc_phaseout_threshold_single_param: statute/26/24/b/1/threshold#phaseout_threshold_single
+  ctc_phaseout_rate_param: statute/26/24/b/2/phaseout_rate#phaseout_rate
+  ctc_phaseout_increment_param: statute/26/24/ctc_phaseout_increment#phaseout_increment
+  actc_refundable_maximum_param: statute/26/24/h/5/refundable_maximum#refundable_maximum
+  actc_earned_income_threshold_param: statute/26/24/d/1/B/parameters#earned_income_threshold
+  actc_refundable_rate_param: statute/26/24/d/1/B/parameters#refundable_rate
+  qualifying_children_ss_threshold: statute/26/24/actc_qualifying_children_threshold#qualifying_children_ss_threshold
 
 # Filing status enum per Section 1
 enum FilingStatus:
@@ -100,102 +114,102 @@ variable filing_status:
   description "Federal income tax filing status per Section 1"
   default SINGLE
 
-# === Inlined Parameters (2024 values) ===
+# === Parameter-backed Variables ===
 
-# Credit per qualifying child - $2,000 (TCJA)
+# Credit per qualifying child (from parameters)
 variable ctc_credit_amount:
   entity TaxUnit
   period Year
   dtype Money
   unit "USD"
   label "CTC Credit Amount Per Child"
-  description "Credit amount per qualifying child - $2,000 under TCJA"
+  description "Credit amount per qualifying child per 26 USC 24(h)(2)"
 
   formula:
-    return 2000
+    return ctc_credit_amount_param
 
-# Credit per other dependent - $500 (TCJA)
+# Credit per other dependent (from parameters)
 variable ctc_other_dependent_amount:
   entity TaxUnit
   period Year
   dtype Money
   unit "USD"
   label "Other Dependent Credit Amount"
-  description "Credit amount per other dependent - $500 under TCJA"
+  description "Credit amount per other dependent per 26 USC 24(h)(4)"
 
   formula:
-    return 500
+    return ctc_other_dependent_amount_param
 
-# Phase-out threshold for joint filers - $400,000
+# Phase-out threshold for joint filers (from parameters)
 variable ctc_phaseout_threshold_joint:
   entity TaxUnit
   period Year
   dtype Money
   unit "USD"
   label "CTC Phase-Out Threshold (Joint)"
-  description "AGI threshold for joint filers - $400,000 under TCJA"
+  description "AGI threshold for joint filers per 26 USC 24(b)(1)(A)"
 
   formula:
-    return 400000
+    return ctc_phaseout_threshold_joint_param
 
-# Phase-out threshold for other filers - $200,000
+# Phase-out threshold for other filers (from parameters)
 variable ctc_phaseout_threshold_single:
   entity TaxUnit
   period Year
   dtype Money
   unit "USD"
   label "CTC Phase-Out Threshold (Single)"
-  description "AGI threshold for non-joint filers - $200,000 under TCJA"
+  description "AGI threshold for non-joint filers per 26 USC 24(b)(1)(B)"
 
   formula:
-    return 200000
+    return ctc_phaseout_threshold_single_param
 
-# Phase-out rate - $50 per $1,000
+# Phase-out rate (from parameters)
 variable ctc_phaseout_rate:
   entity TaxUnit
   period Year
   dtype Money
   unit "USD"
   label "CTC Phase-Out Rate"
-  description "Credit reduction per $1,000 over threshold - $50"
+  description "Credit reduction per $1,000 over threshold per 26 USC 24(b)(2)"
 
   formula:
-    return 50
+    return ctc_phaseout_rate_param
 
-# Maximum refundable per child - $1,700 for 2024
+# Maximum refundable per child (from parameters)
 variable actc_refundable_maximum:
   entity TaxUnit
   period Year
   dtype Money
   unit "USD"
   label "ACTC Refundable Maximum Per Child"
-  description "Maximum refundable amount per child - $1,700 for 2024"
+  description "Maximum refundable amount per child per 26 USC 24(h)(5)"
 
   formula:
-    return 1700
+    return actc_refundable_maximum_param
 
-# Earned income threshold - $2,500
+# Earned income threshold (from parameters)
 variable actc_earned_income_threshold:
   entity TaxUnit
   period Year
   dtype Money
   unit "USD"
   label "ACTC Earned Income Threshold"
-  description "Earned income floor for refundable credit - $2,500"
+  description "Earned income floor for refundable credit per 26 USC 24(d)(1)(B)(i)"
 
   formula:
-    return 2500
+    return actc_earned_income_threshold_param
 
-# Refundable rate - 15%
+# Refundable rate (from parameters)
 variable actc_refundable_rate:
   entity TaxUnit
   period Year
   dtype Rate
   label "ACTC Refundable Rate"
-  description "Percentage of earned income above threshold - 15%"
+  description "Percentage of earned income above threshold per 26 USC 24(d)(1)(B)(i)"
 
   formula:
-    return 0.15
+    return actc_refundable_rate_param
 
 # === Credit Calculations ===
 
@@ -239,7 +253,7 @@ variable ctc_phaseout_reduction:
   formula:
     let excess = adjusted_gross_income - ctc_phaseout_threshold
     if excess <= 0 : 0
-    else ceil(excess / 1000) * ctc_phaseout_rate
+    else ceil(excess / ctc_phaseout_increment_param) * ctc_phaseout_rate
 
 # Total CTC (this IS the final credit per PolicyEngine's convention)
 # In PolicyEngine, ctc = max(0, maximum - phase_out)
@@ -292,7 +306,7 @@ variable ctc_phase_in:
   description "Amount used to determine refundable credit"
 
   formula:
-    if num_qualifying_children < 3 : ctc_phase_in_earnings
+    if num_qualifying_children < qualifying_children_ss_threshold : ctc_phase_in_earnings
     else max(ctc_phase_in_earnings, ctc_social_security_excess)
 
 # Maximum refundable amount per child
