@@ -218,3 +218,20 @@ priority:
     7:
       description: "Individuals at nutritional risk solely from homelessness or migrancy"
       reference: "7 CFR 246.7(e)(1)(vii)"
+
+  # Default priority assignment by category (assuming dietary risk)
+  # Clinical assessments would override to Priorities I-III
+  by_category:
+    pregnant_woman: 4
+    breastfeeding_woman: 4
+    infant: 4
+    child: 5
+    postpartum_woman: 6
+
+  # Priority level thresholds for categorization
+  ranges:
+    high_max: 3         # Priorities 1-3 are high priority
+    standard_min: 4     # Priority 4-5 are standard
+    standard_max: 5
+    lower_min: 6        # Priority 6-7 are lower priority
+    lower_max: 7

@@ -40,106 +40,109 @@ imports:
   wic_category: statute/42/1786/d/1/wic_category
   is_wic_eligible: statute/42/1786/d/is_wic_eligible
 
+parameters:
+# Priority assignments by category (assuming dietary risk = Priority IV-VI)
+# Clinical assessments would override to Priorities I-III
+  priority_by_category: parameters#priority.by_category
+
+# Priority level thresholds for categorization
+  priority_ranges: parameters#priority.ranges
+
 # =============================================================================
 # PRIORITY LEVEL ASSIGNMENT
 # 7 CFR 246.7(e) - Nationwide priority system
 # =============================================================================
 
-# Simplified priority assignment based on category
-# Note: Actual priority requires clinical nutritional risk assessment
-entity Person
-period Month
-dtype Integer  # 1-7, or 0 if not eligible
+variable wic_priority_level:
+  entity Person
+  period Month
+  dtype Integer  # 1-7, or 0 if not eligible
 
-formula:
-  if not is_wic_eligible:
+  formula:
+    if not is_wic_eligible:
+      return 0
+
+    category = wic_category
+
+    # Priority assignment based on category
+    # Using parameters lookup for priority values
+    if category == "pregnant_woman":
+      return priority_by_category.pregnant_woman
+    if category == "breastfeeding_woman":
+      return priority_by_category.breastfeeding_woman
+    if category == "infant":
+      return priority_by_category.infant
+    if category == "child":
+      return priority_by_category.child
+    if category == "postpartum_woman":
+      return priority_by_category.postpartum_woman
+
     return 0
 
-  category = wic_category
-
-  # Priority I: Pregnant/breastfeeding women and infants with documented
-  # medical nutrition risk (anemia, underweight, failure to thrive, etc.)
-  #
-  # Priority II: Infants under 6 months of mothers on WIC/Medicaid pregnancy
-  #
-  # Priority III: Children with documented medical nutrition risk
-  #
-  # For modeling, we assume standard dietary risk (Priority IV/V/VI) since
-  # clinical assessments cannot be simulated.
-
-  # Priority IV - Pregnant/breastfeeding women, infants (dietary risk assumed)
-  if category == "pregnant_woman" or category == "breastfeeding_woman":
-    return 4
-
-  if category == "infant":
-    return 4
-
-  # Priority V - Children (dietary risk assumed)
-  if category == "child":
-    return 5
-
-  # Priority VI - Postpartum non-breastfeeding women
-  if category == "postpartum_woman":
-    return 6
-
-  return 0
+---
 
 # =============================================================================
 # PRIORITY DESCRIPTIONS
 # =============================================================================
 
-entity Person
-period Month
-dtype String
+variable wic_priority_description:
+  entity Person
+  period Month
+  dtype String
 
-formula:
-  priority = wic_priority_level
+  formula:
+    priority = wic_priority_level
 
-  if priority == 1:
-    return "Priority I - High-risk pregnant/breastfeeding women and infants"
-  else if priority == 2:
-    return "Priority II - Infants of WIC/Medicaid mothers"
-  else if priority == 3:
-    return "Priority III - High-risk children"
-  else if priority == 4:
-    return "Priority IV - Pregnant/breastfeeding women and infants"
-  else if priority == 5:
-    return "Priority V - Children at dietary risk"
-  else if priority == 6:
-    return "Priority VI - Postpartum non-breastfeeding women"
-  else if priority == 7:
-    return "Priority VII - Homeless/migrant certification"
-  else if priority == 0:
+    if priority == 1:
+      return "Priority I - High-risk pregnant/breastfeeding women and infants"
+    if priority == priority_ranges.standard_min - 1:
+      return "Priority II - Infants of WIC/Medicaid mothers"
+    if priority == priority_ranges.high_max:
+      return "Priority III - High-risk children"
+    if priority == priority_ranges.standard_min:
+      return "Priority IV - Pregnant/breastfeeding women and infants"
+    if priority == priority_ranges.standard_max:
+      return "Priority V - Children at dietary risk"
+    if priority == priority_ranges.lower_min:
+      return "Priority VI - Postpartum non-breastfeeding women"
+    if priority == priority_ranges.lower_max:
+      return "Priority VII - Homeless/migrant certification"
     return "Not eligible for WIC"
+
+---
 
 # =============================================================================
 # PRIORITY CATEGORY FLAGS
 # For filtering and analysis
 # =============================================================================
 
-# High priority (I-III)
-entity Person
-period Month
-dtype Boolean
+variable is_wic_high_priority:
+  entity Person
+  period Month
+  dtype Boolean
 
-formula:
-  priority = wic_priority_level
-  return priority >= 1 and priority <= 3
+  formula:
+    priority = wic_priority_level
+    return priority >= 1 and priority <= priority_ranges.high_max
 
-# Standard priority (IV-V)
-entity Person
-period Month
-dtype Boolean
+---
 
-formula:
-  priority = wic_priority_level
-  return priority >= 4 and priority <= 5
+variable is_wic_standard_priority:
+  entity Person
+  period Month
+  dtype Boolean
 
-# Lower priority (VI-VII)
-entity Person
-period Month
-dtype Boolean
+  formula:
+    priority = wic_priority_level
+    return priority >= priority_ranges.standard_min and priority <= priority_ranges.standard_max
 
-formula:
-  priority = wic_priority_level
-  return priority >= 6 and priority <= 7
+---
+
+variable is_wic_lower_priority:
+  entity Person
+  period Month
+  dtype Boolean
+
+  formula:
+    priority = wic_priority_level
+    return priority >= priority_ranges.lower_min and priority <= priority_ranges.lower_max
