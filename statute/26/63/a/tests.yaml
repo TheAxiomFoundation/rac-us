@@ -16,8 +16,8 @@ test_cases:
       age: 35
     expected:
       standard_deduction: 14600
-      takes_standard_deduction: true
-      deductions_from_agi: 14600
+      uses_standard_deduction: true
+      taxable_income_deductions: 14600
       taxable_income: 60400  # $75K - $14.6K
     citations:
       - "26 USC 63(b): AGI minus standard deduction"
@@ -31,8 +31,8 @@ test_cases:
       spouse_age: 38
     expected:
       standard_deduction: 29200
-      takes_standard_deduction: true
-      deductions_from_agi: 29200
+      uses_standard_deduction: true
+      taxable_income_deductions: 29200
       taxable_income: 120800  # $150K - $29.2K
     citations:
       - "26 USC 63(b)"
@@ -45,7 +45,7 @@ test_cases:
       age: 42
     expected:
       standard_deduction: 21900
-      deductions_from_agi: 21900
+      taxable_income_deductions: 21900
       taxable_income: 38100  # $60K - $21.9K
     citations:
       - "26 USC 63(c)(2)(B): HOH standard deduction"
@@ -62,12 +62,12 @@ test_cases:
       mortgage_interest: 15000
       acquisition_debt_amount: 400000
       salt_taxes_paid: 9000
-      charitable_cash_public_charity: 5000
+      charitable_cash_donations: 5000
     expected:
       standard_deduction: 14600
-      total_itemized_deductions: 29000
-      takes_standard_deduction: false
-      deductions_from_agi: 29000
+      itemized_taxable_income_deductions: 29000
+      uses_standard_deduction: false
+      taxable_income_deductions: 29000
       taxable_income: 71000  # $100K - $29K
     citations:
       - "26 USC 63(a): itemized deductions"
@@ -81,7 +81,7 @@ test_cases:
       mortgage_interest: 25000
       acquisition_debt_amount: 600000
       salt_taxes_paid: 15000  # Capped at $10K
-      charitable_cash_public_charity: 20000
+      charitable_cash_donations: 20000
       medical_expenses: 25000  # -> $25K - 7.5%*$250K = $6,250
     expected:
       standard_deduction: 29200
@@ -89,8 +89,8 @@ test_cases:
       interest_deduction: 25000
       salt_deduction: 10000
       charitable_deduction: 20000
-      total_itemized_deductions: 61250
-      takes_standard_deduction: false
+      itemized_taxable_income_deductions: 61250
+      uses_standard_deduction: false
       taxable_income: 188750  # $250K - $61.25K
     citations:
       - "26 USC 63(a)"
@@ -108,7 +108,7 @@ test_cases:
     expected:
       # Basic: $14,600 + Additional aged single: $1,950 = $16,550
       standard_deduction: 16550
-      deductions_from_agi: 16550
+      taxable_income_deductions: 16550
       taxable_income: 33450  # $50K - $16.55K
     citations:
       - "26 USC 63(f)(1): additional for aged"
@@ -121,7 +121,7 @@ test_cases:
       age: 68
       spouse_age: 66
     expected:
-      # Basic: $29,200 + 2 × $1,550 (married aged) = $32,300
+      # Basic: $29,200 + 2 x $1,550 (married aged) = $32,300
       standard_deduction: 32300
       taxable_income: 67700  # $100K - $32.3K
     citations:
@@ -153,7 +153,7 @@ test_cases:
       age: 25
     expected:
       standard_deduction: 14600
-      deductions_from_agi: 14600
+      taxable_income_deductions: 14600
       taxable_income: 0  # max(0, $10K - $14.6K) = 0
     citations:
       - "26 USC 63: taxable income cannot be negative"
@@ -226,8 +226,8 @@ test_cases:
       spouse_itemizes: true
     expected:
       standard_deduction: 0  # Ineligible
-      total_itemized_deductions: 10000
-      deductions_from_agi: 10000
+      itemized_taxable_income_deductions: 10000
+      taxable_income_deductions: 10000
       taxable_income: 70000  # $80K - $10K
     citations:
       - "26 USC 63(c)(6)(A): zero if spouse itemizes"
@@ -241,7 +241,7 @@ test_cases:
       is_nonresident_alien: true
     expected:
       standard_deduction: 0
-      total_itemized_deductions: 3000
+      itemized_taxable_income_deductions: 3000
       taxable_income: 47000  # $50K - $3K
     citations:
       - "26 USC 63(c)(6)(B): zero for NRA"

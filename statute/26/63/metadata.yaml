@@ -19,11 +19,33 @@ variables:
     dtype: Money
     path: c/standard_deduction.cosilico
 
+  - name: itemized_taxable_income_deductions
+    entity: TaxUnit
+    period: Year
+    dtype: Money
+    path: d/itemized_deductions.cosilico
+    description: "Matches PolicyEngine's itemized_taxable_income_deductions"
+
   - name: total_itemized_deductions
     entity: TaxUnit
     period: Year
     dtype: Money
     path: d/itemized_deductions.cosilico
+    description: "Alias for itemized_taxable_income_deductions (backward compatibility)"
+
+  - name: uses_standard_deduction
+    entity: TaxUnit
+    period: Year
+    dtype: Boolean
+    path: e/deduction_choice.cosilico
+    description: "Whether taxpayer uses standard vs itemized deduction"
+
+  - name: taxable_income_deductions
+    entity: TaxUnit
+    period: Year
+    dtype: Money
+    path: e/deduction_choice.cosilico
+    description: "The deduction amount used (larger of standard or itemized)"
 
 coverage:
   tax_years: [2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025]
@@ -53,7 +75,8 @@ sources:
         - a/taxable_income.cosilico       # Main taxable income computation
         - c/2/basic_amounts.yaml          # Basic deduction by filing status
         - c/5/parameters.yaml             # Dependent limitation
-        - d/itemized_deductions.cosilico  # Total itemized deductions
+        - d/itemized_deductions.cosilico  # itemized_taxable_income_deductions
+        - e/deduction_choice.cosilico     # uses_standard_deduction, taxable_income_deductions
         - f/1/aged_amount.yaml            # Additional for aged
         - f/2/blind_amount.yaml           # Additional for blind
 
@@ -89,10 +112,11 @@ architecture:
     Section 63 defines taxable income as AGI minus deductions:
 
     1. TAXABLE INCOME (63(a))
-       taxable_income = AGI - deductions_from_agi - personal_exemptions
+       taxable_income = AGI - taxable_income_deductions - personal_exemptions
 
-    2. DEDUCTIONS FROM AGI
-       deductions_from_agi = max(standard_deduction, total_itemized_deductions)
+    2. DEDUCTION CHOICE (63(e))
+       taxable_income_deductions = max(standard_deduction, itemized_taxable_income_deductions)
+       uses_standard_deduction = (standard > 0) AND (standard >= itemized)
        (Unless ineligible for standard deduction - 63(c)(6))
 
     3. STANDARD DEDUCTION (63(c))
@@ -102,6 +126,7 @@ architecture:
        - Zero if ineligible (63(c)(6))
 
     4. ITEMIZED DEDUCTIONS (63(d))
+       itemized_taxable_income_deductions = (maps to PolicyEngine variable)
        - Medical expenses (213) - exceeding 7.5% AGI
        - SALT (164) - capped at $10K (TCJA)
        - Mortgage interest (163) - limited by debt amount
@@ -111,8 +136,15 @@ architecture:
   formula_structure: |
     taxable_income =
       adjusted_gross_income
-      - max(standard_deduction, total_itemized_deductions)
+      - taxable_income_deductions
       - personal_exemption  # Zero under TCJA 2018-2025
+
+    taxable_income_deductions =
+      max(standard_deduction, itemized_taxable_income_deductions)
+      # Unless ineligible for standard deduction
+
+    uses_standard_deduction =
+      (standard_deduction > 0) AND (standard_deduction >= itemized_taxable_income_deductions)
 
     Standard deduction (non-dependent):
       basic_amount(filing_status)
@@ -126,9 +158,9 @@ architecture:
       )
       + additional amounts (if applicable)
 
-    Total itemized deductions:
-      medical_expense_deduction +     # Section 213
+    itemized_taxable_income_deductions:
+      medical_expense_deduction +      # Section 213
       salt_deduction +                 # Section 164
       interest_deduction +             # Section 163
-      charitable_deduction +           # Section 170
-      casualty_loss_deduction          # Section 165
+      charitable_deduction             # Section 170
+      # Note: casualty_loss_deduction pending Section 165 implementation

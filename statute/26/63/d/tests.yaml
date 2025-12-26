@@ -1,6 +1,6 @@
 # Tests for 26 USC Section 63(d) - Itemized Deductions
 
-variable: total_itemized_deductions
+variable: itemized_taxable_income_deductions
 tax_year: 2024
 
 test_cases:
@@ -17,7 +17,7 @@ test_cases:
     expected:
       # Medical: $10,000 - (7.5% * $50,000) = $10,000 - $3,750 = $6,250
       medical_expense_deduction: 6250
-      total_itemized_deductions: 6250
+      itemized_taxable_income_deductions: 6250
     citations:
       - "26 USC 63(d): itemized deductions defined"
       - "26 USC 213(a): 7.5% floor"
@@ -31,7 +31,7 @@ test_cases:
       acquisition_debt_amount: 500000
     expected:
       interest_deduction: 15000
-      total_itemized_deductions: 15000
+      itemized_taxable_income_deductions: 15000
     citations:
       - "26 USC 163(h): qualified residence interest"
 
@@ -40,10 +40,10 @@ test_cases:
     inputs:
       filing_status: single
       adjusted_gross_income: 80000
-      charitable_cash_public_charity: 12000
+      charitable_cash_donations: 12000
     expected:
       charitable_deduction: 12000
-      total_itemized_deductions: 12000
+      itemized_taxable_income_deductions: 12000
     citations:
       - "26 USC 170(a): charitable deduction"
 
@@ -59,13 +59,13 @@ test_cases:
       medical_expenses: 20000      # -> $20K - 7.5%*$150K = $8,750
       mortgage_interest: 18000     # -> $18,000 (under limit)
       salt_taxes_paid: 15000       # -> $10,000 (SALT cap)
-      charitable_cash_public_charity: 10000  # -> $10,000
+      charitable_cash_donations: 10000  # -> $10,000
     expected:
       medical_expense_deduction: 8750   # $20K - $11,250
       interest_deduction: 18000
       salt_deduction: 10000             # Capped at $10K
       charitable_deduction: 10000
-      total_itemized_deductions: 46750
+      itemized_taxable_income_deductions: 46750
     citations:
       - "26 USC 63(d)"
       - "Schedule A components"
@@ -79,13 +79,13 @@ test_cases:
       mortgage_interest: 35000     # -> $35K (large mortgage but under limit)
       acquisition_debt_amount: 700000
       salt_taxes_paid: 50000       # -> $10,000 (capped)
-      charitable_cash_public_charity: 150000  # -> $150K (under 60% = $300K)
+      charitable_cash_donations: 150000  # -> $150K (under 60% = $300K)
     expected:
       medical_expense_deduction: 12500
       interest_deduction: 35000
       salt_deduction: 10000
       charitable_deduction: 150000
-      total_itemized_deductions: 207500
+      itemized_taxable_income_deductions: 207500
     citations:
       - "26 USC 63(d)"
 
@@ -97,12 +97,12 @@ test_cases:
       mortgage_interest: 8000
       acquisition_debt_amount: 300000
       salt_taxes_paid: 6000
-      charitable_cash_public_charity: 2000
+      charitable_cash_donations: 2000
     expected:
       interest_deduction: 8000
       salt_deduction: 6000
       charitable_deduction: 2000
-      total_itemized_deductions: 16000
+      itemized_taxable_income_deductions: 16000
     citations:
       - "26 USC 63(d)"
 
@@ -117,12 +117,12 @@ test_cases:
       adjusted_gross_income: 100000
       mortgage_interest: 12000
       salt_taxes_paid: 8000
-      charitable_cash_public_charity: 3000
+      charitable_cash_donations: 3000
     expected:
-      total_itemized_deductions: 23000  # $12K + $8K + $3K
+      itemized_taxable_income_deductions: 23000  # $12K + $8K + $3K
       standard_deduction: 14600
-      takes_standard_deduction: false
-      deductions_from_agi: 23000  # Itemized wins
+      uses_standard_deduction: false
+      taxable_income_deductions: 23000  # Itemized wins
     citations:
       - "26 USC 63(e): election to itemize"
 
@@ -133,12 +133,12 @@ test_cases:
       adjusted_gross_income: 60000
       mortgage_interest: 5000
       salt_taxes_paid: 3000
-      charitable_cash_public_charity: 1000
+      charitable_cash_donations: 1000
     expected:
-      total_itemized_deductions: 9000   # $5K + $3K + $1K
+      itemized_taxable_income_deductions: 9000   # $5K + $3K + $1K
       standard_deduction: 14600
-      takes_standard_deduction: true
-      deductions_from_agi: 14600  # Standard wins
+      uses_standard_deduction: true
+      taxable_income_deductions: 14600  # Standard wins
     citations:
       - "26 USC 63(b): individuals who do not itemize"
 
@@ -149,12 +149,12 @@ test_cases:
       adjusted_gross_income: 200000
       mortgage_interest: 20000
       salt_taxes_paid: 10000
-      charitable_cash_public_charity: 8000
+      charitable_cash_donations: 8000
     expected:
-      total_itemized_deductions: 38000  # $20K + $10K + $8K
+      itemized_taxable_income_deductions: 38000  # $20K + $10K + $8K
       standard_deduction: 29200
-      takes_standard_deduction: false
-      deductions_from_agi: 38000
+      uses_standard_deduction: false
+      taxable_income_deductions: 38000
     citations:
       - "26 USC 63(e)"
 
@@ -169,12 +169,12 @@ test_cases:
       adjusted_gross_income: 50000
       mortgage_interest: 0
       salt_taxes_paid: 0
-      charitable_cash_public_charity: 0
+      charitable_cash_donations: 0
       medical_expenses: 0
     expected:
-      total_itemized_deductions: 0
-      takes_standard_deduction: true
-      deductions_from_agi: 14600
+      itemized_taxable_income_deductions: 0
+      uses_standard_deduction: true
+      taxable_income_deductions: 14600
 
   - name: "MFS spouse itemizes (must itemize)"
     description: "Must itemize if MFS spouse itemizes"
@@ -187,8 +187,8 @@ test_cases:
     expected:
       # Standard deduction = 0 (ineligible)
       standard_deduction: 0
-      total_itemized_deductions: 8000
-      takes_standard_deduction: false
-      deductions_from_agi: 8000  # Must use itemized
+      itemized_taxable_income_deductions: 8000
+      uses_standard_deduction: false
+      taxable_income_deductions: 8000  # Must use itemized
     citations:
       - "26 USC 63(c)(6)(A): MFS must itemize if spouse does"

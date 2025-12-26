@@ -12,14 +12,21 @@
 #
 # Eligibility requirements:
 #   - Age 18 or older at end of tax year
-#   - Not claimed as a dependent on another return
-#   - Not a full-time student
+#   - Head of household or spouse (only filers claim the credit)
+#   - Not claimed as a dependent on ANOTHER return (25B(c)(2)(A))
+#   - Not a full-time student (25B(c)(2)(B))
+#
+# Note: The statute says "with respect to whom a deduction under section 151
+# is allowed to another taxpayer" - this means the person cannot be claimed
+# as a dependent on someone else's return, but can still be a filer.
 
 imports:
 # Age at end of tax year
   age: inputs/person/age
-# Whether claimed as dependent
-  is_tax_unit_dependent: statute/26/152/c/is_tax_unit_dependent
+# Whether this person is head or spouse (filer status)
+  is_tax_unit_head_or_spouse: statute/26/1/is_tax_unit_head_or_spouse
+# Whether claimed as dependent on ANOTHER return (not this one)
+  claimed_as_dependent_on_another_return: inputs/person/claimed_as_dependent_on_another_return
 # Whether full-time student
   is_full_time_student: inputs/person/is_full_time_student
 
@@ -36,13 +43,16 @@ formula:
   # 25B(c)(1): Must be at least 18 at end of tax year
   meets_age_requirement = age >= minimum_age
 
-  # 25B(c)(2)(A): Not claimed as dependent on another return
-  not_a_dependent = not is_tax_unit_dependent
+  # Only head of household or spouse can claim (they are the filers)
+  is_filer = is_tax_unit_head_or_spouse
+
+  # 25B(c)(2)(A): Not claimed as dependent on ANOTHER taxpayer's return
+  not_dependent_elsewhere = not claimed_as_dependent_on_another_return
 
   # 25B(c)(2)(B): Not a full-time student (as defined in 152(f)(2))
   not_a_student = not is_full_time_student
 
   # All conditions must be met
-  return meets_age_requirement and not_a_dependent and not_a_student
+  return meets_age_requirement and is_filer and not_dependent_elsewhere and not_a_student
 
 default False

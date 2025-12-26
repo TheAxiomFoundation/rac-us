@@ -1,0 +1,259 @@
+# Tests for 26 USC Section 63(e) - Election to Itemize
+
+variable: taxable_income_deductions
+tax_year: 2024
+
+test_cases:
+  # ==========================================================================
+  # Standard Deduction Choice (Standard > Itemized)
+  # ==========================================================================
+
+  - name: "Single filer - standard deduction wins"
+    description: "Standard deduction exceeds itemized, so standard is used"
+    inputs:
+      filing_status: single
+      adjusted_gross_income: 60000
+      mortgage_interest: 5000
+      salt_taxes_paid: 3000
+      charitable_cash_donations: 1000
+    expected:
+      standard_deduction: 14600
+      itemized_taxable_income_deductions: 9000   # $5K + $3K + $1K
+      uses_standard_deduction: true
+      taxable_income_deductions: 14600  # Standard wins
+    citations:
+      - "26 USC 63(b): individuals who do not itemize"
+      - "26 USC 63(e): election to itemize"
+
+  - name: "Joint filers - standard deduction wins"
+    description: "Married couple with modest itemized deductions"
+    inputs:
+      filing_status: joint
+      adjusted_gross_income: 100000
+      mortgage_interest: 8000
+      salt_taxes_paid: 5000
+      charitable_cash_donations: 2000
+    expected:
+      standard_deduction: 29200
+      itemized_taxable_income_deductions: 15000  # $8K + $5K + $2K
+      uses_standard_deduction: true
+      taxable_income_deductions: 29200  # Standard wins
+    citations:
+      - "26 USC 63(c)(2)(B): joint return standard deduction"
+
+  - name: "Head of household - standard deduction wins"
+    description: "HOH filer with small itemized deductions"
+    inputs:
+      filing_status: head_of_household
+      adjusted_gross_income: 70000
+      mortgage_interest: 6000
+      salt_taxes_paid: 4000
+      charitable_cash_donations: 1000
+    expected:
+      standard_deduction: 21900
+      itemized_taxable_income_deductions: 11000  # $6K + $4K + $1K
+      uses_standard_deduction: true
+      taxable_income_deductions: 21900  # Standard wins
+    citations:
+      - "26 USC 63(c)(2)(B): head of household standard deduction"
+
+  # ==========================================================================
+  # Itemized Deduction Choice (Itemized > Standard)
+  # ==========================================================================
+
+  - name: "Single filer - itemized wins"
+    description: "High itemized deductions exceed standard"
+    inputs:
+      filing_status: single
+      adjusted_gross_income: 100000
+      mortgage_interest: 12000
+      salt_taxes_paid: 8000
+      charitable_cash_donations: 5000
+    expected:
+      standard_deduction: 14600
+      itemized_taxable_income_deductions: 25000  # $12K + $8K + $5K
+      uses_standard_deduction: false
+      taxable_income_deductions: 25000  # Itemized wins
+    citations:
+      - "26 USC 63(a): itemized deductions"
+      - "26 USC 63(e): election to itemize"
+
+  - name: "Joint filers - itemized wins"
+    description: "Married couple with significant itemized deductions"
+    inputs:
+      filing_status: joint
+      adjusted_gross_income: 200000
+      mortgage_interest: 20000
+      salt_taxes_paid: 15000  # Capped at $10K
+      charitable_cash_donations: 10000
+    expected:
+      standard_deduction: 29200
+      salt_deduction: 10000  # SALT cap applied
+      itemized_taxable_income_deductions: 40000  # $20K + $10K + $10K
+      uses_standard_deduction: false
+      taxable_income_deductions: 40000  # Itemized wins
+    citations:
+      - "26 USC 63(a)"
+      - "26 USC 164(b)(6): SALT cap"
+
+  - name: "High earner with medical expenses"
+    description: "Medical expenses push itemized above standard"
+    inputs:
+      filing_status: joint
+      adjusted_gross_income: 150000
+      medical_expenses: 20000      # -> $20K - 7.5%*$150K = $8,750
+      mortgage_interest: 15000
+      salt_taxes_paid: 10000
+      charitable_cash_donations: 5000
+    expected:
+      standard_deduction: 29200
+      medical_expense_deduction: 8750  # $20K - $11.25K floor
+      itemized_taxable_income_deductions: 38750  # $8.75K + $15K + $10K + $5K
+      uses_standard_deduction: false
+      taxable_income_deductions: 38750  # Itemized wins
+    citations:
+      - "26 USC 213(a): 7.5% AGI floor"
+      - "26 USC 63(e)"
+
+  # ==========================================================================
+  # Edge Cases
+  # ==========================================================================
+
+  - name: "Equal standard and itemized - standard wins"
+    description: "When equal, taxpayer uses standard (simpler)"
+    inputs:
+      filing_status: single
+      adjusted_gross_income: 80000
+      mortgage_interest: 7000
+      salt_taxes_paid: 5000
+      charitable_cash_donations: 2600
+    expected:
+      standard_deduction: 14600
+      itemized_taxable_income_deductions: 14600
+      uses_standard_deduction: true
+      taxable_income_deductions: 14600  # Tie goes to standard
+    citations:
+      - "26 USC 63(e): election to itemize (not required when equal)"
+
+  - name: "Zero itemized deductions"
+    description: "No qualifying itemized deductions"
+    inputs:
+      filing_status: single
+      adjusted_gross_income: 50000
+    expected:
+      standard_deduction: 14600
+      itemized_taxable_income_deductions: 0
+      uses_standard_deduction: true
+      taxable_income_deductions: 14600
+    citations:
+      - "26 USC 63(b)"
+
+  - name: "Very low income - standard still applies"
+    description: "Standard deduction even when exceeds income"
+    inputs:
+      filing_status: single
+      adjusted_gross_income: 10000
+    expected:
+      standard_deduction: 14600
+      itemized_taxable_income_deductions: 0
+      uses_standard_deduction: true
+      taxable_income_deductions: 14600  # Full standard deduction
+
+  # ==========================================================================
+  # MFS Spouse Itemizes (Must Itemize)
+  # ==========================================================================
+
+  - name: "MFS spouse itemizes - must itemize"
+    description: "Must itemize when MFS and spouse itemizes per 63(c)(6)(A)"
+    inputs:
+      filing_status: married_separate
+      adjusted_gross_income: 80000
+      mortgage_interest: 5000
+      salt_taxes_paid: 3000  # Capped at $5K for MFS
+      spouse_itemizes: true
+    expected:
+      # Standard deduction = 0 (ineligible per 63(c)(6)(A))
+      standard_deduction: 0
+      salt_deduction: 3000  # Under $5K MFS cap
+      itemized_taxable_income_deductions: 8000
+      uses_standard_deduction: false
+      taxable_income_deductions: 8000  # Must use itemized
+    citations:
+      - "26 USC 63(c)(6)(A): zero standard deduction if spouse itemizes"
+
+  - name: "MFS spouse itemizes with low itemized"
+    description: "Forced to itemize even with low deductions"
+    inputs:
+      filing_status: married_separate
+      adjusted_gross_income: 100000
+      mortgage_interest: 2000
+      salt_taxes_paid: 1000
+      spouse_itemizes: true
+    expected:
+      standard_deduction: 0
+      itemized_taxable_income_deductions: 3000
+      uses_standard_deduction: false
+      taxable_income_deductions: 3000  # Forced to use itemized
+    citations:
+      - "26 USC 63(c)(6)(A)"
+
+  # ==========================================================================
+  # Nonresident Alien (Must Itemize)
+  # ==========================================================================
+
+  - name: "Nonresident alien - must itemize"
+    description: "NRA ineligible for standard deduction per 63(c)(6)(B)"
+    inputs:
+      filing_status: single
+      adjusted_gross_income: 75000
+      mortgage_interest: 4000
+      salt_taxes_paid: 2000
+      is_nonresident_alien: true
+    expected:
+      standard_deduction: 0  # Ineligible
+      itemized_taxable_income_deductions: 6000
+      uses_standard_deduction: false
+      taxable_income_deductions: 6000  # Must use itemized
+    citations:
+      - "26 USC 63(c)(6)(B): zero for nonresident aliens"
+
+  # ==========================================================================
+  # Additional Standard Deduction Impact
+  # ==========================================================================
+
+  - name: "Senior filer - additional amount tips balance"
+    description: "Additional aged deduction makes standard better"
+    inputs:
+      filing_status: single
+      adjusted_gross_income: 80000
+      age: 67
+      mortgage_interest: 8000
+      salt_taxes_paid: 6000
+      charitable_cash_donations: 2000
+    expected:
+      # Basic: $14,600 + Aged single: $1,950 = $16,550
+      standard_deduction: 16550
+      itemized_taxable_income_deductions: 16000  # $8K + $6K + $2K
+      uses_standard_deduction: true
+      taxable_income_deductions: 16550  # Standard wins with additional
+    citations:
+      - "26 USC 63(f)(1): additional amount for aged"
+
+  - name: "Blind filer - additional amount considered"
+    description: "Additional blind deduction included in comparison"
+    inputs:
+      filing_status: single
+      adjusted_gross_income: 70000
+      age: 50
+      is_blind: true
+      mortgage_interest: 7000
+      salt_taxes_paid: 5000
+      charitable_cash_donations: 3000
+    expected:
+      # Basic: $14,600 + Blind single: $1,950 = $16,550
+      standard_deduction: 16550
+      itemized_taxable_income_deductions: 15000  # $7K + $5K + $3K
+      uses_standard_deduction: true
+      taxable_income_deductions: 16550  # Standard wins with additional
+    citations:
+      - "26 USC 63(f)(2): additional amount for blind"

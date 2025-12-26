@@ -14,30 +14,50 @@
 # - Section 165: Casualty and theft losses (disaster areas only under TCJA)
 
 imports:
-# Individual itemized deductions from their sections
+  # Individual itemized deductions from their sections
   interest_deduction: statute/26/163/a/interest_deduction
-  salt_deduction: statute/26/164/b/salt_deduction
+  salt_deduction: statute/26/164/b/6/salt_deduction
   charitable_deduction: statute/26/170/a/charitable_deduction
   medical_expense_deduction: statute/26/213/a/medical_expense_deduction
-  casualty_loss_deduction: statute/26/165/h/casualty_loss_deduction
+  # Note: casualty_loss_deduction from 165/h not yet implemented
+  # Under TCJA, limited to federally declared disaster areas only
 
+# --- itemized_taxable_income_deductions ---
+# Maps to PolicyEngine's itemized_taxable_income_deductions variable
+
+variable itemized_taxable_income_deductions
 entity TaxUnit
 period Year
 dtype Money
 unit "USD"
 label "Total Itemized Deductions"
 description "Sum of allowable itemized deductions per 26 USC 63(d)"
-"IRS Schedule A",
-"IRS Publication 17"
+reference "26 USC 63(d)", "IRS Schedule A", "IRS Publication 17"
 
 formula:
   # Sum all itemized deduction components
-  medical = medical_expense_deduction      # 213: Exceeds 7.5% AGI
-  salt = salt_deduction                     # 164: Capped at $10K (TCJA)
-  interest = interest_deduction             # 163: Mortgage + investment
-  charity = charitable_deduction            # 170: Subject to AGI limits
-  casualty = casualty_loss_deduction        # 165: Disaster areas only (TCJA)
+  # Note: casualty_loss_deduction omitted pending Section 165 implementation
+  medical = medical_expense_deduction      # 213: Exceeds 7.5% AGI floor
+  salt = salt_deduction                    # 164: Capped at $10K (TCJA)
+  interest = interest_deduction            # 163: Mortgage + investment
+  charity = charitable_deduction           # 170: Subject to AGI limits
 
-  return medical + salt + interest + charity + casualty
+  return medical + salt + interest + charity
+
+default 0
+
+# --- total_itemized_deductions ---
+# Alias for backward compatibility with existing code
+
+variable total_itemized_deductions
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Total Itemized Deductions"
+description "Alias for itemized_taxable_income_deductions"
+
+formula:
+  return itemized_taxable_income_deductions
 
 default 0

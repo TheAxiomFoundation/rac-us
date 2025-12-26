@@ -14,10 +14,14 @@
 #
 #   (3) OTHER INDIVIDUALS.--In any other case, the applicable percentage..."
 #
-# Note: 2024 thresholds from Rev. Proc. 2023-34:
-#   Joint: $46,000 (50%), $50,000 (20%), $76,500 (10%)
-#   HOH:   $34,500 (50%), $37,500 (20%), $57,375 (10%)
-#   Other: $23,000 (50%), $25,000 (20%), $38,250 (10%)
+# Note: The thresholds for other filing statuses are derived from joint thresholds:
+#   - Head of Household: 75% of joint thresholds
+#   - Single/MFS/Surviving Spouse: 50% of joint thresholds
+#
+# 2024 thresholds from Rev. Proc. 2023-34:
+#   Joint:     $46,000 (50%), $50,000 (20%), $76,500 (10%)
+#   HOH:       $34,500 (50%), $37,500 (20%), $57,375 (10%)  [75% of joint]
+#   Other:     $23,000 (50%), $25,000 (20%), $38,250 (10%)  [50% of joint]
 
 imports:
 # Filing status
@@ -25,25 +29,17 @@ imports:
 # AGI
   adjusted_gross_income: statute/26/62/a/adjusted_gross_income
 
-# Credit rates
-  rate_50_percent: params/savers_credit/2024#rate_50_percent
-  rate_20_percent: params/savers_credit/2024#rate_20_percent
-  rate_10_percent: params/savers_credit/2024#rate_10_percent
-
-# AGI thresholds by filing status - Joint
+# Joint thresholds (base thresholds, other statuses derived from these)
   joint_threshold_50: params/savers_credit/2024#joint_threshold_50
   joint_threshold_20: params/savers_credit/2024#joint_threshold_20
   joint_threshold_10: params/savers_credit/2024#joint_threshold_10
 
-# AGI thresholds by filing status - Head of Household
-  hoh_threshold_50: params/savers_credit/2024#hoh_threshold_50
-  hoh_threshold_20: params/savers_credit/2024#hoh_threshold_20
-  hoh_threshold_10: params/savers_credit/2024#hoh_threshold_10
-
-# AGI thresholds by filing status - Other (Single, MFS)
-  other_threshold_50: params/savers_credit/2024#other_threshold_50
-  other_threshold_20: params/savers_credit/2024#other_threshold_20
-  other_threshold_10: params/savers_credit/2024#other_threshold_10
+# Threshold adjustment factors by filing status
+  threshold_adjustment_joint: params/savers_credit/2024#threshold_adjustment_joint
+  threshold_adjustment_hoh: params/savers_credit/2024#threshold_adjustment_hoh
+  threshold_adjustment_single: params/savers_credit/2024#threshold_adjustment_single
+  threshold_adjustment_mfs: params/savers_credit/2024#threshold_adjustment_mfs
+  threshold_adjustment_surviving_spouse: params/savers_credit/2024#threshold_adjustment_surviving_spouse
 
 entity TaxUnit
 period Year
@@ -54,39 +50,37 @@ description "Credit rate for Saver's Credit based on AGI and filing status per 2
 formula:
   agi = adjusted_gross_income
 
-  # Determine applicable thresholds based on filing status
-  # 25B(b)(1): Joint returns (includes Qualifying Widow/Widower)
-  if filing_status == MARRIED_FILING_JOINTLY or filing_status == QUALIFYING_WIDOW then
-    threshold_50 = joint_threshold_50
-    threshold_20 = joint_threshold_20
-    threshold_10 = joint_threshold_10
-
-  # 25B(b)(2): Head of Household
+  # Get threshold adjustment factor based on filing status
+  # Joint is the base (1.0), other statuses adjust down
+  if filing_status == MARRIED_FILING_JOINTLY then
+    threshold_adjustment = threshold_adjustment_joint
   else if filing_status == HEAD_OF_HOUSEHOLD then
-    threshold_50 = hoh_threshold_50
-    threshold_20 = hoh_threshold_20
-    threshold_10 = hoh_threshold_10
+    threshold_adjustment = threshold_adjustment_hoh
+  else if filing_status == SINGLE then
+    threshold_adjustment = threshold_adjustment_single
+  else if filing_status == MARRIED_FILING_SEPARATELY then
+    threshold_adjustment = threshold_adjustment_mfs
+  else  # SURVIVING_SPOUSE / QUALIFYING_WIDOW(ER)
+    threshold_adjustment = threshold_adjustment_surviving_spouse
 
-  # 25B(b)(3): Other individuals (Single, MFS)
-  else
-    threshold_50 = other_threshold_50
-    threshold_20 = other_threshold_20
-    threshold_10 = other_threshold_10
+  # Adjust AGI to compare against joint thresholds
+  # This is equivalent to adjusting thresholds down, but more efficient
+  adjusted_agi = agi / threshold_adjustment
 
-  # Apply rate based on AGI
-  # AGI at or below 50% threshold
-  if agi <= threshold_50 then
-    return rate_50_percent
+  # Apply rate based on adjusted AGI against joint thresholds
+  # 50% rate: AGI at or below first threshold
+  if adjusted_agi <= joint_threshold_50 then
+    return 0.50
 
-  # AGI above 50% threshold but at or below 20% threshold
-  if agi <= threshold_20 then
-    return rate_20_percent
+  # 20% rate: AGI above first but at or below second threshold
+  if adjusted_agi <= joint_threshold_20 then
+    return 0.20
 
-  # AGI above 20% threshold but at or below 10% threshold
-  if agi <= threshold_10 then
-    return rate_10_percent
+  # 10% rate: AGI above second but at or below third threshold
+  if adjusted_agi <= joint_threshold_10 then
+    return 0.10
 
-  # AGI above 10% threshold - no credit
+  # 0% rate: AGI above third threshold - no credit
   return 0
 
 default 0

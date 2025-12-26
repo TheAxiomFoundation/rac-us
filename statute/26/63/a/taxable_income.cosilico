@@ -16,62 +16,24 @@
 
 imports:
   adjusted_gross_income: statute/26/62/a/adjusted_gross_income
-  standard_deduction: statute/26/63/c/standard_deduction
-  total_itemized_deductions: statute/26/63/d/total_itemized_deductions
+  taxable_income_deductions: statute/26/63/e/taxable_income_deductions
   personal_exemption: statute/26/151/personal_exemption
 
-entity TaxUnit
-period Year
-dtype Money
-unit "USD"
-label "Deductions from AGI"
-description "Greater of standard or itemized deductions per 26 USC 63"
+# --- taxable_income ---
+# Main variable for Section 63
 
-formula:
-  # § 63(e): Election to itemize
-  # Taxpayer takes larger of standard or itemized deductions
-  # (unless ineligible for standard deduction)
-
-  std = standard_deduction
-  itemized = total_itemized_deductions
-
-  # Note: If standard_deduction is 0 (ineligible), must itemize
-  if std == 0 then
-  return itemized
-
-  # Otherwise take the larger
-  return max(std, itemized)
-
-default 0
-
-entity TaxUnit
-period Year
-dtype Boolean
-label "Takes Standard Deduction"
-description "Whether taxpayer uses standard vs itemized deduction"
-
-formula:
-  # Taxpayer takes standard if:
-  # 1. Eligible for standard deduction, AND
-  # 2. Standard deduction >= itemized deductions
-
-  std = standard_deduction
-  itemized = total_itemized_deductions
-
-  return std > 0 and std >= itemized
-
-default true
-
+variable taxable_income
 entity TaxUnit
 period Year
 dtype Money
 unit "USD"
 label "Taxable Income"
 description "Adjusted gross income minus deductions per 26 USC 63"
+reference "26 USC 63(a)", "26 USC 63(b)"
 
 formula:
   agi = adjusted_gross_income
-  deductions = deductions_from_agi
+  deductions = taxable_income_deductions
 
   # Personal exemption (suspended 2018-2025 by TCJA Section 11041)
   exemptions = personal_exemption

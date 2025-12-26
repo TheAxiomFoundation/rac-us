@@ -1,5 +1,11 @@
 # Tests for 26 USC 25B - Saver's Credit
 # Reference: IRS Form 8880 Instructions
+#
+# Updated to match PolicyEngine's implementation:
+# - Uses detailed contribution types (401k, 403b, etc.)
+# - Subtracts retirement_distributions from contributions
+# - Uses is_tax_unit_head_or_spouse and claimed_as_dependent_on_another_return
+# - Credit limit uses income_tax_before_credits minus preceding credits
 
 # --- Single Filer Tests ---
 
@@ -9,18 +15,30 @@
   input:
     filing_status: SINGLE
     adjusted_gross_income: 20000
-    elective_deferrals: 1000
+    traditional_401k_contributions: 1000
     traditional_ira_contributions: 500
     roth_ira_contributions: 0
+    traditional_403b_contributions: 0
+    roth_401k_contributions: 0
+    roth_403b_contributions: 0
+    self_employed_pension_contributions: 0
+    able_contributions_person: 0
+    retirement_distributions: 0
     age: 25
-    is_tax_unit_dependent: False
+    is_tax_unit_head_or_spouse: True
+    claimed_as_dependent_on_another_return: False
     is_full_time_student: False
-    tax_liability_before_credits: 1500
+    income_tax_before_credits: 1500
+    foreign_tax_credit: 0
+    cdcc: 0
+    non_refundable_american_opportunity_credit: 0
+    lifetime_learning_credit: 0
   output:
     savers_credit_qualified_contributions: 1500
-    savers_credit_eligible_contributions: 1500
+    savers_credit_capped_contributions: 1500
     savers_credit_applicable_percentage: 0.50
-    savers_credit_tentative: 750
+    savers_credit_person: 750
+    savers_credit_potential: 750
     savers_credit: 750
 
 - name: Single filer with 20% rate
@@ -29,16 +47,27 @@
   input:
     filing_status: SINGLE
     adjusted_gross_income: 24000
-    elective_deferrals: 2000
+    traditional_401k_contributions: 2000
     traditional_ira_contributions: 0
     roth_ira_contributions: 0
+    traditional_403b_contributions: 0
+    roth_401k_contributions: 0
+    roth_403b_contributions: 0
+    self_employed_pension_contributions: 0
+    able_contributions_person: 0
+    retirement_distributions: 0
     age: 30
-    is_tax_unit_dependent: False
+    is_tax_unit_head_or_spouse: True
+    claimed_as_dependent_on_another_return: False
     is_full_time_student: False
-    tax_liability_before_credits: 2000
+    income_tax_before_credits: 2000
+    foreign_tax_credit: 0
+    cdcc: 0
+    non_refundable_american_opportunity_credit: 0
+    lifetime_learning_credit: 0
   output:
     savers_credit_applicable_percentage: 0.20
-    savers_credit_tentative: 400
+    savers_credit_person: 400
     savers_credit: 400
 
 - name: Single filer with 10% rate
@@ -47,16 +76,27 @@
   input:
     filing_status: SINGLE
     adjusted_gross_income: 30000
-    elective_deferrals: 2000
+    traditional_401k_contributions: 2000
     traditional_ira_contributions: 0
     roth_ira_contributions: 0
+    traditional_403b_contributions: 0
+    roth_401k_contributions: 0
+    roth_403b_contributions: 0
+    self_employed_pension_contributions: 0
+    able_contributions_person: 0
+    retirement_distributions: 0
     age: 35
-    is_tax_unit_dependent: False
+    is_tax_unit_head_or_spouse: True
+    claimed_as_dependent_on_another_return: False
     is_full_time_student: False
-    tax_liability_before_credits: 3000
+    income_tax_before_credits: 3000
+    foreign_tax_credit: 0
+    cdcc: 0
+    non_refundable_american_opportunity_credit: 0
+    lifetime_learning_credit: 0
   output:
     savers_credit_applicable_percentage: 0.10
-    savers_credit_tentative: 200
+    savers_credit_person: 200
     savers_credit: 200
 
 - name: Single filer over income limit
@@ -65,13 +105,24 @@
   input:
     filing_status: SINGLE
     adjusted_gross_income: 40000
-    elective_deferrals: 2000
+    traditional_401k_contributions: 2000
     traditional_ira_contributions: 0
     roth_ira_contributions: 0
+    traditional_403b_contributions: 0
+    roth_401k_contributions: 0
+    roth_403b_contributions: 0
+    self_employed_pension_contributions: 0
+    able_contributions_person: 0
+    retirement_distributions: 0
     age: 40
-    is_tax_unit_dependent: False
+    is_tax_unit_head_or_spouse: True
+    claimed_as_dependent_on_another_return: False
     is_full_time_student: False
-    tax_liability_before_credits: 4000
+    income_tax_before_credits: 4000
+    foreign_tax_credit: 0
+    cdcc: 0
+    non_refundable_american_opportunity_credit: 0
+    lifetime_learning_credit: 0
   output:
     savers_credit_applicable_percentage: 0.0
     savers_credit: 0
@@ -84,16 +135,27 @@
   input:
     filing_status: MARRIED_FILING_JOINTLY
     adjusted_gross_income: 40000
-    elective_deferrals: 2000
+    traditional_401k_contributions: 2000
     traditional_ira_contributions: 0
     roth_ira_contributions: 0
+    traditional_403b_contributions: 0
+    roth_401k_contributions: 0
+    roth_403b_contributions: 0
+    self_employed_pension_contributions: 0
+    able_contributions_person: 0
+    retirement_distributions: 0
     age: 35
-    is_tax_unit_dependent: False
+    is_tax_unit_head_or_spouse: True
+    claimed_as_dependent_on_another_return: False
     is_full_time_student: False
-    tax_liability_before_credits: 3000
+    income_tax_before_credits: 3000
+    foreign_tax_credit: 0
+    cdcc: 0
+    non_refundable_american_opportunity_credit: 0
+    lifetime_learning_credit: 0
   output:
     savers_credit_applicable_percentage: 0.50
-    savers_credit_tentative: 1000
+    savers_credit_person: 1000
     savers_credit: 1000
 
 - name: Joint filer with 20% rate
@@ -102,16 +164,27 @@
   input:
     filing_status: MARRIED_FILING_JOINTLY
     adjusted_gross_income: 48000
-    elective_deferrals: 2000
+    traditional_401k_contributions: 2000
     traditional_ira_contributions: 0
     roth_ira_contributions: 0
+    traditional_403b_contributions: 0
+    roth_401k_contributions: 0
+    roth_403b_contributions: 0
+    self_employed_pension_contributions: 0
+    able_contributions_person: 0
+    retirement_distributions: 0
     age: 40
-    is_tax_unit_dependent: False
+    is_tax_unit_head_or_spouse: True
+    claimed_as_dependent_on_another_return: False
     is_full_time_student: False
-    tax_liability_before_credits: 3500
+    income_tax_before_credits: 3500
+    foreign_tax_credit: 0
+    cdcc: 0
+    non_refundable_american_opportunity_credit: 0
+    lifetime_learning_credit: 0
   output:
     savers_credit_applicable_percentage: 0.20
-    savers_credit_tentative: 400
+    savers_credit_person: 400
     savers_credit: 400
 
 - name: Joint filer with 10% rate
@@ -120,16 +193,27 @@
   input:
     filing_status: MARRIED_FILING_JOINTLY
     adjusted_gross_income: 60000
-    elective_deferrals: 2000
+    traditional_401k_contributions: 2000
     traditional_ira_contributions: 0
     roth_ira_contributions: 0
+    traditional_403b_contributions: 0
+    roth_401k_contributions: 0
+    roth_403b_contributions: 0
+    self_employed_pension_contributions: 0
+    able_contributions_person: 0
+    retirement_distributions: 0
     age: 45
-    is_tax_unit_dependent: False
+    is_tax_unit_head_or_spouse: True
+    claimed_as_dependent_on_another_return: False
     is_full_time_student: False
-    tax_liability_before_credits: 5000
+    income_tax_before_credits: 5000
+    foreign_tax_credit: 0
+    cdcc: 0
+    non_refundable_american_opportunity_credit: 0
+    lifetime_learning_credit: 0
   output:
     savers_credit_applicable_percentage: 0.10
-    savers_credit_tentative: 200
+    savers_credit_person: 200
     savers_credit: 200
 
 - name: Joint filer over income limit
@@ -138,13 +222,24 @@
   input:
     filing_status: MARRIED_FILING_JOINTLY
     adjusted_gross_income: 80000
-    elective_deferrals: 2000
+    traditional_401k_contributions: 2000
     traditional_ira_contributions: 0
     roth_ira_contributions: 0
+    traditional_403b_contributions: 0
+    roth_401k_contributions: 0
+    roth_403b_contributions: 0
+    self_employed_pension_contributions: 0
+    able_contributions_person: 0
+    retirement_distributions: 0
     age: 50
-    is_tax_unit_dependent: False
+    is_tax_unit_head_or_spouse: True
+    claimed_as_dependent_on_another_return: False
     is_full_time_student: False
-    tax_liability_before_credits: 6000
+    income_tax_before_credits: 6000
+    foreign_tax_credit: 0
+    cdcc: 0
+    non_refundable_american_opportunity_credit: 0
+    lifetime_learning_credit: 0
   output:
     savers_credit_applicable_percentage: 0.0
     savers_credit: 0
@@ -157,17 +252,28 @@
   input:
     filing_status: HEAD_OF_HOUSEHOLD
     adjusted_gross_income: 30000
-    elective_deferrals: 1500
+    traditional_401k_contributions: 1500
     traditional_ira_contributions: 500
     roth_ira_contributions: 0
+    traditional_403b_contributions: 0
+    roth_401k_contributions: 0
+    roth_403b_contributions: 0
+    self_employed_pension_contributions: 0
+    able_contributions_person: 0
+    retirement_distributions: 0
     age: 35
-    is_tax_unit_dependent: False
+    is_tax_unit_head_or_spouse: True
+    claimed_as_dependent_on_another_return: False
     is_full_time_student: False
-    tax_liability_before_credits: 2000
+    income_tax_before_credits: 2000
+    foreign_tax_credit: 0
+    cdcc: 0
+    non_refundable_american_opportunity_credit: 0
+    lifetime_learning_credit: 0
   output:
     savers_credit_applicable_percentage: 0.50
-    savers_credit_eligible_contributions: 2000
-    savers_credit_tentative: 1000
+    savers_credit_capped_contributions: 2000
+    savers_credit_person: 1000
     savers_credit: 1000
 
 - name: Head of Household with 20% rate
@@ -176,16 +282,27 @@
   input:
     filing_status: HEAD_OF_HOUSEHOLD
     adjusted_gross_income: 36000
-    elective_deferrals: 2000
+    traditional_401k_contributions: 2000
     traditional_ira_contributions: 0
     roth_ira_contributions: 0
+    traditional_403b_contributions: 0
+    roth_401k_contributions: 0
+    roth_403b_contributions: 0
+    self_employed_pension_contributions: 0
+    able_contributions_person: 0
+    retirement_distributions: 0
     age: 40
-    is_tax_unit_dependent: False
+    is_tax_unit_head_or_spouse: True
+    claimed_as_dependent_on_another_return: False
     is_full_time_student: False
-    tax_liability_before_credits: 2500
+    income_tax_before_credits: 2500
+    foreign_tax_credit: 0
+    cdcc: 0
+    non_refundable_american_opportunity_credit: 0
+    lifetime_learning_credit: 0
   output:
     savers_credit_applicable_percentage: 0.20
-    savers_credit_tentative: 400
+    savers_credit_person: 400
     savers_credit: 400
 
 - name: Head of Household with 10% rate
@@ -194,16 +311,27 @@
   input:
     filing_status: HEAD_OF_HOUSEHOLD
     adjusted_gross_income: 45000
-    elective_deferrals: 2000
+    traditional_401k_contributions: 2000
     traditional_ira_contributions: 0
     roth_ira_contributions: 0
+    traditional_403b_contributions: 0
+    roth_401k_contributions: 0
+    roth_403b_contributions: 0
+    self_employed_pension_contributions: 0
+    able_contributions_person: 0
+    retirement_distributions: 0
     age: 45
-    is_tax_unit_dependent: False
+    is_tax_unit_head_or_spouse: True
+    claimed_as_dependent_on_another_return: False
     is_full_time_student: False
-    tax_liability_before_credits: 3000
+    income_tax_before_credits: 3000
+    foreign_tax_credit: 0
+    cdcc: 0
+    non_refundable_american_opportunity_credit: 0
+    lifetime_learning_credit: 0
   output:
     savers_credit_applicable_percentage: 0.10
-    savers_credit_tentative: 200
+    savers_credit_person: 200
     savers_credit: 200
 
 # --- Contribution Cap Tests ---
@@ -214,19 +342,95 @@
   input:
     filing_status: SINGLE
     adjusted_gross_income: 20000
-    elective_deferrals: 5000
+    traditional_401k_contributions: 5000
     traditional_ira_contributions: 2000
     roth_ira_contributions: 1000
+    traditional_403b_contributions: 0
+    roth_401k_contributions: 0
+    roth_403b_contributions: 0
+    self_employed_pension_contributions: 0
+    able_contributions_person: 0
+    retirement_distributions: 0
     age: 30
-    is_tax_unit_dependent: False
+    is_tax_unit_head_or_spouse: True
+    claimed_as_dependent_on_another_return: False
     is_full_time_student: False
-    tax_liability_before_credits: 2000
+    income_tax_before_credits: 2000
+    foreign_tax_credit: 0
+    cdcc: 0
+    non_refundable_american_opportunity_credit: 0
+    lifetime_learning_credit: 0
   output:
+    savers_credit_gross_qualified_contributions: 8000
     savers_credit_qualified_contributions: 8000
-    savers_credit_eligible_contributions: 2000
+    savers_credit_capped_contributions: 2000
     savers_credit_applicable_percentage: 0.50
-    savers_credit_tentative: 1000
+    savers_credit_person: 1000
     savers_credit: 1000
+
+# --- Distribution Reduction Tests (25B(d)(2)) ---
+
+- name: Contributions reduced by distributions
+  description: Qualified contributions are reduced by retirement distributions
+  period: 2024
+  input:
+    filing_status: SINGLE
+    adjusted_gross_income: 20000
+    traditional_401k_contributions: 3000
+    traditional_ira_contributions: 0
+    roth_ira_contributions: 0
+    traditional_403b_contributions: 0
+    roth_401k_contributions: 0
+    roth_403b_contributions: 0
+    self_employed_pension_contributions: 0
+    able_contributions_person: 0
+    retirement_distributions: 1000
+    age: 30
+    is_tax_unit_head_or_spouse: True
+    claimed_as_dependent_on_another_return: False
+    is_full_time_student: False
+    income_tax_before_credits: 2000
+    foreign_tax_credit: 0
+    cdcc: 0
+    non_refundable_american_opportunity_credit: 0
+    lifetime_learning_credit: 0
+  output:
+    savers_credit_gross_qualified_contributions: 3000
+    savers_credit_qualified_contributions: 2000
+    savers_credit_capped_contributions: 2000
+    savers_credit_applicable_percentage: 0.50
+    savers_credit_person: 1000
+    savers_credit: 1000
+
+- name: Distributions exceed contributions
+  description: Qualified contributions cannot go below zero
+  period: 2024
+  input:
+    filing_status: SINGLE
+    adjusted_gross_income: 20000
+    traditional_401k_contributions: 1000
+    traditional_ira_contributions: 0
+    roth_ira_contributions: 0
+    traditional_403b_contributions: 0
+    roth_401k_contributions: 0
+    roth_403b_contributions: 0
+    self_employed_pension_contributions: 0
+    able_contributions_person: 0
+    retirement_distributions: 2000
+    age: 30
+    is_tax_unit_head_or_spouse: True
+    claimed_as_dependent_on_another_return: False
+    is_full_time_student: False
+    income_tax_before_credits: 2000
+    foreign_tax_credit: 0
+    cdcc: 0
+    non_refundable_american_opportunity_credit: 0
+    lifetime_learning_credit: 0
+  output:
+    savers_credit_gross_qualified_contributions: 1000
+    savers_credit_qualified_contributions: 0
+    savers_credit_capped_contributions: 0
+    savers_credit: 0
 
 # --- Eligibility Tests ---
 
@@ -236,34 +440,56 @@
   input:
     filing_status: SINGLE
     adjusted_gross_income: 15000
-    elective_deferrals: 1000
+    traditional_401k_contributions: 1000
     traditional_ira_contributions: 0
     roth_ira_contributions: 0
+    traditional_403b_contributions: 0
+    roth_401k_contributions: 0
+    roth_403b_contributions: 0
+    self_employed_pension_contributions: 0
+    able_contributions_person: 0
+    retirement_distributions: 0
     age: 17
-    is_tax_unit_dependent: False
+    is_tax_unit_head_or_spouse: True
+    claimed_as_dependent_on_another_return: False
     is_full_time_student: False
-    tax_liability_before_credits: 1000
+    income_tax_before_credits: 1000
+    foreign_tax_credit: 0
+    cdcc: 0
+    non_refundable_american_opportunity_credit: 0
+    lifetime_learning_credit: 0
   output:
     is_savers_credit_eligible: False
-    savers_credit_eligible_contributions: 0
+    savers_credit_person: 0
     savers_credit: 0
 
-- name: Dependent not eligible
-  description: Individual claimed as dependent is not eligible per 25B(c)(2)(A)
+- name: Claimed on another return not eligible
+  description: Individual claimed as dependent on another return is not eligible per 25B(c)(2)(A)
   period: 2024
   input:
     filing_status: SINGLE
     adjusted_gross_income: 15000
-    elective_deferrals: 1000
+    traditional_401k_contributions: 1000
     traditional_ira_contributions: 0
     roth_ira_contributions: 0
+    traditional_403b_contributions: 0
+    roth_401k_contributions: 0
+    roth_403b_contributions: 0
+    self_employed_pension_contributions: 0
+    able_contributions_person: 0
+    retirement_distributions: 0
     age: 22
-    is_tax_unit_dependent: True
+    is_tax_unit_head_or_spouse: True
+    claimed_as_dependent_on_another_return: True
     is_full_time_student: False
-    tax_liability_before_credits: 1000
+    income_tax_before_credits: 1000
+    foreign_tax_credit: 0
+    cdcc: 0
+    non_refundable_american_opportunity_credit: 0
+    lifetime_learning_credit: 0
   output:
     is_savers_credit_eligible: False
-    savers_credit_eligible_contributions: 0
+    savers_credit_person: 0
     savers_credit: 0
 
 - name: Full-time student not eligible
@@ -272,36 +498,89 @@
   input:
     filing_status: SINGLE
     adjusted_gross_income: 15000
-    elective_deferrals: 1000
+    traditional_401k_contributions: 1000
     traditional_ira_contributions: 0
     roth_ira_contributions: 0
+    traditional_403b_contributions: 0
+    roth_401k_contributions: 0
+    roth_403b_contributions: 0
+    self_employed_pension_contributions: 0
+    able_contributions_person: 0
+    retirement_distributions: 0
     age: 22
-    is_tax_unit_dependent: False
+    is_tax_unit_head_or_spouse: True
+    claimed_as_dependent_on_another_return: False
     is_full_time_student: True
-    tax_liability_before_credits: 1000
+    income_tax_before_credits: 1000
+    foreign_tax_credit: 0
+    cdcc: 0
+    non_refundable_american_opportunity_credit: 0
+    lifetime_learning_credit: 0
   output:
     is_savers_credit_eligible: False
-    savers_credit_eligible_contributions: 0
+    savers_credit_person: 0
     savers_credit: 0
 
-# --- Nonrefundable Credit Tests ---
+- name: Not filer (dependent on this return) not eligible
+  description: Dependent child on this tax unit cannot claim credit
+  period: 2024
+  input:
+    filing_status: SINGLE
+    adjusted_gross_income: 15000
+    traditional_401k_contributions: 1000
+    traditional_ira_contributions: 0
+    roth_ira_contributions: 0
+    traditional_403b_contributions: 0
+    roth_401k_contributions: 0
+    roth_403b_contributions: 0
+    self_employed_pension_contributions: 0
+    able_contributions_person: 0
+    retirement_distributions: 0
+    age: 22
+    is_tax_unit_head_or_spouse: False
+    claimed_as_dependent_on_another_return: False
+    is_full_time_student: False
+    income_tax_before_credits: 1000
+    foreign_tax_credit: 0
+    cdcc: 0
+    non_refundable_american_opportunity_credit: 0
+    lifetime_learning_credit: 0
+  output:
+    is_savers_credit_eligible: False
+    savers_credit_person: 0
+    savers_credit: 0
+
+# --- Credit Limit Tests (income_tax_before_credits - preceding credits) ---
 
 - name: Credit limited by tax liability
-  description: Nonrefundable credit cannot exceed tax liability
+  description: Nonrefundable credit cannot exceed available tax liability
   period: 2024
   input:
     filing_status: SINGLE
     adjusted_gross_income: 18000
-    elective_deferrals: 2000
+    traditional_401k_contributions: 2000
     traditional_ira_contributions: 0
     roth_ira_contributions: 0
+    traditional_403b_contributions: 0
+    roth_401k_contributions: 0
+    roth_403b_contributions: 0
+    self_employed_pension_contributions: 0
+    able_contributions_person: 0
+    retirement_distributions: 0
     age: 25
-    is_tax_unit_dependent: False
+    is_tax_unit_head_or_spouse: True
+    claimed_as_dependent_on_another_return: False
     is_full_time_student: False
-    tax_liability_before_credits: 500
+    income_tax_before_credits: 500
+    foreign_tax_credit: 0
+    cdcc: 0
+    non_refundable_american_opportunity_credit: 0
+    lifetime_learning_credit: 0
   output:
     savers_credit_applicable_percentage: 0.50
-    savers_credit_tentative: 1000
+    savers_credit_person: 1000
+    savers_credit_potential: 1000
+    savers_credit_limit: 500
     savers_credit: 500
 
 - name: Zero tax liability means no credit
@@ -310,16 +589,91 @@
   input:
     filing_status: SINGLE
     adjusted_gross_income: 10000
-    elective_deferrals: 2000
+    traditional_401k_contributions: 2000
     traditional_ira_contributions: 0
     roth_ira_contributions: 0
+    traditional_403b_contributions: 0
+    roth_401k_contributions: 0
+    roth_403b_contributions: 0
+    self_employed_pension_contributions: 0
+    able_contributions_person: 0
+    retirement_distributions: 0
     age: 25
-    is_tax_unit_dependent: False
+    is_tax_unit_head_or_spouse: True
+    claimed_as_dependent_on_another_return: False
     is_full_time_student: False
-    tax_liability_before_credits: 0
+    income_tax_before_credits: 0
+    foreign_tax_credit: 0
+    cdcc: 0
+    non_refundable_american_opportunity_credit: 0
+    lifetime_learning_credit: 0
   output:
     savers_credit_applicable_percentage: 0.50
-    savers_credit_tentative: 1000
+    savers_credit_person: 1000
+    savers_credit_potential: 1000
+    savers_credit_limit: 0
+    savers_credit: 0
+
+- name: Credit limited by available liability after preceding credits
+  description: Saver's Credit comes after foreign tax, CDCC, education credits
+  period: 2024
+  input:
+    filing_status: SINGLE
+    adjusted_gross_income: 20000
+    traditional_401k_contributions: 2000
+    traditional_ira_contributions: 0
+    roth_ira_contributions: 0
+    traditional_403b_contributions: 0
+    roth_401k_contributions: 0
+    roth_403b_contributions: 0
+    self_employed_pension_contributions: 0
+    able_contributions_person: 0
+    retirement_distributions: 0
+    age: 25
+    is_tax_unit_head_or_spouse: True
+    claimed_as_dependent_on_another_return: False
+    is_full_time_student: False
+    income_tax_before_credits: 2000
+    foreign_tax_credit: 500
+    cdcc: 300
+    non_refundable_american_opportunity_credit: 0
+    lifetime_learning_credit: 200
+  output:
+    savers_credit_applicable_percentage: 0.50
+    savers_credit_person: 1000
+    savers_credit_potential: 1000
+    savers_credit_limit: 1000  # 2000 - 500 - 300 - 200
+    savers_credit: 1000
+
+- name: Preceding credits exhaust liability
+  description: No Saver's Credit when preceding credits use all liability
+  period: 2024
+  input:
+    filing_status: SINGLE
+    adjusted_gross_income: 20000
+    traditional_401k_contributions: 2000
+    traditional_ira_contributions: 0
+    roth_ira_contributions: 0
+    traditional_403b_contributions: 0
+    roth_401k_contributions: 0
+    roth_403b_contributions: 0
+    self_employed_pension_contributions: 0
+    able_contributions_person: 0
+    retirement_distributions: 0
+    age: 25
+    is_tax_unit_head_or_spouse: True
+    claimed_as_dependent_on_another_return: False
+    is_full_time_student: False
+    income_tax_before_credits: 1000
+    foreign_tax_credit: 500
+    cdcc: 300
+    non_refundable_american_opportunity_credit: 200
+    lifetime_learning_credit: 0
+  output:
+    savers_credit_applicable_percentage: 0.50
+    savers_credit_person: 1000
+    savers_credit_potential: 1000
+    savers_credit_limit: 0  # 1000 - 500 - 300 - 200
     savers_credit: 0
 
 # --- Boundary Tests ---
@@ -330,13 +684,24 @@
   input:
     filing_status: SINGLE
     adjusted_gross_income: 23000
-    elective_deferrals: 2000
+    traditional_401k_contributions: 2000
     traditional_ira_contributions: 0
     roth_ira_contributions: 0
+    traditional_403b_contributions: 0
+    roth_401k_contributions: 0
+    roth_403b_contributions: 0
+    self_employed_pension_contributions: 0
+    able_contributions_person: 0
+    retirement_distributions: 0
     age: 30
-    is_tax_unit_dependent: False
+    is_tax_unit_head_or_spouse: True
+    claimed_as_dependent_on_another_return: False
     is_full_time_student: False
-    tax_liability_before_credits: 2000
+    income_tax_before_credits: 2000
+    foreign_tax_credit: 0
+    cdcc: 0
+    non_refundable_american_opportunity_credit: 0
+    lifetime_learning_credit: 0
   output:
     savers_credit_applicable_percentage: 0.50
     savers_credit: 1000
@@ -347,35 +712,125 @@
   input:
     filing_status: SINGLE
     adjusted_gross_income: 23001
-    elective_deferrals: 2000
+    traditional_401k_contributions: 2000
     traditional_ira_contributions: 0
     roth_ira_contributions: 0
+    traditional_403b_contributions: 0
+    roth_401k_contributions: 0
+    roth_403b_contributions: 0
+    self_employed_pension_contributions: 0
+    able_contributions_person: 0
+    retirement_distributions: 0
     age: 30
-    is_tax_unit_dependent: False
+    is_tax_unit_head_or_spouse: True
+    claimed_as_dependent_on_another_return: False
     is_full_time_student: False
-    tax_liability_before_credits: 2000
+    income_tax_before_credits: 2000
+    foreign_tax_credit: 0
+    cdcc: 0
+    non_refundable_american_opportunity_credit: 0
+    lifetime_learning_credit: 0
   output:
     savers_credit_applicable_percentage: 0.20
     savers_credit: 400
 
 # --- Multiple Contribution Types ---
 
-- name: Mix of elective deferrals and IRAs
-  description: Credit calculated on combined contributions
+- name: Mix of all contribution types
+  description: Credit calculated on combined contributions from multiple sources
   period: 2024
   input:
     filing_status: SINGLE
     adjusted_gross_income: 22000
-    elective_deferrals: 500
-    traditional_ira_contributions: 750
-    roth_ira_contributions: 750
+    traditional_401k_contributions: 300
+    traditional_ira_contributions: 400
+    roth_ira_contributions: 300
+    traditional_403b_contributions: 200
+    roth_401k_contributions: 200
+    roth_403b_contributions: 100
+    self_employed_pension_contributions: 300
+    able_contributions_person: 200
+    retirement_distributions: 0
     age: 28
-    is_tax_unit_dependent: False
+    is_tax_unit_head_or_spouse: True
+    claimed_as_dependent_on_another_return: False
     is_full_time_student: False
-    tax_liability_before_credits: 1500
+    income_tax_before_credits: 1500
+    foreign_tax_credit: 0
+    cdcc: 0
+    non_refundable_american_opportunity_credit: 0
+    lifetime_learning_credit: 0
   output:
+    savers_credit_gross_qualified_contributions: 2000
     savers_credit_qualified_contributions: 2000
-    savers_credit_eligible_contributions: 2000
+    savers_credit_capped_contributions: 2000
     savers_credit_applicable_percentage: 0.50
-    savers_credit_tentative: 1000
+    savers_credit_person: 1000
+    savers_credit: 1000
+
+# --- PolicyEngine Comparison Tests ---
+
+- name: PE comparison - basic single filer
+  description: Test case to verify alignment with PolicyEngine calculation
+  period: 2024
+  input:
+    filing_status: SINGLE
+    adjusted_gross_income: 22000
+    traditional_401k_contributions: 1500
+    traditional_ira_contributions: 0
+    roth_ira_contributions: 0
+    traditional_403b_contributions: 0
+    roth_401k_contributions: 0
+    roth_403b_contributions: 0
+    self_employed_pension_contributions: 0
+    able_contributions_person: 0
+    retirement_distributions: 0
+    age: 30
+    is_tax_unit_head_or_spouse: True
+    claimed_as_dependent_on_another_return: False
+    is_full_time_student: False
+    income_tax_before_credits: 1500
+    foreign_tax_credit: 0
+    cdcc: 0
+    non_refundable_american_opportunity_credit: 0
+    lifetime_learning_credit: 0
+  output:
+    # 50% rate * $1,500 contributions = $750 credit
+    savers_credit_applicable_percentage: 0.50
+    savers_credit_capped_contributions: 1500
+    savers_credit_person: 750
+    savers_credit: 750
+
+- name: PE comparison - married filing jointly with distributions
+  description: Joint filer with retirement distributions reducing contributions
+  period: 2024
+  input:
+    filing_status: MARRIED_FILING_JOINTLY
+    adjusted_gross_income: 45000
+    traditional_401k_contributions: 3000
+    traditional_ira_contributions: 0
+    roth_ira_contributions: 0
+    traditional_403b_contributions: 0
+    roth_401k_contributions: 0
+    roth_403b_contributions: 0
+    self_employed_pension_contributions: 0
+    able_contributions_person: 0
+    retirement_distributions: 500
+    age: 40
+    is_tax_unit_head_or_spouse: True
+    claimed_as_dependent_on_another_return: False
+    is_full_time_student: False
+    income_tax_before_credits: 3000
+    foreign_tax_credit: 0
+    cdcc: 0
+    non_refundable_american_opportunity_credit: 0
+    lifetime_learning_credit: 0
+  output:
+    # $3,000 - $500 = $2,500 net, capped at $2,000
+    # 50% rate * $2,000 = $1,000 credit
+    savers_credit_gross_qualified_contributions: 3000
+    savers_credit_qualified_contributions: 2500
+    savers_credit_capped_contributions: 2000
+    savers_credit_applicable_percentage: 0.50
+    savers_credit_person: 1000
     savers_credit: 1000

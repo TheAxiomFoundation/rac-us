@@ -24,7 +24,7 @@ imports:
 # Standard deduction and personal exemptions
   standard_deduction: statute/26/63/c/standard_deduction
   personal_exemptions: statute/26/151/personal_exemption_amount
-  uses_standard_deduction: statute/26/63/uses_standard_deduction
+  uses_standard_deduction: statute/26/63/e/uses_standard_deduction
 
 # AMT-specific thresholds
   adjusted_gross_income: statute/26/62/a/adjusted_gross_income

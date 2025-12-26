@@ -7,44 +7,209 @@
 # a credit to low- and moderate-income taxpayers who contribute to
 # qualified retirement plans or IRAs.
 
-# Credit rates per 25B(b)
-rate_50_percent: 0.50
-rate_20_percent: 0.20
-rate_10_percent: 0.10
+# --- Basic Parameters ---
 
 # Maximum contribution eligible for credit per 25B(a)
 # "$2,000" - this amount is NOT indexed for inflation
-maximum_eligible_contribution: 2000
+maximum_eligible_contribution:
+  description: "The IRS caps the qualifying contributions at this amount per person under the Saver's Credit."
+  unit: currency-USD
+  period: year
+  label: "Saver's Credit contributions cap"
+  reference:
+    - title: "26 U.S. Code 25B(a)"
+      href: "https://www.law.cornell.edu/uscode/text/26/25B#a"
+    - title: "IRS Form 8880 Instructions"
+      href: "https://www.irs.gov/pub/irs-pdf/f8880.pdf#page=1"
+  values:
+    2018-01-01: 2000
 
 # Minimum age requirement per 25B(c)(1)
-minimum_age: 18
+minimum_age:
+  description: "The IRS limits the Saver's Credit to taxpayers who have attained this age by year end."
+  unit: year
+  period: year
+  label: "Saver's Credit age threshold"
+  reference:
+    - title: "26 U.S. Code 25B(c)(1)"
+      href: "https://www.law.cornell.edu/uscode/text/26/25B#c_1"
+  values:
+    2018-01-01: 18
+
+# --- AGI Thresholds (Joint Returns as Base) ---
+# Other filing statuses use threshold_adjustment multipliers
 
 # 2024 AGI thresholds (from Rev. Proc. 2023-34, Section 3.09)
-# These thresholds are indexed for inflation annually
-
 # Joint Returns - 25B(b)(1)
-# 50% rate: $0 to $46,000
-# 20% rate: $46,001 to $50,000
-# 10% rate: $50,001 to $76,500
-# 0% rate:  over $76,500
-joint_threshold_50: 46000
-joint_threshold_20: 50000
-joint_threshold_10: 76500
+# These are the base thresholds; other filing statuses derive from these
 
-# Head of Household - 25B(b)(2)
-# 50% rate: $0 to $34,500
-# 20% rate: $34,501 to $37,500
-# 10% rate: $37,501 to $57,375
-# 0% rate:  over $57,375
-hoh_threshold_50: 34500
-hoh_threshold_20: 37500
-hoh_threshold_10: 57375
+joint_threshold_50:
+  description: "The IRS applies the 50% Saver's Credit rate to joint filers with AGI at or below this amount."
+  unit: currency-USD
+  period: year
+  label: "Saver's Credit joint 50% rate threshold"
+  reference:
+    - title: "26 U.S. Code 25B(b)(1)"
+      href: "https://www.law.cornell.edu/uscode/text/26/25B#b_1"
+    - title: "Rev. Proc. 2023-34, Section 3.09"
+      href: "https://www.irs.gov/irb/2023-48_IRB#REV-PROC-2023-34"
+  values:
+    2018-01-01: 38000
+    2019-01-01: 38500
+    2020-01-01: 39000
+    2021-01-01: 39500
+    2022-01-01: 41000
+    2023-01-01: 43500
+    2024-01-01: 46000
 
-# Other Filers (Single, MFS) - 25B(b)(3)
-# 50% rate: $0 to $23,000
-# 20% rate: $23,001 to $25,000
-# 10% rate: $25,001 to $38,250
-# 0% rate:  over $38,250
-other_threshold_50: 23000
-other_threshold_20: 25000
-other_threshold_10: 38250
+joint_threshold_20:
+  description: "The IRS applies the 20% Saver's Credit rate to joint filers with AGI above the 50% threshold but at or below this amount."
+  unit: currency-USD
+  period: year
+  label: "Saver's Credit joint 20% rate threshold"
+  reference:
+    - title: "26 U.S. Code 25B(b)(1)"
+      href: "https://www.law.cornell.edu/uscode/text/26/25B#b_1"
+    - title: "Rev. Proc. 2023-34, Section 3.09"
+      href: "https://www.irs.gov/irb/2023-48_IRB#REV-PROC-2023-34"
+  values:
+    2018-01-01: 41000
+    2019-01-01: 41500
+    2020-01-01: 42500
+    2021-01-01: 43000
+    2022-01-01: 44000
+    2023-01-01: 47500
+    2024-01-01: 50000
+
+joint_threshold_10:
+  description: "The IRS applies the 10% Saver's Credit rate to joint filers with AGI above the 20% threshold but at or below this amount."
+  unit: currency-USD
+  period: year
+  label: "Saver's Credit joint 10% rate threshold"
+  reference:
+    - title: "26 U.S. Code 25B(b)(1)"
+      href: "https://www.law.cornell.edu/uscode/text/26/25B#b_1"
+    - title: "Rev. Proc. 2023-34, Section 3.09"
+      href: "https://www.irs.gov/irb/2023-48_IRB#REV-PROC-2023-34"
+  values:
+    2018-01-01: 63000
+    2019-01-01: 64000
+    2020-01-01: 65000
+    2021-01-01: 66000
+    2022-01-01: 68000
+    2023-01-01: 73000
+    2024-01-01: 76500
+
+# --- Threshold Adjustment Factors ---
+# These multiply the joint thresholds to get thresholds for other filing statuses
+# Joint = 1.0 (base), HOH = 0.75, Single/MFS/Surviving Spouse = 0.5
+
+threshold_adjustment_joint:
+  description: "The IRS uses joint filers as the base for Saver's Credit thresholds (no adjustment)."
+  unit: /1
+  period: year
+  label: "Saver's Credit joint threshold adjustment"
+  reference:
+    - title: "26 U.S. Code 25B(b)(1)"
+      href: "https://www.law.cornell.edu/uscode/text/26/25B#b_1"
+  values:
+    2018-01-01: 1.0
+
+threshold_adjustment_hoh:
+  description: "The IRS applies this factor to the joint thresholds to calculate Saver's Credit thresholds for head of household filers."
+  unit: /1
+  period: year
+  label: "Saver's Credit HOH threshold adjustment"
+  reference:
+    - title: "26 U.S. Code 25B(b)(2)"
+      href: "https://www.law.cornell.edu/uscode/text/26/25B#b_2"
+  values:
+    2018-01-01: 0.75
+
+threshold_adjustment_single:
+  description: "The IRS applies this factor to the joint thresholds to calculate Saver's Credit thresholds for single filers."
+  unit: /1
+  period: year
+  label: "Saver's Credit single threshold adjustment"
+  reference:
+    - title: "26 U.S. Code 25B(b)(3)"
+      href: "https://www.law.cornell.edu/uscode/text/26/25B#b_3"
+  values:
+    2018-01-01: 0.5
+
+threshold_adjustment_mfs:
+  description: "The IRS applies this factor to the joint thresholds to calculate Saver's Credit thresholds for married filing separately filers."
+  unit: /1
+  period: year
+  label: "Saver's Credit MFS threshold adjustment"
+  reference:
+    - title: "26 U.S. Code 25B(b)(3)"
+      href: "https://www.law.cornell.edu/uscode/text/26/25B#b_3"
+  values:
+    2018-01-01: 0.5
+
+threshold_adjustment_surviving_spouse:
+  description: "The IRS applies this factor to the joint thresholds to calculate Saver's Credit thresholds for surviving spouse filers."
+  unit: /1
+  period: year
+  label: "Saver's Credit surviving spouse threshold adjustment"
+  reference:
+    - title: "26 U.S. Code 25B(b)(3)"
+      href: "https://www.law.cornell.edu/uscode/text/26/25B#b_3"
+  values:
+    # Note: Surviving spouse historically used "other" (0.5) thresholds per IRS Form 8880
+    # However, some sources suggest they should use joint thresholds
+    # Using 0.5 to match PolicyEngine and IRS Form 8880 instructions
+    2018-01-01: 0.5
+
+# --- Qualified Contributions List ---
+# Per 25B(d)(1), these contribution types qualify for the credit
+
+qualified_retirement_savings_contributions:
+  description: "The IRS includes these contribution types as qualified retirement savings for the Saver's Credit."
+  unit: list
+  period: year
+  label: "Saver's Credit qualified contributions"
+  reference:
+    - title: "26 U.S. Code 25B(d)(1)"
+      href: "https://www.law.cornell.edu/uscode/text/26/25B#d_1"
+    - title: "IRS Form 8880"
+      href: "https://www.irs.gov/pub/irs-pdf/f8880.pdf#page=2"
+  values:
+    2018-01-01:
+      - traditional_ira_contributions
+      - traditional_401k_contributions
+      - traditional_403b_contributions
+      - roth_ira_contributions
+      - roth_401k_contributions
+      - roth_403b_contributions
+      - self_employed_pension_contributions
+      - able_contributions_person
+    # Note: ABLE contributions added by ABLE Act of 2014, effective 2018
+    # ABLE provision sunsets after 2025 per current law
+    2026-01-01:
+      - traditional_ira_contributions
+      - traditional_401k_contributions
+      - traditional_403b_contributions
+      - roth_ira_contributions
+      - roth_401k_contributions
+      - roth_403b_contributions
+      - self_employed_pension_contributions
+
+# --- Preceding Credits List ---
+# Per IRS Schedule 3, these credits come before Saver's Credit in the ordering
+
+preceding_credits:
+  description: "Nonrefundable tax credits that precede the Saver's Credit in the credit ordering per IRS Schedule 3."
+  unit: list
+  period: year
+  label: "Credits preceding Saver's Credit"
+  reference:
+    - title: "IRS Schedule 3, Additional Credits and Payments"
+      href: "https://www.irs.gov/pub/irs-pdf/f1040s3.pdf"
+  values:
+    2018-01-01:
+      - foreign_tax_credit
+      - cdcc
+      - non_refundable_american_opportunity_credit
+      - lifetime_learning_credit
