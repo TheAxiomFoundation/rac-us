@@ -1,0 +1,247 @@
+# 42 USC 608(a) - Prohibitions and Requirements for Eligibility
+#
+# This section establishes federal eligibility prohibitions and requirements.
+# States define most specific eligibility criteria. This encodes:
+#
+# - 608(a)(1): Definition of "needy family" (state-defined)
+# - 608(a)(2): Denial to minor parent not in adult-supervised setting
+# - 608(a)(3): Denial to minor parent without education/training
+# - 608(a)(4): Denial to families not cooperating with child support
+# - 608(a)(5): Denial to noncitizens (per 8 USC 1612)
+# - 608(a)(6): Denial to fleeing felons
+# - 608(a)(8): Denial to drug felons (with state opt-out)
+# - 608(a)(9): Denial for fraudulent representation of residence
+#
+# See also: 42 USC 602(a) for State Plan requirements
+
+references {
+  snap_eligibility: statute/7/2014/a/categorical_eligibility
+  federal_poverty_level: statute/7/2014/c/fpl_by_household_size
+}
+
+# Core definition: TANF assistance unit
+# A family unit receiving or eligible for TANF benefits
+variable tanf_assistance_unit_members {
+  entity TanfUnit
+  period Month
+  dtype PersonList
+
+  documentation {
+    TANF unit generally includes:
+    - Dependent children under 18 (or 19 if in school)
+    - Parents/caretaker relatives of dependent children
+    - Spouses of parents
+
+    Does NOT include:
+    - SSI recipients (excluded from unit)
+    - Ineligible non-citizens
+    - Persons receiving foster care
+  }
+}
+
+# 608(a)(1): Needy family requirement
+# States define income and resource limits for "need"
+variable tanf_needy_family {
+  entity TanfUnit
+  period Month
+  dtype Boolean
+
+  formula {
+    # States set their own need standards
+    # Typical components (state parameters override these):
+    # 1. Gross income test
+    # 2. Net income test (after disregards)
+    # 3. Resource/asset test
+
+    let gross_income_eligible = tanf_gross_income <= tanf_gross_income_limit
+    let net_income_eligible = tanf_countable_income <= tanf_need_standard
+    let resource_eligible = tanf_countable_resources <= tanf_resource_limit
+
+    return gross_income_eligible and net_income_eligible and resource_eligible
+  }
+}
+
+# 608(a)(1)(B): Deprivation requirement
+# Child must be deprived of parental support (varies by state)
+variable tanf_deprivation_requirement_met {
+  entity TanfUnit
+  period Month
+  dtype Boolean
+
+  formula {
+    # Deprivation exists if child lacks support due to:
+    # - Absence of a parent
+    # - Death of a parent
+    # - Incapacity of a parent
+    # - Unemployment of principal earner (in two-parent families, if state covers)
+
+    return parent_absent or parent_deceased or parent_incapacitated or
+           (tanf_two_parent_family and principal_earner_unemployed)
+  }
+}
+
+# 608(a)(2): Minor parent living arrangement
+# Minor parents must live in adult-supervised setting
+variable tanf_minor_parent_living_arrangement_met {
+  entity Person
+  period Month
+  dtype Boolean
+
+  formula {
+    # Requirement applies to: minor parents under 18
+    if age >= 18 or not has_child then
+      return true
+
+    # Must live with parent, guardian, or adult relative
+    # OR in adult-supervised supportive living arrangement
+    return lives_with_adult_relative or in_adult_supervised_living
+  }
+}
+
+# 608(a)(3): Minor parent education/training
+# Minor parents must participate in education activities
+variable tanf_minor_parent_education_met {
+  entity Person
+  period Month
+  dtype Boolean
+
+  formula {
+    if age >= 18 or not has_child then
+      return true
+
+    # Must be in school, GED program, or alternative education
+    return in_school or in_ged_program or in_alternative_education
+  }
+}
+
+# 608(a)(4): Child support cooperation
+# Families must cooperate with child support enforcement
+variable tanf_child_support_cooperation_met {
+  entity TanfUnit
+  period Month
+  dtype Boolean
+
+  formula {
+    # Good cause exemptions apply (DV, best interest of child)
+    if child_support_good_cause_exemption then
+      return true
+
+    # Otherwise must cooperate with:
+    # - Establishing paternity
+    # - Establishing child support orders
+    # - Enforcing support orders
+    return child_support_cooperation
+  }
+}
+
+# 608(a)(5): Noncitizen eligibility
+# Per 8 USC 1612, most noncitizens ineligible for 5 years
+variable tanf_citizen_eligible {
+  entity Person
+  period Month
+  dtype Boolean
+
+  formula {
+    # US citizens always eligible
+    if is_us_citizen then
+      return true
+
+    # Qualified aliens may be eligible after 5-year bar
+    # Exception categories (no 5-year bar):
+    # - Refugees, asylees
+    # - Cuban/Haitian entrants
+    # - Certain veterans
+    # - Amerasian immigrants
+
+    if qualified_alien_exempt_category then
+      return true
+
+    if qualified_alien and years_since_entry >= 5 then
+      return true
+
+    return false
+  }
+}
+
+# 608(a)(6): Fleeing felon prohibition
+variable tanf_fleeing_felon_eligible {
+  entity Person
+  period Month
+  dtype Boolean
+
+  formula {
+    # Cannot receive if fleeing felony charge/conviction
+    # or violating probation/parole
+    return not is_fleeing_felon and not is_probation_violator
+  }
+}
+
+# 608(a)(8): Drug felon prohibition
+# States may opt out of this restriction
+variable tanf_drug_felon_eligible {
+  entity Person
+  period Month
+  dtype Boolean
+
+  formula {
+    # Federal default: convicted drug felons permanently ineligible
+    # Many states have opted out or modified this ban
+    if state_opted_out_drug_felon_ban then
+      return true
+
+    if state_modified_drug_felon_ban then
+      return drug_felon_modified_eligibility  # State-specific rules
+
+    return not is_convicted_drug_felon
+  }
+}
+
+# 608(a)(9): Fraudulent residence prohibition
+variable tanf_no_fraudulent_residence {
+  entity Person
+  period Month
+  dtype Boolean
+
+  formula {
+    # Ineligible for 10 years if convicted of fraudulently
+    # misrepresenting residence to receive benefits in multiple states
+    return not is_convicted_fraudulent_residence
+  }
+}
+
+# Combined individual eligibility (federal requirements)
+variable tanf_individual_eligible {
+  entity Person
+  period Month
+  dtype Boolean
+
+  formula {
+    # All federal individual eligibility requirements
+    return tanf_citizen_eligible and
+           tanf_fleeing_felon_eligible and
+           tanf_drug_felon_eligible and
+           tanf_no_fraudulent_residence and
+           tanf_minor_parent_living_arrangement_met and
+           tanf_minor_parent_education_met and
+           not tanf_time_limit_exceeded
+  }
+}
+
+# Main TANF unit eligibility determination
+variable tanf_eligible {
+  entity TanfUnit
+  period Month
+  dtype Boolean
+
+  formula {
+    # Unit requirements
+    let unit_eligible = tanf_needy_family and
+                        tanf_deprivation_requirement_met and
+                        tanf_child_support_cooperation_met
+
+    # All adults in unit must be individually eligible
+    let all_adults_eligible = all(tanf_individual_eligible for adult in tanf_adults)
+
+    return unit_eligible and all_adults_eligible
+  }
+}

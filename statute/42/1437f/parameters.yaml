@@ -1,0 +1,259 @@
+# Section 8 Housing Choice Voucher Parameters
+# 42 USC 1437f - United States Housing Act of 1937
+#
+# Primary sources:
+# - 42 USC 1437f (statute)
+# - 24 CFR Part 5 (income and family determination)
+# - 24 CFR Part 982 (HCV program requirements)
+# - HUD FY 2024 Income Limits (FR-6500-N-01)
+
+variable: hcv
+entity: Household
+period: Month
+dtype: Money
+
+# ============================================================
+# INCOME LIMITS - 24 CFR 5.603, 42 USC 1437f(a)
+# ============================================================
+# Income limits based on Area Median Income (AMI)
+# HUD publishes annually for each metropolitan area
+# Using FY 2024 National Non-Metro Median as baseline
+
+income_limits:
+  description: "Income eligibility thresholds as percentage of Area Median Income per 42 USC 1437f(a) and 24 CFR 5.603"
+  unit: USD
+  period: year
+
+  # Percentage thresholds (fixed by regulation)
+  thresholds:
+    very_low_income: 0.50       # 50% AMI - basic eligibility
+    extremely_low_income: 0.30  # 30% AMI - targeting requirement
+    low_income: 0.80            # 80% AMI - for continued occupancy
+
+  # FY 2024 National Median Income Limits by household size
+  # Source: HUD FY 2024 Income Limits (effective April 1, 2024)
+  # https://www.huduser.gov/portal/datasets/il.html
+  2024:
+    # 50% AMI (Very Low Income) - Primary eligibility threshold
+    very_low_income:
+      1: 35750
+      2: 40850
+      3: 45950
+      4: 51050
+      5: 55150
+      6: 59250
+      7: 63300
+      8: 67400
+      additional_per_person: 4050
+
+    # 30% AMI (Extremely Low Income) - 75% targeting requirement
+    extremely_low_income:
+      1: 21450
+      2: 24500
+      3: 27600
+      4: 30630
+      5: 33090
+      6: 35550
+      7: 38010
+      8: 40440
+      additional_per_person: 2430
+
+    # 80% AMI (Low Income) - for continued occupancy only
+    low_income:
+      1: 57200
+      2: 65350
+      3: 73500
+      4: 81650
+      5: 88200
+      6: 94750
+      7: 101300
+      8: 107850
+      additional_per_person: 6475
+
+# ============================================================
+# INCOME DEDUCTIONS - 24 CFR 5.611
+# ============================================================
+
+deductions:
+  description: "Allowable deductions from annual income per 24 CFR 5.611"
+
+  # 24 CFR 5.611(a)(1) - Dependent deduction
+  dependent:
+    description: "Deduction for each dependent family member per 24 CFR 5.611(a)(1)"
+    unit: USD
+    period: year
+    amount: 480
+
+  # 24 CFR 5.611(a)(2) - Elderly/disabled household deduction
+  elderly_disabled:
+    description: "Deduction for elderly (62+) or disabled head/spouse per 24 CFR 5.611(a)(2)"
+    unit: USD
+    period: year
+    amount: 400
+
+  # 24 CFR 5.611(a)(3) - Child care deduction
+  childcare:
+    description: "Child care expenses enabling work/school per 24 CFR 5.611(a)(3)"
+    # Deduction = actual reasonable expenses, not exceeding income earned
+
+  # 24 CFR 5.611(a)(4) - Medical expense deduction (elderly/disabled only)
+  medical:
+    description: "Medical expenses exceeding 3% of annual income for elderly/disabled per 24 CFR 5.611(a)(4)"
+    threshold_rate: 0.03  # 3% of annual income
+
+  # 24 CFR 5.611(a)(5) - Disability assistance expense deduction
+  disability_assistance:
+    description: "Attendant care and auxiliary apparatus for disabled to work per 24 CFR 5.611(a)(5)"
+    # Deduction = actual expenses enabling work, not exceeding income earned
+
+# ============================================================
+# TENANT CONTRIBUTION - 24 CFR 5.628
+# ============================================================
+
+tenant_contribution:
+  description: "Total Tenant Payment (TTP) calculation parameters per 24 CFR 5.628"
+
+  # 24 CFR 5.628(a)(1) - Primary formula: 30% of adjusted monthly income
+  income_rate: 0.30
+
+  # 24 CFR 5.628(a)(2) - Alternative: 10% of monthly income (without deductions)
+  gross_income_rate: 0.10
+
+  # 24 CFR 5.630 - Minimum rent
+  # PHAs may set minimum rent from $0-$50
+  minimum_rent:
+    description: "Minimum monthly rent per 24 CFR 5.630"
+    unit: USD
+    period: month
+    default: 50
+    maximum_allowed: 50
+    # PHAs can set lower including $0
+
+  # 24 CFR 5.628(a)(3) - Welfare rent (if applicable)
+  # TTP cannot exceed portion of welfare for housing
+
+# ============================================================
+# PAYMENT STANDARDS - 24 CFR 982.503
+# ============================================================
+
+payment_standards:
+  description: "Payment standard amounts by bedroom size per 24 CFR 982.503"
+  unit: USD
+  period: month
+
+  # PHAs set payment standards between 90-110% of Fair Market Rent (FMR)
+  # Using FY 2024 National 2-BR FMR as reference
+  # https://www.huduser.gov/portal/datasets/fmr.html
+
+  fmr_range:
+    minimum_pct: 0.90  # 90% of FMR
+    maximum_pct: 1.10  # 110% of FMR
+    # Higher exception allowed with HUD approval
+
+  # FY 2024 National Median Fair Market Rents (approximate)
+  2024:
+    0_bedroom: 1037   # Efficiency/SRO
+    1_bedroom: 1158
+    2_bedroom: 1412   # Base FMR
+    3_bedroom: 1857
+    4_bedroom: 2089
+    5_bedroom: 2402
+    6_bedroom: 2716
+    additional_per_bedroom: 313
+
+# ============================================================
+# SUBSIDY STANDARDS - 24 CFR 982.402
+# ============================================================
+
+subsidy_standards:
+  description: "Voucher bedroom size determination per 24 CFR 982.402"
+
+  # Minimum standards (PHAs may be more generous)
+  bedroom_allocation:
+    head_of_household: 1  # Head and spouse/partner share 1 bedroom
+    per_two_persons: 1    # Generally 2 persons per bedroom
+    # Children of opposite sex generally need separate rooms after age specified by PHA
+
+  # Age thresholds (PHA-determined, using common standard)
+  child_sharing:
+    opposite_sex_sharing_max_age: 5  # Children of opposite sex may share until this age
+
+# ============================================================
+# UTILITY ALLOWANCES - 24 CFR 982.517
+# ============================================================
+
+utility_allowance:
+  description: "Utility allowance provisions per 24 CFR 982.517"
+  # PHAs establish utility allowance schedules based on local costs
+  # Utility allowance included in gross rent calculation
+
+# ============================================================
+# TARGETING REQUIREMENT - 42 USC 1437f(o)(4)
+# ============================================================
+
+targeting:
+  description: "Income targeting requirement per 42 USC 1437f(o)(4)"
+
+  # At least 75% of new admissions must be extremely low income
+  extremely_low_income_requirement: 0.75
+
+# ============================================================
+# PROGRAM ADMINISTRATION
+# ============================================================
+
+administration:
+  # 42 USC 1437f(o)(7) - Annual reexamination
+  reexamination_period:
+    description: "Frequency of income reexamination per 42 USC 1437f(o)(7)"
+    unit: month
+    frequency: 12  # Annual
+
+  # 24 CFR 982.516 - Family income and composition
+  interim_reexamination:
+    description: "Required when family composition or income changes"
+    income_change_threshold: 0  # Any change in income
+
+# ============================================================
+# INCOME INCLUSIONS - 24 CFR 5.609
+# ============================================================
+
+income_inclusions:
+  description: "Types of income counted per 24 CFR 5.609(b)"
+
+  counted_income:
+    - employment_income
+    - business_income
+    - social_security
+    - ssi
+    - pensions
+    - annuities
+    - alimony
+    - child_support
+    - regular_gifts
+    - unemployment
+    - disability_benefits
+    - workers_compensation
+    - welfare_assistance
+    - interest
+    - dividends
+    - net_rental_income
+
+  excluded_income:
+    description: "Income not counted per 24 CFR 5.609(c)"
+    # Includes: one-time payments, education grants, foster care payments,
+    # food stamps, EITC, etc.
+
+# ============================================================
+# HAP CALCULATION - 24 CFR 982.505
+# ============================================================
+
+housing_assistance:
+  description: "Housing Assistance Payment calculation per 24 CFR 982.505"
+
+  # HAP = lesser of (payment standard - TTP) or (gross rent - TTP)
+  # HAP cannot exceed gross rent
+  # HAP cannot be negative
+
+  # 24 CFR 982.508 - Maximum family share
+  maximum_family_share:
+    at_initial_lease: 0.40  # Family share cannot exceed 40% of adjusted income at move-in

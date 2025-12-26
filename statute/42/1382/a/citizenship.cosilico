@@ -1,0 +1,47 @@
+# 42 USC 1382c(a)(1)(B) - Citizenship/Alienage Eligibility
+#
+# "(B) is a resident of the United States, and is either (i) a citizen
+# or a national of the United States, or (ii) an alien lawfully admitted
+# for permanent residence or otherwise permanently residing in the
+# United States under color of law"
+#
+# Note: PRWORA 1996 significantly restricted alien eligibility.
+# See 8 USC 1612 for qualified alien restrictions.
+
+module statute.42.1382.a
+version "2024.1"
+
+# Citizenship/alienage eligibility
+variable is_ssi_citizenship_eligible {
+  entity Person
+  period Month
+  dtype Boolean
+  label "SSI citizenship/alienage eligibility"
+  description "Is US citizen or qualified alien per 42 USC 1382c(a)(1)(B) and 8 USC 1612"
+  reference (
+    "42 USC 1382c(a)(1)(B)",
+    "8 USC 1612"
+  )
+
+  formula {
+    return is_us_citizen or is_qualified_alien
+  }
+
+  default false
+}
+
+# Residency eligibility
+variable is_ssi_residency_eligible {
+  entity Person
+  period Month
+  dtype Boolean
+  label "SSI residency eligibility"
+  description "Is resident of the United States per 42 USC 1382c(a)(1)(B)"
+  reference "42 USC 1382c(a)(1)(B)"
+
+  formula {
+    return is_us_resident
+  }
+
+  default false
+}

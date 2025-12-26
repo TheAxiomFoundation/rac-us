@@ -1,0 +1,140 @@
+# 42 USC 607 - Work Participation Requirements Parameters
+#
+# Federal minimum requirements for state TANF work participation.
+# States may impose stricter requirements.
+
+variable: tanf_work_requirements
+entity: Person
+period: Month
+dtype: Hours
+
+# 607(a)(1): Minimum participation rates for all families
+minimum_participation_rate:
+  description: "Minimum percentage of TANF families required to participate in work activities per 42 USC 607(a)(1)"
+  unit: rate
+  values:
+    # Ramp-up period 1997-2002
+    1997-10-01: 0.25  # FY 1997
+    1998-10-01: 0.30  # FY 1998
+    1999-10-01: 0.35  # FY 1999
+    2000-10-01: 0.40  # FY 2000
+    2001-10-01: 0.45  # FY 2001
+    2002-10-01: 0.50  # FY 2002+
+  citations:
+    - "42 USC 607(a)(1) - Participation Rate Requirements"
+
+# 607(a)(2): Higher rate for two-parent families
+minimum_participation_rate_two_parent:
+  description: "Minimum percentage of two-parent TANF families required to participate in work activities per 42 USC 607(a)(2)"
+  unit: rate
+  values:
+    1997-10-01: 0.75  # FY 1997
+    1998-10-01: 0.75  # FY 1998
+    1999-10-01: 0.90  # FY 1999+
+  citations:
+    - "42 USC 607(a)(2) - Two-parent participation rate"
+
+# 607(c)(1)(A): Hours per week - reduced (parent with child under 6)
+work_activities_hours_reduced:
+  description: "Weekly work hours required for single parent with child under 6 per 42 USC 607(c)(1)(A)(i)"
+  unit: hours
+  values:
+    1997-10-01: 20
+  citations:
+    - "42 USC 607(c)(1)(A)(i) - 20 hours per week"
+
+# 607(c)(1)(B): Hours per week - single parent families
+work_activities_hours_single_parent:
+  description: "Weekly work hours required for single-parent families per 42 USC 607(c)(1)(B)"
+  unit: hours
+  values:
+    2000-10-01: 30  # FY 2000+
+    1999-10-01: 25  # FY 1999
+    1997-10-01: 20  # FY 1997-1998
+  citations:
+    - "42 USC 607(c)(1)(B) - Work participation hours"
+
+# 607(c)(2)(A): Hours per week - two-parent families
+work_activities_hours_two_parent:
+  description: "Weekly work hours required for two-parent families per 42 USC 607(c)(2)(A)"
+  unit: hours
+  values:
+    1997-10-01: 35
+  citations:
+    - "42 USC 607(c)(2)(A) - 35 hours per week"
+
+# 607(c)(2)(B): Hours per week - two-parent with child care assistance
+work_activities_hours_two_parent_with_childcare:
+  description: "Weekly work hours required for two-parent families receiving federally-funded child care per 42 USC 607(c)(2)(B)"
+  unit: hours
+  values:
+    1997-10-01: 55
+  citations:
+    - "42 USC 607(c)(2)(B) - 55 hours per week combined"
+
+# 608(a)(7): Federal time limit
+federal_time_limit:
+  description: "Maximum months of federal TANF assistance per 42 USC 608(a)(7)"
+  unit: months
+  values:
+    1997-10-01: 60
+  citations:
+    - "42 USC 608(a)(7)(A) - 60 months lifetime limit"
+
+# 608(a)(7)(C)(ii): Hardship exemption limit
+hardship_exemption_rate:
+  description: "Maximum percentage of caseload that may be exempted from time limit due to hardship per 42 USC 608(a)(7)(C)(ii)"
+  unit: rate
+  values:
+    1997-10-01: 0.20  # 20% of average monthly caseload
+  citations:
+    - "42 USC 608(a)(7)(C)(ii) - 20 percent hardship exemption"
+
+# 607(d): Work activities (list)
+# These are countable activities for work participation
+work_activities:
+  description: "Work activities that count toward participation requirements per 42 USC 607(d)"
+  type: enumerated
+  values:
+    1997-10-01:
+      - unsubsidized_employment
+      - subsidized_private_employment
+      - subsidized_public_employment
+      - work_experience
+      - on_the_job_training
+      - job_search  # Limited to 6 weeks (12 weeks if high unemployment)
+      - community_service
+      - vocational_education  # Limited to 12 months lifetime
+      - job_skills_training
+      - education_directly_related_to_employment
+      - high_school_or_ged
+      - child_care_for_community_service_participant
+  citations:
+    - "42 USC 607(d) - Work Activities Defined"
+
+# 607(c)(2)(D): Core activities minimum hours
+core_activities_minimum_hours:
+  description: "Minimum hours in core work activities before other activities count per 42 USC 607(c)(2)(D)"
+  unit: hours
+  values:
+    1997-10-01: 20  # Must do 20 hours of core activities first
+    2006-10-01: 20  # DRA 2005 codified this requirement
+  citations:
+    - "42 USC 607(c)(2)(D) - Core activity requirements"
+
+# Core activities for purposes of minimum hours
+core_work_activities:
+  description: "Activities that count as core work activities per 42 USC 607(c)(2)(D)"
+  type: enumerated
+  values:
+    2006-10-01:  # Deficit Reduction Act clarified
+      - unsubsidized_employment
+      - subsidized_private_employment
+      - subsidized_public_employment
+      - work_experience
+      - on_the_job_training
+      - community_service
+      - job_search  # When combined with other core activities
+      - vocational_education  # Max 12 months lifetime
+  citations:
+    - "42 USC 607(d)(1)-(8), 45 CFR 261.31"

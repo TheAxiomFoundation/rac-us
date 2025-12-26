@@ -1,0 +1,48 @@
+# 42 USC 1382(a)(3)(B) - Resource Eligibility
+#
+# "the individual... has resources... not exceeding $2,000 (or $3,000
+# in the case of such individual and his eligible spouse)"
+#
+# Resource limits have not been updated since 1989.
+
+module statute.42.1382.a
+version "2024.1"
+
+references {
+  resource_limit_individual: statute/42/1382/parameters/resource_limit/individual
+  resource_limit_couple: statute/42/1382/parameters/resource_limit/couple
+}
+
+# Applicable resource limit based on household composition
+variable ssi_resource_limit {
+  entity Person
+  period Month
+  dtype Money
+  unit "USD"
+  label "SSI resource limit"
+  description "Maximum countable resources for SSI eligibility per 42 USC 1382(a)(3)(B)"
+  reference "42 USC 1382(a)(3)(B)"
+
+  formula {
+    if has_eligible_spouse then
+      return resource_limit_couple
+    else
+      return resource_limit_individual
+  }
+}
+
+# Resource eligibility test
+variable is_ssi_resource_eligible {
+  entity Person
+  period Month
+  dtype Boolean
+  label "SSI resource eligibility"
+  description "Resources do not exceed limit per 42 USC 1382(a)(3)(B)"
+  reference "42 USC 1382(a)(3)(B)"
+
+  formula {
+    return countable_resources <= ssi_resource_limit
+  }
+
+  default false
+}

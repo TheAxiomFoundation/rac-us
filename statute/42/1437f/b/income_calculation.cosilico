@@ -1,0 +1,205 @@
+# 24 CFR 5.609 & 5.611 - Annual Income and Deductions
+#
+# Annual income for HCV eligibility and rent calculation includes:
+# - Employment income, business income, Social Security, SSI, pensions,
+#   annuities, alimony, child support, regular gifts, unemployment,
+#   disability benefits, interest, dividends, net rental income.
+#
+# Deductions from annual income (24 CFR 5.611):
+# - $480 for each dependent
+# - $400 for elderly (62+) or disabled head/spouse
+# - Child care expenses enabling work/education
+# - Medical expenses exceeding 3% of income (elderly/disabled only)
+# - Disability assistance expenses enabling employment
+
+references {
+  # Deduction amounts from parameters
+  dependent_deduction: statute/42/1437f/deductions/dependent/amount
+  elderly_disabled_deduction: statute/42/1437f/deductions/elderly_disabled/amount
+  medical_threshold_rate: statute/42/1437f/deductions/medical/threshold_rate
+}
+
+# ============================================================
+# ANNUAL INCOME - 24 CFR 5.609
+# ============================================================
+
+# Total annual income from all sources
+# 24 CFR 5.609(b) - Inclusions
+variable hcv_annual_income {
+  entity Household
+  period Year
+  dtype Money
+
+  formula {
+    # Sum of all counted income sources for all family members
+    # Major categories per 24 CFR 5.609(b):
+    return (
+      employment_income +
+      self_employment_income +
+      social_security_benefits +
+      ssi_benefits +
+      pension_income +
+      annuity_income +
+      alimony_received +
+      child_support_received +
+      regular_gifts_received +
+      unemployment_benefits +
+      disability_benefits +
+      workers_compensation +
+      welfare_assistance +
+      interest_income +
+      dividend_income +
+      net_rental_income
+    )
+  }
+}
+
+# ============================================================
+# INCOME DEDUCTIONS - 24 CFR 5.611
+# ============================================================
+
+# 24 CFR 5.611(a)(1) - Dependent deduction
+# $480 for each dependent family member
+variable hcv_dependent_deduction {
+  entity Household
+  period Year
+  dtype Money
+
+  formula {
+    # Dependent = family member (other than head, spouse, or co-head) who is:
+    # - Under 18 years old, OR
+    # - A person with a disability, OR
+    # - A full-time student
+    return num_dependents * dependent_deduction
+  }
+}
+
+# 24 CFR 5.611(a)(2) - Elderly or disabled family deduction
+# $400 if family is elderly or disabled family
+variable hcv_elderly_disabled_deduction {
+  entity Household
+  period Year
+  dtype Money
+
+  formula {
+    # Elderly family: head, spouse, or sole member is 62 years or older
+    # Disabled family: head, spouse, or sole member has a disability
+    if has_elderly_disabled then
+      return elderly_disabled_deduction
+
+    return 0
+  }
+}
+
+# 24 CFR 5.611(a)(3) - Child care deduction
+# Reasonable child care expenses enabling family member to work, seek work,
+# or further education
+variable hcv_childcare_deduction {
+  entity Household
+  period Year
+  dtype Money
+
+  formula {
+    # Deduction cannot exceed:
+    # (1) Amount earned by family member enabled to work, OR
+    # (2) Cost of care for children under 13 (or disabled children)
+
+    # For modeling, we take the lesser of:
+    # - Actual childcare expenses
+    # - Employment income of the person enabled to work
+
+    let max_deduction = employment_income  # Cannot exceed income earned
+    return min(childcare_expense, max_deduction)
+  }
+}
+
+# 24 CFR 5.611(a)(4) - Medical expense deduction
+# For elderly/disabled families only: unreimbursed medical expenses
+# exceeding 3% of annual income
+variable hcv_medical_deduction {
+  entity Household
+  period Year
+  dtype Money
+
+  formula {
+    # Only available to elderly or disabled families
+    if not has_elderly_disabled then
+      return 0
+
+    # Threshold = 3% of annual gross income
+    let threshold = hcv_annual_income * medical_threshold_rate
+
+    # Deduction = expenses over threshold
+    let excess = medical_expense - threshold
+    return max(0, excess)
+  }
+}
+
+# 24 CFR 5.611(a)(5) - Disability assistance expense deduction
+# Attendant care and auxiliary apparatus expenses for disabled family member
+# that enable a family member to work
+variable hcv_disability_assistance_deduction {
+  entity Household
+  period Year
+  dtype Money
+
+  formula {
+    # Only available if:
+    # (1) Expense is for attendant care or auxiliary apparatus
+    # (2) Expense enables a family member to work
+    # (3) Cannot exceed income earned by person enabled to work
+
+    if not has_disability_expense then
+      return 0
+
+    # Deduction limited to income earned
+    return min(disability_assistance_expense, employment_income)
+  }
+}
+
+# ============================================================
+# TOTAL DEDUCTIONS
+# ============================================================
+
+variable hcv_total_deductions {
+  entity Household
+  period Year
+  dtype Money
+
+  formula {
+    return (
+      hcv_dependent_deduction +
+      hcv_elderly_disabled_deduction +
+      hcv_childcare_deduction +
+      hcv_medical_deduction +
+      hcv_disability_assistance_deduction
+    )
+  }
+}
+
+# ============================================================
+# ADJUSTED INCOME - 24 CFR 5.611
+# ============================================================
+
+# Annual adjusted income = Annual income - Deductions
+variable hcv_annual_adjusted_income {
+  entity Household
+  period Year
+  dtype Money
+
+  formula {
+    let adjusted = hcv_annual_income - hcv_total_deductions
+    return max(0, adjusted)
+  }
+}
+
+# Monthly adjusted income (for rent calculation)
+variable hcv_monthly_adjusted_income {
+  entity Household
+  period Month
+  dtype Money
+
+  formula {
+    return hcv_annual_adjusted_income / 12
+  }
+}

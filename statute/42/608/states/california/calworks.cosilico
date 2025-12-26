@@ -1,0 +1,269 @@
+# California CalWORKs (California Work Opportunity and Responsibility to Kids)
+#
+# California's TANF program, governed by Welfare & Institutions Code Division 9
+# Implemented under 42 USC 601-619 with state-specific rules.
+#
+# Key California features:
+# - Higher benefit levels than most states
+# - Regional cost adjustments (Region 1 vs Region 2)
+# - 48-month time limit for adults (vs 60-month federal)
+# - Earned income disregard of $550 + 50% of remainder
+# - Exempt income treated more liberally
+#
+# Sources:
+# - California Welfare and Institutions Code Division 9
+# - California Department of Social Services (CDSS) Manual
+# - CalWORKs Maximum Aid Payment (MAP) tables
+
+references {
+  federal_eligibility: statute/42/608/a/eligibility
+  federal_benefit: statute/42/608/b/benefit_calculation
+  calworks_map: statute/42/608/states/california/parameters/max_aid_payment
+  calworks_disregards: statute/42/608/states/california/parameters/income_disregards
+}
+
+# CalWORKs-specific earned income disregard
+variable calworks_earned_income_disregard {
+  entity TanfUnit
+  period Month
+  dtype Money
+
+  formula {
+    # California uses:
+    # 1. $550 flat disregard
+    # 2. 50% of remaining earned income
+
+    let flat_disregard = calworks_flat_disregard  # $550
+    let after_flat = max(0, tanf_gross_earned_income - flat_disregard)
+    let percentage_disregard = after_flat * calworks_percentage_disregard  # 50%
+
+    return flat_disregard + percentage_disregard
+  }
+}
+
+# CalWORKs countable earned income
+variable calworks_countable_earned_income {
+  entity TanfUnit
+  period Month
+  dtype Money
+
+  formula {
+    return max(0, tanf_gross_earned_income - calworks_earned_income_disregard)
+  }
+}
+
+# CalWORKs total countable income
+variable calworks_countable_income {
+  entity TanfUnit
+  period Month
+  dtype Money
+
+  formula {
+    # Countable = earned (after disregard) + unearned
+    return calworks_countable_earned_income + tanf_gross_unearned_income
+  }
+}
+
+# CalWORKs income eligibility
+variable calworks_income_eligible {
+  entity TanfUnit
+  period Month
+  dtype Boolean
+
+  formula {
+    # California uses Minimum Basic Standard of Adequate Care (MBSAC)
+    # as the need standard, typically higher than most states
+    return calworks_countable_income <= calworks_need_standard
+  }
+}
+
+# CalWORKs resource eligibility
+variable calworks_resource_eligible {
+  entity TanfUnit
+  period Month
+  dtype Boolean
+
+  formula {
+    # California exempts:
+    # - Home
+    # - One vehicle (no equity limit since 2016)
+    # - Retirement accounts
+    # - Educational accounts
+    # - $10,000 resource limit (increased from $2,000 in 2022)
+
+    return tanf_countable_resources <= calworks_resource_limit
+  }
+}
+
+# CalWORKs time limit check (48 months for adults)
+variable calworks_time_limit_eligible {
+  entity Person
+  period Month
+  dtype Boolean
+
+  formula {
+    # California's 48-month adult time limit
+    # Children are not subject to time limits
+    if age < 18 then
+      return true
+
+    # Hardship exemptions available
+    if calworks_hardship_exempt then
+      return true
+
+    return calworks_months_received < calworks_adult_time_limit
+  }
+}
+
+# CalWORKs deprivation requirement
+# California is more liberal - covers most two-parent families
+variable calworks_deprivation_met {
+  entity TanfUnit
+  period Month
+  dtype Boolean
+
+  formula {
+    # California covers two-parent families without requiring
+    # unemployment/underemployment since welfare reform
+    return has_dependent_child
+  }
+}
+
+# Overall CalWORKs eligibility
+variable calworks_eligible {
+  entity TanfUnit
+  period Month
+  dtype Boolean
+
+  formula {
+    # Federal requirements
+    let federal_eligible = tanf_individual_eligible  # For all adults
+
+    # California-specific requirements
+    let ca_eligible = calworks_income_eligible and
+                      calworks_resource_eligible and
+                      calworks_deprivation_met
+
+    # Time limit check for adults
+    let adults_time_eligible = all(calworks_time_limit_eligible for adult in tanf_adults)
+
+    return federal_eligible and ca_eligible and adults_time_eligible
+  }
+}
+
+# CalWORKs Maximum Aid Payment (MAP)
+# The payment standard varies by:
+# - Assistance unit size
+# - Region (Region 1 = higher cost, Region 2 = lower cost)
+# - Exempt vs non-exempt status (historical, now less relevant)
+variable calworks_maximum_aid_payment {
+  entity TanfUnit
+  period Month
+  dtype Money
+
+  formula {
+    # Lookup based on unit size and region
+    if calworks_region == 1 then
+      return map_region_1[calworks_unit_size]
+    else
+      return map_region_2[calworks_unit_size]
+  }
+}
+
+# CalWORKs benefit calculation
+variable calworks_benefit {
+  entity TanfUnit
+  period Month
+  dtype Money
+
+  formula {
+    if not calworks_eligible then
+      return 0
+
+    # Benefit = MAP - Countable Income
+    let calculated = calworks_maximum_aid_payment - calworks_countable_income
+
+    # California has a minimum payment of $10 if any benefit is owed
+    if calculated > 0 and calculated < calworks_minimum_payment then
+      return calworks_minimum_payment
+
+    return max(0, calculated)
+  }
+}
+
+# CalWORKs region determination
+# Region 1: Higher cost counties (most urban)
+# Region 2: Lower cost counties
+variable calworks_region {
+  entity TanfUnit
+  period Month
+  dtype Integer
+
+  formula {
+    # Region 1 counties (partial list - see parameters for complete):
+    # Alameda, Contra Costa, Los Angeles, Marin, Napa, Orange,
+    # San Diego, San Francisco, San Mateo, Santa Barbara,
+    # Santa Clara, Santa Cruz, Solano, Sonoma, Ventura
+
+    if county in calworks_region_1_counties then
+      return 1
+    else
+      return 2
+  }
+}
+
+# Assistance unit size for CalWORKs
+variable calworks_unit_size {
+  entity TanfUnit
+  period Month
+  dtype Integer
+
+  formula {
+    # Count eligible members in assistance unit
+    # Includes dependent children and parents/caretaker relatives
+    return count(calworks_assistance_unit_members)
+  }
+}
+
+# CalWORKs-specific income exemptions
+variable calworks_exempt_income {
+  entity TanfUnit
+  period Month
+  dtype Money
+
+  formula {
+    # California exempts more income types than federal minimum:
+    # - All EITC
+    # - Child Tax Credit
+    # - SSI (SSI recipients excluded from unit)
+    # - In-kind income from non-household members
+    # - Student financial aid
+    # - CalFresh (SNAP) benefits
+    # - Infrequent income under $60/quarter
+
+    return eitc_received + child_tax_credit + student_aid +
+           infrequent_income_exempt + other_exempt_income
+  }
+}
+
+# CalWORKs homeless assistance
+# Additional aid for homeless families
+variable calworks_homeless_assistance {
+  entity TanfUnit
+  period Month
+  dtype Money
+
+  formula {
+    if not calworks_eligible then
+      return 0
+
+    if not is_homeless then
+      return 0
+
+    # California provides temporary homeless assistance:
+    # - Up to 16 days of temporary shelter
+    # - Permanent housing assistance (move-in costs)
+
+    return calworks_homeless_temporary_shelter + calworks_homeless_permanent_housing
+  }
+}
