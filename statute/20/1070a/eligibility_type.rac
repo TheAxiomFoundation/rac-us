@@ -1,0 +1,51 @@
+# 20 USC 1070a - Pell Grant Eligibility Type (SAI Methodology)
+#
+# Under FAFSA Simplification (2024+), eligibility is determined by
+# AGI as a fraction of Federal Poverty Guidelines.
+
+imports:
+  adjusted_gross_income: statute/26/62/a/adjusted_gross_income
+  fpg: statute/42/9902/fpg#federal_poverty_guidelines
+  fpg_fraction: statute/20/1070a/parameters#sai.fpg_fraction
+  is_tax_unit_head: statute/26/1/filing_status#is_tax_unit_head
+  filing_status: statute/26/1/filing_status
+  is_dependent_student: statute/20/1070a/dependent_status
+
+entity Person
+period Year
+dtype Enum["INELIGIBLE", "MAXIMUM", "MINIMUM", "CALCULATED"]
+label "Pell Grant Eligibility Type"
+description "Eligibility category under SAI methodology determining maximum, minimum, or calculated award"
+
+formula:
+  agi = adjusted_gross_income
+  poverty_line = fpg
+
+  # Determine household type for threshold lookup
+  is_dependent = is_dependent_student
+  is_single = (filing_status == SINGLE) | (filing_status == HEAD_OF_HOUSEHOLD)
+
+  # Get applicable FPG fraction thresholds
+  if is_dependent and is_single:
+    max_threshold = fpg_fraction.max_pell_limits.DEPENDENT_SINGLE
+    min_threshold = fpg_fraction.min_pell_limits.DEPENDENT_SINGLE
+  else if is_dependent and (not is_single):
+    max_threshold = fpg_fraction.max_pell_limits.DEPENDENT_NOT_SINGLE
+    min_threshold = fpg_fraction.min_pell_limits.DEPENDENT_NOT_SINGLE
+  else if (not is_dependent) and is_single:
+    max_threshold = fpg_fraction.max_pell_limits.INDEPENDENT_SINGLE
+    min_threshold = fpg_fraction.min_pell_limits.INDEPENDENT_SINGLE
+  else:
+    max_threshold = fpg_fraction.max_pell_limits.INDEPENDENT_NOT_SINGLE
+    min_threshold = fpg_fraction.min_pell_limits.INDEPENDENT_NOT_SINGLE
+
+  # Calculate AGI as fraction of FPG
+  agi_to_fpg = agi / poverty_line
+
+  # Determine eligibility type
+  if agi_to_fpg > min_threshold: return INELIGIBLE
+  if agi_to_fpg <= max_threshold: return MAXIMUM
+  if agi_to_fpg <= min_threshold: return MINIMUM
+  return CALCULATED
+
+default INELIGIBLE

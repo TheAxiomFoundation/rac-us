@@ -45,4 +45,4 @@ abawd_work_hours:
     - "7 USC § 2015(o)(2): 80 hours per month"
 
 # NOTE: ABAWD time limit (3 months in 36-month period) cannot be tracked
-# in static microsimulation. See work_requirements.cosilico for details.
+# in static microsimulation. See work_requirements.rac for details.

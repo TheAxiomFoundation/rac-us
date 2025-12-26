@@ -1,0 +1,19 @@
+# 26 USC § 1 - Filing Status
+#
+# Determines the rate schedule applicable to an individual's taxable income.
+# The filing status affects tax brackets, standard deductions, and many credits.
+
+# Enum definition for filing status values
+enum FilingStatus:
+SINGLE               # § 1(c) - Unmarried individuals
+MARRIED_FILING_JOINTLY  # § 1(a) - Married individuals filing joint return
+MARRIED_FILING_SEPARATELY  # § 1(d) - Married individuals filing separate returns
+HEAD_OF_HOUSEHOLD    # § 1(b) - Unmarried head of household
+QUALIFYING_WIDOW     # § 1(a) - Surviving spouse with dependent child
+
+entity TaxUnit
+period Year
+dtype Enum(FilingStatus)
+label "Filing Status"
+description "Tax filing status determining applicable rate schedule"
+# Input from CPS: derived from marital status and dependents

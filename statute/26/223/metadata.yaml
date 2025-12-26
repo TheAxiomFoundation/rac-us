@@ -128,8 +128,8 @@ related_sections:
     description: "Prohibited transaction exemption"
 
 files:
-  - hsa_deduction.cosilico
-  - contribution_limits.cosilico
-  - hdhp_requirements.cosilico
+  - hsa_deduction.rac
+  - contribution_limits.rac
+  - hdhp_requirements.rac
   - parameters.yaml
   - tests.yaml

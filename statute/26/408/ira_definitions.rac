@@ -1,0 +1,167 @@
+# 26 USC Section 408 - Individual Retirement Accounts (Definitions)
+#
+# Section 408 defines what constitutes an Individual Retirement Account (IRA)
+# and the requirements for IRA trustees/custodians.
+#
+# "(a) Individual retirement account.--For purposes of this section, the term
+#      'individual retirement account' means a trust created or organized in
+#      the United States for the exclusive benefit of an individual or his
+#      beneficiaries..."
+#
+# Key requirements under 408(a):
+#   (1) Written governing instrument
+#   (2) Trustee must be bank, insurance company, or IRS-approved entity
+#   (3) No commingling except with other IRA funds
+#   (4) Beneficiary interest is nonforfeitable
+#   (5) Assets cannot be invested in life insurance
+#   (6) Assets cannot be invested in collectibles (with exceptions)
+#
+# Related files:
+# - 408/d/distributions.rac - Tax treatment of distributions
+# - 408/d/3/rollovers.rac - Rollover rules
+# - 408/o/contribution_limits.rac - Contribution limits
+# - 408A/d/distributions.rac - Roth IRA distributions
+# - 408/parameters.yaml - All parameter values
+
+# ============================================================================
+# Account Balance Variables (Inputs)
+# ============================================================================
+
+# Input: Total value of all traditional IRAs
+entity Person
+period Year
+dtype Money
+unit "USD"
+label "Traditional IRA Balance"
+description "Total balance in all traditional IRA accounts"
+default 0
+
+---
+
+# Input: Total value of all Roth IRAs
+entity Person
+period Year
+dtype Money
+unit "USD"
+label "Roth IRA Balance"
+description "Total balance in all Roth IRA accounts"
+default 0
+
+---
+
+# Input: Year of birth (for determining RMD age)
+entity Person
+period Year
+dtype Integer
+label "Birth Year"
+description "Year of birth for RMD age determination"
+
+---
+
+# ============================================================================
+# IRA Required Minimum Distributions - 408(a)(6) / 401(a)(9)
+# RMD rules are shared with 401(k), see 402/c/rmd.rac
+# ============================================================================
+
+imports:
+  rmd_applicable_age: statute/26/402/c/rmd#rmd_applicable_age
+
+# Derived: RMD applicable age based on birth year
+# Per SECURE 2.0 Act - uses same rules as 401(k)
+entity Person
+period Year
+dtype Integer
+label "IRA RMD Applicable Age"
+description "Age at which IRA required minimum distributions must begin"
+
+formula:
+  # Same rules as 401(k) - reference 402/c/rmd for RMD age by birth year
+  return rmd_applicable_age
+
+default 0
+
+---
+
+# Derived: Has reached IRA RMD age?
+entity Person
+period Year
+dtype Boolean
+label "IRA Reached RMD Age"
+description "Whether individual has reached IRA required minimum distribution age"
+
+formula:
+  return age >= ira_rmd_applicable_age
+
+default false
+
+---
+
+# Input: IRA balance at end of prior year (for RMD calculation)
+entity Person
+period Year
+dtype Money
+unit "USD"
+label "IRA Prior Year Balance"
+description "Total IRA account balance as of December 31 of prior year"
+default 0
+
+---
+
+# Derived: IRA Required Minimum Distribution amount
+entity Person
+period Year
+dtype Money
+unit "USD"
+label "IRA Required Minimum Distribution"
+description "Minimum amount that must be withdrawn from IRA"
+
+formula:
+  if not is_ira_reached_rmd_age:
+    return 0
+
+  if ira_prior_year_balance <= 0:
+    return 0
+
+  # RMD divisor from Uniform Lifetime Table (same as 401k)
+  # Simplified - actual table has specific values for each age
+  # Using ternary chain for DSL compatibility
+  divisor = 27.4 if age < 73 else (26.5 if age == 73 else (25.5 if age == 74 else (24.6 if age == 75 else (23.7 if age == 76 else (22.9 if age == 77 else (22.0 if age == 78 else (21.1 if age == 79 else (20.2 if age == 80 else max(3.0, 20.2 - (age - 80) * 0.8)))))))))
+
+  return ira_prior_year_balance / divisor
+
+---
+
+# ============================================================================
+# Account Type Identification
+# ============================================================================
+
+# Input: Is this a SIMPLE IRA?
+entity Person
+period Year
+dtype Boolean
+label "Has SIMPLE IRA"
+description "Whether individual has a SIMPLE IRA (higher contribution limits)"
+default false
+
+---
+
+# Input: Is this a SEP IRA?
+entity Person
+period Year
+dtype Boolean
+label "Has SEP IRA"
+description "Whether individual has a SEP IRA (self-employed)"
+default false
+
+---
+
+# Derived: Combined IRA balance
+entity Person
+period Year
+dtype Money
+unit "USD"
+label "Total IRA Balance"
+description "Combined balance of all traditional and Roth IRAs"
+
+formula:
+  return traditional_ira_balance + roth_ira_balance

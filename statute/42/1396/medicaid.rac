@@ -1,0 +1,148 @@
+# Title 42 USC 1396 - Medicaid (Grants to States for Medical Assistance Programs)
+#
+# Medicaid provides health coverage to low-income individuals through a
+# federal-state partnership. The Affordable Care Act (ACA) significantly
+# expanded Medicaid eligibility and standardized income methodology.
+#
+# Key statutory sections:
+# - 42 USC 1396a: State plan requirements (eligibility, coverage, administration)
+# - 42 USC 1396b: Federal matching payments (FMAP)
+# - 42 USC 1396d: Definition of medical assistance, ACA expansion
+# - 42 USC 1396o: Cost sharing (premiums, copayments, deductibles)
+# - 42 USC 1396u-1: Section 1931 parent/caretaker eligibility
+#
+# Eligibility pathways:
+# 1. MAGI-based (ACA): Children, pregnant women, parents, expansion adults
+# 2. Non-MAGI: SSI recipients, aged, blind, disabled, medically needy
+#
+# Reference: https://uscode.house.gov/view.xhtml?path=/prelim@title42/chapter7/subchapterXIX
+
+module statute.42.1396.medicaid
+version "2025.1"
+jurisdiction us
+
+references:
+  # Eligibility determination (42 USC 1396a)
+  medicaid_eligible: statute/42/1396/a/eligibility/medicaid_eligible
+  medicaid_category: statute/42/1396/a/eligibility/medicaid_category
+  medicaid_income_eligible: statute/42/1396/a/eligibility/medicaid_income_eligible
+
+  # Categorical groups
+  medicaid_infant_eligible: statute/42/1396/a/eligibility/medicaid_infant_eligible
+  medicaid_child_eligible: statute/42/1396/a/eligibility/medicaid_child_eligible
+  medicaid_pregnant_eligible: statute/42/1396/a/eligibility/medicaid_pregnant_eligible
+  medicaid_expansion_eligible: statute/42/1396/d/expansion/medicaid_expansion_eligible
+  medicaid_ssi_eligible: statute/42/1396/a/eligibility/medicaid_ssi_eligible
+
+  # Income methodology (42 USC 1396a(e)(14), 42 CFR 435.603)
+  magi: statute/42/1396/b/income_methodology/magi
+  magi_monthly: statute/42/1396/b/income_methodology/magi_monthly
+  magi_household_size: statute/42/1396/b/income_methodology/magi_household_size
+  magi_income: statute/42/1396/b/income_methodology/magi_income
+  magi_income_pct_fpl: statute/42/1396/b/income_methodology/magi_income_pct_fpl
+
+  # Household composition (42 CFR 435.603(f))
+  medicaid_household_size: statute/42/1396/b/income_methodology/medicaid_household_size
+  medicaid_fpl_monthly: statute/42/1396/b/income_methodology/medicaid_fpl_monthly
+
+  # CHIP eligibility (42 USC 1397aa)
+  chip_eligible: statute/42/1396/a/eligibility/chip_eligible
+  chip_income_eligible: statute/42/1396/a/eligibility/chip_income_eligible
+
+  # Cost sharing (42 USC 1396o)
+  medicaid_premium: statute/42/1396/o/cost_sharing/medicaid_premium
+  medicaid_copayment: statute/42/1396/o/cost_sharing/medicaid_copayment
+
+  # Non-MAGI pathways
+  medicaid_aged_eligible: statute/42/1396/a/aged/medicaid_aged_eligible
+  medicaid_disabled_eligible: statute/42/1396/a/disabled/medicaid_disabled_eligible
+  medicaid_resource_eligible: statute/42/1396/a/resources/medicaid_resource_eligible
+
+# =============================================================================
+# MAIN MEDICAID ELIGIBILITY
+# =============================================================================
+
+# Medicaid eligibility (all pathways)
+variable medicaid:
+  entity Person
+  period Month
+  dtype Boolean
+  label "Medicaid Eligible"
+  description "Eligible for Medicaid coverage under any pathway"
+  reference (
+    "42 USC 1396",
+    "42 USC 1396a(a)(10)",
+    "https://www.medicaid.gov/medicaid/eligibility/index.html"
+  )
+
+  formula:
+    return medicaid_eligible
+
+  default false
+
+# CHIP eligibility (Children's Health Insurance Program)
+variable chip:
+  entity Person
+  period Month
+  dtype Boolean
+  label "CHIP Eligible"
+  description "Eligible for Children's Health Insurance Program"
+  reference (
+    "42 USC 1397aa et seq.",
+    "https://www.medicaid.gov/chip/index.html"
+  )
+
+  formula:
+    return chip_eligible
+
+  default false
+
+# Combined public coverage eligibility
+variable public_health_coverage_eligible:
+  entity Person
+  period Month
+  dtype Boolean
+  label "Public Health Coverage Eligible"
+  description "Eligible for Medicaid or CHIP"
+  reference "42 USC 1396, 42 USC 1397aa"
+
+  formula:
+    return medicaid_eligible or chip_eligible
+
+  default false
+
+# =============================================================================
+# MAGI INCOME (for Medicaid and ACA marketplace)
+# =============================================================================
+
+# Modified Adjusted Gross Income at household level
+variable household_magi:
+  entity Household
+  period Month
+  dtype Money
+  unit "USD"
+  label "Household MAGI"
+  description "Household Modified Adjusted Gross Income for Medicaid/ACA eligibility"
+  reference (
+    "42 USC 1396a(e)(14)",
+    "26 USC 36B(d)(2)(B)"
+  )
+
+  formula:
+    return magi_income
+
+  default 0
+
+# MAGI as percentage of Federal Poverty Level
+variable household_magi_pct_fpl:
+  entity Household
+  period Month
+  dtype Rate
+  label "Household MAGI as % FPL"
+  description "Household MAGI income as percentage of Federal Poverty Level"
+  reference "42 CFR 435.603"
+
+  formula:
+    return magi_income_pct_fpl
+
+  default 0

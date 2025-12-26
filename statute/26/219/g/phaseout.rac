@@ -1,0 +1,161 @@
+# 26 USC Section 219(g) - Limitation on Deduction for Active Participants
+#                          in Certain Pension Plans
+#
+# "(1) In general.--If, for any taxable year, the individual or the
+#      individual's spouse is an active participant, each of the dollar
+#      limitations... shall be reduced (but not below zero) by the amount
+#      determined under paragraph (2)."
+#
+# "(2) Amount of reduction.--
+#      (A) In general.--The amount determined under this paragraph shall be
+#          the amount which bears the same ratio to the dollar limitation...
+#          as the excess of adjusted gross income over the applicable dollar
+#          amount bears to $10,000 ($20,000 in the case of a joint return)."
+
+parameters:
+# From phaseout.yaml
+  phaseout_single_start: 77000
+  phaseout_single_end: 87000
+  phaseout_joint_start: 123000
+  phaseout_joint_end: 143000
+  phaseout_spouse_covered_start: 230000
+  phaseout_spouse_covered_end: 240000
+  phaseout_mfs_start: 0
+  phaseout_mfs_end: 10000
+
+imports:
+  filing_status: statute/26/1/filing_status
+  adjusted_gross_income: statute/26/62/a/adjusted_gross_income
+  ira_max_deductible_contribution: statute/26/219/b/contribution_limits
+
+# Input: Whether individual is an active participant in employer plan
+# 219(g)(5) defines "active participant"
+entity Person
+period Year
+dtype Boolean
+label "Active Retirement Plan Participant"
+description "Whether individual is an active participant in an employer retirement plan"
+
+# Input variable - from W-2 Box 13
+
+---
+
+# Spouse's participation status (needed for 219(g)(7) rule)
+entity Person
+period Year
+dtype Boolean
+label "Spouse is Active Retirement Plan Participant"
+description "Whether spouse is an active participant in an employer retirement plan"
+
+# Input variable - from spouse's W-2 Box 13
+
+---
+
+# Determine applicable phase-out range based on filing status and participation
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "IRA Deduction Phase-out Start"
+description "AGI where IRA deduction phase-out begins"
+
+formula:
+  # MFS has its own very narrow range
+  if filing_status == MARRIED_FILING_SEPARATELY:
+    return phaseout_mfs_start
+  elif filing_status == JOINT:
+    # For joint filers, check participation status
+    # 219(g)(7): If contributor not covered but spouse is covered
+    if not is_active_retirement_plan_participant and spouse_is_active_retirement_plan_participant:
+      return phaseout_spouse_covered_start
+    else:
+      # Contributor is covered (or neither covered - no phase-out in that case)
+      return phaseout_joint_start
+  else:
+    # Single or Head of Household
+    return phaseout_single_start
+
+default 0
+
+---
+
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "IRA Deduction Phase-out End"
+description "AGI where IRA deduction is fully phased out"
+
+formula:
+  if filing_status == MARRIED_FILING_SEPARATELY:
+    return phaseout_mfs_end
+
+  if filing_status == JOINT:
+    if not is_active_retirement_plan_participant and spouse_is_active_retirement_plan_participant:
+      return phaseout_spouse_covered_end
+    return phaseout_joint_end
+
+  return phaseout_single_end
+
+---
+
+# Whether phase-out applies at all
+entity Person
+period Year
+dtype Boolean
+label "IRA Phase-out Applies"
+description "Whether IRA deduction is subject to income-based phase-out"
+
+formula:
+  # Phase-out only applies if individual OR spouse is active participant
+  # 219(g)(1): "If... the individual or the individual's spouse is an active participant"
+  return is_active_retirement_plan_participant or spouse_is_active_retirement_plan_participant
+
+---
+
+# 219(g)(2): Calculate the phase-out ratio
+entity Person
+period Year
+dtype Rate
+label "IRA Deduction Phase-out Ratio"
+description "Ratio of IRA deduction that is phased out based on income"
+
+formula:
+  # If neither spouse is an active participant, no phase-out
+  if not ira_phaseout_applies:
+    return 0
+
+  agi = adjusted_gross_income
+  start = ira_phaseout_start
+  end = ira_phaseout_end
+
+  # Below phase-out start: full deduction
+  if agi <= start:
+    return 0
+
+  # Above phase-out end: no deduction
+  if agi >= end:
+    return 1
+
+  # Proportional phase-out
+  # 219(g)(2)(A): ratio = (AGI - start) / (end - start)
+  return (agi - start) / (end - start)
+
+---
+
+# Amount of deduction after phase-out
+entity Person
+period Year
+dtype Money
+unit "USD"
+label "IRA Deduction After Phase-out"
+description "IRA deduction after applying income-based phase-out"
+
+formula:
+  max_deduction = ira_max_deductible_contribution
+  phaseout_fraction = ira_phaseout_ratio
+
+  # Apply phase-out reduction
+  # 219(g)(2)(C): Round UP to nearest $10 (favorable to taxpayer)
+  reduced = max_deduction * (1 - phaseout_fraction)
+  return ceil(reduced / 10) * 10

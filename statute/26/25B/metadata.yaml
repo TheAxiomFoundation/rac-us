@@ -27,9 +27,9 @@ sources:
       title: "Elective deferrals and IRA contributions by certain individuals"
       path: statute/26/25B/
       files:
-        - a/savers_credit.cosilico  # Main credit calculation
-        - b/applicable_percentage.cosilico  # Rate determination
-        - c/eligible_individual.cosilico  # Eligibility requirements
+        - a/savers_credit.rac  # Main credit calculation
+        - b/applicable_percentage.rac  # Rate determination
+        - c/eligible_individual.rac  # Eligibility requirements
 
   guidance:
     - citation: "Rev. Proc. 2023-34"
@@ -58,19 +58,19 @@ architecture:
 
     1. 25B(a) - Allowance of Credit
        - Credit = Applicable Percentage x min(Qualified Contributions, $2,000)
-       - a/savers_credit.cosilico
+       - a/savers_credit.rac
 
     2. 25B(b) - Applicable Percentage
        - 50%, 20%, 10%, or 0% based on AGI and filing status
        - Joint filers are the base; other statuses use threshold adjustments
-       - b/applicable_percentage.cosilico
+       - b/applicable_percentage.rac
 
     3. 25B(c) - Eligible Individual
        - Must be 18+ at year end
        - Must be head of household or spouse (filer)
        - Not claimed as dependent on another return
        - Not a full-time student
-       - c/eligible_individual.cosilico
+       - c/eligible_individual.rac
 
     4. 25B(d) - Qualified Retirement Savings Contributions
        - Elective deferrals (401k, 403b, 457b)

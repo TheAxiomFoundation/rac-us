@@ -23,7 +23,7 @@ scope:
 # =============================================================================
 
 files:
-  - path: principal_residence_exclusion.cosilico
+  - path: principal_residence_exclusion.rac
     description: |
       Main exclusion calculation per Section 121(a).
       Implements: Exclusion = min(realized_gain, exclusion_limit)
@@ -184,12 +184,12 @@ architecture:
   description: |
     The Section 121 exclusion follows a straightforward calculation:
 
-    1. **Eligibility Check** (principal_residence_exclusion.cosilico)
+    1. **Eligibility Check** (principal_residence_exclusion.rac)
        - Ownership test: Owned 2+ years in last 5
        - Use test: Used as principal residence 2+ years in last 5
        - Frequency test: No exclusion claimed in prior 2 years
 
-    2. **Limit Determination** (principal_residence_exclusion.cosilico)
+    2. **Limit Determination** (principal_residence_exclusion.rac)
        - Single/HoH/MFS: $250,000
        - MFJ with both spouses meeting tests: $500,000
        - MFJ with only one spouse meeting tests: $250,000

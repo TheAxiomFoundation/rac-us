@@ -1,0 +1,95 @@
+# 42 USC 608(a)(7) - Time Limits on Federal Assistance
+#
+# Note: Time limit is in 608(a)(7), but logically grouped with 607 work rules
+# as both relate to ongoing participation requirements.
+#
+# "(7) No assistance for more than 5 years
+#     (A) In general
+#         A State to which a grant is made under section 603 shall not use
+#         any part of the grant to provide assistance to a family that
+#         includes an adult who has received assistance under any State
+#         program funded under this part attributable to funds provided by
+#         the Federal Government... for 60 months (whether or not consecutive)
+#         after the date the State program... becomes effective"
+#
+# IMPORTANT: Time limits cannot be enforced in point-in-time simulation.
+# This encodes the RULE structure for reference. Actual enforcement requires
+# tracking benefit receipt history over 60+ months.
+
+imports:
+  federal_time_limit_months: statute/42/607/parameters/federal_time_limit
+  hardship_exemption_pct: statute/42/607/parameters/hardship_exemption_rate
+
+# 608(a)(7)(A): Federal 60-month time limit
+# This is the maximum federal participation, states may be stricter
+entity Person
+period None  # Statutory constant
+dtype Integer
+
+formula:
+  return federal_time_limit_months  # 60 months
+
+# 608(a)(7)(C): Hardship exemption
+# States may exempt up to 20% of caseload due to hardship
+entity Person
+period Month
+dtype Boolean
+
+formula:
+  # Exemption determined by state based on:
+  # - Domestic violence
+  # - Disability (recipient or family member)
+  # - Other state-defined hardship
+
+  # NOTE: Cannot simulate - requires individual hardship determination
+  # This is a placeholder for state override
+  return hardship_exemption_claimed
+
+# 608(a)(7)(D): Minor child exception
+# Time limit does not apply to minor children
+entity Person
+period Month
+dtype Boolean
+
+formula:
+  return age < 18
+
+# 608(a)(7)(E): Domestic violence waiver (Family Violence Option)
+# States may temporarily waive time limits for DV victims
+entity Person
+period Month
+dtype Boolean
+
+formula:
+  # States electing FVO under 602(a)(7) may waive requirements
+  # Cannot simulate - requires individual DV determination
+  return domestic_violence_waiver_claimed
+
+# Cumulative months of TANF receipt
+# NOTE: Simulation limitation - cannot track across time
+entity Person
+period Month
+dtype Integer
+
+formula:
+  # In real implementation, this would sum all prior months
+  # For point-in-time simulation, this must be input data
+  return tanf_months_received_input
+
+# NOTE: This variable requires historical data to compute.
+# In microsimulation, it must be provided as input or estimated
+# from survey data on TANF receipt duration.
+
+# Has person exceeded federal time limit?
+entity Person
+period Month
+dtype Boolean
+
+formula:
+  # Minor children exempt
+  if tanf_minor_child_time_limit_exempt: return false
+
+  # Hardship exemptions
+  if tanf_hardship_exempt or tanf_domestic_violence_exempt: return false
+
+  return tanf_months_received >= tanf_federal_time_limit_months

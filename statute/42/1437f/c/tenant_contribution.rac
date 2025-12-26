@@ -1,0 +1,193 @@
+# 42 USC 1437f(o)(2) & 24 CFR 5.628 - Tenant Contribution
+#
+# "The monthly assistance payment... shall be the amount by which the
+# rent (including the amount allowed for tenant-paid utilities) for
+# the dwelling unit... exceeds the greatest of--
+#   (A) 30 percent of the monthly adjusted income of the family;
+#   (B) 10 percent of the monthly income of the family; or
+#   (C) if the family is receiving payments for welfare assistance...
+#       the portion of such payments which is specifically designated
+#       by such agency to meet the housing costs of the family."
+#
+# Total Tenant Payment (TTP) is the greater of:
+# - 30% of monthly adjusted income
+# - 10% of monthly gross income
+# - Welfare rent (if applicable)
+# - Minimum rent (PHA-determined, $0-$50)
+#
+# Reference: https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title42-section1437f
+
+module statute.42.1437f.c
+version "2025.1"
+jurisdiction us
+
+references:
+  # Contribution rates from parameters
+  adjusted_income_rate: statute/42/1437f/tenant_contribution/income_rate
+  gross_income_rate: statute/42/1437f/tenant_contribution/gross_income_rate
+  minimum_rent: statute/42/1437f/tenant_contribution/minimum_rent/default
+
+  # Income variables
+  hcv_annual_income: statute/42/1437f/b/hcv_annual_income
+  hcv_annual_adjusted_income: statute/42/1437f/b/hcv_annual_adjusted_income
+  hcv_monthly_adjusted_income: statute/42/1437f/b/hcv_monthly_adjusted_income
+
+# ============================================================
+# TTP COMPONENTS - 24 CFR 5.628
+# ============================================================
+
+# 24 CFR 5.628(a)(1) - 30% of adjusted monthly income
+variable hcv_contribution_30_adjusted:
+  entity Household
+  period Month
+  dtype Money
+  unit "USD"
+  label "HCV 30% Adjusted Income Contribution"
+  description "30% of monthly adjusted income per 24 CFR 5.628(a)(1)"
+  reference "24 CFR 5.628(a)(1)"
+
+  formula:
+    let rate = parameter(gov.hud.hcv.tenant_contribution.income_rate)
+    return round(hcv_monthly_adjusted_income * rate)
+
+  default 0
+
+# 24 CFR 5.628(a)(2) - 10% of monthly gross income
+variable hcv_contribution_10_gross:
+  entity Household
+  period Month
+  dtype Money
+  unit "USD"
+  label "HCV 10% Gross Income Contribution"
+  description "10% of monthly gross income per 24 CFR 5.628(a)(2)"
+  reference "24 CFR 5.628(a)(2)"
+
+  formula:
+    let rate = parameter(gov.hud.hcv.tenant_contribution.gross_income_rate)
+    let monthly_gross = hcv_annual_income / 12
+    return round(monthly_gross * rate)
+
+  default 0
+
+# 24 CFR 5.628(a)(3) - Welfare rent
+# If family receives welfare assistance with designated housing amount
+variable hcv_welfare_rent:
+  entity Household
+  period Month
+  dtype Money
+  unit "USD"
+  label "HCV Welfare Rent"
+  description "Welfare assistance portion designated for housing"
+  reference "24 CFR 5.628(a)(3)"
+
+  formula:
+    # Welfare rent = portion of welfare designated for housing
+    # Only applies if welfare agency designates housing portion
+    return welfare_housing_portion
+
+  default 0
+
+# 24 CFR 5.630 - Minimum rent
+# PHAs may set minimum rent between $0-$50
+variable hcv_minimum_rent:
+  entity Household
+  period Month
+  dtype Money
+  unit "USD"
+  label "HCV Minimum Rent"
+  description "PHA-determined minimum rent ($0-$50)"
+  reference "24 CFR 5.630"
+
+  formula:
+    # Using default minimum rent from parameters
+    # PHAs may set lower (including $0) with hardship exemptions
+    return parameter(gov.hud.hcv.tenant_contribution.minimum_rent.default)
+
+  default 50
+
+# ============================================================
+# TOTAL TENANT PAYMENT (TTP) - 24 CFR 5.628
+# ============================================================
+
+# TTP is the GREATEST of the four calculations above
+variable hcv_total_tenant_payment:
+  entity Household
+  period Month
+  dtype Money
+  unit "USD"
+  label "HCV Total Tenant Payment"
+  description "Monthly tenant contribution - greatest of 30% adjusted, 10% gross, welfare rent, or minimum rent"
+  reference (
+    "42 USC 1437f(o)(2)",
+    "24 CFR 5.628"
+  )
+
+  formula:
+    # Per 24 CFR 5.628, TTP = greatest of:
+    # (A) 30% of adjusted monthly income
+    # (B) 10% of monthly gross income
+    # (C) Welfare rent (if applicable)
+    # (D) Minimum rent
+
+    let ttp_adjusted = hcv_contribution_30_adjusted
+    let ttp_gross = hcv_contribution_10_gross
+    let ttp_welfare = hcv_welfare_rent
+    let ttp_minimum = hcv_minimum_rent
+
+    # Take the greatest
+    let ttp = max(ttp_adjusted, ttp_gross)
+    let ttp = max(ttp, ttp_welfare)
+    let ttp = max(ttp, ttp_minimum)
+
+    return ttp
+
+  default 0
+
+# ============================================================
+# TENANT RENT - 24 CFR 982.515
+# ============================================================
+
+# Tenant rent to owner
+# When gross rent exceeds payment standard, tenant pays difference
+variable hcv_tenant_rent_to_owner:
+  entity Household
+  period Month
+  dtype Money
+  unit "USD"
+  label "HCV Tenant Rent to Owner"
+  description "Amount tenant pays directly to landlord"
+  reference "24 CFR 982.515"
+
+  formula:
+    # Tenant rent = greater of:
+    # (1) TTP - utility allowance, OR
+    # (2) Gross rent - HAP
+
+    # First calculate based on TTP
+    let rent_from_ttp = max(0, hcv_total_tenant_payment - utility_allowance)
+
+    # If gross rent exceeds payment standard, tenant pays the excess
+    let excess_rent = max(0, gross_rent - payment_standard)
+    let rent_with_excess = rent_from_ttp + excess_rent
+
+    return rent_with_excess
+
+  default 0
+
+# Utility reimbursement
+# If utility allowance exceeds TTP, family receives reimbursement
+variable hcv_utility_reimbursement:
+  entity Household
+  period Month
+  dtype Money
+  unit "USD"
+  label "HCV Utility Reimbursement"
+  description "Reimbursement when utility allowance exceeds TTP"
+  reference "24 CFR 982.514(b)"
+
+  formula:
+    # If utility allowance > TTP, family receives the difference
+    let reimbursement = utility_allowance - hcv_total_tenant_payment
+    return max(0, reimbursement)
+
+  default 0

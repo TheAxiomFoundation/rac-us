@@ -1,0 +1,149 @@
+# 42 USC 8624(b)(5) - LIHEAP Benefit Calculation
+#
+# "(5) the State will...provide, in a timely manner, that the highest level
+#  of assistance will be furnished to those households which have the lowest
+#  incomes and the highest energy costs or needs in relation to income,
+#  taking into account family size, except that the State may not differentiate
+#  in implementing this section between the households described in clauses
+#  (2)(A) and (2)(B) of this subsection...
+#  (A) ensure that the highest level of assistance will be provided to—
+#      (i) households with the lowest incomes that pay a high proportion
+#          of household income for home energy, taking into account
+#          household size;
+#      (ii) households containing the elderly;
+#      (iii) households with disabled individuals; and
+#      (iv) households with young children"
+
+imports:
+  liheap_eligible: statute/42/8624/b/eligibility/liheap_eligible
+  liheap_vulnerable_household: statute/42/8624/b/eligibility/liheap_vulnerable_household
+  minimum_benefit: statute/42/8624/benefit_targeting/minimum_benefit
+  high_energy_burden_threshold: statute/42/8624/benefit_targeting/high_energy_burden_threshold
+
+# Energy burden calculation - energy costs as proportion of income
+entity Household
+period Year
+dtype Rate
+label "LIHEAP energy burden"
+description "Annual energy costs as proportion of household income per 42 USC 8624(b)(5)"
+
+formula:
+  # Energy burden = energy costs / income
+  # Handle zero income case
+  if annual_gross_income <= 0:
+  # If no income but has energy costs, burden is effectively infinite
+  # Cap at 1.0 (100%) for calculation purposes
+  return 1.0
+
+  return min(1.0, annual_energy_costs / annual_gross_income)
+
+default 0
+
+# High energy burden flag
+entity Household
+period Year
+dtype Boolean
+label "LIHEAP high energy burden"
+description "Household has high energy burden per 42 USC 8624(b)(5)(A)"
+
+formula:
+  return liheap_energy_burden >= high_energy_burden_threshold
+
+default false
+
+# Priority household for benefit targeting
+entity Household
+period Year
+dtype Boolean
+label "LIHEAP priority household"
+description "Household qualifies for priority targeting per 42 USC 8624(b)(5)(A)"
+
+formula:
+  # Priority given to households with:
+  # - High energy burden (relative to income)
+  # - Vulnerable populations (elderly, disabled, young children)
+  return liheap_high_energy_burden or liheap_vulnerable_household
+
+default false
+
+# LIHEAP benefit amount
+# Note: Actual benefit amounts vary significantly by state and are based on
+# available funding, applicant pool, and state-specific formulas.
+# This provides a framework for the federal targeting requirements.
+entity Household
+period Year
+dtype Money
+unit "USD"
+label "Low Income Home Energy Assistance"
+description "LIHEAP benefit amount per 42 USC 8624"
+"42 USC 8624(b)(1)",
+"42 USC 8624(b)(5)"
+
+formula:
+  if not liheap_eligible: return 0
+
+  # Benefit calculation follows 42 USC 8624(b)(5) targeting requirements:
+  # - Highest assistance to lowest income + highest energy burden
+  # - Priority for elderly, disabled, young children
+  #
+  # Actual state benefit formulas vary, but typically consider:
+  # 1. Available funding allocation
+  # 2. Energy burden (energy costs / income)
+  # 3. Household size
+  # 4. Vulnerable population status
+  # 5. Type of fuel/heating system
+  #
+  # This is a simplified federal baseline. States implement specific formulas.
+
+  # Base benefit proportional to energy burden and inversely to income
+  income_factor = max(0.1, 1.0 - (annual_gross_income / liheap_fpl_limit))
+  burden_factor = liheap_energy_burden
+
+  # Combined targeting score
+  targeting_score = (income_factor * 0.5) + (burden_factor * 0.5)
+
+  # Priority adjustment for vulnerable households
+  priority_multiplier = if liheap_priority_household : 1.25 else 1.0
+
+  # Calculate benefit (state-specific; this is illustrative)
+  # Actual benefits typically range from $100 to $2,000+ depending on state
+  base_benefit = 500  # Placeholder - actual varies by state/year
+  calculated_benefit = base_benefit * targeting_score * priority_multiplier
+
+  # Ensure minimum benefit per 42 USC 8624(b)(5)(B)
+  return max(minimum_benefit, calculated_benefit)
+
+default 0
+
+# Heating assistance amount
+entity Household
+period Year
+dtype Money
+unit "USD"
+label "LIHEAP heating assistance"
+description "Home heating assistance per 42 USC 8624(b)(1)(A)"
+
+formula:
+  if not liheap_heating_eligible: return 0
+
+  # Heating assistance is a component of total LIHEAP benefit
+  return liheap
+
+default 0
+
+# Cooling assistance amount
+entity Household
+period Year
+dtype Money
+unit "USD"
+label "LIHEAP cooling assistance"
+description "Home cooling assistance per 42 USC 8624(b)(1)(B)"
+
+formula:
+  if not liheap_cooling_eligible: return 0
+
+  # Cooling assistance is typically a smaller portion
+  # Some states have separate cooling programs
+  return liheap * 0.5  # Illustrative; varies by state
+
+default 0

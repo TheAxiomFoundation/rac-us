@@ -16,8 +16,8 @@
 #   - Taxpayer must be legally obligated to pay
 #
 # Parameters: statute/26/221/parameters.yaml
-# Deduction formula: statute/26/221/a/student_loan_deduction.cosilico
-# Definitions: statute/26/221/b/qualified_loan.cosilico
+# Deduction formula: statute/26/221/a/student_loan_deduction.rac
+# Definitions: statute/26/221/b/qualified_loan.rac
 
 reference: "26 USC Section 221"
 tax_year: 2024

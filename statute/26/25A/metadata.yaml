@@ -33,10 +33,10 @@ sources:
       title: "American Opportunity and Lifetime Learning Credits"
       path: statute/26/25A/
       files:
-        - a/education_credits.cosilico    # Combined credits per § 25A(a)
-        - b/aoc.cosilico                  # American Opportunity Credit
+        - a/education_credits.rac    # Combined credits per § 25A(a)
+        - b/aoc.rac                  # American Opportunity Credit
         - b/aoc_parameters.yaml           # AOC parameters
-        - c/llc.cosilico                  # Lifetime Learning Credit
+        - c/llc.rac                  # Lifetime Learning Credit
         - c/llc_parameters.yaml           # LLC parameters
         - d/phaseout_parameters.yaml      # Phaseout thresholds
         - i/refundable_parameters.yaml    # AOC refundable portion
@@ -103,7 +103,7 @@ architecture:
       description: "Allowance of credit (sum of AOC and LLC)"
       variable: education_credit
       files:
-        - a/education_credits.cosilico
+        - a/education_credits.rac
 
     - provision: "Section 25A(b)"
       description: "American Opportunity Credit calculation"

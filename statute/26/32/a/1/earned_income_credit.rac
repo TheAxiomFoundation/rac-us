@@ -1,0 +1,43 @@
+# 26 USC 32(a)(1) - Earned Income Credit
+#
+# "In the case of an eligible individual, there shall be allowed as a credit
+# against the tax imposed by this subtitle for the taxable year an amount
+# equal to the credit percentage of so much of the taxpayer's earned income
+# for the taxable year as does not exceed the earned income amount."
+#
+# Eligibility requirements (checked by is_eligible_individual):
+# - 32(c)(1)(A): Has qualifying children OR meets childless requirements (age 25-64, US abode)
+# - 32(c)(1)(B): Not a qualifying child of another taxpayer
+# - 32(c)(1)(C): No foreign earned income exclusion (Form 2555)
+# - 32(c)(1)(D): Not a nonresident alien
+# - 32(c)(1)(E): Valid SSN for taxpayer and spouse (if filing jointly)
+# - 32(d): Not married filing separately
+# - 32(i): Disqualified (investment) income under limit ($11,600 for 2024)
+
+imports:
+  earned_income: statute/26/32/c/2/A/earned_income
+  adjusted_gross_income: statute/26/62/a/adjusted_gross_income
+  filing_status: statute/26/1/filing_status
+  is_eligible_individual: statute/26/32/c/1/A/i/is_eligible_individual
+  initial_credit_amount: statute/26/32/a/2/A/initial_credit_amount
+  credit_reduction_amount: statute/26/32/a/2/B/credit_reduction_amount
+  agi_limit: statute/26/32/b/2/A/agi_limit
+
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Earned Income Tax Credit"
+description "Refundable credit for low-to-moderate income working individuals and families per 26 USC 32(a)(1)"
+
+formula:
+  # is_eligible_individual checks all requirements from 32(c), 32(d), and 32(i)
+  if not is_eligible_individual: return 0
+
+  # Credit = phase-in amount minus phase-out reduction, but not below zero
+  return max(0, initial_credit_amount - credit_reduction_amount)
+
+defined_for:
+  earned_income > 0 and adjusted_gross_income < agi_limit
+
+default 0

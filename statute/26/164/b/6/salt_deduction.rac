@@ -1,0 +1,121 @@
+# 26 USC § 164(b)(6) - SALT Deduction Cap (TCJA 2018-2025)
+#
+# "(A) IN GENERAL.—In the case of an individual, the aggregate amount of taxes
+#      taken into account under subsection (a) for any taxable year shall not exceed
+#      $10,000 ($5,000 in the case of a married individual filing a separate return).
+#
+#  (B) EXCEPTION FOR FOREIGN REAL PROPERTY TAXES.—Subparagraph (A) shall not
+#      apply to any foreign real property taxes described in subsection (a)(3).
+#
+#  (C) TERMINATION.—This paragraph shall not apply to taxable years beginning
+#      after December 31, 2025."
+#
+# This module applies the limitation from the Tax Cuts and Jobs Act (P.L. 115-97).
+# The deductible taxes under § 164(a) are defined in statute/26/164/a/.
+
+imports:
+  deductible_taxes: statute/26/164/a/deductible_taxes
+  filing_status: statute/26/1/filing_status
+
+# --- Input Variables (defined in § 164(a)) ---
+# These are re-declared here for standalone use; prefer imports from 164/a
+
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "State Income Tax Paid"
+description "State and local income taxes paid or withheld"
+
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Real Property Tax Paid"
+description "State and local real property taxes paid"
+
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Personal Property Tax Paid"
+description "State and local personal property taxes paid"
+
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Sales Tax Paid"
+description "General sales taxes paid (alternative to state income tax deduction)"
+
+entity TaxUnit
+period Year
+dtype Boolean
+label "Elects Sales Tax Deduction"
+description "Whether taxpayer elects to deduct sales tax instead of income tax"
+default false
+
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Foreign Real Property Tax Paid"
+description "Foreign real property taxes (exempt from SALT cap per § 164(b)(6)(B))"
+
+entity TaxUnit
+period Year
+dtype String
+label "Filing Status"
+description "Tax filing status: JOINT, SINGLE, HEAD_OF_HOUSEHOLD, MARRIED_SEPARATE"
+
+# --- Calculated Variables ---
+
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "SALT Before Cap"
+description "Total state and local taxes before applying the $10,000 cap"
+
+formula:
+  # Choose income tax or sales tax per taxpayer election
+  income_or_sales = if elects_sales_tax : sales_tax else state_income_tax
+
+  # Sum all SALT components
+  real_property_tax + personal_property_tax + income_or_sales
+
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "SALT Cap Amount"
+description "Applicable SALT cap based on filing status"
+
+formula:
+  if filing_status == "MARRIED_SEPARATE":
+    return parameters.statute.26.164.b.6.salt_cap_married_separate
+  return parameters.statute.26.164.b.6.salt_cap
+
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "SALT Deduction"
+description "State and local tax deduction after applying the cap"
+
+formula:
+  # Apply cap to domestic SALT
+  capped_salt = min(salt_before_cap, salt_cap_amount)
+
+  # Foreign real property tax is exempt from cap per § 164(b)(6)(B)
+  capped_salt + foreign_real_property_tax
+
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "SALT Cap Reduction"
+description "Amount of SALT disallowed due to the $10,000 cap"
+
+formula:
+  max(0, salt_before_cap - salt_cap_amount)

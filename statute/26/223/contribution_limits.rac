@@ -1,0 +1,199 @@
+# 26 USC Section 223(b) - HSA Contribution Limits
+#
+# "(b) Limitations.—
+#   (1) In general.—The amount allowable as a deduction under subsection
+#       (a) to an individual for the taxable year shall not exceed the
+#       sum of the monthly limitations for months during such taxable
+#       year that the individual is an eligible individual.
+#   (2) Monthly limitation.—The monthly limitation for any month is
+#       1/12 of—
+#     (A) in the case of an eligible individual who has self-only
+#         coverage under a high deductible health plan as of the first
+#         day of such month, $2,250 ($4,150 for 2024), and
+#     (B) in the case of an eligible individual who has family
+#         coverage under a high deductible health plan as of the first
+#         day of such month, $4,500 ($8,300 for 2024).
+#   (3) Additional contributions for individuals 55 or older.—
+#     (A) In general.—In the case of an individual who has attained
+#         age 55 before the close of the taxable year, the applicable
+#         limitation under subparagraphs (A) and (B) of paragraph (2)
+#         shall be increased by the additional contribution amount.
+#     (B) Additional contribution amount.—For purposes of this section,
+#         the term 'additional contribution amount' means $1,000.
+#   (5) Special rule for married individuals.—In the case of individuals
+#       who are married to each other, if either spouse has family
+#       coverage—
+#     (A) both shall be treated as having only such family coverage,
+#         and
+#     (B) the limitation under paragraph (1) shall be divided equally
+#         between them unless they agree on a different division.
+#   (6) Denial of deduction to dependents.—No deduction shall be
+#       allowed under this section to any individual with respect to
+#       whom a deduction under section 151 is allowable to another
+#       taxpayer for a taxable year beginning in the calendar year in
+#       which such individual's taxable year begins.
+#   (7) Medicare eligible individuals.—The limitation under this
+#       subsection for any month with respect to an individual shall
+#       be zero for the first month such individual is entitled to
+#       benefits under title XVIII of the Social Security Act and for
+#       each month thereafter."
+
+imports:
+# HDHP requirements from Section 223(c)
+  hdhp_coverage_type: statute/26/223/c/hdhp_coverage_type
+  is_qualifying_hdhp: statute/26/223/c/is_qualifying_hdhp
+  has_disqualifying_health_coverage: statute/26/223/c/has_disqualifying_health_coverage
+  is_enrolled_in_medicare: statute/26/223/c/is_enrolled_in_medicare
+  can_be_claimed_as_dependent: statute/26/223/c/can_be_claimed_as_dependent
+
+parameters:
+# Annual contribution limit - self-only coverage (indexed)
+# 2024: $4,150 per Rev. Proc. 2023-22
+  contribution_limit_self_only: 4150
+
+# Annual contribution limit - family coverage (indexed)
+# 2024: $8,300 per Rev. Proc. 2023-22
+  contribution_limit_family: 8300
+
+# Catch-up contribution for age 55+ (fixed at $1,000)
+  catch_up_contribution: 1000
+
+# Age threshold for catch-up contributions
+  catch_up_age: 55
+
+# Input variable: Individual's age at end of tax year
+entity Person
+period Year
+dtype Integer
+label "Age"
+description "Individual's age at the end of the taxable year"
+
+# Input variable: Individual's own HSA contributions for the year
+entity Person
+period Year
+dtype Money
+unit "USD"
+label "Own HSA Contributions"
+description "Contributions made by the individual to their HSA"
+default 0
+
+# Input variable: Employer contributions to individual's HSA
+entity Person
+period Year
+dtype Money
+unit "USD"
+label "Employer HSA Contributions"
+description "Contributions made by employer to individual's HSA (excluded from income)"
+default 0
+
+# Derived: Total contributions to HSA
+entity Person
+period Year
+dtype Money
+unit "USD"
+label "Total HSA Contributions"
+description "Total contributions to HSA (self + employer)"
+
+formula:
+  return hsa_contributions_self + hsa_contributions_employer
+
+# Derived: Months of HDHP coverage (simplified as full year if covered)
+# Full implementation would track monthly eligibility
+entity Person
+period Year
+dtype Integer
+label "Months of HDHP Coverage"
+description "Number of months individual was covered by qualifying HDHP"
+default 12
+
+# Derived: Is eligible for HSA contributions?
+entity Person
+period Year
+dtype Boolean
+label "HSA Eligible"
+description "Whether individual is an eligible individual for HSA purposes"
+
+formula:
+  # Must have qualifying HDHP coverage
+  if not is_qualifying_hdhp: return false
+
+  # Cannot have disqualifying coverage
+  if has_disqualifying_health_coverage: return false
+
+  # Cannot be enrolled in Medicare - 223(b)(7)
+  if is_enrolled_in_medicare: return false
+
+  # Cannot be claimed as dependent - 223(b)(6)
+  if can_be_claimed_as_dependent: return false
+
+  return true
+
+# Derived: Is eligible for catch-up contribution?
+entity Person
+period Year
+dtype Boolean
+label "HSA Catch-up Eligible"
+description "Whether individual is eligible for HSA catch-up contribution (age 55+)"
+
+formula:
+  return is_hsa_eligible and age >= catch_up_age
+
+# Derived: Base contribution limit (before catch-up)
+entity Person
+period Year
+dtype Money
+unit "USD"
+label "HSA Base Contribution Limit"
+description "Base HSA contribution limit based on coverage type"
+
+formula:
+  if not is_hsa_eligible: return 0
+  if hdhp_coverage_type == self_only: return contribution_limit_self_only
+  if hdhp_coverage_type == family: return contribution_limit_family
+  return 0
+
+# Derived: Prorated limit based on months of coverage
+entity Person
+period Year
+dtype Money
+unit "USD"
+label "HSA Prorated Contribution Limit"
+description "HSA contribution limit prorated for partial year coverage"
+
+formula:
+  if not is_hsa_eligible: return 0
+
+  # Prorate based on months of coverage
+  base = hsa_base_contribution_limit
+  monthly_limit = base / 12
+  return monthly_limit * months_hdhp_coverage
+
+# Derived: Total contribution limit including catch-up
+entity Person
+period Year
+dtype Money
+unit "USD"
+label "HSA Contribution Limit"
+description "Maximum allowable HSA contribution including catch-up"
+
+formula:
+  if not is_hsa_eligible: return 0
+
+  base = hsa_prorated_limit
+
+  # Add catch-up contribution if age 55+ (prorated based on months eligible)
+  catch_up_monthly = catch_up_contribution / 12
+  prorated_catch_up = catch_up_monthly * months_hdhp_coverage
+  return is_hsa_catch_up_eligible ? (base + prorated_catch_up) : base
+
+# Derived: Excess contributions (subject to 6% excise tax under 4973)
+entity Person
+period Year
+dtype Money
+unit "USD"
+label "HSA Excess Contributions"
+description "Contributions exceeding the limit (subject to excise tax)"
+
+formula:
+  excess = hsa_contributions_total - hsa_contribution_limit
+  return max(0, excess)

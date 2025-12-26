@@ -1,0 +1,27 @@
+# Phaseout Threshold - Depends on Filing Status
+# 26 USC Section 469(i)(3)
+
+imports:
+  filing_status: statute/26/1/filing_status
+  lived_apart_from_spouse_all_year: inputs/lived_apart_from_spouse_all_year
+  phaseout_start: parameters#rental_real_estate.phaseout_start
+  phaseout_start_mfs: parameters#rental_real_estate.phaseout_start_mfs
+
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Rental Real Estate Phaseout Threshold"
+description "Modified AGI threshold where phaseout begins per 26 USC 469(i)(3)"
+
+formula:
+  # Per 469(i)(5)(B): MFS living apart uses $50,000 threshold
+  # All others (including MFS living together, who get $0 anyway) use $100,000
+
+  is_mfs = filing_status == "married_separate"
+  lived_apart = lived_apart_from_spouse_all_year
+
+  if is_mfs and lived_apart: return phaseout_start_mfs
+  return phaseout_start
+
+default 100000

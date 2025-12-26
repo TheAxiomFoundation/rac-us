@@ -26,26 +26,26 @@ subsections:
     title: "Allowance of Deduction"
     description: "Main deduction = lesser of combined QBI amount or 20% of (taxable income - capital gains)"
     files:
-      - a/qbi_deduction.cosilico
+      - a/qbi_deduction.rac
 
   b:
     title: "Combined Qualified Business Income Amount"
     description: "W-2 wage and UBIA limitations on the deduction"
     files:
-      - b/w2_wage_limitation.cosilico
+      - b/w2_wage_limitation.rac
       - b/parameters.yaml
 
   c:
     title: "Qualified Business Income"
     description: "Definition and components of QBI"
     files:
-      - c/qualified_business_income.cosilico
+      - c/qualified_business_income.rac
 
   d:
     title: "Qualified Trade or Business"
     description: "SSTB definitions and phase-out rules"
     files:
-      - d/sstb.cosilico
+      - d/sstb.rac
 
   e:
     title: "Other Definitions"

@@ -1,0 +1,371 @@
+# 26 USC 36B(a) - Premium Tax Credit
+#
+# "(a) IN GENERAL.--In the case of an applicable taxpayer, there shall be
+#  allowed as a credit against the tax imposed by this subtitle for any
+#  taxable year an amount equal to the premium assistance credit amount
+#  of the taxpayer for the taxable year."
+#
+# The Premium Tax Credit (PTC) helps eligible individuals and families pay
+# for health insurance purchased through the Health Insurance Marketplace
+# (Exchanges established under the Affordable Care Act).
+#
+# Key provisions:
+# - Section 36B(a): Credit allowance
+# - Section 36B(b): Premium assistance credit amount calculation
+# - Section 36B(c): Definition of applicable taxpayer
+# - Section 36B(d): Definitions (coverage month, SLCSP, household income)
+#
+# Credit formula per 36B(b)(2):
+#   Credit = Benchmark Premium - Expected Contribution
+#   Where:
+#     Benchmark = Second Lowest Cost Silver Plan (SLCSP) premium
+#     Expected Contribution = Household Income * Applicable Percentage
+#
+# Modified by:
+# - Inflation Reduction Act of 2022 (P.L. 117-169): Extended through 2025
+# - American Rescue Plan Act of 2021 (P.L. 117-2): Enhanced for 2021-2022
+#
+# Sources:
+# - https://www.law.cornell.edu/uscode/text/26/36B
+# - https://www.healthcare.gov/glossary/premium-tax-credit/
+
+imports:
+# Income and AGI
+  adjusted_gross_income: statute/26/62/a/adjusted_gross_income
+  filing_status: statute/26/1/filing_status
+
+# Applicable percentage calculation
+  applicable_percentage: statute/26/36B/b/applicable_percentage
+  expected_contribution: statute/26/36B/b/expected_contribution
+
+# FPL parameters
+  fpl_first_person: statute/26/36B/federal_poverty_level/2024/first_person
+  fpl_additional_person: statute/26/36B/federal_poverty_level/2024/additional_person
+
+# Income eligibility
+  income_lower_limit: statute/26/36B/income_eligibility/lower_limit
+  income_upper_limit_ira: statute/26/36B/income_eligibility/upper_limit_ira
+
+# =============================================================================
+# HOUSEHOLD SIZE AND FPL CALCULATIONS
+# 26 USC 36B(d)(1) - "Household income"
+# 26 USC 36B(d)(3) - "Federal poverty line"
+# =============================================================================
+
+# Household size for FPL purposes
+entity TaxUnit
+period Year
+dtype Integer
+label "PTC Household Size"
+description "Household size for FPL determination per 26 USC 36B(d)(1)"
+
+formula:
+  # Household includes:
+  # - Taxpayer
+  # - Spouse (if filing jointly)
+  # - All dependents claimed
+  return tax_unit_size
+
+# Federal Poverty Level for household
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "FPL for PTC Household"
+description "Federal poverty level for household size per 26 USC 36B(d)(3)"
+"HHS Poverty Guidelines"
+
+formula:
+  size = ptc_household_size
+
+  # FPL = First person amount + (additional persons * additional amount)
+  if size <= 0: return 0
+
+  return fpl_first_person + max(0, size - 1) * fpl_additional_person
+
+# Household income as percentage of FPL
+entity TaxUnit
+period Year
+dtype Rate
+unit "/1"
+label "Household Income as % FPL"
+description "Household income relative to federal poverty level"
+
+formula:
+  income = household_income
+  fpl = ptc_federal_poverty_level
+
+  if fpl <= 0: return 0
+
+  return income / fpl
+
+# =============================================================================
+# HOUSEHOLD INCOME DEFINITION
+# 26 USC 36B(d)(2) - "Household income"
+# =============================================================================
+
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Household Income for PTC"
+description "Modified AGI of taxpayer plus modified AGI of dependents per 26 USC 36B(d)(2)"
+
+formula:
+  # Household income = MAGI of taxpayer (and spouse) + MAGI of dependents
+  # who are required to file
+  #
+  # MAGI for 36B purposes = AGI + tax-exempt interest + foreign earned income
+  # + nontaxable Social Security benefits
+
+  # For simplicity, using AGI as approximation
+  # Full implementation would add excluded foreign income and nontaxable SS
+  return adjusted_gross_income
+
+# =============================================================================
+# APPLICABLE TAXPAYER ELIGIBILITY
+# 26 USC 36B(c)(1) - "Applicable taxpayer"
+# =============================================================================
+
+# Filing status check - MFS generally excluded
+entity TaxUnit
+period Year
+dtype Boolean
+label "PTC Filing Status Eligible"
+description "Eligible filing status per 26 USC 36B(c)(1)(C)"
+
+formula:
+  # Married filing separately is generally ineligible
+  # Exception: Victims of domestic abuse or spousal abandonment
+  return filing_status != "separate"
+
+# Income eligibility check
+entity TaxUnit
+period Year
+dtype Boolean
+label "PTC Income Eligible"
+description "Household income within eligible range per 26 USC 36B(c)(1)(A)"
+"P.L. 117-169 Section 12001 (IRA)"
+
+formula:
+  income_pct = household_income_pct_fpl
+
+  # Must be at least 100% FPL
+  # Those below 100% may be eligible for Medicaid
+  if income_pct < income_lower_limit: return false
+
+  # Under IRA (2021-2025): No upper limit
+  # Credit phases out naturally via 8.5% contribution rate
+  # Pre-IRA: Hard cliff at 400% FPL
+
+  # Using IRA upper limit (effectively no limit through 2025)
+  return income_pct <= income_upper_limit_ira
+
+# Dependent exclusion check
+entity TaxUnit
+period Year
+dtype Boolean
+label "PTC Not Claimed as Dependent"
+description "Not claimed as dependent by another per 26 USC 36B(c)(1)(D)"
+
+formula:
+  # Taxpayer cannot be claimed as dependent by another
+  return not is_tax_unit_dependent
+
+# Combined applicable taxpayer eligibility
+entity TaxUnit
+period Year
+dtype Boolean
+label "Is Applicable Taxpayer"
+description "Meets all requirements for PTC per 26 USC 36B(c)(1)"
+
+formula:
+  # All conditions must be met
+  if not ptc_filing_status_eligible: return false
+
+  if not ptc_income_eligible: return false
+
+  if not ptc_not_dependent: return false
+
+  return true
+
+# =============================================================================
+# COVERAGE MONTH AND SLCSP
+# 26 USC 36B(b)(2)(A) and 36B(c)(2)
+# =============================================================================
+
+# Number of coverage months
+entity TaxUnit
+period Year
+dtype Integer
+label "Coverage Months"
+description "Number of months enrolled in qualified health plan per 26 USC 36B(c)(2)"
+
+# This would typically be an input variable
+# A coverage month is one where:
+# - Individual is covered by qualified health plan through Exchange
+# - Premium is paid by taxpayer
+# - Individual is not eligible for other minimum essential coverage
+#   (employer plan, Medicare, Medicaid, CHIP, etc.)
+
+default 0
+
+# Second Lowest Cost Silver Plan (SLCSP) benchmark premium
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "SLCSP Annual Premium"
+description "Second lowest cost silver plan premium for coverage area per 26 USC 36B(b)(3)(B)"
+
+# This is determined by the Marketplace based on:
+# - Rating area (geographic location)
+# - Ages of covered individuals
+# - Family composition
+#
+# Would be an input variable in practice
+
+default 0
+
+# Monthly SLCSP premium
+entity TaxUnit
+period Month
+dtype Money
+unit "USD"
+label "Monthly SLCSP Premium"
+description "Monthly portion of SLCSP premium"
+
+formula:
+  return slcsp_premium / 12
+
+# =============================================================================
+# PREMIUM ASSISTANCE CREDIT AMOUNT
+# 26 USC 36B(b)(1) and (2)
+# =============================================================================
+
+# Monthly credit amount per coverage month
+entity TaxUnit
+period Month
+dtype Money
+unit "USD"
+label "Monthly PTC Amount"
+description "Premium tax credit for coverage month per 26 USC 36B(b)(2)"
+
+formula:
+  # Credit = Benchmark Premium - Expected Contribution
+  # But cannot be negative
+  benchmark = slcsp_premium_monthly
+  contribution = expected_contribution_monthly
+
+  return max(0, benchmark - contribution)
+
+# Annual premium assistance credit amount
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Premium Assistance Credit Amount"
+description "Total annual premium tax credit per 26 USC 36B(b)(1)"
+
+formula:
+  # "(b) PREMIUM ASSISTANCE CREDIT AMOUNT.--
+  #  (1) IN GENERAL.--The premium assistance credit amount of the taxpayer
+  #      for any taxable year is the sum of the premium assistance amounts
+  #      determined under paragraph (2) with respect to all coverage months
+  #      of the taxpayer occurring during the taxable year."
+
+  months = ptc_coverage_months
+  benchmark = slcsp_premium
+  contribution = expected_contribution
+
+  # Annual credit = (Annual Benchmark - Annual Contribution) * (Coverage Months / 12)
+  annual_max_credit = max(0, benchmark - contribution)
+
+  # Pro-rate for actual coverage months
+  return annual_max_credit * months / 12
+
+# =============================================================================
+# PREMIUM TAX CREDIT (FINAL)
+# 26 USC 36B(a)
+# =============================================================================
+
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Premium Tax Credit"
+description "Refundable credit for Marketplace health insurance per 26 USC 36B(a)"
+"P.L. 117-169 Section 12001 (IRA)"
+
+formula:
+  # Check eligibility as applicable taxpayer
+  if not is_applicable_taxpayer: return 0
+
+  # Return the premium assistance credit amount
+  return premium_assistance_credit_amount
+
+default 0
+
+# =============================================================================
+# ADVANCE PAYMENT RECONCILIATION
+# 26 USC 36B(f) - Reconciliation
+# =============================================================================
+
+# Advance payments received during year
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Advance Premium Tax Credit"
+description "Advance payments of PTC made during year"
+
+# Input variable: total advance payments made to insurer
+
+default 0
+
+# Net PTC adjustment on return
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Net PTC Adjustment"
+description "Reconciliation of actual PTC vs advance payments per 26 USC 36B(f)"
+
+formula:
+  actual_credit = premium_tax_credit
+  advance = advance_ptc
+
+  # Positive = Additional credit due (refund)
+  # Negative = Excess advance (repayment required)
+  return actual_credit - advance
+
+# Excess advance PTC repayment
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Excess Advance PTC Repayment"
+description "Additional tax due for excess advance payments per 26 USC 36B(f)(2)"
+
+formula:
+  adjustment = net_ptc_adjustment
+
+  # If negative, taxpayer received too much advance credit
+  if adjustment >= 0: return 0
+
+  # Repayment required (as positive amount for tax liability)
+  return -adjustment
+
+# Additional PTC refund
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Additional PTC Refund"
+description "Additional refund if actual PTC exceeds advance payments"
+
+formula:
+  adjustment = net_ptc_adjustment
+
+  # If positive, taxpayer is owed additional credit
+  return max(0, adjustment)

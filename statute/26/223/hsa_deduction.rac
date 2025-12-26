@@ -1,0 +1,149 @@
+# 26 USC Section 223 - Health Savings Accounts
+#
+# "(a) Deduction allowed.—In the case of an individual who is an
+#     eligible individual for any month during the taxable year,
+#     there shall be allowed as a deduction for the taxable year
+#     an amount equal to the aggregate amount paid in cash during
+#     such taxable year by or on behalf of such individual to a
+#     health savings account of such individual."
+#
+# Section 223 establishes Health Savings Accounts (HSAs) which provide:
+# 1. Above-the-line deduction for contributions (223(a))
+# 2. Tax-free growth (223(e))
+# 3. Tax-free distributions for qualified medical expenses (223(f))
+#
+# Key eligibility requirements:
+# - Must be covered by a High Deductible Health Plan (HDHP) - 223(c)(1)
+# - Cannot be enrolled in Medicare - 223(b)(7)
+# - Cannot be claimed as a dependent - 223(b)(6)
+# - Cannot have disqualifying non-HDHP coverage - 223(c)(1)(A)(ii)
+#
+# 2024 Contribution Limits (Rev. Proc. 2023-22):
+# - Self-only: $4,150
+# - Family: $8,300
+# - Catch-up (age 55+): additional $1,000
+#
+# 2024 HDHP Requirements (Rev. Proc. 2023-22):
+# - Minimum deductible: $1,600 self / $3,200 family
+# - Maximum OOP: $8,050 self / $16,100 family
+
+imports:
+# Eligibility from 223(c)
+  is_hsa_eligible: statute/26/223/b/is_hsa_eligible
+  is_qualifying_hdhp: statute/26/223/c/is_qualifying_hdhp
+  hdhp_coverage_type: statute/26/223/c/hdhp_coverage_type
+
+# Contribution variables from 223(b)
+  hsa_contributions_self: statute/26/223/b/hsa_contributions_self
+  hsa_contributions_employer: statute/26/223/b/hsa_contributions_employer
+  hsa_contribution_limit: statute/26/223/b/hsa_contribution_limit
+  hsa_excess_contributions: statute/26/223/b/hsa_excess_contributions
+
+# Eligibility blockers
+  is_enrolled_in_medicare: statute/26/223/c/is_enrolled_in_medicare
+  can_be_claimed_as_dependent: statute/26/223/c/can_be_claimed_as_dependent
+
+# Main deduction variable - 26 USC 223(a)
+entity Person
+period Year
+dtype Money
+unit "USD"
+label "HSA Deduction"
+description "Above-the-line deduction for Health Savings Account contributions"
+"Rev. Proc. 2023-22"
+
+formula:
+  # Must be an eligible individual
+  if not is_hsa_eligible:
+  return 0
+
+# Deduction is for self contributions only (employer contributions
+# are excluded from income under 223(b)(4), not deducted)
+# Deduction limited to contribution limit
+return min(hsa_contributions_self, hsa_contribution_limit)
+
+defined_for:
+  is_qualifying_hdhp and not is_enrolled_in_medicare
+
+default 0
+
+# Tax unit level aggregation for AGI calculation
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Total HSA Deduction"
+description "Combined HSA deduction for all members of the tax unit"
+
+formula:
+  return sum(members.hsa_deduction)
+
+# Input variable: HSA distributions during the year
+entity Person
+period Year
+dtype Money
+unit "USD"
+label "HSA Distributions"
+description "Total distributions from Health Savings Account during the year"
+default 0
+
+# Input variable: Qualified medical expenses paid from HSA
+entity Person
+period Year
+dtype Money
+unit "USD"
+label "HSA Qualified Medical Expenses"
+description "Medical expenses paid from HSA that qualify under 26 USC 213(d)"
+default 0
+
+# Derived: Non-qualified HSA distributions (taxable + penalty)
+entity Person
+period Year
+dtype Money
+unit "USD"
+label "HSA Non-Qualified Distributions"
+description "HSA distributions not used for qualified medical expenses"
+
+formula:
+  nonqualified = hsa_distributions - hsa_qualified_medical_expenses
+  return max(0, nonqualified)
+
+# Input variable: Is disabled?
+entity Person
+period Year
+dtype Boolean
+label "Is Disabled"
+description "Whether the individual is disabled under 26 USC 72(m)(7)"
+default false
+
+# Derived: Is subject to additional tax on non-qualified distributions?
+entity Person
+period Year
+dtype Boolean
+label "Subject to HSA Penalty"
+description "Whether non-qualified distributions are subject to 20% penalty"
+
+formula:
+  # Exceptions to 20% penalty:
+  # - Age 65 or older (Medicare age)
+  # - Disabled
+  # - Death (beneficiary distributions)
+  if age >= 65:
+  return false
+if is_disabled:
+return false
+return hsa_nonqualified_distributions > 0
+
+# Derived: Additional tax on non-qualified HSA distributions
+entity Person
+period Year
+dtype Money
+unit "USD"
+label "HSA Additional Tax"
+description "20% additional tax on non-qualified HSA distributions"
+
+formula:
+  if not is_subject_to_hsa_penalty:
+  return 0
+# 20% penalty on non-qualified distributions
+return hsa_nonqualified_distributions * 0.20

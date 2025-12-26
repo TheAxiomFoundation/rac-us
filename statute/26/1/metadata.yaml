@@ -26,8 +26,8 @@ sources:
       title: "Tax imposed"
       path: statute/26/1/
       files:
-        - income_tax.cosilico        # Main bracket calculation
-        - filing_status.cosilico     # Filing status enum
+        - income_tax.rac        # Main bracket calculation
+        - filing_status.rac     # Filing status enum
         - brackets/rates.yaml        # Fixed tax rates
         - brackets/base_thresholds.yaml  # 2018 base thresholds
         - brackets/thresholds_2024.yaml  # 2024 indexed thresholds

@@ -202,8 +202,8 @@ def main():
 
     base_dir = Path('/Users/maxghenis/CosilicoAI/cosilico-us/statute')
 
-    files = list(base_dir.rglob('*.cosilico'))
-    print(f"Found {len(files)} .cosilico files")
+    files = list(base_dir.rglob('*.rac'))
+    print(f"Found {len(files)} .rac files")
 
     changed = 0
     for filepath in files:

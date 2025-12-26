@@ -31,7 +31,7 @@ sources:
       path: ../../../statute/26/32/
       files:
         - text.md       # Full statute text
-        - formula.cosilico  # Formula encoding
+        - formula.rac  # Formula encoding
 
   guidance:
     - citation: "Rev. Proc. 2022-38"
@@ -55,7 +55,7 @@ architecture:
 
     1. STATUTE layer (data/federal/statute/26/32/)
        - text.md: Full statute text from uscode.house.gov
-       - formula.cosilico: Encodes the calculation rules
+       - formula.rac: Encodes the calculation rules
          - Fixed percentages (§ 32(b)(1))
          - Base year amounts (§ 32(b)(2))
          - Indexing rules (§ 32(b)(3), § 32(i)(3))

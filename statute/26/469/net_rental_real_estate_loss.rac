@@ -1,0 +1,18 @@
+# Net Rental Real Estate Loss - For Exception Calculation
+# 26 USC Section 469(i)
+
+imports:
+  rental_real_estate_loss: inputs/rental_real_estate_loss
+  rental_real_estate_income: inputs/rental_real_estate_income
+
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Net Rental Real Estate Loss"
+description "Losses from rental real estate activities exceeding income per 26 USC 469(i)"
+
+formula:
+  return max(0, rental_real_estate_loss - rental_real_estate_income)
+
+default 0

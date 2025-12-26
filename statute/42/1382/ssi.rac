@@ -1,0 +1,79 @@
+# 42 USC 1382 - Supplemental Security Income (SSI)
+#
+# SSI provides monthly cash assistance to aged, blind, and disabled
+# individuals with limited income and resources.
+#
+# Eligibility requirements (42 USC 1382(a)):
+#   (1)(A) Aged (65+), blind, or disabled
+#   (1)(B) Citizen or qualified alien, US resident
+#   (3)(B) Resources not exceeding $2,000 ($3,000 couple)
+#
+# Benefit calculation (42 USC 1382(b)):
+#   SSI = FBR - countable income
+#   Subject to living arrangement reductions per 42 USC 1382(a)(2)(A)
+
+imports:
+# Eligibility components
+  is_ssi_categorical_eligible: statute/42/1382/a/age_requirement/is_ssi_categorical_eligible
+  is_ssi_resource_eligible: statute/42/1382/a/resource_test/is_ssi_resource_eligible
+  is_ssi_citizenship_eligible: statute/42/1382/a/citizenship/is_ssi_citizenship_eligible
+  is_ssi_residency_eligible: statute/42/1382/a/citizenship/is_ssi_residency_eligible
+
+# Income components
+  ssi_countable_income: statute/42/1382a/income_exclusions/ssi_countable_income
+
+# Benefit components
+  applicable_fbr: statute/42/1382/b/federal_benefit_rate/applicable_fbr
+  federal_benefit_rate: statute/42/1382/b/federal_benefit_rate/federal_benefit_rate
+
+# Income eligibility - countable income must not exceed FBR
+entity Person
+period Month
+dtype Boolean
+label "SSI income eligibility"
+description "Countable income does not exceed FBR per 42 USC 1382(a)"
+
+formula:
+  return ssi_countable_income <= federal_benefit_rate
+
+default false
+
+# Overall SSI eligibility
+entity Person
+period Month
+dtype Boolean
+label "SSI eligibility"
+description "All SSI eligibility requirements met per 42 USC 1382"
+"42 USC 1382(a)",
+"42 USC 1382c"
+
+formula:
+  # All requirements must be met
+  return is_ssi_categorical_eligible
+  and is_ssi_resource_eligible
+  and is_ssi_citizenship_eligible
+  and is_ssi_residency_eligible
+  and is_ssi_income_eligible
+
+default false
+
+# SSI benefit amount
+entity Person
+period Month
+dtype Money
+unit "USD"
+label "Supplemental Security Income"
+description "Monthly SSI payment per 42 USC 1382(b)"
+"42 USC 1382(b)",
+"42 USC 1382a"
+
+formula:
+  if not is_ssi_eligible: return 0
+
+  # SSI = applicable FBR - countable income
+  benefit = applicable_fbr - ssi_countable_income
+
+  # Benefit cannot be negative
+  return max(0, benefit)
+
+default 0

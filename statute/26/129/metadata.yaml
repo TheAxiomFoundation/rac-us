@@ -30,10 +30,10 @@ sources:
       title: "Dependent care assistance programs"
       path: statute/26/129/
       files:
-        - a/exclusion.cosilico           # Main exclusion calculation
-        - a/inputs.cosilico              # Input variables
-        - b/earned_income_limit.cosilico # Earned income limitation
-        - d/requirements.cosilico        # Program requirements
+        - a/exclusion.rac           # Main exclusion calculation
+        - a/inputs.rac              # Input variables
+        - b/earned_income_limit.rac # Earned income limitation
+        - d/requirements.rac        # Program requirements
         - e/parameters.yaml              # Dollar limits
 
   guidance:
@@ -52,12 +52,12 @@ architecture:
     1. 129(a) - Exclusion from Gross Income
        - Amounts paid or incurred by employer for dependent care assistance
        - Up to applicable dollar limit per 129(a)(2)
-       - a/exclusion.cosilico
+       - a/exclusion.rac
 
     2. 129(b) - Earned Income Limitation
        - Cannot exceed lesser of employee's or spouse's earned income
        - Special rule for disabled or student spouse
-       - b/earned_income_limit.cosilico
+       - b/earned_income_limit.rac
 
     3. 129(c) - Payments to Related Individuals
        - Not includible if paid to dependents or children under 19

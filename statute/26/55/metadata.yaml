@@ -44,7 +44,7 @@ implementation:
   test_coverage: "comprehensive"
 
   components:
-    - path: "a/amt.cosilico"
+    - path: "a/amt.rac"
       description: "Core AMT calculation: exemption, TMT, AMT"
       variables:
         - amt_exemption_base
@@ -59,7 +59,7 @@ implementation:
     - path: "b/1/rate.yaml"
       description: "AMT tax rates (26% and 28%)"
 
-    - path: "b/2/amti.cosilico"
+    - path: "b/2/amti.rac"
       description: "AMTI calculation from taxable income + adjustments + preferences"
       variables:
         - alternative_minimum_taxable_income
@@ -74,7 +74,7 @@ implementation:
       description: "Exemption phaseout thresholds and rate"
 
   related_sections:
-    - path: "../56/adjustments.cosilico"
+    - path: "../56/adjustments.rac"
       description: "AMT adjustments (SALT, misc deductions, ISO bargain element, etc.)"
       variables:
         - amt_salt_addback
@@ -85,10 +85,10 @@ implementation:
         - amt_iso_adjustment
         - amt_adjustments
 
-    - path: "../57/preferences.cosilico"
+    - path: "../57/preferences.rac"
       description: "Tax preference items (PAB interest, depletion, etc.)"
 
-    - path: "../422/b/iso_bargain_element.cosilico"
+    - path: "../422/b/iso_bargain_element.rac"
       description: "ISO bargain element input variables for AMT adjustment"
 
 # Parameter sources

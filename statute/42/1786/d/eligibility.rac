@@ -1,0 +1,133 @@
+# 42 USC 1786(d) - Eligibility for WIC Program
+#
+# "Persons eligible. - Subject to the availability of funds appropriated for
+# the fiscal year involved and subject to income eligibility standards
+# established by State agencies under paragraph (2)(A) for local agencies
+# or clinics to use in determining eligibility..."
+#
+# "(1) participate in the program only pregnant women, breastfeeding women,
+#      postpartum women, infants, and children who--
+#      (A) are income eligible under clause (i) or (ii) of paragraph (2)(A); and
+#      (B) are determined to be at nutritional risk by a competent professional
+#          authority..."
+#
+# "(3) A State agency may not deny services under this section to an otherwise
+#      eligible applicant solely on the basis of the applicant's failure to meet
+#      a residency requirement..."
+#
+# Note: Nutritional risk assessment cannot be modeled; we assume it is met
+# for any categorically and income-eligible participant. In practice, nearly
+# all applicants who meet categorical and income requirements are found to
+# have some nutritional risk factor.
+#
+# Note: Residency requirement is implemented but WIC explicitly prohibits
+# durational residency requirements (must only be physically present in state).
+
+imports:
+# Categorical eligibility
+  wic_category: statute/42/1786/d/1/wic_category
+  is_wic_categorical_eligible: statute/42/1786/d/1/is_wic_categorical_eligible
+
+# Income eligibility
+  is_wic_person_income_eligible: statute/42/1786/d/2/is_wic_person_income_eligible
+  is_wic_income_eligible: statute/42/1786/d/2/is_wic_income_eligible
+
+# Adjunctive eligibility
+  is_wic_adjunctively_eligible: statute/42/1786/d/3/is_wic_adjunctively_eligible
+
+# =============================================================================
+# RESIDENCY ELIGIBILITY
+# 42 USC 1786(d)(3): Physical presence in state required, but no durational
+# residency requirements allowed
+# =============================================================================
+
+entity Person
+period Month
+dtype Boolean
+
+formula:
+  # 42 USC 1786(d)(3) prohibits durational residency requirements
+  # Person must only be physically present in the state where applying
+  # This is typically captured by is_us_resident at federal level
+  return is_us_resident
+
+# =============================================================================
+# NUTRITIONAL RISK
+# 42 USC 1786(d)(1)(B): Must be at nutritional risk
+# Cannot be modeled - assumed met for modeling purposes
+# =============================================================================
+
+entity Person
+period Month
+dtype Boolean
+
+formula:
+  # Nutritional risk must be determined by a "competent professional
+  # authority" through:
+  # - Anthropometric measurements (height, weight, head circumference)
+  # - Biochemical data (blood tests for anemia, lead)
+  # - Clinical data (medical history)
+  # - Dietary assessment
+  #
+  # Cannot be modeled computationally. In practice, the vast majority
+  # (>90%) of applicants who meet categorical and income requirements
+  # are found to have at least one nutritional risk factor.
+  #
+  # For modeling purposes, we assume nutritional risk is met.
+  return true
+
+# =============================================================================
+# COMBINED ELIGIBILITY DETERMINATION
+# =============================================================================
+
+# Main WIC eligibility determination
+entity Person
+period Month
+dtype Boolean
+
+formula:
+  # 42 USC 1786(d): All requirements must be met
+
+  # (1) Categorical eligibility - must be pregnant, postpartum,
+  #     breastfeeding woman, infant, or child under 5
+  if not is_wic_categorical_eligible: return false
+
+  # (2) Income eligibility - either standard (185% FPL) or adjunctive
+  #     (SNAP/TANF/Medicaid participation)
+  if not is_wic_person_income_eligible: return false
+
+  # (3) Residency - must be physically present in state
+  if not is_wic_residency_eligible: return false
+
+  # (4) Nutritional risk - assumed met for modeling
+  if not is_wic_nutritional_risk_eligible: return false
+
+  return true
+
+# Alternative name for compatibility
+entity Person
+period Month
+dtype Boolean
+
+formula:
+  return wic_eligible
+
+# =============================================================================
+# HOUSEHOLD ELIGIBILITY SUMMARY
+# =============================================================================
+
+# Count of WIC-eligible persons in household
+entity Household
+period Month
+dtype Integer
+
+formula:
+  return sum(members.wic_eligible)
+
+# Whether household has any WIC-eligible member
+entity Household
+period Month
+dtype Boolean
+
+formula:
+  return wic_eligible_count > 0

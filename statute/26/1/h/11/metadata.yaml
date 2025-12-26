@@ -31,8 +31,8 @@ sources:
       title: "Dividends taxed as net capital gain"
       path: statute/26/1/h/11/
       files:
-        - qualified_dividend_income.cosilico  # Total qualified dividend income
-        - is_qualified_dividend.cosilico      # Per-dividend qualification test
+        - qualified_dividend_income.rac  # Total qualified dividend income
+        - is_qualified_dividend.rac      # Per-dividend qualification test
         - parameters.yaml                      # Holding period parameters
 
   guidance:

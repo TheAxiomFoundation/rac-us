@@ -11,40 +11,40 @@ variables:
     entity: TaxUnit
     period: Year
     dtype: Money
-    path: a/taxable_income.cosilico
+    path: a/taxable_income.rac
 
   - name: standard_deduction
     entity: TaxUnit
     period: Year
     dtype: Money
-    path: c/standard_deduction.cosilico
+    path: c/standard_deduction.rac
 
   - name: itemized_taxable_income_deductions
     entity: TaxUnit
     period: Year
     dtype: Money
-    path: d/itemized_deductions.cosilico
+    path: d/itemized_deductions.rac
     description: "Matches PolicyEngine's itemized_taxable_income_deductions"
 
   - name: total_itemized_deductions
     entity: TaxUnit
     period: Year
     dtype: Money
-    path: d/itemized_deductions.cosilico
+    path: d/itemized_deductions.rac
     description: "Alias for itemized_taxable_income_deductions (backward compatibility)"
 
   - name: uses_standard_deduction
     entity: TaxUnit
     period: Year
     dtype: Boolean
-    path: e/deduction_choice.cosilico
+    path: e/deduction_choice.rac
     description: "Whether taxpayer uses standard vs itemized deduction"
 
   - name: taxable_income_deductions
     entity: TaxUnit
     period: Year
     dtype: Money
-    path: e/deduction_choice.cosilico
+    path: e/deduction_choice.rac
     description: "The deduction amount used (larger of standard or itemized)"
 
 coverage:
@@ -72,11 +72,11 @@ sources:
         - e: Election to itemize
         - f: Additional amounts for aged and blind
       files:
-        - a/taxable_income.cosilico       # Main taxable income computation
+        - a/taxable_income.rac       # Main taxable income computation
         - c/2/basic_amounts.yaml          # Basic deduction by filing status
         - c/5/parameters.yaml             # Dependent limitation
-        - d/itemized_deductions.cosilico  # itemized_taxable_income_deductions
-        - e/deduction_choice.cosilico     # uses_standard_deduction, taxable_income_deductions
+        - d/itemized_deductions.rac  # itemized_taxable_income_deductions
+        - e/deduction_choice.rac     # uses_standard_deduction, taxable_income_deductions
         - f/1/aged_amount.yaml            # Additional for aged
         - f/2/blind_amount.yaml           # Additional for blind
 

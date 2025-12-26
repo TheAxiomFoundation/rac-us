@@ -1,0 +1,314 @@
+# 42 USC 1396a(e)(14) - Modified Adjusted Gross Income (MAGI)
+#
+# "(14) INCOME DETERMINED USING MODIFIED ADJUSTED GROSS INCOME.--
+#  (A) In general.-- ...the State shall determine income eligibility
+#  for medical assistance... using modified adjusted gross income..."
+#
+# MAGI is the primary income methodology for most Medicaid eligibility groups
+# under the ACA. It aligns Medicaid with ACA marketplace income counting rules.
+#
+# MAGI applies to:
+# - Children (infants, 1-5, 6-18)
+# - Pregnant women
+# - Parents and caretaker relatives
+# - ACA expansion adults
+#
+# MAGI does NOT apply to (non-MAGI groups):
+# - Aged (65+), blind, or disabled individuals
+# - Medicare beneficiaries
+# - Medically needy spend-down
+# - Long-term care recipients
+# - SSI-based eligibility
+#
+# Per 26 USC 36B(d)(2)(B):
+# MAGI = AGI + tax-exempt interest + untaxed foreign income + non-taxable Social Security
+
+imports:
+# Federal Poverty Level from SNAP statute (shared)
+  fpl_by_household_size: statute/7/2014/c/fpl_by_household_size
+
+# Income components from tax code
+  adjusted_gross_income: statute/26/62/a/adjusted_gross_income
+  tax_exempt_interest: statute/26/103/tax_exempt_interest
+  social_security_benefits: statute/26/86/social_security_benefits
+  taxable_social_security: statute/26/86/taxable_social_security
+  foreign_earned_income_exclusion: statute/26/911/foreign_earned_income_exclusion
+
+# Medicaid income disregard
+  magi_disregard: statute/42/1396/magi_disregard
+
+# =============================================================================
+# MAGI CALCULATION
+# 42 CFR 435.603(e) - MAGI-based income methodology
+# =============================================================================
+
+# Modified Adjusted Gross Income (annual)
+# Per 26 USC 36B(d)(2)(B), as referenced by 42 USC 1396a(e)(14)
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Modified Adjusted Gross Income"
+description "MAGI per 26 USC 36B(d)(2)(B)"
+"42 USC 1396a(e)(14)",
+"42 CFR 435.603(e)"
+
+formula:
+  # Start with AGI (26 USC 62)
+  agi = adjusted_gross_income
+
+  # Add tax-exempt interest (26 USC 103)
+  exempt_interest = tax_exempt_interest
+
+  # Add non-taxable Social Security benefits
+  # 42 CFR 435.603(e): add back SS that was excluded from gross income
+  total_ss = social_security_benefits
+  taxable_ss = taxable_social_security
+  nontaxable_ss = max(0, total_ss - taxable_ss)
+
+  # Add back foreign earned income exclusion (26 USC 911)
+  foreign_exclusion = foreign_earned_income_exclusion
+
+  return agi + exempt_interest + nontaxable_ss + foreign_exclusion
+
+default 0
+
+# Monthly MAGI (for Medicaid determination)
+entity TaxUnit
+period Month
+dtype Money
+unit "USD"
+label "Monthly MAGI"
+description "MAGI converted to monthly for Medicaid eligibility"
+
+formula:
+  # Medicaid uses monthly income, but MAGI is annual
+  # Convert annual MAGI to monthly
+  return magi / 12
+
+default 0
+
+# =============================================================================
+# HOUSEHOLD COMPOSITION FOR MAGI
+# 42 CFR 435.603(b), (c), (d), (f) - Household determination rules
+# =============================================================================
+
+# MAGI household size
+# 42 CFR 435.603(b): Household includes tax filer, spouse, dependents
+entity Household
+period Month
+dtype Integer
+label "MAGI household size"
+description "Household size for MAGI-based Medicaid eligibility"
+"42 CFR 435.603(b)",
+"42 CFR 435.603(c)"
+
+formula:
+  # Base household size
+  base_size = household_size
+
+  # Pregnant women: count expected children
+  # 42 CFR 435.603(b)(2): unborn children counted in household
+  expected_children = sum(members.expected_children)
+
+  return base_size + expected_children
+
+default 1
+
+# Calculate monthly FPL for household
+entity Household
+period Month
+dtype Money
+unit "USD"
+label "Monthly Federal Poverty Level"
+description "FPL for MAGI household size"
+
+formula:
+  # FPL = base for 1 person + additional per person beyond 1
+  # Uses MAGI household size (includes expected children)
+  base = fpl_by_household_size[1]
+  additional = fpl_by_household_size["additional_per_person"]
+  extra_members = max(0, magi_household_size - 1)
+
+  return base + (additional * extra_members)
+
+default 0
+
+# =============================================================================
+# HOUSEHOLD INCOME AGGREGATION
+# 42 CFR 435.603(d) - Whose income to count
+# =============================================================================
+
+# Household MAGI income (for Medicaid purposes)
+# Different from tax unit - uses MAGI household rules
+entity Household
+period Month
+dtype Money
+unit "USD"
+label "Household MAGI income"
+description "Aggregated MAGI for household members per 42 CFR 435.603(d)"
+
+formula:
+  # 42 CFR 435.603(d)(2): Count income of all tax filers in household
+  # 42 CFR 435.603(d)(3): Tax dependents counted with their tax household
+  return sum(members.tax_unit.magi_monthly)
+
+default 0
+
+# Income as percentage of FPL
+entity Household
+period Month
+dtype Rate
+label "MAGI as % of FPL"
+description "Household MAGI income as percentage of Federal Poverty Level"
+
+formula:
+  if medicaid_fpl_monthly <= 0: return 0
+
+  return magi_income / medicaid_fpl_monthly
+
+default 0
+
+# =============================================================================
+# 5% FPL INCOME DISREGARD
+# 42 CFR 435.603(d)(4)
+# =============================================================================
+
+# Effective income after 5% FPL disregard
+# This disregard effectively raises all MAGI thresholds by 5 percentage points
+entity Household
+period Month
+dtype Rate
+label "MAGI % FPL after disregard"
+description "Household MAGI as % FPL after 5% income disregard"
+
+formula:
+  # The 5% disregard is subtracted from income as % of FPL
+  # Equivalent to raising thresholds: 133% becomes 138%, etc.
+  return max(0, magi_income_pct_fpl - magi_disregard)
+
+default 0
+
+# =============================================================================
+# INCOME TYPES UNDER MAGI
+# 42 CFR 435.603(e) - What income counts
+# =============================================================================
+
+# Current monthly income (point-in-time determination)
+# Medicaid uses current income, not prior year taxes
+entity Person
+period Month
+dtype Money
+unit "USD"
+label "Current monthly income"
+description "Current month income for ongoing eligibility"
+
+formula:
+  # For ongoing eligibility, use current month income
+  wages = employment_income
+  self_emp = self_employment_income
+  interest = interest_income
+  dividends = dividend_income
+  rental = rental_income
+  retirement = retirement_income
+  social_security = social_security_benefits
+
+  # Alimony: counted if divorce/separation before 2019
+  # Post-2018 divorces: alimony not taxable, not in MAGI
+  alimony = alimony_received_pre_2019
+
+  return wages + self_emp + interest + dividends + rental + retirement + social_security + alimony
+
+default 0
+
+# =============================================================================
+# INCOME EXCLUSIONS
+# 42 CFR 435.603(e) - Income NOT counted under MAGI
+# =============================================================================
+
+# Income excluded from MAGI
+# These are already excluded by AGI calculation, but documented for clarity
+entity Person
+period Month
+dtype Money
+unit "USD"
+label "MAGI excluded income"
+description "Income types not counted under MAGI methodology"
+
+formula:
+  # Not counted under MAGI (not taxable income):
+  # - Child support received
+  # - TANF/welfare cash assistance
+  # - SSI benefits
+  # - Workers' compensation
+  # - Veterans benefits (most types)
+  # - Gifts and inheritances
+  # - Scholarships for tuition/fees
+
+  child_support = child_support_received
+  tanf = tanf_benefits
+  ssi = ssi_benefits
+  workers_comp = workers_compensation
+  va_benefits = veterans_benefits_nontaxable
+
+  return child_support + tanf + ssi + workers_comp + va_benefits
+
+default 0
+
+# =============================================================================
+# SPECIAL INCOME RULES
+# =============================================================================
+
+# Lump sum income treatment
+# 42 CFR 435.603(h)(4)
+entity Person
+period Month
+dtype Money
+unit "USD"
+label "Lump sum income"
+description "Lump sum income counted only in month received"
+
+formula:
+  # Under MAGI: lump sums counted only in month received
+  # NOT prorated over time (differs from pre-MAGI rules)
+  return lump_sum_income
+
+default 0
+
+# Self-employment income
+# Uses net earnings (after business expenses)
+entity Person
+period Month
+dtype Money
+unit "USD"
+label "Net self-employment income"
+description "Self-employment income after business expenses"
+
+formula:
+  # MAGI uses net self-employment income
+  # Same as tax treatment (Schedule C net profit)
+  gross = self_employment_gross_income
+  expenses = self_employment_expenses
+
+  return max(0, gross - expenses)
+
+default 0
+
+# Scholarship and fellowship income
+# 42 CFR 435.603(e)(3)
+entity Person
+period Month
+dtype Money
+unit "USD"
+label "Countable scholarship income"
+description "Scholarship income counted under MAGI"
+
+formula:
+  # Tuition/fees portion: NOT counted (26 USC 117)
+  # Room/board/stipend: counted as income
+  total_scholarship = scholarship_income
+  tuition_portion = scholarship_tuition_amount
+
+  return max(0, total_scholarship - tuition_portion)
+
+default 0

@@ -1,0 +1,172 @@
+# 26 USC Section 56 - Adjustments in Computing Alternative Minimum Taxable Income
+#
+# "In determining the amount of the alternative minimum taxable income for any
+# taxable year, the following adjustments shall apply to taxable income..."
+#
+# This section specifies modifications to taxable income for AMT purposes.
+# Key adjustments include:
+# - State and local tax (SALT) deduction is disallowed
+# - Miscellaneous itemized deductions are disallowed
+# - Medical expense threshold is adjusted
+# - Standard deduction is disallowed
+# - Personal exemptions are disallowed
+# - Incentive stock option bargain element is included (Section 56(b)(3))
+
+imports:
+# Regular taxable income from Section 63
+  taxable_income: statute/26/63/c/taxable_income
+
+# Itemized deduction components
+  state_local_taxes: statute/26/164/state_local_tax_deduction
+  miscellaneous_deductions: statute/26/67/miscellaneous_itemized_deductions
+  medical_expenses_claimed: statute/26/213/medical_expense_deduction
+
+# Standard deduction and personal exemptions
+  standard_deduction: statute/26/63/c/standard_deduction
+  personal_exemptions: statute/26/151/personal_exemption_amount
+  uses_standard_deduction: statute/26/63/e/uses_standard_deduction
+
+# AMT-specific thresholds
+  adjusted_gross_income: statute/26/62/a/adjusted_gross_income
+
+# Filing status for medical expense calculation
+  filing_status: statute/26/1/filing_status
+
+# Incentive stock option data (Section 422)
+  iso_exercise_bargain_element: statute/26/422/b/iso_bargain_element
+
+# --- Section 56(b)(1) - Itemized Deduction Adjustments ---
+
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "AMT SALT Addback"
+description "State and local taxes disallowed for AMT per Section 56(b)(1)(A)"
+
+formula:
+  # State and local taxes (including property taxes) claimed as itemized
+  # deduction must be added back for AMT purposes
+  if uses_standard_deduction: return 0
+
+  return state_local_taxes
+
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "AMT Miscellaneous Deduction Addback"
+description "Miscellaneous itemized deductions disallowed for AMT per Section 56(b)(1)(A)"
+
+formula:
+  # Miscellaneous itemized deductions subject to 2% floor are
+  # completely disallowed for AMT
+  # Note: TCJA suspended these deductions for 2018-2025 anyway
+  if uses_standard_deduction: return 0
+
+  return miscellaneous_deductions
+
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "AMT Medical Expense Adjustment"
+description "Adjustment to medical expense deduction for AMT per Section 56(b)(1)(B)"
+
+formula:
+  # For AMT, medical expenses must exceed 7.5% of AGI (same as regular for 2021+)
+  # Prior to 2021, AMT threshold was 10% vs regular 7.5%
+  # Since thresholds are now aligned, this adjustment is typically $0
+  # for tax years 2021 and later
+
+  # For pre-2021 logic:
+  # amt_floor = adjusted_gross_income * 0.10
+  # regular_floor = adjusted_gross_income * 0.075
+  # If medical_expenses > regular_floor but < amt_floor,
+  # add back the difference
+
+  # For 2024: Both thresholds are 7.5%, so no adjustment
+  return 0
+
+# --- Section 56(b)(1)(E) - Standard Deduction ---
+
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "AMT Standard Deduction Addback"
+description "Standard deduction disallowed for AMT per Section 56(b)(1)(E)"
+
+formula:
+  # Standard deduction is not allowed for AMT purposes
+  # If taxpayer claimed standard deduction, add it back
+  if uses_standard_deduction: return standard_deduction
+
+  return 0
+
+# --- Section 56(b)(1)(E) - Personal Exemptions ---
+
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "AMT Personal Exemption Addback"
+description "Personal exemptions disallowed for AMT per Section 56(b)(1)(E)"
+
+formula:
+  # Personal exemptions are not allowed for AMT
+  # Note: TCJA suspended personal exemptions for 2018-2025
+  # so this is typically $0 during that period
+  return personal_exemptions
+
+# --- Section 56(b)(3) - Incentive Stock Options ---
+
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "AMT ISO Bargain Element"
+description "Incentive stock option spread included in AMTI per Section 56(b)(3)"
+
+formula:
+  # Section 56(b)(3): ISO Spread Included for AMT
+  #
+  # For regular tax purposes, the exercise of an incentive stock option
+  # under Section 422 is not a taxable event. However, for AMT purposes,
+  # the "bargain element" (FMV at exercise minus exercise price) must be
+  # included in AMTI.
+  #
+  # This is often the primary cause of AMT liability for employees of
+  # high-growth companies who exercise ISOs and hold the shares.
+  #
+  # The bargain element = (Fair Market Value at exercise) - (Exercise Price)
+  # This amount is added to taxable income for AMT purposes.
+  #
+  # Note: This adjustment only applies if the taxpayer holds the stock
+  # through the end of the tax year. If a disqualifying disposition occurs
+  # (sale before meeting holding requirements), the gain is taxed as
+  # ordinary income and this AMT adjustment does not apply.
+
+  return iso_exercise_bargain_element
+
+default 0
+
+# --- Total Adjustments under Section 56 ---
+
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Total AMT Adjustments"
+description "Sum of all AMT adjustments under Section 56"
+
+formula:
+  # All adjustments are addbacks (increase AMTI)
+  salt_addback = amt_salt_addback
+  misc_addback = amt_miscellaneous_addback
+  medical_adj = amt_medical_expense_adjustment
+  std_ded_addback = amt_standard_deduction_addback
+  exemption_addback = amt_personal_exemption_addback
+  iso_adj = amt_iso_adjustment
+
+  return salt_addback + misc_addback + medical_adj + std_ded_addback + exemption_addback + iso_adj

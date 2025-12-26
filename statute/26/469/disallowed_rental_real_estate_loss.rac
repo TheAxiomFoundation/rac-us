@@ -1,0 +1,19 @@
+# Disallowed Rental Real Estate Loss
+# 26 USC Section 469(a)
+
+imports:
+  net_rental_real_estate_loss: statute/26/469/net_rental_real_estate_loss
+  rental_real_estate_loss_allowance: statute/26/469/rental_real_estate_exception
+
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Disallowed Rental Real Estate Loss"
+description "Rental real estate loss that is suspended per 26 USC 469(a)"
+
+formula:
+  # Loss that cannot be deducted this year - carries forward
+  return max(0, net_rental_real_estate_loss - rental_real_estate_loss_allowance)
+
+default 0

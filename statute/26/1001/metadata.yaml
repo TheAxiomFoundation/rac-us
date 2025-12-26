@@ -23,7 +23,7 @@ scope:
 # =============================================================================
 
 files:
-  - path: capital_gains.cosilico
+  - path: capital_gains.rac
     description: |
       Core gain/loss determination per Section 1001(a).
       Implements: Amount Realized - Adjusted Basis = Gain/Loss
@@ -46,7 +46,7 @@ files:
       - long_term_capital_gain
       - long_term_capital_loss
 
-  - path: holding_period.cosilico
+  - path: holding_period.rac
     description: |
       Holding period classification for short-term vs long-term treatment.
       Implements tacking rules for substituted basis property.
@@ -61,7 +61,7 @@ files:
       - holding_period_days
       - effective_holding_period_days
 
-  - path: netting.cosilico
+  - path: netting.rac
     description: |
       Capital gain/loss netting rules and loss limitation.
       Implements Schedule D ordering and $3,000 loss limit.
@@ -80,7 +80,7 @@ files:
       - capital_loss_deduction
       - capital_loss_carryover_generated
 
-  - path: preferential_rates.cosilico
+  - path: preferential_rates.rac
     description: |
       Integration with Section 1(h) preferential rates and NIIT.
       Connects capital gains to 0%/15%/20%/25%/28% rate structure.
@@ -288,23 +288,23 @@ architecture:
   description: |
     The capital gains encoding follows the Schedule D calculation flow:
 
-    1. **Per-Asset Calculation** (capital_gains.cosilico)
+    1. **Per-Asset Calculation** (capital_gains.rac)
        - Each asset: gain/loss = amount realized - adjusted basis
        - Classify by holding period (ST vs LT)
 
-    2. **Aggregation** (capital_gains.cosilico)
+    2. **Aggregation** (capital_gains.rac)
        - Sum all ST gains, ST losses, LT gains, LT losses
 
-    3. **Netting** (netting.cosilico)
+    3. **Netting** (netting.rac)
        - Net ST gains vs ST losses -> Net STCG or Net STCL
        - Net LT gains vs LT losses -> Net LTCG or Net LTCL
        - Combine: Net capital gain or Net capital loss
 
-    4. **Loss Limitation** (netting.cosilico)
+    4. **Loss Limitation** (netting.rac)
        - If net loss: limited to $3,000 ($1,500 MFS)
        - Excess carries forward
 
-    5. **Rate Application** (preferential_rates.cosilico)
+    5. **Rate Application** (preferential_rates.rac)
        - Net capital gain (LTCG portion): 0%/15%/20% rates
        - Collectibles: 28% rate
        - Section 1250: 25% rate

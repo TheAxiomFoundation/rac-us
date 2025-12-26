@@ -1,0 +1,256 @@
+# 26 USC Section 1223 - Holding Period Rules
+#
+# The holding period determines whether a capital gain or loss is short-term
+# or long-term, which affects the tax rate applied.
+#
+# Section 1222 Definitions:
+#   (1) Short-term capital gain: gain from sale of capital asset held <= 1 year
+#   (2) Short-term capital loss: loss from sale of capital asset held <= 1 year
+#   (3) Long-term capital gain: gain from sale of capital asset held > 1 year
+#   (4) Long-term capital loss: loss from sale of capital asset held > 1 year
+#
+# Section 1223 provides special holding period rules for:
+#   - Substituted basis property (Section 1223(1)): tack holding period from prior owner
+#   - Like-kind exchanges (Section 1223(1)): tack holding period of relinquished property
+#   - Inherited property (Section 1223(9)): automatically treated as long-term
+#   - Gifted property (Section 1223(2)): tack donor's holding period if basis is carryover
+
+imports:
+# Property acquisition and basis
+  is_inherited_property: statute/26/1001/capital_gains
+  is_gifted_property: statute/26/1001/capital_gains
+  is_like_kind_exchange: statute/26/1031/like_kind_exchange
+
+parameters:
+# Long-term holding period threshold (in months)
+  long_term_threshold_months: 1001/parameters#long_term_holding_period_months
+
+# =============================================================================
+# Section 1222 - Holding Period Classification
+# =============================================================================
+
+# Holding period in days (raw input)
+entity Asset
+period Year
+dtype Int
+label "Holding Period in Days"
+description "Number of days asset was held before disposition"
+
+formula:
+  # Calculate days between acquisition and disposition
+  # Note: Day of acquisition is excluded, day of disposition is included
+  return days_between(acquisition_date, disposition_date)
+
+default 0
+
+---
+
+# Date asset was acquired
+entity Asset
+period Year
+dtype Date
+label "Acquisition Date"
+description "Date property was acquired for holding period purposes"
+
+# Input variable
+
+---
+
+# Date asset was disposed
+entity Asset
+period Year
+dtype Date
+label "Disposition Date"
+description "Date property was sold or exchanged"
+
+# Input variable
+
+---
+
+# =============================================================================
+# Section 1223 - Tacking Rules for Holding Period
+# =============================================================================
+
+# Effective holding period (after tacking)
+# Certain transactions allow the taxpayer to "tack" the prior owner's
+# holding period onto their own
+entity Asset
+period Year
+dtype Int
+label "Effective Holding Period"
+description "Holding period including any tacked periods per 26 USC Section 1223"
+
+formula:
+  # Special rules per Section 1223:
+
+  # Section 1223(9): Property acquired from decedent is always long-term
+  if is_inherited_property: return 366  # Automatically exceeds 1 year threshold
+
+  # Section 1223(2): Gifted property - tack donor's holding period
+  # (if basis is carryover from donor)
+  if is_gifted_property and basis_is_carryover: return holding_period_days + donor_holding_period_days
+
+  # Section 1223(1): Like-kind exchange - tack relinquished property period
+  if is_like_kind_exchange: return holding_period_days + relinquished_property_holding_days
+
+  # Default: just the taxpayer's holding period
+  return holding_period_days
+
+default 0
+
+---
+
+# Whether basis carries over from donor (determines tacking eligibility)
+entity Asset
+period Year
+dtype Bool
+label "Carryover Basis Applies"
+description "Whether basis is carried over from prior owner"
+
+# True if gifted property where gain basis = donor's basis
+# False if gifted property sold at loss where FMV < donor's basis
+default true
+
+---
+
+# Donor's holding period for gifted property
+entity Asset
+period Year
+dtype Int
+label "Donor Holding Period"
+description "Number of days donor held the property before gifting"
+
+default 0
+
+---
+
+# Holding period of relinquished property in like-kind exchange
+entity Asset
+period Year
+dtype Int
+label "Relinquished Property Holding Period"
+description "Holding period of relinquished property in like-kind exchange"
+
+default 0
+
+---
+
+# =============================================================================
+# Long-Term vs Short-Term Classification
+# =============================================================================
+
+# Is this a long-term capital asset?
+# Per Section 1222(3)-(4): Long-term = held MORE than 1 year (> 365 days)
+entity Asset
+period Year
+dtype Bool
+label "Long-Term Capital Asset"
+description "Asset held more than 1 year per 26 USC Section 1222(3)-(4)"
+
+formula:
+  # More than 1 year = more than 365 days (366 in leap year, but statute says "> 1 year")
+  # Standard: if acquired Jan 1 and sold Jan 2 next year = 366 days = long-term
+  return effective_holding_period_days > 365
+
+default false
+
+---
+
+# Is this a short-term capital asset?
+entity Asset
+period Year
+dtype Bool
+label "Short-Term Capital Asset"
+description "Asset held 1 year or less per 26 USC Section 1222(1)-(2)"
+
+formula:
+  return not is_long_term_asset
+
+default false
+
+---
+
+# =============================================================================
+# Special Cases
+# =============================================================================
+
+# Securities - wash sale rule consideration
+# While Section 1091 disallows losses, the holding period tacks
+entity Asset
+period Year
+dtype Bool
+label "Wash Sale Replacement Stock"
+description "Stock acquired that triggered wash sale rule on prior sale"
+
+default false
+
+---
+
+# Wash sale: tack disallowed loss into replacement stock basis and holding period
+entity Asset
+period Year
+dtype Int
+label "Wash Sale Tacked Holding Period"
+description "Holding period from original shares disallowed under wash sale"
+
+default 0
+
+---
+
+# Short sales - Section 1233 holding period rules
+# Complex rules for determining holding period of short sales
+entity Asset
+period Year
+dtype Bool
+label "Short Sale"
+description "Sale of borrowed securities"
+
+default false
+
+---
+
+# Short sale holding period determination
+# Per Section 1233(b): depends on substantially identical property owned
+entity Asset
+period Year
+dtype Enum(HoldingType)
+label "Short Sale Holding Period Type"
+description "Holding period classification for short sale per Section 1233"
+
+formula:
+  if not is_short_sale:
+    if is_long_term_asset:
+      return HoldingType.LONG_TERM
+    else:
+      return HoldingType.SHORT_TERM
+
+  # Short sale rules per Section 1233(b):
+  # If substantially identical property held long-term at time of short sale,
+  # gain is short-term regardless of time short position was open
+  if held_substantially_identical_long_term:
+    return HoldingType.SHORT_TERM  # Forced short-term
+  else:
+    # Otherwise, based on how long short position was open
+    pass
+  if effective_holding_period_days > 365:
+    return HoldingType.LONG_TERM
+  else:
+    return HoldingType.SHORT_TERM
+
+default HoldingType.SHORT_TERM
+
+---
+
+# Whether held substantially identical property long-term at short sale
+entity Asset
+period Year
+dtype Bool
+label "Held Substantially Identical Long-Term"
+description "Held substantially identical property long-term when short sale initiated"
+
+default false
+
+# Holding type enumeration
+enum HoldingType:
+SHORT_TERM
+LONG_TERM

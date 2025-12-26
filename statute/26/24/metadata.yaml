@@ -27,11 +27,11 @@ sources:
       title: "Child tax credit"
       path: statute/26/24/
       files:
-        - a/credit.cosilico              # Main credit calculation
-        - b/2/phaseout.cosilico          # Phase-out reduction
-        - c/1/qualifying_child.cosilico  # Qualifying child definition
-        - d/1/B/refundable_credit.cosilico  # ACTC (refundable portion)
-        - ctc_validation.cosilico        # Standalone validation version
+        - a/credit.rac              # Main credit calculation
+        - b/2/phaseout.rac          # Phase-out reduction
+        - c/1/qualifying_child.rac  # Qualifying child definition
+        - d/1/B/refundable_credit.rac  # ACTC (refundable portion)
+        - ctc_validation.rac        # Standalone validation version
 
   guidance:
     - citation: "Rev. Proc. 2023-34"
@@ -50,23 +50,23 @@ architecture:
 
     1. § 24(a) - Allowance of Credit
        - $2,000 per qualifying child (TCJA 2018-2025, § 24(h)(2))
-       - a/credit.cosilico
+       - a/credit.rac
 
     2. § 24(b) - Limitation Based on AGI (Phase-Out)
        - $50 reduction per $1,000 over threshold
        - Thresholds: $400k joint, $200k other (TCJA § 24(h)(3))
-       - b/1/threshold.yaml, b/2/phaseout.cosilico
+       - b/1/threshold.yaml, b/2/phaseout.rac
 
     3. § 24(c) - Qualifying Child Definition
        - Must be qualifying child per § 152(c)
        - Must be under 17 at year end
-       - c/1/qualifying_child.cosilico
+       - c/1/qualifying_child.rac
 
     4. § 24(d) - Additional Child Tax Credit (Refundable)
        - 15% of earned income over $2,500
        - OR social security taxes minus EITC (3+ children)
        - Capped at $1,700 per child (2024, § 24(h)(5))
-       - d/1/B/refundable_credit.cosilico
+       - d/1/B/refundable_credit.rac
 
     5. § 24(h) - TCJA Special Rules (2018-2025)
        - Increased credit from $1,000 to $2,000

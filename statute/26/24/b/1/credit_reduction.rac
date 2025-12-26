@@ -1,0 +1,65 @@
+# 26 USC § 24(b)(1) - Credit Reduction (Phase-Out)
+#
+# "(b) LIMITATIONS.—
+# (1) LIMITATION BASED ON ADJUSTED GROSS INCOME.—The amount of the
+# credit allowable under subsection (a) shall be reduced (but not below
+# zero) by $50 for each $1,000 (or fraction thereof) by which the
+# taxpayer's modified adjusted gross income exceeds the threshold amount."
+#
+# Modified by TCJA § 11022 for 2018-2025.
+
+imports:
+# AGI from §62
+  adjusted_gross_income: statute/26/62/a/adjusted_gross_income
+  filing_status: statute/26/1/filing_status
+
+# Phase-out parameters
+  phaseout_threshold_joint: statute/26/24/h/phaseout#phaseout_threshold.joint
+  phaseout_threshold_single: statute/26/24/h/phaseout#phaseout_threshold.single
+  phaseout_threshold_hoh: statute/26/24/h/phaseout#phaseout_threshold.head_of_household
+  phaseout_threshold_separate: statute/26/24/h/phaseout#phaseout_threshold.separate
+  phaseout_threshold_surviving: statute/26/24/h/phaseout#phaseout_threshold.surviving_spouse
+  phaseout_rate: statute/26/24/h/phaseout#phaseout_rate
+
+# Filing status values per §1
+enum FilingStatus:
+SINGLE
+JOINT
+SEPARATE
+HEAD_OF_HOUSEHOLD
+SURVIVING_SPOUSE
+
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "CTC Phase-Out Threshold"
+description "Modified AGI threshold above which CTC begins to phase out"
+
+formula:
+  if filing_status == JOINT: return phaseout_threshold_joint
+  if filing_status == SURVIVING_SPOUSE: return phaseout_threshold_surviving
+  if filing_status == SINGLE: return phaseout_threshold_single
+  if filing_status == HEAD_OF_HOUSEHOLD: return phaseout_threshold_hoh
+  if filing_status == SEPARATE: return phaseout_threshold_separate
+  return phaseout_threshold_single
+
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "CTC Phase-Out Reduction"
+description "Credit reduction based on income above threshold per 26 USC § 24(b)(1)"
+
+formula:
+  # Calculate excess over threshold
+  excess = adjusted_gross_income - ctc_phaseout_threshold
+
+  # If below threshold, no reduction
+  if excess <= 0: return 0
+
+  # Reduction is $50 for each $1,000 (or fraction thereof)
+  # ceiling(excess / 1000) gives us the number of $1,000 increments
+  increments = ceiling(excess / 1000)
+
+  return increments * phaseout_rate

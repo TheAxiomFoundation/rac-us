@@ -39,19 +39,19 @@ sources:
       title: "Tax on Self-Employment Income"
       path: statute/26/1401/
       files:
-        - self_employment_tax.cosilico        # Main calculation
+        - self_employment_tax.rac        # Main calculation
 
     - citation: "26 USC 1402"
       title: "Definitions (Net Earnings)"
       path: statute/26/1402/
       files:
-        - a/net_earnings_self_employment.cosilico  # 92.35% adjustment
+        - a/net_earnings_self_employment.rac  # 92.35% adjustment
 
     - citation: "26 USC 164(f)"
       title: "Deduction for One-Half of SE Taxes"
       path: statute/26/164/f/
       files:
-        - se_tax_deduction.cosilico           # 50% deduction
+        - se_tax_deduction.rac           # 50% deduction
 
   guidance:
     - citation: "Rev. Proc. 2023-34"
@@ -84,7 +84,7 @@ architecture:
        - 0.9% rate on SE income above threshold
        - Thresholds vary by filing status (not indexed)
        - b/2/parameters.yaml
-       - b/2/additional_medicare_tax.cosilico
+       - b/2/additional_medicare_tax.rac
 
     4. 1402(a) - Net Earnings Definition
        - 92.35% of gross self-employment income

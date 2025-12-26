@@ -30,7 +30,7 @@ sources:
       title: "Maximum capital gains rate"
       path: statute/26/1/h/
       files:
-        - capital_gains_tax.cosilico    # Main rate calculation
+        - capital_gains_tax.rac    # Main rate calculation
         - thresholds_2024.yaml          # 2024 indexed thresholds
 
   guidance:
@@ -101,7 +101,7 @@ architecture:
       status: "Added 2024-12-25"
       notes: |
         Qualified dividends now receive preferential capital gains rates.
-        The capital_gains_tax.cosilico file was updated to include qualified
+        The capital_gains_tax.rac file was updated to include qualified
         dividend income in the preferential rate calculation per Section 1(h)(11)(A).
 
   not_implemented:

@@ -1,0 +1,238 @@
+# 26 USC 30D - New Clean Vehicle Credit
+#
+# "(a) ALLOWANCE OF CREDIT. -- There shall be allowed as a credit against the
+# tax imposed by this chapter for the taxable year an amount equal to the sum
+# of the credit amounts determined under subsection (b) with respect to each
+# new clean vehicle placed in service by the taxpayer during the taxable year."
+#
+# As amended by the Inflation Reduction Act of 2022.
+#
+# Credit Structure (post-IRA):
+#   - $3,750 if critical minerals requirement met (Section 30D(e)(1)(A))
+#   - $3,750 if battery components requirement met (Section 30D(e)(2))
+#   - Maximum: $7,500 total
+#
+# Eligibility Requirements:
+#   - MAGI limits: $300k joint, $225k HOH, $150k single (Section 30D(f)(10))
+#   - MSRP limits: $80k van/SUV/pickup, $55k other (Section 30D(f)(11))
+#   - Minimum 7 kWh battery capacity (post-IRA), 4 kWh (pre-IRA)
+#   - Final assembly in North America
+#
+# References:
+#   - 26 USC 30D: https://www.law.cornell.edu/uscode/text/26/30D
+#   - IRA 2022: https://www.democrats.senate.gov/imo/media/doc/inflation_reduction_act_of_2022.pdf#page=373
+
+imports:
+# Parameters
+  p: statute/26/30D/parameters
+
+# Input variables (vehicle characteristics)
+  purchased_new_clean_vehicle: inputs/vehicles/purchased_new_clean_vehicle
+  new_clean_vehicle_msrp: inputs/vehicles/new_clean_vehicle_msrp
+  new_clean_vehicle_classification: inputs/vehicles/new_clean_vehicle_classification
+  new_clean_vehicle_battery_capacity_kwh: inputs/vehicles/new_clean_vehicle_battery_capacity_kwh
+  new_clean_vehicle_critical_minerals_pct: inputs/vehicles/new_clean_vehicle_critical_minerals_pct
+  new_clean_vehicle_battery_components_pct: inputs/vehicles/new_clean_vehicle_battery_components_pct
+  new_clean_vehicle_final_assembly_north_america: inputs/vehicles/new_clean_vehicle_final_assembly_north_america
+
+# Other sections
+  filing_status: statute/26/1/filing_status
+  adjusted_gross_income: statute/26/62/a/adjusted_gross_income
+  income_tax_before_credits: statute/26/1/income_tax
+
+# Filing status values
+enum FilingStatus:
+  SINGLE
+  JOINT
+  SEPARATE
+  HEAD_OF_HOUSEHOLD
+  SURVIVING_SPOUSE
+
+# Vehicle classification for MSRP limits
+enum VehicleClassification:
+  VAN
+  SUV
+  PICKUP
+  OTHER
+
+# --- Eligibility Determination per Section 30D(d), (f) ---
+
+entity TaxUnit
+period Year
+dtype Boolean
+label "Battery Capacity Eligible"
+description "Whether vehicle meets minimum battery capacity requirement per 30D(d)(1)(F)"
+
+formula:
+  capacity = new_clean_vehicle_battery_capacity_kwh
+  min_capacity = p.eligibility.min_battery_capacity_kwh
+  return capacity >= min_capacity
+
+entity TaxUnit
+period Year
+dtype Boolean
+label "Income Eligible for New Clean Vehicle Credit"
+description "Whether taxpayer MAGI is below limit per 30D(f)(10)"
+
+formula:
+  agi = adjusted_gross_income
+  limit = p.eligibility.income_limit[filing_status]
+  return agi <= limit
+
+entity TaxUnit
+period Year
+dtype Boolean
+label "MSRP Eligible for New Clean Vehicle Credit"
+description "Whether vehicle MSRP is below limit per 30D(f)(11)"
+
+formula:
+  msrp = new_clean_vehicle_msrp
+  classification = new_clean_vehicle_classification
+  limit = p.eligibility.msrp_limit[classification]
+  return msrp <= limit
+
+entity TaxUnit
+period Year
+dtype Boolean
+label "New Clean Vehicle Credit Eligible"
+description "Whether taxpayer meets all requirements for new clean vehicle credit per 30D"
+
+formula:
+  # Must have purchased a qualifying new clean vehicle
+  has_vehicle = purchased_new_clean_vehicle
+
+  # Battery capacity requirement
+  meets_capacity = new_clean_vehicle_battery_capacity_eligible
+
+  # Income limit
+  meets_income = new_clean_vehicle_income_eligible
+
+  # MSRP limit
+  meets_msrp = new_clean_vehicle_msrp_eligible
+
+  # Final assembly in North America
+  meets_assembly = new_clean_vehicle_final_assembly_north_america
+
+  return has_vehicle & meets_capacity & meets_income & meets_msrp & meets_assembly
+
+# --- Credit Amount Calculation per Section 30D(b), (e) ---
+
+entity TaxUnit
+period Year
+dtype Boolean
+label "Meets Critical Minerals Requirement"
+description "Whether vehicle meets critical minerals requirement per 30D(e)(1)(A)"
+
+formula:
+  pct = new_clean_vehicle_critical_minerals_pct
+  threshold = p.amount.critical_minerals.threshold
+  return pct >= threshold
+
+entity TaxUnit
+period Year
+dtype Boolean
+label "Meets Battery Components Requirement"
+description "Whether vehicle meets battery components requirement per 30D(e)(2)"
+
+formula:
+  pct = new_clean_vehicle_battery_components_pct
+  threshold = p.amount.battery_components.threshold
+  return pct >= threshold
+
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Critical Minerals Credit Component"
+description "Credit amount for critical minerals requirement per 30D(e)(1)(A)"
+
+formula:
+  if meets_critical_minerals_requirement:
+    return p.amount.critical_minerals.credit_amount
+  return 0
+
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Battery Components Credit Component"
+description "Credit amount for battery components requirement per 30D(e)(2)"
+
+formula:
+  if meets_battery_components_requirement:
+    return p.amount.battery_components.credit_amount
+  return 0
+
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Pre-IRA Capacity Bonus"
+description "Capacity bonus for pre-IRA vehicles per 30D(b)(3)"
+
+formula:
+  capacity = new_clean_vehicle_battery_capacity_kwh
+  threshold = p.amount.capacity_bonus.threshold_kwh
+  per_kwh = p.amount.capacity_bonus.per_kwh
+  max_bonus = p.amount.capacity_bonus.max
+
+  # Calculate excess kWh above threshold (includes first kWh above)
+  excess_kwh = max(0, capacity - threshold + 1)
+
+  # Credit is per_kwh * floor(excess), capped at max
+  bonus = per_kwh * floor(excess_kwh)
+  return min(bonus, max_bonus)
+
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "New Clean Vehicle Credit Potential"
+description "Potential credit amount before nonrefundable limitation per 30D(b)"
+
+formula:
+  # Pre-IRA: base amount + capacity bonus
+  base = p.amount.base
+  capacity_bonus = pre_ira_capacity_bonus
+
+  # IRA components (2022+): critical minerals + battery components
+  minerals_credit = critical_minerals_credit_component
+  components_credit = battery_components_credit_component
+
+  return base + capacity_bonus + minerals_credit + components_credit
+
+# --- Final Credit with Nonrefundable Limitation per Section 30D(c) ---
+
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "New Clean Vehicle Credit Limit"
+description "Credit limitation based on tax liability per 30D(c)"
+
+formula:
+  # Credit cannot exceed income tax liability (nonrefundable)
+  # Note: For simplicity, not modeling preceding credits offset
+  return max(0, income_tax_before_credits)
+
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "New Clean Vehicle Credit"
+description "Credit for new clean vehicles per 26 USC 30D"
+
+formula:
+  # Not eligible = no credit
+  if not new_clean_vehicle_credit_eligible:
+    return 0
+
+  potential = new_clean_vehicle_credit_potential
+  limit = new_clean_vehicle_credit_limit
+
+  return min(potential, limit)
+
+defined_for:
+  purchased_new_clean_vehicle
+
+default 0

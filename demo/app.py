@@ -4,7 +4,7 @@ Cosilico Demo App
 
 Shows the full pipeline from source document to calculation:
 1. Lawarchive: Fetched source document (USC XML)
-2. Encoding: .cosilico formula that references the source
+2. Encoding: .rac formula that references the source
 3. Parameters: Resolved values from statute + guidance
 4. Calculation: Run on sample data
 
@@ -45,7 +45,7 @@ class SourceDocument:
 
 @dataclass
 class Encoding:
-    """A .cosilico encoding."""
+    """A .rac encoding."""
     variable: str
     citation: str
     formula_preview: str
@@ -210,7 +210,7 @@ def run_streamlit():
     # Tabs for each layer
     tab1, tab2, tab3, tab4 = st.tabs([
         "1. Source Document",
-        "2. Encoding (.cosilico)",
+        "2. Encoding (.rac)",
         "3. Parameters",
         "4. Calculate"
     ])
@@ -227,7 +227,7 @@ def run_streamlit():
         st.code(SAMPLE_SOURCE.content_preview, language="text")
 
     with tab2:
-        st.header("Encoding: .cosilico File")
+        st.header("Encoding: .rac File")
         st.markdown(f"**Variable:** `{SAMPLE_ENCODING.variable}`")
         st.markdown(f"**Source:** `lawarchive://{SAMPLE_ENCODING.source_path}`")
 
@@ -294,7 +294,7 @@ def run_streamlit():
             st.subheader("Citation Chain")
             st.markdown(f"""
             1. **Source:** `lawarchive://us/statute/26/32/2025-01-01`
-            2. **Encoding:** `cosilico-us://26/32/eitc.cosilico`
+            2. **Encoding:** `cosilico-us://26/32/eitc.rac`
             3. **Parameters:** Rev. Proc. 2024-40 (TY {SAMPLE_PARAMS.tax_year})
             4. **Result:** ${result.result:,}
             """)
@@ -313,7 +313,7 @@ def run_cli():
     print(f"Effective: {SAMPLE_SOURCE.effective_date}")
     print(f"\nPreview:\n{SAMPLE_SOURCE.content_preview[:500]}...")
 
-    print("\n2. ENCODING (.cosilico)")
+    print("\n2. ENCODING (.rac)")
     print("-" * 40)
     print(f"Variable: {SAMPLE_ENCODING.variable}")
     print(f"Source: lawarchive://{SAMPLE_ENCODING.source_path}")
@@ -350,7 +350,7 @@ def run_cli():
     print("\n" + "=" * 60)
     print("Citation Chain:")
     print(f"  1. lawarchive://us/statute/26/32/2025-01-01")
-    print(f"  2. cosilico-us://26/32/eitc.cosilico")
+    print(f"  2. cosilico-us://26/32/eitc.rac")
     print(f"  3. Rev. Proc. 2024-40 (TY 2025)")
     print(f"  4. Result: ${result.result:,}")
 

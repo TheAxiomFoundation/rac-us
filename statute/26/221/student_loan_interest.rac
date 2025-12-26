@@ -1,0 +1,182 @@
+# 26 USC Section 221 - Interest on Education Loans
+#
+# "(a) Allowance of deduction
+#   In the case of an individual, there shall be allowed as a deduction
+#   for the taxable year an amount equal to the interest paid by the
+#   taxpayer during the taxable year on any qualified education loan."
+#
+# "(b) Maximum deduction
+#   (1) In general
+#     Except as provided in paragraph (2), the deduction allowed by
+#     subsection (a) for the taxable year shall not exceed $2,500.
+#   (2) Limitation based on modified adjusted gross income
+#     (A) In general
+#       The amount which would (but for this paragraph) be allowable
+#       as a deduction under this section shall be reduced (but not
+#       below zero) by the amount determined under subparagraph (B)."
+#
+# "(c) Definitions
+#   For purposes of this section... the term 'qualified education loan'
+#   means any indebtedness incurred by the taxpayer solely to pay
+#   qualified higher education expenses..."
+#
+# "(d) Special rules
+#   (1) Denial of double benefit. No deduction shall be allowed...
+#   (2) Married couples must file joint return. If the taxpayer is
+#       married at the close of the taxable year, the deduction shall
+#       be allowed only if the taxpayer and the taxpayer's spouse file
+#       a joint return for the taxable year.
+#   (3) Dependents not eligible. No deduction shall be allowed... to
+#       an individual with respect to whom a deduction under section
+#       151 is allowable to another taxpayer..."
+
+parameters:
+# 26 USC 221(b)(1) - Maximum deduction allowed
+  max_deduction: 2500
+
+# 26 USC 221(b)(2)(B) - Phase-out thresholds for 2024
+# Phase-out for Single/HoH
+  phaseout_single_start: 75000
+  phaseout_single_end: 90000
+
+# Phase-out for Married Filing Jointly
+  phaseout_joint_start: 155000
+  phaseout_joint_end: 185000
+
+imports:
+  filing_status: statute/26/1/filing_status
+  adjusted_gross_income: statute/26/62/a/adjusted_gross_income
+
+# =============================================================================
+# INPUT VARIABLES
+# =============================================================================
+
+entity Person
+period Year
+dtype Money
+unit "USD"
+label "Student Loan Interest Paid"
+description "Interest paid on qualified education loans during the tax year"
+
+# Input variable - amount of interest paid on qualified education loans
+# To qualify, the loan must be:
+# - Incurred solely to pay qualified higher education expenses
+# - For the taxpayer, spouse, or dependent
+# - The taxpayer must be legally obligated to make interest payments
+
+entity Person
+period Year
+dtype Bool
+label "Claimed as Dependent"
+description "Whether the individual can be claimed as a dependent by another taxpayer"
+
+# Input variable - true if another taxpayer can claim this person under Section 151
+
+# =============================================================================
+# ELIGIBILITY DETERMINATION
+# =============================================================================
+
+entity TaxUnit
+period Year
+dtype Bool
+label "Student Loan Interest Deduction Eligibility"
+description "Whether the tax unit meets eligibility requirements for the deduction"
+
+formula:
+  # 26 USC 221(d)(2) - MFS cannot claim this deduction
+  not_mfs = filing_status != MARRIED_FILING_SEPARATELY
+
+  # 26 USC 221(d)(3) - Cannot be claimed as dependent
+  # Check if the primary taxpayer is claimed as dependent
+  taxpayer_not_dependent = not any(members.is_claimed_as_dependent)
+
+  return not_mfs and taxpayer_not_dependent
+
+# =============================================================================
+# PHASE-OUT CALCULATION
+# =============================================================================
+
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Phase-out Start Threshold"
+description "MAGI threshold where phase-out begins"
+
+formula:
+  if filing_status == MARRIED_FILING_JOINTLY:
+  return phaseout_joint_start
+return phaseout_single_start
+
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Phase-out End Threshold"
+description "MAGI threshold where deduction is fully phased out"
+
+formula:
+  if filing_status == MARRIED_FILING_JOINTLY:
+  return phaseout_joint_end
+return phaseout_single_end
+
+entity TaxUnit
+period Year
+dtype Rate
+label "Student Loan Interest Phase-out Ratio"
+description "Ratio of deduction phased out based on MAGI"
+
+formula:
+  # For this deduction, MAGI = AGI (no add-backs required for Section 221)
+  magi = adjusted_gross_income
+
+  start = student_loan_interest_phaseout_start
+  end = student_loan_interest_phaseout_end
+  range = end - start
+
+  if magi <= start:
+  return 0  # No phase-out
+if magi >= end:
+return 1  # Fully phased out
+
+# Proportional phase-out per 26 USC 221(b)(2)(B)
+return (magi - start) / range
+
+# =============================================================================
+# DEDUCTION CALCULATION
+# =============================================================================
+
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Student Loan Interest Deduction (Before Phase-out)"
+description "Deduction amount before applying income-based phase-out"
+
+formula:
+  # Sum interest paid by all members of the tax unit
+  total_interest = sum(members.student_loan_interest_paid)
+
+  # 26 USC 221(b)(1) - Cannot exceed maximum deduction
+  return min(total_interest, max_deduction)
+
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Student Loan Interest Deduction"
+description "Above-the-line deduction for interest paid on qualified education loans"
+
+formula:
+  # Check eligibility first
+  if not student_loan_interest_deduction_eligible:
+  return 0
+
+# Get base deduction (capped at maximum)
+let base = student_loan_interest_deduction_before_phaseout
+
+# Apply phase-out based on MAGI
+let phaseout = student_loan_interest_phaseout_ratio
+
+# 26 USC 221(b)(2)(A) - Reduce by phase-out amount
+return base * (1 - phaseout)

@@ -8,14 +8,14 @@ encoding:
 
 variables:
   - name: qualifying_medical_expenses
-    path: statute/26/213/d/qualified_medical_expenses.cosilico
+    path: statute/26/213/d/qualified_medical_expenses.rac
     entity: TaxUnit
     period: Year
     dtype: Money
     description: "Medical expenses net of insurance reimbursement per 213(d)"
 
   - name: medical_expense_deduction
-    path: statute/26/213/a/medical_expense_deduction.cosilico
+    path: statute/26/213/a/medical_expense_deduction.rac
     entity: TaxUnit
     period: Year
     dtype: Money

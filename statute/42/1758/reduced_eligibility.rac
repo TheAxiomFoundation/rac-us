@@ -1,0 +1,107 @@
+# 42 USC 1758(b)(1)(A)(ii) - Reduced-Price School Meal Eligibility
+#
+# "(ii) a child shall be served a reduced price lunch or breakfast,
+# as the case may be, if the household income is above 130 percent
+# but at or below 185 percent of the applicable family size income
+# level contained in the nonfarm income poverty guidelines"
+#
+# A child qualifies for REDUCED-PRICE meals if:
+# - Household income > 130% FPL AND <= 185% FPL
+# - NOT categorically eligible (categorical = free, not reduced)
+# - NOT attending a CEP school (CEP = free, not reduced)
+#
+# Maximum charges per 42 USC 1758(b)(3) and (b)(9)(A):
+# - Lunch: $0.40
+# - Breakfast: $0.30
+#
+# Reference: https://www.law.cornell.edu/uscode/text/42/1758#b_1
+
+# ------------------------------------------------------------------------------
+# school_meal_income_eligible_reduced
+# Income-based eligibility for reduced-price meals: 130% < income <= 185% FPL
+# 42 USC 1758(b)(1)(A)(ii)
+# ------------------------------------------------------------------------------
+
+entity Person
+period Year
+dtype Boolean
+label "School Meal Income Eligible Reduced"
+description "Income-based eligibility for reduced-price meals: 130% < income <= 185% FPL per 42 USC 1758(b)(1)(A)(ii)"
+
+formula:
+  # Get household's gross annual income
+  household_income = household.gross_income
+
+  # Get Federal Poverty Level for household size
+  household_size = household.size
+  fpl = federal_poverty_level(household_size)
+
+  # Calculate income ratio to FPL
+  income_ratio = household_income / fpl
+
+  # Reduced-price eligibility: above 130% but at or below 185% FPL
+  above_free_threshold = income_ratio > free_meal_limit_pct_fpl
+  at_or_below_reduced_threshold = income_ratio <= reduced_price_limit_pct_fpl
+
+  return above_free_threshold and at_or_below_reduced_threshold
+
+default false
+
+---
+
+# ------------------------------------------------------------------------------
+# school_meal_reduced_eligible
+# Final reduced-price meal eligibility
+# Must qualify by income AND not be categorically eligible (which gives free)
+# ------------------------------------------------------------------------------
+
+entity Person
+period Year
+dtype Boolean
+label "School Meal Reduced Eligible"
+description "Final reduced-price meal eligibility per 42 USC 1758(b)(1)(A)(ii)"
+
+formula:
+  # Income eligibility for reduced-price (130-185% FPL)
+  income_eligible = school_meal_income_eligible_reduced
+
+  # Categorical eligibility provides FREE meals, not reduced
+  categorical = categorically_eligible
+
+  # CEP schools provide FREE meals to all
+  cep_school = attends_cep_school
+
+  # Reduced-price only if income-qualified AND not categorical AND not CEP
+  return income_eligible and (not categorical) and (not cep_school)
+
+default false
+
+---
+
+# ------------------------------------------------------------------------------
+# school_meal_eligible_subsidized
+# Whether eligible for any subsidized meals (free OR reduced-price)
+# Convenience variable for determining if family qualifies for any subsidy
+# ------------------------------------------------------------------------------
+
+entity Person
+period Year
+dtype Boolean
+label "School Meal Eligible Subsidized"
+description "Whether eligible for any subsidized meals (free OR reduced-price)"
+
+formula:
+  # Get household income ratio to FPL
+  household_income = household.gross_income
+  household_size = household.size
+  fpl = federal_poverty_level(household_size)
+  income_ratio = household_income / fpl
+
+  # Eligible for subsidy: income at or below 185% FPL OR categorical
+  income_qualifies = income_ratio <= reduced_price_limit_pct_fpl
+  categorical = categorically_eligible
+  cep_school = attends_cep_school
+
+  return income_qualifies or categorical or cep_school
+
+default false

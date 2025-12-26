@@ -1,0 +1,127 @@
+# 26 USC Section 61 - Gross Income Defined
+#
+# "(a) General definition.—Except as otherwise provided in this subtitle,
+# gross income means all income from whatever source derived, including
+# (but not limited to)—
+#   (1) Compensation for services, including fees, commissions, fringe
+#       benefits, and similar items;
+#   (2) Gross income derived from business;
+#   (3) Gains derived from dealings in property;
+#   (4) Interest;
+#   (5) Rents;
+#   (6) Royalties;
+#   (7) Dividends;
+#   (8) Annuities;
+#   (9) Income from life insurance and endowment contracts;
+#   (10) Pensions;
+#   (11) Income from discharge of indebtedness;
+#   (12) Distributive share of partnership gross income;
+#   (13) Income in respect of a decedent; and
+#   (14) Income from an interest in an estate or trust."
+
+imports:
+# Section 61(a)(1) - Compensation for services
+  wages: statute/26/61/a/1/wages
+  salaries: statute/26/61/a/1/salaries
+  tips: statute/26/61/a/1/tips
+
+# Section 61(a)(2) - Business income
+# Gross income from business before deductions
+  self_employment_income: statute/26/1402/a/net_earnings_self_employment
+
+# Section 61(a)(3) - Gains from property
+  capital_gains: statute/26/61/a/3/gains_from_property
+
+# Section 61(a)(4) - Interest
+  interest_income: statute/26/61/a/4/interest_income
+
+# Section 61(a)(7) - Dividends
+  dividend_income: statute/26/61/a/7/dividend_income
+
+# Section 61(a)(10) - Pensions
+# Includes 401(k)/403(b) distributions (402), IRA distributions (408/408A)
+  taxable_pension_income: statute/26/61/a/10/pension_income
+
+# Other income categories (simplified aggregation)
+  other_income: statute/26/61/a/other_income
+
+# Section 85 - Unemployment compensation is gross income
+  unemployment_compensation: statute/26/85/a/unemployment_compensation
+
+# Capital loss limitation - per Section 1211(b), individual capital losses
+# are limited to $3,000 per year against ordinary income
+
+parameters:
+# Capital loss limitation per Section 1211(b)
+  capital_loss_limit: 3000
+
+# Total compensation for services - Section 61(a)(1)
+entity Person
+period Year
+dtype Money
+unit "USD"
+label "Compensation Income"
+description "Total compensation for services including wages, salaries, and tips per Section 61(a)(1)"
+
+formula:
+  return wages + salaries + tips
+
+# Net capital gains after applying loss limitation
+entity Person
+period Year
+dtype Money
+unit "USD"
+label "Net Capital Gains"
+description "Capital gains after applying $3,000 loss limitation per Section 1211(b)"
+
+formula:
+  # If capital gains are positive, use full amount
+  # If negative (losses), limit to -$3,000 per year
+  # Excess losses are carried forward (tracked separately)
+  if capital_gains >= 0: return capital_gains
+  # Capital loss deduction limited to $3,000
+  return max(capital_gains, -capital_loss_limit)
+
+# Total investment income - Sections 61(a)(4) and 61(a)(7)
+entity Person
+period Year
+dtype Money
+unit "USD"
+label "Investment Income"
+description "Total investment income including interest, dividends, and capital gains"
+
+formula:
+  return interest_income + dividend_income + net_capital_gains
+
+# Gross income - the sum of all income sources per Section 61
+entity TaxUnit
+period Year
+dtype Money
+unit "USD"
+label "Gross Income"
+description "Total gross income from all sources per 26 USC Section 61"
+
+formula:
+  # Aggregate income from all members of the tax unit
+  # Each member contributes their personal income
+
+  # Sum compensation across tax unit members
+  total_compensation = sum(members.compensation_income)
+
+  # Sum self-employment income
+  total_se_income = sum(members.self_employment_income)
+
+  # Sum investment income
+  total_investment = sum(members.investment_income)
+
+  # Sum pension/retirement income (Section 61(a)(10))
+  # Includes 401(k), pension, traditional IRA, and non-qualified Roth distributions
+  total_pension = sum(members.taxable_pension_income)
+
+  # Sum other income
+  total_other = sum(members.other_income)
+
+  # Sum unemployment compensation (Section 85)
+  total_unemployment = sum(members.unemployment_compensation)
+
+  return total_compensation + total_se_income + total_investment + total_pension + total_other + total_unemployment
