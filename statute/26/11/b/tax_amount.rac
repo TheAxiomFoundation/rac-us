@@ -11,6 +11,7 @@ imports:
   flat_rate: statute/26/11/parameters/flat_rate
   graduated_brackets: statute/26/11/parameters/graduated_brackets
   is_subject_to_corporate_tax: statute/26/11/a/is_subject_to_corporate_tax
+  tcja_effective_year: statute/26/11/parameters/tcja_effective_year
 
 entity Corporation
 period Year
@@ -27,7 +28,7 @@ formula:
   if taxable_income <= 0: return 0
 
   # Post-TCJA: flat 21% rate
-  if tax_year >= 2018: return taxable_income * flat_rate
+  if tax_year >= tcja_effective_year: return taxable_income * flat_rate
 
   # Pre-TCJA: graduated rates with bubbles
   return compute_graduated_tax(taxable_income, graduated_brackets)

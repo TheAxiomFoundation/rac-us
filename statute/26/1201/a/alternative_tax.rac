@@ -21,6 +21,7 @@ imports:
   flat_rate: statute/26/11/parameters/flat_rate
   graduated_brackets: statute/26/11/parameters/graduated_brackets
   is_subject_to_corporate_tax: statute/26/11/a/is_subject_to_corporate_tax
+  tcja_effective_year: statute/26/11/parameters/tcja_effective_year
 
 entity Corporation
 period Year
@@ -36,7 +37,7 @@ formula:
   if net_capital_gain <= 0: return false
 
   # Post-TCJA: Regular rate (21%) is always lower than alternative (35%)
-  if tax_year >= 2018: return false
+  if tax_year >= tcja_effective_year: return false
 
   # Pre-TCJA: Compare regular tax vs Section 1201 tax
   regular_tax = compute_regular_tax()
@@ -55,7 +56,7 @@ formula:
   if not is_subject_to_corporate_tax: return 0
 
   # Post-TCJA: Always use regular tax
-  if tax_year >= 2018: return 0
+  if tax_year >= tcja_effective_year: return 0
 
   # Pre-TCJA calculation:
   # Tax = (Regular tax on ordinary income) + (35% of net capital gain)
@@ -80,7 +81,7 @@ formula:
   if not is_subject_to_corporate_tax: return 0
 
   # Post-TCJA: Use regular 21% tax (Section 1201 never beneficial)
-  if tax_year >= 2018: return corporate_income_tax
+  if tax_year >= tcja_effective_year: return corporate_income_tax
 
   # Pre-TCJA: Use lower of regular tax or Section 1201 tax
   if uses_section_1201:

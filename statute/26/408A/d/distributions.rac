@@ -31,6 +31,7 @@ imports:
 
 parameters:
   early_withdrawal_penalty_rate: statute/26/402/parameters/early_withdrawal_penalty_rate
+  early_withdrawal_penalty_age: statute/26/402/parameters/early_withdrawal_penalty_age
 
 # Input: Total Roth IRA distributions
 entity Person
@@ -120,7 +121,7 @@ formula:
 
   # Must meet one of these conditions:
   # (i) Age 59.5+
-  if age >= 60:  # Simplified from 59.5
+  if age >= early_withdrawal_penalty_age:
     return true
 
   # (ii) Death
@@ -204,7 +205,7 @@ formula:
     return false
 
   # Age 59.5+ exception
-  if age >= 60:
+  if age >= early_withdrawal_penalty_age:
     return false
 
   # Death exception

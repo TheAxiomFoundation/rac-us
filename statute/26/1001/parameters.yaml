@@ -26,6 +26,30 @@ long_term_holding_period_months:
   citations:
     - "26 USC Section 1222(3): Long-term = held more than 1 year"
 
+long_term_holding_period_days:
+  description: "Days asset must be held to qualify as long-term capital gain (> 1 year)"
+  unit: days
+  values:
+    1942-01-01: 365  # More than 1 year = more than 365 days
+  citations:
+    - "26 USC Section 1222(3): Long-term = held more than 1 year"
+  notes: |
+    The statute says "more than 1 year" which is typically interpreted as
+    more than 365 days. For leap year considerations, if acquired Jan 1 and
+    sold Jan 2 next year = 366 days = long-term.
+
+inherited_property_holding_days:
+  description: "Deemed holding period for inherited property (automatically long-term)"
+  unit: days
+  values:
+    1942-01-01: 366  # Always exceeds 365-day threshold
+  citations:
+    - "26 USC Section 1223(9): Property acquired from decedent treated as long-term"
+  notes: |
+    Property acquired from a decedent is automatically treated as held for
+    more than 1 year, regardless of actual holding period. Using 366 days
+    ensures it always exceeds the 365-day threshold.
+
 # =============================================================================
 # Section 1(h) - Preferential Capital Gains Rates
 # =============================================================================

@@ -22,6 +22,9 @@ imports:
   age: statute/26/person/age
   early_withdrawal_penalty_401k: statute/26/402/e/4/early_withdrawal
 
+parameters:
+  early_withdrawal_penalty_age: statute/26/402/parameters/early_withdrawal_penalty_age
+
 # Input: Total distributions from employer retirement plans
 entity Person
 period Year
@@ -81,7 +84,7 @@ formula:
 
   # Roth distributions are tax-free if qualified
   # Qualified: 5-year holding period AND (age 59.5+ OR death/disability)
-  is_qualified_roth = roth_401k_5_year_satisfied and age >= 59.5
+  is_qualified_roth = roth_401k_5_year_satisfied and age >= early_withdrawal_penalty_age
 
   # Non-qualified Roth: earnings portion is taxable
   # Simplified: assume contributions recovered first (FIFO)

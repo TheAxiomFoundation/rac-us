@@ -35,7 +35,8 @@ imports:
 parameters:
   early_withdrawal_penalty_rate: statute/26/402/parameters/early_withdrawal_penalty_rate
   birth_adoption_distribution_limit: statute/26/402/parameters/birth_adoption_distribution_limit
-  medical_expense_threshold_rate: 0.075  # Per 72(t)(2)(B) - 7.5% of AGI
+  medical_expense_threshold_rate: statute/26/402/parameters/medical_expense_threshold_rate
+  early_withdrawal_penalty_age: statute/26/402/parameters/early_withdrawal_penalty_age
 
 # Input: Age at time of distribution
 entity Person
@@ -141,7 +142,7 @@ formula:
     return false
 
   # Exception (A)(i): Age 59-1/2 or older
-  if age >= 60:  # Simplified to 60 for modeling
+  if age >= early_withdrawal_penalty_age:
     return false
 
   # Exception (A)(ii): Death

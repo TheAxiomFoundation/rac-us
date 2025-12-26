@@ -7,6 +7,15 @@
 # - TCJA Section 13001 - 21% flat rate effective 2018
 # - IRS Publication 542 - Corporations
 
+# TCJA effective year for flat rate
+tcja_effective_year:
+  description: "First tax year for TCJA flat 21% corporate rate"
+  unit: year
+  values:
+    2017-12-22: 2018  # TCJA enacted, effective for tax years beginning after 2017
+  citations:
+    - "TCJA Section 13001(c): effective for taxable years beginning after December 31, 2017"
+
 # Post-TCJA flat rate (2018+)
 flat_rate:
   description: "Corporate income tax rate (flat)"

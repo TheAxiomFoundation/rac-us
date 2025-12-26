@@ -194,3 +194,17 @@ rmd_birth_year_thresholds:
   # Born 1950 or earlier: 72
   # Born 1951-1959: 73
   # Born 1960 or later: 75
+
+# ============================================================================
+# Medical Expense Exception - 72(t)(2)(B)
+# ============================================================================
+
+medical_expense_threshold_rate:
+  description: "AGI threshold rate for medical expense early withdrawal exception"
+  unit: rate
+  values:
+    2013-01-01: 0.10  # 10% for most taxpayers (temporary)
+    2017-01-01: 0.075 # 7.5% - TCJA made permanent
+  citations:
+    - "26 USC 72(t)(2)(B): medical expenses exceeding 7.5% of AGI"
+    - "TCJA Section 11027: made 7.5% threshold permanent"

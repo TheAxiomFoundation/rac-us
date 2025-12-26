@@ -24,6 +24,10 @@ imports:
 parameters:
 # Long-term holding period threshold (in months)
   long_term_threshold_months: 1001/parameters#long_term_holding_period_months
+# Long-term holding period threshold (in days)
+  long_term_threshold_days: 1001/parameters#long_term_holding_period_days
+# Deemed holding period for inherited property
+  inherited_property_holding_days: 1001/parameters#inherited_property_holding_days
 
 # =============================================================================
 # Section 1222 - Holding Period Classification
@@ -84,7 +88,7 @@ formula:
   # Special rules per Section 1223:
 
   # Section 1223(9): Property acquired from decedent is always long-term
-  if is_inherited_property: return 366  # Automatically exceeds 1 year threshold
+  if is_inherited_property: return inherited_property_holding_days
 
   # Section 1223(2): Gifted property - tack donor's holding period
   # (if basis is carryover from donor)
@@ -150,7 +154,7 @@ description "Asset held more than 1 year per 26 USC Section 1222(3)-(4)"
 formula:
   # More than 1 year = more than 365 days (366 in leap year, but statute says "> 1 year")
   # Standard: if acquired Jan 1 and sold Jan 2 next year = 366 days = long-term
-  return effective_holding_period_days > 365
+  return effective_holding_period_days > long_term_threshold_days
 
 default false
 
@@ -227,7 +231,7 @@ formula:
     # Short sale rules per Section 1233(b):
     # If substantially identical property held long-term, gain is short-term
     return HoldingType.SHORT_TERM  # Forced short-term
-  elif effective_holding_period_days > 365:
+  elif effective_holding_period_days > long_term_threshold_days:
     return HoldingType.LONG_TERM
   else:
     return HoldingType.SHORT_TERM
