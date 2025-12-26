@@ -1,0 +1,263 @@
+# Child Care and Development Fund (CCDF) Parameters
+# 42 USC 9858 - Child Care and Development Block Grant
+#
+# CCDF provides federal funding to states for child care subsidies
+# for low-income families. States have significant flexibility in
+# setting eligibility thresholds and payment rates within federal limits.
+#
+# Key federal statute references:
+# - 42 USC 9858c(a)(2)(B) - Income eligibility limit
+# - 42 USC 9858c(c)(2)(F) - Activity requirements
+# - 42 USC 9858c(c)(4)(A) - Sliding fee scale (copayment)
+# - 42 USC 9858n(4) - Eligible child definition (age limits)
+
+variable: ccdf
+entity: SPMUnit
+period: Year
+dtype: Money
+
+# Income Eligibility
+# 42 USC 9858c(a)(2)(B) - Federal maximum income limit
+income_eligibility:
+  description: "Income eligibility thresholds for CCDF per 42 USC 9858c(a)(2)(B)"
+
+  # Maximum income as percentage of State Median Income
+  # Federal law caps initial eligibility at 85% SMI
+  initial_limit_smi:
+    description: "Maximum income as percentage of SMI for initial eligibility"
+    unit: rate
+    values:
+      1991-01-01: 0.75  # Original CCDF
+      2015-01-01: 0.85  # CCDBG Act of 2014 increased cap
+    citations:
+      - "42 USC 9858c(a)(2)(B): 85 percent of State median income"
+      - "Pub. L. 113-186 Section 3(a) - CCDBG Act of 2014"
+
+  # Continuing eligibility (redetermination) - at or below initial limit
+  # 2014 reauthorization required states to set continuing at or above 85% SMI
+  # if initial is at 85%
+  continuing_limit_smi:
+    description: "Maximum income as percentage of SMI for continuing eligibility"
+    unit: rate
+    values:
+      2015-01-01: 0.85  # Must be at least equal to initial limit
+    citations:
+      - "42 USC 9858c(c)(2)(N)(i): 12-month eligibility"
+      - "45 CFR 98.21(a) - Continuing eligibility"
+
+# Age Eligibility
+# 42 USC 9858n(4) - "Eligible child" definition
+age_limits:
+  description: "Age limits for CCDF-eligible children per 42 USC 9858n(4)"
+
+  maximum_age:
+    description: "Maximum age for CCDF eligibility"
+    unit: year
+    values:
+      1991-01-01: 13
+    citations:
+      - "42 USC 9858n(4)(A)(i): who has not attained 13 years of age"
+
+  # States may extend to age 19 for children with disabilities
+  maximum_age_with_disability:
+    description: "Maximum age for children with disabilities"
+    unit: year
+    values:
+      1991-01-01: 19
+    citations:
+      - "42 USC 9858n(4)(A)(ii): who is under 19 and physically or mentally incapable"
+
+# Activity Requirements
+# 42 USC 9858c(c)(2)(F) - Parents must be working, in training, or in education
+activity_requirements:
+  description: "Activity requirements for CCDF eligibility per 42 USC 9858c(c)(2)(F)"
+
+  eligible_activities:
+    description: "Activities that satisfy CCDF eligibility requirements"
+    type: enumerated
+    values:
+      1991-01-01:
+        - employment  # Working
+        - job_search  # Actively searching for work
+        - job_training  # Vocational training
+        - education  # Attending school
+        - protective_services  # Child receiving/needing protective services
+    citations:
+      - "42 USC 9858c(c)(2)(F): employed, or attending training or education"
+      - "42 USC 9858n(4)(B): child is in need of protective services"
+
+  # Protective services exemption from activity test
+  protective_services_exemption:
+    description: "Children in protective services exempt from parent activity test"
+    values:
+      1991-01-01: true
+    citations:
+      - "42 USC 9858n(4)(B): receiving, or needs to receive, protective services"
+
+# Asset Limits
+# Federal CCDF does not mandate asset tests - state option
+# Many states have eliminated asset tests after 2014 reauthorization
+asset_limits:
+  description: "Asset/resource limits for CCDF (state-set, not federally mandated)"
+
+  # Federal default (no limit) - states may impose stricter
+  federal_default:
+    description: "Federal law does not require asset test"
+    unit: USD
+    values:
+      1991-01-01: .inf  # No federal asset limit
+      2015-01-01: 1000000  # Effectively no limit (1 million)
+    citations:
+      - "42 USC 9858c(a)(2) - No federal asset test required"
+      - "CCDBG Act of 2014 encouraged states to eliminate asset tests"
+
+# Copayment (Sliding Fee Scale)
+# 42 USC 9858c(c)(4)(A) - States must establish sliding fee scales
+copayment:
+  description: "Family copayment requirements per 42 USC 9858c(c)(4)(A)"
+
+  # Federal requirement that families pay based on ability
+  sliding_fee_required:
+    description: "States must use sliding fee scale for copayments"
+    values:
+      1991-01-01: true
+    citations:
+      - "42 USC 9858c(c)(4)(A): a sliding fee scale that provides for cost sharing"
+
+  # States must waive copay at or below poverty level
+  poverty_level_waiver:
+    description: "States must waive copay for families at or below FPL"
+    values:
+      2015-01-01: true
+    citations:
+      - "42 USC 9858c(c)(4)(A)(i): families below poverty line waived"
+
+  # Copayment cannot exceed 7% of family income
+  maximum_percent_of_income:
+    description: "Federal maximum copayment as percentage of family income"
+    unit: rate
+    values:
+      2015-01-01: 0.07  # 7% of income maximum (CCDBG 2014 best practice)
+    citations:
+      - "CCDBG Act of 2014 Section 5 - 7% affordability standard"
+
+  # Minimum weekly family fee (state-specific, typical value)
+  minimum_weekly_fee:
+    description: "Minimum weekly family copayment (typical state value)"
+    unit: USD
+    values:
+      2021-01-01: 1
+    citations:
+      - "State CCDF plans typically set minimum fee of $1/week"
+
+# Provider Payment Rates
+# 42 USC 9858c(c)(4)(B) - Market rate surveys and payment rates
+payment_rates:
+  description: "Provider payment rate requirements per 42 USC 9858c(c)(4)(B)"
+
+  # Market rate survey requirement
+  market_rate_survey_frequency:
+    description: "Frequency of market rate surveys (in years)"
+    unit: year
+    values:
+      1991-01-01: 2  # Biennial surveys originally
+      2015-01-01: 3  # Every 3 years after 2014 reauthorization
+    citations:
+      - "45 CFR 98.45(c): every 3 years"
+      - "42 USC 9858c(c)(4)(B)(ii)"
+
+  # Target percentile for payment rates
+  target_percentile:
+    description: "Recommended percentile of market rate for payment"
+    unit: rate
+    values:
+      2015-01-01: 0.75  # 75th percentile recommended
+    citations:
+      - "45 CFR 98.45(b): at least the 75th percentile"
+      - "CCDBG Act of 2014 guidance"
+
+# Equal Access Requirement
+# 42 USC 9858c(c)(4)(C) - Payment rates must provide equal access
+equal_access:
+  description: "Equal access requirements per 42 USC 9858c(c)(4)(C)"
+  values:
+    1991-01-01: true
+  citations:
+    - "42 USC 9858c(c)(4)(C): equal access for eligible children"
+
+# 12-Month Eligibility
+# 42 USC 9858c(c)(2)(N) - Minimum eligibility period (added 2014)
+eligibility_period:
+  description: "Minimum eligibility period per 42 USC 9858c(c)(2)(N)"
+
+  minimum_months:
+    description: "Minimum months of eligibility regardless of changes"
+    unit: month
+    values:
+      1991-01-01: 0  # No requirement before 2014
+      2015-01-01: 12  # 12-month eligibility required
+    citations:
+      - "42 USC 9858c(c)(2)(N)(i): not less than 12 months"
+
+  # Continuation during temporary changes
+  temporary_change_continuation:
+    description: "Eligibility continues during temporary changes in activity"
+    values:
+      2015-01-01: true
+    citations:
+      - "42 USC 9858c(c)(2)(N)(ii): temporary changes shall not terminate eligibility"
+
+# Graduated Phase-Out
+# 42 USC 9858c(c)(2)(N)(iv) - Graduated phase-out when income exceeds limit
+graduated_phase_out:
+  description: "Graduated phase-out requirements per 42 USC 9858c(c)(2)(N)(iv)"
+
+  required:
+    description: "States must provide graduated phase-out"
+    values:
+      2015-01-01: true
+    citations:
+      - "42 USC 9858c(c)(2)(N)(iv): graduated phase-out"
+
+  # States may use up to 85% SMI as exit threshold
+  exit_threshold_smi:
+    description: "Maximum income for graduated phase-out exit"
+    unit: rate
+    values:
+      2015-01-01: 0.85
+    citations:
+      - "42 USC 9858c(c)(2)(N)(iv): exceeds 85 percent of State median income"
+
+# State Median Income Reference Values
+# Published annually by HHS for CCDF eligibility
+# These are federal reference values; states use their own SMI
+state_median_income_reference:
+  description: "HHS State Median Income reference values for CCDF"
+  unit: USD
+  period: year
+
+  # 4-person family SMI (baseline reference)
+  # States may use federal SMI or their own calculations
+  2024:
+    by_household_size:
+      1: 45000
+      2: 58900
+      3: 72750
+      4: 86600
+      5: 100450
+      6: 114300
+      additional_per_person: 13850
+
+  2025:
+    by_household_size:
+      1: 46350
+      2: 60650
+      3: 74900
+      4: 89200
+      5: 103450
+      6: 117700
+      additional_per_person: 14250
+
+  citations:
+    - "HHS Federal Register Annual SMI Estimates for CCDF"
+    - "45 CFR 98.20(a)(2)(ii)"

@@ -1,0 +1,101 @@
+# 42 USC 1758(b)(1)(A)(i) - Free School Meal Eligibility
+#
+# "(A)(i) except as provided in clause (ii), a child shall be served a
+# free lunch if the household income is at or below 130 percent of the
+# applicable family size income level contained in the nonfarm income
+# poverty guidelines prescribed by the Office of Management and Budget"
+#
+# A child is eligible for FREE school meals if:
+# 1. Household income <= 130% of Federal Poverty Level (income eligibility), OR
+# 2. Categorically eligible via program participation (SNAP, TANF, FDPIR, etc.), OR
+# 3. Attends a Community Eligibility Provision (CEP) school
+#
+# Reference: https://www.law.cornell.edu/uscode/text/42/1758#b_1
+
+imports:
+  free_meal_limit_pct_fpl: statute/42/1751-1773/income/free_meal_limit_pct_fpl
+  categorically_eligible: statute/42/1751-1773/1758/categorical
+  federal_poverty_level: statute/hhs/poverty_guidelines/fpl
+
+# ------------------------------------------------------------------------------
+# school_meal_income_eligible_free
+# Income-based eligibility for free meals: income <= 130% FPL
+# 42 USC 1758(b)(1)(A)(i)
+# ------------------------------------------------------------------------------
+
+variable school_meal_income_eligible_free
+entity Person
+period Year
+dtype Boolean
+
+formula:
+  # Get household's gross annual income
+  household_income = household.gross_income
+
+  # Get Federal Poverty Level for household size
+  household_size = household.size
+  fpl = federal_poverty_level(household_size)
+
+  # Calculate income ratio to FPL
+  income_ratio = household_income / fpl
+
+  # Free meal eligibility: at or below 130% FPL
+  return income_ratio <= free_meal_limit_pct_fpl
+
+# ------------------------------------------------------------------------------
+# school_meal_free_eligible
+# Combined free meal eligibility (income OR categorical OR CEP)
+# A child qualifies for free meals through any of three pathways
+# ------------------------------------------------------------------------------
+
+variable school_meal_free_eligible
+entity Person
+period Year
+dtype Boolean
+
+formula:
+  # Pathway 1: Income eligibility (<=130% FPL)
+  income_eligible = school_meal_income_eligible_free
+
+  # Pathway 2: Categorical eligibility (SNAP, TANF, FDPIR, foster, homeless, etc.)
+  categorical = categorically_eligible
+
+  # Pathway 3: Attends a CEP school (all students get free meals)
+  cep_school = attends_cep_school
+
+  return income_eligible or categorical or cep_school
+
+# ------------------------------------------------------------------------------
+# is_in_k12_school
+# Whether the person is enrolled in K-12 schooling
+# Used to determine eligibility for school meal programs
+# ------------------------------------------------------------------------------
+
+variable is_in_k12_school
+entity Person
+period Year
+dtype Boolean
+
+formula:
+  # Age range for typical K-12 (ages 5-18)
+  # Some states vary, but this covers the general case
+  age = person.age
+  return (age >= 5) and (age <= 18) and is_student
+
+# ------------------------------------------------------------------------------
+# school_meal_fpg_ratio
+# Ratio of household income to Federal Poverty Guidelines
+# Used for determining eligibility tier
+# ------------------------------------------------------------------------------
+
+variable school_meal_fpg_ratio
+entity Household
+period Year
+dtype Rate
+
+formula:
+  household_income = household.gross_income
+  household_size = household.size
+  fpl = federal_poverty_level(household_size)
+
+  return household_income / fpl

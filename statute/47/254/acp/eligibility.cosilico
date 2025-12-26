@@ -1,0 +1,120 @@
+# 47 USC § 1752(a)(6) - ACP Eligible Household
+#
+# "The term 'eligible household' means... a household in which—
+#  (A) the income of such household... is at or below 200 percent of
+#      the Federal Poverty Level;
+#  (B) at least 1 member of the household has applied for and been
+#      approved to receive benefits under the free and reduced price
+#      lunch program...
+#  (C) at least 1 member of the household has received a Federal Pell Grant...
+#  (D) at least 1 member of the household meets the eligibility criteria for a
+#      participating provider's existing low-income program...
+#  (E) at least 1 member of the household receives assistance through the
+#      special supplemental nutritional program for women, infants, and children...
+#  (F) at least 1 member of the household is enrolled in... Lifeline
+#      categorical eligibility programs"
+#
+# Note: ACP funding expired May 2024, benefit = $0 after June 2024
+
+imports:
+  # Income ratio from Lifeline
+  fcc_fpg_ratio: statute/47/254/lifeline/eligibility/fcc_fpg_ratio
+
+  # Lifeline eligibility
+  is_lifeline_eligible: statute/47/254/lifeline/eligibility/is_lifeline_eligible
+  is_lifeline_categorically_eligible: statute/47/254/lifeline/eligibility/is_lifeline_categorically_eligible
+
+  # Tribal status
+  is_on_tribal_land: inputs/household/is_on_tribal_land
+
+  # ACP-specific qualifying programs (beyond Lifeline)
+  receives_free_school_meals: programs/nslp/free_meals
+  receives_reduced_price_school_meals: programs/nslp/reduced_price_meals
+  receives_pell_grant: programs/pell_grant/enrolled
+  receives_wic: programs/wic/enrolled
+
+  # EBB for exclusion check
+  ebb_amount: statute/47/ebb/benefit
+
+# ---------------------------------------------------------------------------
+# ACP Income Eligibility (47 USC § 1752(a)(6)(A))
+# ---------------------------------------------------------------------------
+
+variable is_acp_income_eligible:
+  entity Household
+  period Year
+  dtype Boolean
+  label "ACP Income Eligible"
+  description "Household income is at or below 200% of federal poverty guidelines"
+
+  formula:
+    fpg_limit = parameters.acp.fpg_limit  # 2.00 (200%)
+    return fcc_fpg_ratio <= fpg_limit
+
+# ---------------------------------------------------------------------------
+# ACP Categorical Eligibility (47 USC § 1752(a)(6)(B)-(F))
+# ---------------------------------------------------------------------------
+
+variable is_acp_categorically_eligible:
+  entity Household
+  period Year
+  dtype Boolean
+  label "ACP Categorical Eligibility"
+  description "Participates in qualifying program for ACP eligibility"
+
+  formula:
+    # Per 47 USC § 1752(a)(6):
+    # (B) Free or reduced price school meals (NSLP/SBP)
+    school_meals = receives_free_school_meals or receives_reduced_price_school_meals
+
+    # (C) Federal Pell Grant recipient
+    pell_grant = receives_pell_grant
+
+    # (D) Provider's low-income program - not implemented
+    # provider_program = false
+
+    # (E) WIC (Special Supplemental Nutrition Program for Women, Infants, and Children)
+    wic = receives_wic
+
+    # (F) Lifeline categorical eligibility also qualifies for ACP
+    # This includes: Medicaid, SNAP, SSI, Head Start, FDPIR, TANF
+    lifeline = is_lifeline_categorically_eligible
+
+    return school_meals or pell_grant or wic or lifeline
+
+# ---------------------------------------------------------------------------
+# EBB Exclusion Check
+# ---------------------------------------------------------------------------
+
+variable is_enrolled_in_ebb:
+  entity Household
+  period Year
+  dtype Boolean
+  label "Enrolled in Emergency Broadband Benefit"
+  description "Household receives EBB (cannot simultaneously receive ACP)"
+
+  formula:
+    # Cannot be enrolled in both EBB and ACP
+    return ebb_amount > 0
+
+# ---------------------------------------------------------------------------
+# Overall ACP Eligibility (47 USC § 1752(a)(6))
+# ---------------------------------------------------------------------------
+
+variable is_acp_eligible:
+  entity Household
+  period Year
+  dtype Boolean
+  label "ACP Eligible"
+  description "Eligible for Affordable Connectivity Program per 47 USC § 1752(a)(6)"
+
+  formula:
+    # Eligible if income-eligible OR categorically eligible
+    income_or_categorical = is_acp_income_eligible or is_acp_categorically_eligible
+
+    # Cannot be simultaneously enrolled in EBB
+    not_on_ebb = not is_enrolled_in_ebb
+
+    return income_or_categorical and not_on_ebb
+
+  default false

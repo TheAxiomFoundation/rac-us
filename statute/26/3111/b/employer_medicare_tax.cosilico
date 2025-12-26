@@ -18,8 +18,9 @@ imports:
   irs_employment_income: statute/26/3121/a/irs_employment_income
 
 parameters:
-# Load employer rate from parameters.yaml
+# Load rates from parameters.yaml
   employer_medicare_rate: statute/26/3111/parameters.yaml#employer_medicare_rate
+  employee_medicare_rate: statute/26/3101/parameters.yaml#employee_rate
 
 # Employer Medicare tax on wages
 entity Person
@@ -43,8 +44,8 @@ label "Total Medicare Tax"
 description "Combined employer and employee Medicare tax (2.9% of wages)"
 
 formula:
-  # Employee share: 1.45%
-  employee_share = irs_employment_income * 0.0145
+  # Employee share: 1.45% (from 3101 parameters)
+  employee_share = irs_employment_income * employee_medicare_rate
 
   # Employer share: 1.45%
   employer_share = employer_medicare_tax

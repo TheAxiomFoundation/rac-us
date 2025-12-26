@@ -1,0 +1,139 @@
+# 47 CFR § 54.409 - Lifeline Eligibility
+#
+# "A consumer is eligible to receive Lifeline service if the consumer meets
+# the income-based eligibility threshold or participates in one of the
+# qualifying assistance programs."
+#
+# Eligibility paths:
+# 1. Income-based: Gross income <= 135% of Federal Poverty Guidelines
+# 2. Categorical: Participation in qualifying programs (differs for tribal/non-tribal)
+#
+# Only ONE Lifeline benefit per household per 47 CFR § 54.409(c)
+
+imports:
+  # Federal Poverty Guidelines from HHS
+  federal_poverty_guideline: hhs/poverty_guidelines/fpg
+
+  # Household characteristics
+  is_on_tribal_land: inputs/household/is_on_tribal_land
+  household_size: inputs/household/size
+  gross_income: statute/26/61/gross_income
+
+  # Categorical eligibility programs
+  receives_medicaid: programs/medicaid/enrolled
+  receives_snap: statute/7/2011/snap_eligible
+  receives_ssi: ssa/ssi/eligible
+  receives_tanf: programs/tanf/enrolled
+  receives_head_start: programs/head_start/enrolled
+  receives_fdpir: programs/fdpir/enrolled
+
+# ---------------------------------------------------------------------------
+# FCC Income Ratio (47 CFR § 54.400(f))
+# ---------------------------------------------------------------------------
+
+variable fcc_fpg_ratio:
+  entity Household
+  period Year
+  dtype Rate
+  label "FCC Federal Poverty Guideline Ratio"
+  description "Household gross income as a fraction of the federal poverty guideline per 47 CFR § 54.400(f)"
+
+  formula:
+    return gross_income / federal_poverty_guideline
+
+# ---------------------------------------------------------------------------
+# Income-Based Eligibility (47 CFR § 54.409(a)(1))
+# ---------------------------------------------------------------------------
+
+variable is_lifeline_income_eligible:
+  entity Household
+  period Year
+  dtype Boolean
+  label "Lifeline Income Eligible"
+  description "Household income is at or below 135% of federal poverty guidelines"
+
+  formula:
+    fpg_limit = parameters.lifeline.fpg_limit
+    return fcc_fpg_ratio <= fpg_limit
+
+# ---------------------------------------------------------------------------
+# Categorical Eligibility - Non-Tribal (47 CFR § 54.409(b))
+# ---------------------------------------------------------------------------
+
+variable is_lifeline_categorically_eligible_non_tribal:
+  entity Household
+  period Year
+  dtype Boolean
+  label "Lifeline Categorical Eligibility (Non-Tribal)"
+  description "Participates in qualifying program for non-tribal Lifeline eligibility"
+
+  formula:
+    # Per 47 CFR § 54.409(b):
+    # - Medicaid
+    # - SNAP (Supplemental Nutrition Assistance Program)
+    # - SSI (Supplemental Security Income)
+    # Also includes but not yet implemented:
+    # - Veterans Pension
+    # - Federal Public Housing Assistance / Section 8
+    return receives_medicaid or receives_snap or receives_ssi
+
+# ---------------------------------------------------------------------------
+# Categorical Eligibility - Tribal (47 CFR § 54.409(b))
+# ---------------------------------------------------------------------------
+
+variable is_lifeline_categorically_eligible_tribal:
+  entity Household
+  period Year
+  dtype Boolean
+  label "Lifeline Categorical Eligibility (Tribal)"
+  description "Participates in qualifying program for tribal Lifeline eligibility"
+
+  formula:
+    # Tribal households have additional qualifying programs per 47 CFR § 54.409(b):
+    # - Head Start
+    # - FDPIR (Food Distribution Program on Indian Reservations)
+    # - TANF (including Tribally-administered TANF)
+    # Also includes but not yet implemented:
+    # - Bureau of Indian Affairs General Assistance
+
+    # Tribal households also qualify through non-tribal programs
+    non_tribal_eligible = is_lifeline_categorically_eligible_non_tribal
+
+    tribal_programs = receives_head_start or receives_fdpir or receives_tanf
+
+    return non_tribal_eligible or tribal_programs
+
+# ---------------------------------------------------------------------------
+# Combined Categorical Eligibility
+# ---------------------------------------------------------------------------
+
+variable is_lifeline_categorically_eligible:
+  entity Household
+  period Year
+  dtype Boolean
+  label "Lifeline Categorical Eligibility"
+  description "Participates in qualifying program for Lifeline eligibility (tribal or non-tribal)"
+
+  formula:
+    if is_on_tribal_land then
+      return is_lifeline_categorically_eligible_tribal
+    else
+      return is_lifeline_categorically_eligible_non_tribal
+
+# ---------------------------------------------------------------------------
+# Overall Lifeline Eligibility (47 CFR § 54.409)
+# ---------------------------------------------------------------------------
+
+variable is_lifeline_eligible:
+  entity Household
+  period Year
+  dtype Boolean
+  label "Lifeline Eligible"
+  description "Eligible for Lifeline phone or broadband subsidy per 47 CFR § 54.409"
+
+  formula:
+    # Eligible if income-eligible OR categorically eligible
+    # Note: Only one Lifeline per household per 47 CFR § 54.409(c)
+    return is_lifeline_income_eligible or is_lifeline_categorically_eligible
+
+  default false

@@ -6,6 +6,7 @@
 # - 24 CFR Part 5 (income and family determination)
 # - 24 CFR Part 982 (HCV program requirements)
 # - HUD FY 2024 Income Limits (FR-6500-N-01)
+# - HUD FY 2025 Income Limits (FR-6600-N-01)
 
 variable: hcv
 entity: Household
@@ -17,7 +18,7 @@ dtype: Money
 # ============================================================
 # Income limits based on Area Median Income (AMI)
 # HUD publishes annually for each metropolitan area
-# Using FY 2024 National Non-Metro Median as baseline
+# Using National Non-Metro Median as baseline
 
 income_limits:
   description: "Income eligibility thresholds as percentage of Area Median Income per 42 USC 1437f(a) and 24 CFR 5.603"
@@ -29,6 +30,46 @@ income_limits:
     very_low_income: 0.50       # 50% AMI - basic eligibility
     extremely_low_income: 0.30  # 30% AMI - targeting requirement
     low_income: 0.80            # 80% AMI - for continued occupancy
+
+  # FY 2025 National Median Income Limits by household size
+  # Source: HUD FY 2025 Income Limits (effective April 1, 2025)
+  # https://www.huduser.gov/portal/datasets/il.html
+  2025:
+    # 50% AMI (Very Low Income) - Primary eligibility threshold
+    very_low_income:
+      1: 37100
+      2: 42400
+      3: 47700
+      4: 53000
+      5: 57250
+      6: 61500
+      7: 65750
+      8: 70000
+      additional_per_person: 4250
+
+    # 30% AMI (Extremely Low Income) - 75% targeting requirement
+    extremely_low_income:
+      1: 22250
+      2: 25450
+      3: 28600
+      4: 31800
+      5: 34350
+      6: 36900
+      7: 39450
+      8: 42000
+      additional_per_person: 2550
+
+    # 80% AMI (Low Income) - for continued occupancy only
+    low_income:
+      1: 59350
+      2: 67850
+      3: 76350
+      4: 84800
+      5: 91600
+      6: 98400
+      7: 105200
+      8: 112000
+      additional_per_person: 6800
 
   # FY 2024 National Median Income Limits by household size
   # Source: HUD FY 2024 Income Limits (effective April 1, 2024)
@@ -82,14 +123,18 @@ deductions:
     description: "Deduction for each dependent family member per 24 CFR 5.611(a)(1)"
     unit: USD
     period: year
-    amount: 480
+    values:
+      2024-04-01: 480
+      2025-04-01: 480  # No inflation adjustment in statute
 
   # 24 CFR 5.611(a)(2) - Elderly/disabled household deduction
   elderly_disabled:
     description: "Deduction for elderly (62+) or disabled head/spouse per 24 CFR 5.611(a)(2)"
     unit: USD
     period: year
-    amount: 400
+    values:
+      2024-04-01: 400
+      2025-04-01: 400  # No inflation adjustment in statute
 
   # 24 CFR 5.611(a)(3) - Child care deduction
   childcare:
@@ -142,7 +187,6 @@ payment_standards:
   period: month
 
   # PHAs set payment standards between 90-110% of Fair Market Rent (FMR)
-  # Using FY 2024 National 2-BR FMR as reference
   # https://www.huduser.gov/portal/datasets/fmr.html
 
   fmr_range:
@@ -150,7 +194,20 @@ payment_standards:
     maximum_pct: 1.10  # 110% of FMR
     # Higher exception allowed with HUD approval
 
-  # FY 2024 National Median Fair Market Rents (approximate)
+  # FY 2025 National Median Fair Market Rents
+  # Source: HUD FY 2025 FMR (effective October 1, 2024)
+  2025:
+    0_bedroom: 1089   # Efficiency/SRO
+    1_bedroom: 1216
+    2_bedroom: 1483   # Base FMR
+    3_bedroom: 1950
+    4_bedroom: 2193
+    5_bedroom: 2522
+    6_bedroom: 2851
+    additional_per_bedroom: 329
+
+  # FY 2024 National Median Fair Market Rents
+  # Source: HUD FY 2024 FMR (effective October 1, 2023)
   2024:
     0_bedroom: 1037   # Efficiency/SRO
     1_bedroom: 1158

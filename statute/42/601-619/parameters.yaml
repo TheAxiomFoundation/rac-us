@@ -1,0 +1,404 @@
+# 42 USC 601-619 - TANF Federal Parameters
+#
+# Temporary Assistance for Needy Families block grant program.
+# Federal law establishes minimum requirements; states set most benefit levels.
+#
+# This file contains:
+# 1. Federal requirements and limits
+# 2. Default/typical state parameters (for baseline simulation)
+#
+# For state-specific overrides, see:
+# - states/[state]/tanf/parameters.yaml
+#
+# References:
+# - https://uscode.house.gov/view.xhtml?path=/prelim@title42/chapter7/subchapterIV/partA
+# - 45 CFR Part 260-265 (TANF regulations)
+
+# =============================================================================
+# 42 USC 601 - PURPOSE
+# =============================================================================
+
+program:
+  name: "Temporary Assistance for Needy Families"
+  acronym: "TANF"
+  agency: "HHS/ACF/OFA"
+  effective_date: "1996-08-22"
+  citations:
+    - "Personal Responsibility and Work Opportunity Reconciliation Act of 1996 (PRWORA)"
+    - "Pub. L. 104-193"
+
+# =============================================================================
+# 42 USC 607 - WORK PARTICIPATION REQUIREMENTS
+# =============================================================================
+
+work_requirements:
+  # 607(a)(1): All families participation rate
+  participation_rate:
+    description: "Minimum percentage of TANF families required to participate in work activities"
+    unit: rate
+    period: year
+    label: "TANF Work Participation Rate"
+    reference:
+      - "42 USC 607(a)(1)"
+      - "45 CFR 261.21"
+    values:
+      1997-10-01: 0.25
+      1998-10-01: 0.30
+      1999-10-01: 0.35
+      2000-10-01: 0.40
+      2001-10-01: 0.45
+      2002-10-01: 0.50
+
+  # 607(a)(2): Two-parent families rate
+  two_parent_participation_rate:
+    description: "Minimum work participation rate for two-parent TANF families"
+    unit: rate
+    period: year
+    label: "TANF Two-Parent Work Participation Rate"
+    reference: "42 USC 607(a)(2)"
+    values:
+      1997-10-01: 0.75
+      1999-10-01: 0.90
+
+  # 607(c)(1)(A): Hours - single parent with child under 6
+  hours_single_parent_young_child:
+    description: "Weekly work hours required for single parent with child under 6"
+    unit: hours
+    period: week
+    label: "Work Hours (Parent with Child Under 6)"
+    reference: "42 USC 607(c)(1)(A)(i)"
+    values:
+      1997-10-01: 20
+
+  # 607(c)(1)(B): Hours - general single parent
+  hours_single_parent:
+    description: "Weekly work hours required for single-parent families"
+    unit: hours
+    period: week
+    label: "Work Hours (Single Parent)"
+    reference: "42 USC 607(c)(1)(B)"
+    values:
+      1997-10-01: 20
+      1999-10-01: 25
+      2000-10-01: 30
+
+  # 607(c)(2)(A): Hours - two-parent families
+  hours_two_parent:
+    description: "Combined weekly work hours required for two-parent families"
+    unit: hours
+    period: week
+    label: "Work Hours (Two-Parent)"
+    reference: "42 USC 607(c)(2)(A)"
+    values:
+      1997-10-01: 35
+
+  # 607(c)(2)(B): Hours - two-parent with federally-funded child care
+  hours_two_parent_with_childcare:
+    description: "Combined weekly work hours for two-parent families receiving federal child care"
+    unit: hours
+    period: week
+    label: "Work Hours (Two-Parent with Child Care)"
+    reference: "42 USC 607(c)(2)(B)"
+    values:
+      1997-10-01: 55
+
+  # Core activities minimum (DRA 2005)
+  core_hours_minimum:
+    description: "Minimum hours in core work activities before other activities count"
+    unit: hours
+    period: week
+    label: "Core Work Activity Minimum Hours"
+    reference:
+      - "42 USC 607(c)(2)(D)"
+      - "Deficit Reduction Act of 2005"
+    values:
+      2006-10-01: 20
+
+  # Job search time limits
+  job_search_weeks_max:
+    description: "Maximum weeks of job search counted as work activity"
+    unit: weeks
+    period: year
+    label: "Job Search Week Limit"
+    reference: "42 USC 607(c)(2)(A)(i)"
+    values:
+      1997-10-01: 6
+
+  job_search_weeks_high_unemployment:
+    description: "Maximum job search weeks in states with high unemployment"
+    unit: weeks
+    period: year
+    label: "Job Search Week Limit (High Unemployment)"
+    reference: "42 USC 607(c)(2)(A)(ii)"
+    values:
+      1997-10-01: 12
+
+  # Vocational education limit
+  vocational_education_months:
+    description: "Maximum months of vocational education as work activity"
+    unit: months
+    label: "Vocational Education Month Limit"
+    reference: "42 USC 607(d)(8)"
+    values:
+      1997-10-01: 12
+
+  # Young child exemption age
+  young_child_age_threshold:
+    description: "Age of youngest child for reduced work hours requirement"
+    unit: year
+    label: "Young Child Age for Reduced Hours"
+    reference: "42 USC 607(c)(1)(A)(i)"
+    values:
+      1997-10-01: 6
+
+# =============================================================================
+# 42 USC 608 - PROHIBITIONS AND REQUIREMENTS
+# =============================================================================
+
+time_limits:
+  # 608(a)(7)(A): Federal 60-month limit
+  federal_months:
+    description: "Maximum months of federally-funded TANF assistance per adult"
+    unit: months
+    label: "Federal TANF Time Limit"
+    reference: "42 USC 608(a)(7)(A)"
+    values:
+      1997-10-01: 60
+
+  # 608(a)(7)(C)(ii): Hardship exemption cap
+  hardship_exemption_rate:
+    description: "Maximum percentage of caseload exempt from time limit due to hardship"
+    unit: rate
+    label: "Hardship Exemption Rate"
+    reference: "42 USC 608(a)(7)(C)(ii)"
+    values:
+      1997-10-01: 0.20
+
+# Age limits
+age_limits:
+  # Child eligibility age
+  child_max_age:
+    description: "Maximum age for child to be included in TANF unit"
+    unit: year
+    label: "TANF Child Age Limit"
+    reference: "42 USC 619"
+    values:
+      1997-10-01: 18
+
+  child_max_age_in_school:
+    description: "Maximum age for child in secondary school"
+    unit: year
+    label: "TANF Child Age Limit (In School)"
+    reference: "42 USC 619"
+    values:
+      1997-10-01: 19
+
+  # Minor parent age for living arrangement requirement
+  minor_parent_age:
+    description: "Age below which parent must live in adult-supervised setting"
+    unit: year
+    label: "Minor Parent Age Threshold"
+    reference: "42 USC 608(a)(2)"
+    values:
+      1997-10-01: 18
+
+  # Teen parent school requirement age
+  teen_parent_max_age:
+    description: "Age below which custodial parent must attend school"
+    unit: year
+    label: "Teen Parent Education Requirement Age"
+    reference: "42 USC 608(a)(3)"
+    values:
+      1997-10-01: 20
+
+noncitizen_eligibility:
+  # 8 USC 1613: Five-year bar
+  waiting_period_years:
+    description: "Years qualified aliens must wait for TANF eligibility"
+    unit: year
+    label: "Qualified Alien Waiting Period"
+    reference:
+      - "8 USC 1613"
+      - "42 USC 608(a)(5)"
+    values:
+      1997-08-22: 5
+
+  # Fraudulent residence penalty
+  fraud_ineligibility_years:
+    description: "Years of ineligibility for fraudulent residence representation"
+    unit: year
+    label: "Fraudulent Residence Penalty"
+    reference: "42 USC 608(a)(9)"
+    values:
+      1997-10-01: 10
+
+# =============================================================================
+# SANCTIONS (42 USC 607(e))
+# =============================================================================
+
+sanctions:
+  # 607(e): Work requirement non-compliance
+  work_noncompliance:
+    description: "Sanction policy for failure to comply with work requirements"
+    label: "Work Sanction Policy"
+    reference: "42 USC 607(e)"
+    # Federal law requires sanction but does not specify amount
+    # States vary from pro-rata reduction to full-family sanction
+    notes: |
+      Federal law requires states to reduce or terminate assistance
+      for non-compliance. States choose between:
+      - Pro-rata sanction (reduce by non-compliant adult's needs)
+      - Full-family sanction (terminate entire benefit)
+      - Progressive sanctions (escalating over time)
+
+  # 608(a)(4): Child support non-cooperation
+  child_support_noncompliance_rate:
+    description: "Minimum benefit reduction for child support non-cooperation"
+    unit: rate
+    label: "Child Support Non-Cooperation Sanction"
+    reference: "42 USC 608(a)(4)"
+    values:
+      1997-10-01: 0.25  # At least 25% reduction
+    notes: |
+      States may impose higher sanctions including full termination.
+      Good cause exemptions apply (domestic violence, etc.)
+
+# =============================================================================
+# DEFAULT STATE PARAMETERS (Typical/Baseline Values)
+# States override these with their own plans under 42 USC 602
+# =============================================================================
+
+# NOTE: The following are NOT federal requirements but typical state values
+# used for baseline simulation. Actual values vary dramatically by state.
+
+default_state:
+  # Resource limits (typical values; many states have eliminated)
+  resource_limit:
+    description: "Default countable resource limit for TANF eligibility"
+    unit: currency-USD
+    period: month
+    label: "Default Resource Limit"
+    reference: "State TANF Plans per 42 USC 602(a)"
+    values:
+      1997-10-01: 1000
+      2000-01-01: 2000
+      2024-01-01: 2500
+    note: "Ranges from $0 to unlimited by state; 11 states eliminated asset test"
+
+  resource_limit_elderly_disabled:
+    description: "Resource limit for units with elderly or disabled member"
+    unit: currency-USD
+    period: month
+    label: "Resource Limit (Elderly/Disabled)"
+    reference: "State TANF Plans"
+    values:
+      1997-10-01: 2000
+      2000-01-01: 3000
+      2024-01-01: 3500
+
+  # Vehicle exclusion
+  vehicle_exclusion:
+    description: "Maximum vehicle value excluded from resources"
+    unit: currency-USD
+    label: "Vehicle Exclusion"
+    reference: "State TANF Plans"
+    values:
+      1997-10-01: 1500  # Historic AFDC value
+      2010-01-01: 15000  # Many states liberalized
+    note: "Many states now fully exclude at least one vehicle"
+
+  # Earned income disregards
+  earned_income_disregard_flat:
+    description: "Flat dollar disregard from earned income"
+    unit: currency-USD
+    period: month
+    label: "Earned Income Disregard (Flat)"
+    reference: "State TANF Plans"
+    values:
+      1997-10-01: 90  # Historic AFDC work expense
+      2024-01-01: 120  # Inflation-adjusted typical
+
+  earned_income_disregard_rate:
+    description: "Percentage of earned income disregarded after flat disregard"
+    unit: rate
+    period: month
+    label: "Earned Income Disregard (Percent)"
+    reference: "State TANF Plans"
+    values:
+      1997-10-01: 0.50  # 50% typical
+
+  # Gross income limit (for initial screen)
+  gross_income_limit_rate:
+    description: "Gross income limit as multiplier of need standard"
+    unit: rate
+    label: "Gross Income Limit Rate"
+    reference: "State TANF Plans"
+    values:
+      1997-10-01: 1.85  # 185% of need standard typical
+
+  # Payment to need ratio (many states pay less than need standard)
+  payment_to_need_ratio:
+    description: "Ratio of payment standard to need standard"
+    unit: rate
+    label: "Payment to Need Ratio"
+    reference: "State TANF Plans"
+    values:
+      1997-10-01: 1.00  # Some states pay full need
+      2024-01-01: 0.75  # Many states pay fraction
+    note: "Ranges from ~30% to 100% by state"
+
+  # Example need/payment standards by unit size (placeholder - use state files)
+  # These are rough national medians, not requirements
+  need_standard:
+    description: "Monthly income need standard by unit size (national median)"
+    unit: currency-USD
+    period: month
+    label: "Need Standard by Unit Size"
+    reference: "State TANF Plans (median values)"
+    values:
+      2024-01-01:
+        1: 360
+        2: 440
+        3: 550
+        4: 660
+        5: 770
+        6: 880
+        additional: 110  # Per additional person
+
+  payment_standard:
+    description: "Monthly maximum payment by unit size (national median)"
+    unit: currency-USD
+    period: month
+    label: "Payment Standard by Unit Size"
+    reference: "State TANF Plans (median values)"
+    values:
+      2024-01-01:
+        1: 270
+        2: 330
+        3: 420
+        4: 500
+        5: 580
+        6: 660
+        additional: 80
+
+# =============================================================================
+# MAINTENANCE OF EFFORT (42 USC 609)
+# =============================================================================
+
+maintenance_of_effort:
+  # 609(a)(7): State spending requirement
+  rate_meeting_participation:
+    description: "MOE rate for states meeting work participation requirements"
+    unit: rate
+    label: "MOE Rate (Meeting Work Requirements)"
+    reference: "42 USC 609(a)(7)(A)"
+    values:
+      1997-10-01: 0.75  # 75% of historic spending
+
+  rate_not_meeting_participation:
+    description: "MOE rate for states not meeting work participation requirements"
+    unit: rate
+    label: "MOE Rate (Not Meeting Work Requirements)"
+    reference: "42 USC 609(a)(7)(B)(i)"
+    values:
+      1997-10-01: 0.80  # 80% of historic spending

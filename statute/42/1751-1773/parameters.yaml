@@ -1,0 +1,364 @@
+# National School Lunch Act (42 USC 1751-1773) Parameters
+# NSLP: National School Lunch Program
+# SBP: School Breakfast Program (established via 42 USC 1773)
+#
+# Key statute sections:
+# - 42 USC 1751: Congressional findings and declaration of policy
+# - 42 USC 1758: Program requirements (income eligibility, free/reduced meals)
+# - 42 USC 1773: School Breakfast Program
+#
+# References:
+# - USDA FNS Income Eligibility Guidelines: https://www.fns.usda.gov/cn/income-eligibility-guidelines
+# - 42 USC 1758: https://www.law.cornell.edu/uscode/text/42/1758
+# - 7 CFR 245: Child nutrition programs - income eligibility guidelines
+
+# ==============================================================================
+# Income Eligibility Thresholds
+# 42 USC 1758(b)(1): Income eligibility guidelines
+# ==============================================================================
+
+income:
+  description: "Income eligibility thresholds for school meal programs per 42 USC 1758(b)(1)"
+
+  free_meal_limit_pct_fpl:
+    description: "Maximum income as percentage of Federal Poverty Level for free meals per 42 USC 1758(b)(1)(A)(i)"
+    unit: ratio
+    values:
+      1981-07-01: 1.30  # 130% FPL - established in 1981 amendments
+    reference:
+      - title: "42 USC 1758(b)(1)(A)(i) - Free meal eligibility"
+        href: "https://www.law.cornell.edu/uscode/text/42/1758#b_1_A"
+
+  reduced_price_limit_pct_fpl:
+    description: "Maximum income as percentage of Federal Poverty Level for reduced-price meals per 42 USC 1758(b)(1)(A)(ii)"
+    unit: ratio
+    values:
+      1981-07-01: 1.85  # 185% FPL - established in 1981 amendments
+    reference:
+      - title: "42 USC 1758(b)(1)(A)(ii) - Reduced price meal eligibility"
+        href: "https://www.law.cornell.edu/uscode/text/42/1758#b_1_A"
+
+# ==============================================================================
+# Maximum Meal Prices
+# 42 USC 1758(b)(3): Maximum prices for reduced-price meals
+# ==============================================================================
+
+meal_prices:
+  description: "Maximum meal charges for reduced-price meals per 42 USC 1758(b)(3)"
+
+  reduced_price_lunch_max:
+    description: "Maximum charge for reduced-price lunch per 42 USC 1758(b)(3)"
+    unit: USD
+    values:
+      1981-07-01: 0.40  # Statutory maximum
+    reference:
+      - title: "42 USC 1758(b)(3) - Reduced price lunch maximum"
+        href: "https://www.law.cornell.edu/uscode/text/42/1758#b_3"
+
+  reduced_price_breakfast_max:
+    description: "Maximum charge for reduced-price breakfast per 42 USC 1758(b)(9)(A)"
+    unit: USD
+    values:
+      1989-07-01: 0.30  # Statutory maximum
+    reference:
+      - title: "42 USC 1758(b)(9)(A) - Reduced price breakfast maximum"
+        href: "https://www.law.cornell.edu/uscode/text/42/1758#b_9"
+
+# ==============================================================================
+# Community Eligibility Provision (CEP)
+# 42 USC 1758(b)(1)(A): Schools may provide free meals to all students
+# ==============================================================================
+
+community_eligibility:
+  description: "Community Eligibility Provision parameters per 42 USC 1758(b)(1)(A)"
+
+  identified_student_percentage_threshold:
+    description: "Minimum Identified Student Percentage (ISP) for CEP eligibility"
+    unit: ratio
+    values:
+      2014-07-01: 0.25  # 25% threshold established when CEP went nationwide
+    reference:
+      - title: "42 USC 1758(b)(1)(A) - Community eligibility"
+        href: "https://www.law.cornell.edu/uscode/text/42/1758#b_1_A"
+
+  claiming_percentage_multiplier:
+    description: "Multiplier applied to ISP to determine free meal claiming percentage"
+    unit: ratio
+    values:
+      2014-07-01: 1.60  # ISP * 1.6 = claiming percentage for free meal reimbursement
+    reference:
+      - title: "7 CFR 245.9(f)(3) - Claiming percentage"
+        href: "https://www.law.cornell.edu/cfr/text/7/245.9"
+
+  max_claiming_percentage:
+    description: "Maximum claiming percentage for free meal reimbursement under CEP"
+    unit: ratio
+    values:
+      2014-07-01: 1.00  # 100% cap
+    reference:
+      - title: "7 CFR 245.9(f)(3) - Maximum claiming percentage"
+        href: "https://www.law.cornell.edu/cfr/text/7/245.9"
+
+# ==============================================================================
+# School Days per Year
+# Used for annualizing meal subsidy value
+# ==============================================================================
+
+school_days:
+  description: "Average number of school days per year"
+  unit: days
+  values:
+    2020-01-01: 180
+  reference:
+    - title: "NCES Table 5.14 - Number of instructional days"
+      href: "https://nces.ed.gov/programs/statereform/tab5_14.asp"
+
+# ==============================================================================
+# NSLP Reimbursement Rates (daily per meal per child)
+# Published annually by USDA FNS effective July 1
+# ==============================================================================
+
+nslp:
+  description: "National School Lunch Program reimbursement rates per meal"
+  unit: USD
+  period: day
+
+  # Contiguous US rates (48 states + DC)
+  contiguous_us:
+    paid:
+      description: "NSLP reimbursement for paid-tier students"
+      values:
+        2020-07-01: 0.33
+        2021-07-01: 0.35
+        2022-07-01: 0.37
+        2023-07-01: 0.40
+        2024-07-01: 0.42
+        2025-07-01: 0.46
+
+    reduced:
+      description: "NSLP reimbursement for reduced-price students"
+      values:
+        2020-07-01: 3.11
+        2021-07-01: 3.26
+        2022-07-01: 3.53
+        2023-07-01: 3.85
+        2024-07-01: 4.03
+        2025-07-01: 4.20
+
+    free:
+      description: "NSLP reimbursement for free-meal students"
+      values:
+        2020-07-01: 3.51
+        2021-07-01: 3.66
+        2022-07-01: 3.93
+        2023-07-01: 4.25
+        2024-07-01: 4.43
+        2025-07-01: 4.60
+
+  # Alaska rates (higher due to cost of living)
+  alaska:
+    paid:
+      description: "NSLP Alaska reimbursement for paid-tier students"
+      values:
+        2020-07-01: 0.54
+        2021-07-01: 0.57
+        2022-07-01: 0.61
+        2023-07-01: 0.66
+        2024-07-01: 0.69
+        2025-07-01: 0.71
+
+    reduced:
+      description: "NSLP Alaska reimbursement for reduced-price students"
+      values:
+        2020-07-01: 5.30
+        2021-07-01: 5.54
+        2022-07-01: 5.97
+        2023-07-01: 6.50
+        2024-07-01: 6.78
+        2025-07-01: 7.05
+
+    free:
+      description: "NSLP Alaska reimbursement for free-meal students"
+      values:
+        2020-07-01: 5.70
+        2021-07-01: 5.94
+        2022-07-01: 6.37
+        2023-07-01: 6.90
+        2024-07-01: 7.18
+        2025-07-01: 7.45
+
+  # Hawaii rates (higher due to cost of living)
+  hawaii:
+    paid:
+      description: "NSLP Hawaii reimbursement for paid-tier students"
+      values:
+        2020-07-01: 0.39
+        2021-07-01: 0.41
+        2022-07-01: 0.44
+        2023-07-01: 0.53
+        2024-07-01: 0.55
+        2025-07-01: 0.57
+
+    reduced:
+      description: "NSLP Hawaii reimbursement for reduced-price students"
+      values:
+        2020-07-01: 3.71
+        2021-07-01: 3.88
+        2022-07-01: 4.20
+        2023-07-01: 5.14
+        2024-07-01: 5.36
+        2025-07-01: 5.58
+
+    free:
+      description: "NSLP Hawaii reimbursement for free-meal students"
+      values:
+        2020-07-01: 4.11
+        2021-07-01: 4.28
+        2022-07-01: 4.60
+        2023-07-01: 5.54
+        2024-07-01: 5.76
+        2025-07-01: 5.98
+
+  reference:
+    - title: "FNS National School Lunch, Special Milk, and School Breakfast Programs Reimbursement Rates - 2024"
+      href: "https://www.regulations.gov/document/FNS-2024-0022-0001"
+    - title: "FNS National School Lunch, Special Milk, and School Breakfast Programs Reimbursement Rates - 2025"
+      href: "https://www.govinfo.gov/content/pkg/FR-2025-07-24/pdf/2025-13879.pdf#page=3"
+
+# ==============================================================================
+# SBP Reimbursement Rates (daily per meal per child)
+# Published annually by USDA FNS effective July 1
+# ==============================================================================
+
+sbp:
+  description: "School Breakfast Program reimbursement rates per meal"
+  unit: USD
+  period: day
+
+  # Contiguous US rates (Non-severe need)
+  contiguous_us:
+    paid:
+      description: "SBP reimbursement for paid-tier students"
+      values:
+        2020-07-01: 0.32
+        2021-07-01: 0.33
+        2022-07-01: 0.35
+        2023-07-01: 0.38
+        2024-07-01: 0.39
+        2025-07-01: 0.40
+
+    reduced:
+      description: "SBP reimbursement for reduced-price students"
+      values:
+        2020-07-01: 1.59
+        2021-07-01: 1.67
+        2022-07-01: 1.81
+        2023-07-01: 1.98
+        2024-07-01: 2.07
+        2025-07-01: 2.16
+
+    free:
+      description: "SBP reimbursement for free-meal students"
+      values:
+        2020-07-01: 1.89
+        2021-07-01: 1.97
+        2022-07-01: 2.11
+        2023-07-01: 2.28
+        2024-07-01: 2.37
+        2025-07-01: 2.46
+
+  # Alaska rates
+  alaska:
+    paid:
+      description: "SBP Alaska reimbursement for paid-tier students"
+      values:
+        2020-07-01: 0.49
+        2021-07-01: 0.50
+        2022-07-01: 0.54
+        2023-07-01: 0.58
+        2024-07-01: 0.60
+        2025-07-01: 0.62
+
+    reduced:
+      description: "SBP Alaska reimbursement for reduced-price students"
+      values:
+        2020-07-01: 2.73
+        2021-07-01: 2.85
+        2022-07-01: 3.08
+        2023-07-01: 3.36
+        2024-07-01: 3.50
+        2025-07-01: 3.65
+
+    free:
+      description: "SBP Alaska reimbursement for free-meal students"
+      values:
+        2020-07-01: 3.03
+        2021-07-01: 3.15
+        2022-07-01: 3.38
+        2023-07-01: 3.66
+        2024-07-01: 3.80
+        2025-07-01: 3.95
+
+  # Hawaii rates
+  hawaii:
+    paid:
+      description: "SBP Hawaii reimbursement for paid-tier students"
+      values:
+        2020-07-01: 0.37
+        2021-07-01: 0.38
+        2022-07-01: 0.40
+        2023-07-01: 0.47
+        2024-07-01: 0.49
+        2025-07-01: 0.51
+
+    reduced:
+      description: "SBP Hawaii reimbursement for reduced-price students"
+      values:
+        2020-07-01: 1.91
+        2021-07-01: 1.99
+        2022-07-01: 2.16
+        2023-07-01: 2.65
+        2024-07-01: 2.76
+        2025-07-01: 2.88
+
+    free:
+      description: "SBP Hawaii reimbursement for free-meal students"
+      values:
+        2020-07-01: 2.21
+        2021-07-01: 2.29
+        2022-07-01: 2.46
+        2023-07-01: 2.95
+        2024-07-01: 3.06
+        2025-07-01: 3.18
+
+  reference:
+    - title: "FNS National School Lunch, Special Milk, and School Breakfast Programs Reimbursement Rates - 2024"
+      href: "https://www.regulations.gov/document/FNS-2024-0022-0001"
+    - title: "FNS National School Lunch, Special Milk, and School Breakfast Programs Reimbursement Rates - 2025"
+      href: "https://www.govinfo.gov/content/pkg/FR-2025-07-24/pdf/2025-13879.pdf#page=4"
+
+# ==============================================================================
+# Categorical Eligibility Programs
+# 42 USC 1758(b)(2)(C)(ii) and 42 USC 1758(b)(5), (b)(12)
+# ==============================================================================
+
+categorical_eligibility:
+  description: "Programs that provide categorical eligibility for free school meals"
+
+  programs:
+    description: "List of programs that confer automatic free meal eligibility"
+    values:
+      2009-09-01:
+        - snap
+        - tanf
+        - fdpir
+        - foster_care
+        - homeless
+        - runaway
+        - migrant
+        - head_start
+    reference:
+      - title: "42 USC 1758(b)(2)(C)(ii) - Categorical eligibility"
+        href: "https://www.law.cornell.edu/uscode/text/42/1758#b_2"
+      - title: "7 CFR 245.2 - Definitions"
+        href: "https://www.law.cornell.edu/cfr/text/7/245.2"
