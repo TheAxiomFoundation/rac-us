@@ -239,3 +239,97 @@ medically_needy:
     citations:
       - "42 USC 1396a(a)(17): medically needy income standard"
       - "OBRA 1981"
+
+# =============================================================================
+# ACA EXPANSION STATUS
+# 42 USC 1396a(a)(10)(A)(i)(VIII)
+# After NFIB v. Sebelius (2012), expansion is optional for states
+# =============================================================================
+
+expansion_status:
+  description: "State adoption of ACA Medicaid expansion"
+
+  # Federal default - whether expansion is available
+  # State-specific files can override this parameter
+  adopted:
+    description: "Whether state has adopted ACA Medicaid expansion"
+    unit: boolean
+    values:
+      # Default to true (federal baseline assumes expansion available)
+      # Non-expansion states override this to false
+      2014-01-01: true
+      2013-12-31: false  # Not available before ACA implementation
+    citations:
+      - "42 USC 1396a(a)(10)(A)(i)(VIII): ACA expansion group"
+      - "NFIB v. Sebelius, 567 U.S. 519 (2012): expansion optional for states"
+
+  # List of non-expansion states (as of 2024)
+  # AL, FL, GA, KS, MS, SC, TN, TX, WI, WY
+  # Note: States may adopt expansion at different dates
+  # State-specific parameters should override expansion_status/adopted
+
+# =============================================================================
+# ENHANCED FMAP FOR EXPANSION
+# 42 USC 1396d(y)
+# =============================================================================
+
+expansion_fmap:
+  description: "Enhanced federal matching rate for expansion population"
+
+  # The ACA provided phased-in enhanced FMAP for newly eligible adults
+  newly_eligible_rate:
+    description: "Federal matching rate for newly eligible expansion adults"
+    unit: rate
+    values:
+      2014-01-01: 1.00   # 100% federal in 2014-2016
+      2017-01-01: 0.95   # 95% in 2017
+      2018-01-01: 0.94   # 94% in 2018
+      2019-01-01: 0.93   # 93% in 2019
+      2020-01-01: 0.90   # 90% in 2020 and thereafter
+    citations:
+      - "42 USC 1396d(y)(1): phased-in enhanced FMAP"
+      - "P.L. 111-148 Section 2001(a)(3)"
+
+# =============================================================================
+# 2024 FEDERAL POVERTY LEVEL REFERENCE
+# For convenience, 2024 FPL values (primary source: statute/7/2014/c)
+# =============================================================================
+
+fpl_2024:
+  description: "2024 Federal Poverty Level for reference (48 contiguous states)"
+
+  single_person:
+    description: "2024 FPL for one person household"
+    unit: currency-USD
+    values:
+      2024-01-01: 15060  # Annual
+    citations:
+      - "HHS Poverty Guidelines 2024"
+      - "89 FR 3941"
+
+  additional_person:
+    description: "Additional amount per household member above 1"
+    unit: currency-USD
+    values:
+      2024-01-01: 5380  # Annual per additional person
+    citations:
+      - "HHS Poverty Guidelines 2024"
+      - "89 FR 3941"
+
+  # Key thresholds for common eligibility groups (annual)
+  thresholds_2024:
+    description: "2024 income thresholds by category and household size"
+    # 138% FPL (expansion adults, effective with 5% disregard)
+    # Family of 1: $15,060 * 1.38 = $20,783
+    # Family of 2: $20,440 * 1.38 = $28,207
+    # Family of 3: $25,820 * 1.38 = $35,632
+    # Family of 4: $31,200 * 1.38 = $43,056
+
+    # 185% FPL (infants)
+    # Family of 3: $25,820 * 1.85 = $47,767
+
+    # 133% FPL (children 1-5, pregnant)
+    # Family of 3: $25,820 * 1.33 = $34,341
+
+    # 100% FPL (children 6-18)
+    # Family of 3: $25,820 * 1.00 = $25,820

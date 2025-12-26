@@ -1,0 +1,93 @@
+# 42 USC 1786(d)(2)(C) - Adjunctive Income Eligibility for WIC
+#
+# "(C) A member of a family shall be considered income eligible if the
+# family member or a parent or caretaker of the participant participates
+# in the--
+#   (i) supplemental nutrition assistance program established under the
+#       Food and Nutrition Act of 2008 (7 U.S.C. 2011 et seq.);
+#   (ii) a State program funded under the program of block grants to
+#        States for temporary assistance for needy families established
+#        under part A of title IV of the Social Security Act; or
+#   (iii) the program of medical assistance under title XIX of the
+#         Social Security Act."
+#
+# This is known as "adjunctive eligibility" - participation in SNAP,
+# TANF, or Medicaid automatically satisfies WIC's income eligibility
+# requirement, regardless of actual income level.
+
+references {
+  # Input variables for program participation status
+  # These are assumed to be provided as household-level inputs
+}
+
+# =============================================================================
+# ADJUNCTIVE ELIGIBILITY DETERMINATION
+# =============================================================================
+
+# SNAP (Supplemental Nutrition Assistance Program) participation
+# 42 USC 1786(d)(2)(C)(i)
+variable is_wic_adjunctive_snap {
+  entity Person
+  period Month
+  dtype Boolean
+
+  formula {
+    # Person or household receives SNAP benefits
+    return receives_snap or household.receives_snap
+  }
+}
+
+# TANF (Temporary Assistance for Needy Families) participation
+# 42 USC 1786(d)(2)(C)(ii)
+variable is_wic_adjunctive_tanf {
+  entity Person
+  period Month
+  dtype Boolean
+
+  formula {
+    # Person or household receives TANF benefits
+    return receives_tanf or household.receives_tanf
+  }
+}
+
+# Medicaid participation
+# 42 USC 1786(d)(2)(C)(iii)
+variable is_wic_adjunctive_medicaid {
+  entity Person
+  period Month
+  dtype Boolean
+
+  formula {
+    # Person receives Medicaid coverage
+    # Note: Individual-level as Medicaid eligibility is person-specific
+    return receives_medicaid
+  }
+}
+
+# Combined adjunctive eligibility
+variable is_wic_adjunctively_eligible {
+  entity Person
+  period Month
+  dtype Boolean
+
+  formula {
+    # 42 USC 1786(d)(2)(C): Participation in any of the three programs
+    # confers automatic income eligibility for WIC
+    return is_wic_adjunctive_snap or
+           is_wic_adjunctive_tanf or
+           is_wic_adjunctive_medicaid
+  }
+}
+
+# Household-level adjunctive eligibility
+# If any household member has adjunctive eligibility, all categorical
+# eligible members in that household can be considered income-eligible
+variable household_has_wic_adjunctive_member {
+  entity Household
+  period Month
+  dtype Boolean
+
+  formula {
+    return any(members.is_wic_adjunctively_eligible)
+  }
+}

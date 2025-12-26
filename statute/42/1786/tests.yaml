@@ -1,0 +1,484 @@
+# Tests for 42 USC 1786 - Special Supplemental Nutrition Program for Women,
+# Infants, and Children (WIC)
+#
+# WIC provides supplemental foods, nutrition education, and referrals to
+# health and social services for:
+# - Pregnant, postpartum, and breastfeeding women
+# - Infants (under 1 year)
+# - Children (1-4 years old, i.e., up to 5th birthday)
+#
+# Eligibility requires:
+# 1. Categorical eligibility (one of the above categories)
+# 2. Income eligibility (185% FPL) OR adjunctive eligibility
+# 3. Nutritional risk (determined by competent professional authority)
+# 4. Residency
+#
+# Note: Nutritional risk assessment cannot be modeled; we assume it is met.
+#
+# Test organization:
+# 1. Categorical eligibility tests
+# 2. Income eligibility tests
+# 3. Adjunctive eligibility tests (SNAP/Medicaid/TANF)
+# 4. Combined eligibility tests
+
+variable: wic_eligible
+calendar_year: 2024
+
+# ==============================================================================
+# 42 USC 1786(d)(1) - Categorical Eligibility
+# "(1) participate in the program... pregnant women, breastfeeding women,
+# postpartum women, infants, and children"
+# ==============================================================================
+
+test_cases:
+  - name: "Pregnant woman - categorically eligible"
+    description: "Pregnant woman qualifies for WIC"
+    inputs:
+      age: 25
+      is_pregnant: true
+      is_breastfeeding: false
+      is_postpartum: false
+      household_gross_income: 0
+      household_size: 1
+      is_us_resident: true
+    expected:
+      is_wic_categorical_eligible: true
+      wic_category: "pregnant_woman"
+    citations:
+      - "42 USC 1786(d)(1): pregnant women"
+
+  - name: "Breastfeeding woman - categorically eligible"
+    description: "Breastfeeding woman qualifies for WIC"
+    inputs:
+      age: 28
+      is_pregnant: false
+      is_breastfeeding: true
+      is_postpartum: false
+      household_gross_income: 0
+      household_size: 2
+      is_us_resident: true
+    expected:
+      is_wic_categorical_eligible: true
+      wic_category: "breastfeeding_woman"
+    citations:
+      - "42 USC 1786(d)(1): breastfeeding women"
+
+  - name: "Postpartum woman - categorically eligible"
+    description: "Postpartum woman (up to 6 months) qualifies for WIC"
+    inputs:
+      age: 30
+      is_pregnant: false
+      is_breastfeeding: false
+      is_postpartum: true
+      months_postpartum: 3
+      household_gross_income: 0
+      household_size: 2
+      is_us_resident: true
+    expected:
+      is_wic_categorical_eligible: true
+      wic_category: "postpartum_woman"
+    citations:
+      - "42 USC 1786(d)(1): postpartum women"
+
+  - name: "Postpartum woman over 6 months not breastfeeding - ineligible"
+    description: "Postpartum beyond 6 months without breastfeeding"
+    inputs:
+      age: 30
+      is_pregnant: false
+      is_breastfeeding: false
+      is_postpartum: true
+      months_postpartum: 8
+      household_gross_income: 0
+      household_size: 2
+      is_us_resident: true
+    expected:
+      is_wic_categorical_eligible: false
+    citations:
+      - "42 USC 1786(b)(14): postpartum limited to 6 months"
+
+  - name: "Infant under 1 year - categorically eligible"
+    description: "Infant qualifies for WIC"
+    inputs:
+      age_months: 6
+      is_pregnant: false
+      is_breastfeeding: false
+      is_postpartum: false
+      household_gross_income: 0
+      household_size: 3
+      is_us_resident: true
+    expected:
+      is_wic_categorical_eligible: true
+      wic_category: "infant"
+    citations:
+      - "42 USC 1786(b)(6): infant means < 1 year"
+
+  - name: "Child age 2 - categorically eligible"
+    description: "Child between 1 and 5 qualifies for WIC"
+    inputs:
+      age: 2
+      is_pregnant: false
+      is_breastfeeding: false
+      is_postpartum: false
+      household_gross_income: 0
+      household_size: 3
+      is_us_resident: true
+    expected:
+      is_wic_categorical_eligible: true
+      wic_category: "child"
+    citations:
+      - "42 USC 1786(b)(4): child means 1 to 5 years"
+
+  - name: "Child age 4 - categorically eligible"
+    description: "4-year-old qualifies (under 5)"
+    inputs:
+      age: 4
+      is_pregnant: false
+      is_breastfeeding: false
+      is_postpartum: false
+      household_gross_income: 0
+      household_size: 3
+      is_us_resident: true
+    expected:
+      is_wic_categorical_eligible: true
+      wic_category: "child"
+    citations:
+      - "42 USC 1786(b)(4): child means up to 5th birthday"
+
+  - name: "Child age 5 - not categorically eligible"
+    description: "5-year-old exceeds WIC child age limit"
+    inputs:
+      age: 5
+      is_pregnant: false
+      is_breastfeeding: false
+      is_postpartum: false
+      household_gross_income: 0
+      household_size: 3
+      is_us_resident: true
+    expected:
+      is_wic_categorical_eligible: false
+    citations:
+      - "42 USC 1786(b)(4): child must be under 5"
+
+  - name: "Adult woman not pregnant/breastfeeding/postpartum - ineligible"
+    description: "Non-qualifying adult"
+    inputs:
+      age: 35
+      is_pregnant: false
+      is_breastfeeding: false
+      is_postpartum: false
+      household_gross_income: 0
+      household_size: 1
+      is_us_resident: true
+    expected:
+      is_wic_categorical_eligible: false
+    citations:
+      - "42 USC 1786(d)(1): categorical requirement"
+
+# ==============================================================================
+# 42 USC 1786(d)(2) - Income Eligibility
+# "(2)(A) State agencies shall establish income eligibility standards to be
+# used in conjunction with the nutrition risk criteria..."
+# "(B) Income eligibility standards shall be set at 185 percent of the
+# poverty income guidelines"
+# ==============================================================================
+
+  - name: "Income at 185% FPL - income eligible"
+    description: "Income exactly at 185% FPL threshold"
+    inputs:
+      age: 2
+      is_pregnant: false
+      is_breastfeeding: false
+      is_postpartum: false
+      household_gross_income: 2853  # 185% of $1,543 (1-person monthly FPL)
+      household_size: 1
+      is_us_resident: true
+      receives_snap: false
+      receives_medicaid: false
+      receives_tanf: false
+    expected:
+      wic_income_pct_fpl: 1.85
+      is_wic_income_eligible: true
+    citations:
+      - "42 USC 1786(d)(2)(B): 185% poverty guideline"
+
+  - name: "Income below 185% FPL - income eligible"
+    description: "Income under threshold"
+    inputs:
+      age: 2
+      is_pregnant: false
+      is_breastfeeding: false
+      is_postpartum: false
+      household_gross_income: 2000
+      household_size: 1
+      is_us_resident: true
+      receives_snap: false
+      receives_medicaid: false
+      receives_tanf: false
+    expected:
+      is_wic_income_eligible: true
+    citations:
+      - "42 USC 1786(d)(2)(B): income <= 185% FPL"
+
+  - name: "Income above 185% FPL - income ineligible"
+    description: "Income exceeds threshold"
+    inputs:
+      age: 2
+      is_pregnant: false
+      is_breastfeeding: false
+      is_postpartum: false
+      household_gross_income: 4000
+      household_size: 1
+      is_us_resident: true
+      receives_snap: false
+      receives_medicaid: false
+      receives_tanf: false
+    expected:
+      is_wic_income_eligible: false
+    citations:
+      - "42 USC 1786(d)(2)(B): exceeds 185% FPL"
+
+  - name: "Family of 4 at 185% FPL - income eligible"
+    description: "Larger family with proportional income"
+    inputs:
+      age: 3
+      is_pregnant: false
+      is_breastfeeding: false
+      is_postpartum: false
+      household_gross_income: 5750  # ~185% of monthly FPL for 4-person household
+      household_size: 4
+      is_us_resident: true
+      receives_snap: false
+      receives_medicaid: false
+      receives_tanf: false
+    expected:
+      is_wic_income_eligible: true
+    citations:
+      - "42 USC 1786(d)(2)(B): household size adjustment"
+
+# ==============================================================================
+# 42 USC 1786(d)(2)(C) - Adjunctive Income Eligibility
+# "A member of a family... shall be considered income eligible if the family
+# member... participates in [SNAP, Medicaid, or TANF]"
+# ==============================================================================
+
+  - name: "SNAP recipient - adjunctively eligible"
+    description: "SNAP participation confers WIC income eligibility"
+    inputs:
+      age: 3
+      is_pregnant: false
+      is_breastfeeding: false
+      is_postpartum: false
+      household_gross_income: 10000  # Over 185% FPL
+      household_size: 2
+      is_us_resident: true
+      receives_snap: true
+      receives_medicaid: false
+      receives_tanf: false
+    expected:
+      is_wic_adjunctively_eligible: true
+      is_wic_income_eligible: true
+    citations:
+      - "42 USC 1786(d)(2)(C): SNAP participation"
+
+  - name: "Medicaid recipient - adjunctively eligible"
+    description: "Medicaid participation confers WIC income eligibility"
+    inputs:
+      age: 3
+      is_pregnant: false
+      is_breastfeeding: false
+      is_postpartum: false
+      household_gross_income: 10000  # Over 185% FPL
+      household_size: 2
+      is_us_resident: true
+      receives_snap: false
+      receives_medicaid: true
+      receives_tanf: false
+    expected:
+      is_wic_adjunctively_eligible: true
+      is_wic_income_eligible: true
+    citations:
+      - "42 USC 1786(d)(2)(C): Medicaid participation"
+
+  - name: "TANF recipient - adjunctively eligible"
+    description: "TANF participation confers WIC income eligibility"
+    inputs:
+      age: 3
+      is_pregnant: false
+      is_breastfeeding: false
+      is_postpartum: false
+      household_gross_income: 10000  # Over 185% FPL
+      household_size: 2
+      is_us_resident: true
+      receives_snap: false
+      receives_medicaid: false
+      receives_tanf: true
+    expected:
+      is_wic_adjunctively_eligible: true
+      is_wic_income_eligible: true
+    citations:
+      - "42 USC 1786(d)(2)(C): TANF participation"
+
+  - name: "No program participation, over income - ineligible"
+    description: "Without adjunctive eligibility, income test applies"
+    inputs:
+      age: 3
+      is_pregnant: false
+      is_breastfeeding: false
+      is_postpartum: false
+      household_gross_income: 10000  # Over 185% FPL
+      household_size: 2
+      is_us_resident: true
+      receives_snap: false
+      receives_medicaid: false
+      receives_tanf: false
+    expected:
+      is_wic_adjunctively_eligible: false
+      is_wic_income_eligible: false
+    citations:
+      - "42 USC 1786(d)(2): income exceeds 185% FPL without adjunctive"
+
+# ==============================================================================
+# Combined Eligibility Tests
+# Must meet categorical + (income OR adjunctive) + residency
+# ==============================================================================
+
+  - name: "Eligible infant - low income family"
+    description: "Infant in low-income household qualifies"
+    inputs:
+      age_months: 8
+      is_pregnant: false
+      is_breastfeeding: false
+      is_postpartum: false
+      household_gross_income: 1500
+      household_size: 3
+      is_us_resident: true
+      receives_snap: false
+      receives_medicaid: false
+      receives_tanf: false
+    expected:
+      is_wic_categorical_eligible: true
+      is_wic_income_eligible: true
+      is_wic_eligible: true
+    citations:
+      - "42 USC 1786(d): all eligibility requirements met"
+
+  - name: "Eligible pregnant woman - SNAP recipient"
+    description: "Pregnant woman with adjunctive eligibility"
+    inputs:
+      age: 22
+      is_pregnant: true
+      is_breastfeeding: false
+      is_postpartum: false
+      household_gross_income: 8000  # Over 185% FPL
+      household_size: 1
+      is_us_resident: true
+      receives_snap: true
+      receives_medicaid: false
+      receives_tanf: false
+    expected:
+      is_wic_categorical_eligible: true
+      is_wic_adjunctively_eligible: true
+      is_wic_income_eligible: true
+      is_wic_eligible: true
+    citations:
+      - "42 USC 1786(d): categorical + adjunctive eligibility"
+
+  - name: "Eligible child - Medicaid recipient"
+    description: "Child on Medicaid qualifies"
+    inputs:
+      age: 3
+      is_pregnant: false
+      is_breastfeeding: false
+      is_postpartum: false
+      household_gross_income: 5000  # Over 185% FPL for small household
+      household_size: 2
+      is_us_resident: true
+      receives_snap: false
+      receives_medicaid: true
+      receives_tanf: false
+    expected:
+      is_wic_categorical_eligible: true
+      is_wic_adjunctively_eligible: true
+      is_wic_eligible: true
+    citations:
+      - "42 USC 1786(d): child with Medicaid adjunctive eligibility"
+
+  - name: "Ineligible - over income without adjunctive"
+    description: "Child in high-income family without program participation"
+    inputs:
+      age: 2
+      is_pregnant: false
+      is_breastfeeding: false
+      is_postpartum: false
+      household_gross_income: 10000
+      household_size: 2
+      is_us_resident: true
+      receives_snap: false
+      receives_medicaid: false
+      receives_tanf: false
+    expected:
+      is_wic_categorical_eligible: true
+      is_wic_income_eligible: false
+      is_wic_eligible: false
+    citations:
+      - "42 USC 1786(d)(2): income exceeds limit"
+
+  - name: "Ineligible - adult without qualifying status"
+    description: "Adult not in categorical group"
+    inputs:
+      age: 40
+      is_pregnant: false
+      is_breastfeeding: false
+      is_postpartum: false
+      household_gross_income: 1000
+      household_size: 1
+      is_us_resident: true
+      receives_snap: true
+      receives_medicaid: false
+      receives_tanf: false
+    expected:
+      is_wic_categorical_eligible: false
+      is_wic_eligible: false
+    citations:
+      - "42 USC 1786(d)(1): not in categorical group"
+
+  - name: "Ineligible - non-resident"
+    description: "Non-resident fails residency requirement"
+    inputs:
+      age: 2
+      is_pregnant: false
+      is_breastfeeding: false
+      is_postpartum: false
+      household_gross_income: 1000
+      household_size: 2
+      is_us_resident: false
+      receives_snap: false
+      receives_medicaid: false
+      receives_tanf: false
+    expected:
+      is_wic_categorical_eligible: true
+      is_wic_residency_eligible: false
+      is_wic_eligible: false
+    citations:
+      - "42 USC 1786(d)(3): residency requirement"
+
+  - name: "Breastfeeding woman - extended eligibility"
+    description: "Breastfeeding women eligible up to 12 months postpartum"
+    inputs:
+      age: 27
+      is_pregnant: false
+      is_breastfeeding: true
+      is_postpartum: false
+      months_postpartum: 10
+      household_gross_income: 2000
+      household_size: 2
+      is_us_resident: true
+      receives_snap: false
+      receives_medicaid: false
+      receives_tanf: false
+    expected:
+      is_wic_categorical_eligible: true
+      wic_category: "breastfeeding_woman"
+      is_wic_eligible: true
+    citations:
+      - "42 USC 1786(b)(3): breastfeeding up to 1 year"
