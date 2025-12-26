@@ -12,6 +12,10 @@
 #
 # Reference: https://www.law.cornell.edu/uscode/text/42/1758#b_1
 
+parameters:
+  school_age_min: statute/42/1758#school_age.min
+  school_age_max: statute/42/1758#school_age.max
+
 # ------------------------------------------------------------------------------
 # school_meal_income_eligible_free
 # Income-based eligibility for free meals: income <= 130% FPL
@@ -83,18 +87,20 @@ label "Is in K-12 School"
 description "Whether the person is enrolled in K-12 schooling"
 
 formula:
-  # Age range for typical K-12 (ages 5-18)
+  # Age range for typical K-12
   # Some states vary, but this covers the general case
   age = person.age
-  return (age >= 5) and (age <= 18) and is_student
+  return (age >= school_age_min) and (age <= school_age_max) and is_student
+
+default false
+
+---
 
 # ------------------------------------------------------------------------------
 # school_meal_fpg_ratio
 # Ratio of household income to Federal Poverty Guidelines
 # Used for determining eligibility tier
 # ------------------------------------------------------------------------------
-
----
 
 entity Household
 period Year

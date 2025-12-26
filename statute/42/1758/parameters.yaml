@@ -13,6 +13,26 @@
 # - 7 CFR 245: Child nutrition programs - income eligibility guidelines
 
 # ==============================================================================
+# K-12 School Age Range
+# Used to determine eligibility for school meal programs
+# ==============================================================================
+
+school_age:
+  description: "Age range for K-12 school enrollment eligibility"
+
+  min:
+    description: "Minimum age for K-12 school enrollment (kindergarten entry)"
+    unit: year
+    values:
+      1946-01-01: 5
+
+  max:
+    description: "Maximum age for K-12 school enrollment (12th grade)"
+    unit: year
+    values:
+      1946-01-01: 18
+
+# ==============================================================================
 # Income Eligibility Thresholds
 # 42 USC 1758(b)(1): Income eligibility guidelines
 # ==============================================================================

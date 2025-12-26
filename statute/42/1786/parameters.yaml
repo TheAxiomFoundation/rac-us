@@ -112,6 +112,12 @@ fpl_monthly:
   unit: USD
   period: month
 
+  max_table_size:
+    description: "Maximum household size with specific FPL limit in tables"
+    unit: persons
+    values:
+      1980-01-01: 8
+
   2024:
     by_household_size:
       1: 1255    # 15060 / 12
