@@ -1,0 +1,72 @@
+# 26 USC Section 1(a)-(d), (j) - Income Tax Rate Brackets for Tax Year 2025
+#
+# These thresholds are adjusted for inflation per Section 1(f) using C-CPI-U.
+# Published in Rev. Proc. 2024-40 (IRS, October 22, 2024).
+#
+# Brackets apply to ordinary income (not capital gains/qualified dividends).
+
+reference: "26 USC Section 1(a)-(d), (j); Rev. Proc. 2024-40"
+description: Income tax bracket thresholds for tax year 2025
+
+tax_year: 2025
+
+# Section 1(j)(2)(A) - Single (unmarried individuals other than heads of household and surviving spouses)
+# Also used for Married Filing Separately (half of joint thresholds)
+single:
+  0.10: 0        # 10% bracket starts at $0
+  0.12: 11925    # 12% bracket starts at $11,925
+  0.22: 48475    # 22% bracket starts at $48,475
+  0.24: 103350   # 24% bracket starts at $103,350
+  0.32: 197300   # 32% bracket starts at $197,300
+  0.35: 250525   # 35% bracket starts at $250,525
+  0.37: 626350   # 37% bracket starts at $626,350
+
+# Section 1(j)(2)(B) - Married Filing Jointly (and Surviving Spouses)
+# Thresholds are generally 2x single, except for 35% and 37% brackets
+married_filing_jointly:
+  0.10: 0        # 10% bracket starts at $0
+  0.12: 23850    # 12% bracket starts at $23,850
+  0.22: 96950    # 22% bracket starts at $96,950
+  0.24: 206700   # 24% bracket starts at $206,700
+  0.32: 394600   # 32% bracket starts at $394,600
+  0.35: 501050   # 35% bracket starts at $501,050
+  0.37: 751600   # 37% bracket starts at $751,600
+
+# Section 1(j)(2)(C) - Head of Household
+head_of_household:
+  0.10: 0        # 10% bracket starts at $0
+  0.12: 17000    # 12% bracket starts at $17,000
+  0.22: 64850    # 22% bracket starts at $64,850
+  0.24: 103350   # 24% bracket starts at $103,350
+  0.32: 197300   # 32% bracket starts at $197,300
+  0.35: 250500   # 35% bracket starts at $250,500
+  0.37: 626350   # 37% bracket starts at $626,350
+
+# Section 1(j)(2)(D) - Married Filing Separately
+# Generally half of joint filer thresholds
+married_filing_separately:
+  0.10: 0        # 10% bracket starts at $0
+  0.12: 11925    # 12% bracket starts at $11,925
+  0.22: 48475    # 22% bracket starts at $48,475
+  0.24: 103350   # 24% bracket starts at $103,350
+  0.32: 197300   # 32% bracket starts at $197,300
+  0.35: 250525   # 35% bracket starts at $250,525
+  0.37: 375800   # 37% bracket starts at $375,800 (half of joint)
+
+# Surviving Spouse (Qualifying Widow(er)) - uses same brackets as Married Filing Jointly
+# Per Section 1(a), surviving spouses use the same rate schedule as joint filers
+surviving_spouse:
+  0.10: 0
+  0.12: 23850
+  0.22: 96950
+  0.24: 206700
+  0.32: 394600
+  0.35: 501050
+  0.37: 751600
+
+# Source reference
+source:
+  publication: "Rev. Proc. 2024-40"
+  date: "2024-10-22"
+  url: "https://www.irs.gov/pub/irs-drop/rp-24-40.pdf"
+  section: "Section 3.01"

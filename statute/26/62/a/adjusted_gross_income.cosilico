@@ -42,6 +42,7 @@ formula:
   # - Health savings account deduction (§62(a)(16))
   # - Self-employment tax deduction (§62(a)(4))
   # - Student loan interest (§62(a)(17))
+  # - Qualified overtime compensation (§225, added by OBBBA 2025)
   # - etc.
 
   employee_income = wages + salaries + tips

@@ -15,6 +15,7 @@
 #   - 62(a)(12): HSA contributions
 #   - 62(a)(17): Student loan interest (up to $2,500)
 #   - 62(a)(19): Self-employed health insurance deduction
+#   - 62(a)(23): Qualified tip income (OBBBA 2025-2028, up to $25,000)
 
 reference: "26 USC Section 62"
 tax_year: 2024
@@ -407,3 +408,207 @@ tests:
       total_above_the_line_deductions: 9800
       adjusted_gross_income: 10200
     notes: "Low earner with multiple deductions"
+
+  # ==========================================================================
+  # TIP INCOME DEDUCTION - 62(a)(23) (OBBBA 2025-2028)
+  # ==========================================================================
+  # Added by One Big Beautiful Bill Act (H.R.1, signed July 4, 2025)
+  # Effective for tax years 2025-2028, sunsets after 2028.
+  # Reference: https://www.congress.gov/bill/119th-congress/house-bill/1/text
+
+  - name: "Tip income deduction - basic case"
+    tax_year: 2025
+    inputs:
+      wages: 30000
+      tips: 10000
+      filing_status: single
+    expected:
+      tip_income_deduction: 10000
+      adjusted_gross_income: 30000  # 40000 gross - 10000 tip deduction
+    notes: "Basic tip income deduction - full tip amount under $25,000 cap"
+    citations:
+      - "26 USC 62(a)(23): qualified tip income deduction"
+      - "H.R.1 - One Big Beautiful Bill Act, Section 74A"
+
+  - name: "Tip income deduction - capped at $25,000"
+    tax_year: 2025
+    inputs:
+      wages: 30000
+      tips: 35000
+      filing_status: single
+    expected:
+      tip_income_deduction: 25000  # Capped at maximum
+      adjusted_gross_income: 40000  # 65000 gross - 25000 tip deduction
+    notes: "Tip income exceeds $25,000 cap, deduction limited"
+
+  - name: "Tip income deduction - exactly at cap"
+    tax_year: 2025
+    inputs:
+      wages: 40000
+      tips: 25000
+      filing_status: single
+    expected:
+      tip_income_deduction: 25000
+      adjusted_gross_income: 40000  # 65000 gross - 25000 tip deduction
+    notes: "Tip income exactly at $25,000 cap"
+
+  - name: "Tip income deduction - phaseout for single (partial)"
+    tax_year: 2025
+    inputs:
+      wages: 140000
+      tips: 20000
+      filing_status: single
+    expected:
+      # MAGI = $160,000, threshold = $150,000, excess = $10,000
+      # Phase-out amount = $10,000 * 0.10 = $1,000
+      # Base deduction = $20,000 (under cap)
+      # Final deduction = $20,000 - $1,000 = $19,000
+      tip_income_deduction: 19000
+      adjusted_gross_income: 141000  # 160000 gross - 19000 tip deduction
+    notes: "Single filer with income above phase-out threshold"
+    citations:
+      - "H.R.1 Section 74A(b)(2): 10% phase-out rate above threshold"
+
+  - name: "Tip income deduction - phaseout for single (full)"
+    tax_year: 2025
+    inputs:
+      wages: 380000
+      tips: 20000
+      filing_status: single
+    expected:
+      # MAGI = $400,000, threshold = $150,000, excess = $250,000
+      # Phase-out amount = $250,000 * 0.10 = $25,000 (fully phased out)
+      # Base deduction = $20,000
+      # Final deduction = max(0, $20,000 - $25,000) = $0
+      tip_income_deduction: 0
+      adjusted_gross_income: 400000  # No tip deduction
+    notes: "Single filer fully phased out"
+
+  - name: "Tip income deduction - MFJ below threshold"
+    tax_year: 2025
+    inputs:
+      wages: 180000
+      tips: 15000
+      filing_status: joint
+    expected:
+      # MAGI = $195,000, threshold = $300,000, no phase-out
+      tip_income_deduction: 15000
+      adjusted_gross_income: 180000  # 195000 gross - 15000 tip deduction
+    notes: "MFJ below $300,000 threshold, full deduction"
+
+  - name: "Tip income deduction - MFJ partial phaseout"
+    tax_year: 2025
+    inputs:
+      wages: 330000
+      tips: 20000
+      filing_status: joint
+    expected:
+      # MAGI = $350,000, threshold = $300,000, excess = $50,000
+      # Phase-out amount = $50,000 * 0.10 = $5,000
+      # Base deduction = $20,000
+      # Final deduction = $20,000 - $5,000 = $15,000
+      tip_income_deduction: 15000
+      adjusted_gross_income: 335000  # 350000 gross - 15000 tip deduction
+    notes: "MFJ with income above $300,000 threshold"
+
+  - name: "Tip income deduction - MFJ fully phased out"
+    tax_year: 2025
+    inputs:
+      wages: 530000
+      tips: 20000
+      filing_status: joint
+    expected:
+      # MAGI = $550,000, threshold = $300,000, excess = $250,000
+      # Phase-out amount = $250,000 * 0.10 = $25,000 (fully phased out)
+      tip_income_deduction: 0
+      adjusted_gross_income: 550000  # No tip deduction
+    notes: "MFJ fully phased out"
+
+  - name: "Tip income deduction - self-employment limit"
+    tax_year: 2025
+    inputs:
+      wages: 0
+      tips: 30000
+      self_employment_income: 15000  # Net SE income is limiting factor
+      filing_status: single
+    expected:
+      # Self-employed tip earner: deduction limited to net SE income
+      # Tips = $30,000, but net SE = $15,000, so deduction = $15,000
+      # (For employee tips, no such limit)
+      tip_income_deduction: 15000
+    notes: "Self-employed individual - deduction cannot exceed net earnings"
+    citations:
+      - "H.R.1 Section 74A(c): limitation for self-employed individuals"
+
+  - name: "Tip income deduction - not available before 2025"
+    tax_year: 2024
+    inputs:
+      wages: 30000
+      tips: 10000
+      filing_status: single
+    expected:
+      tip_income_deduction: 0
+      adjusted_gross_income: 40000  # Tips fully included in income
+    notes: "OBBBA not effective until 2025 - no tip deduction available"
+
+  - name: "Tip income deduction - not available after 2028 (sunset)"
+    tax_year: 2029
+    inputs:
+      wages: 30000
+      tips: 10000
+      filing_status: single
+    expected:
+      tip_income_deduction: 0
+      adjusted_gross_income: 40000  # Tips fully included in income
+    notes: "OBBBA sunset after 2028 - no tip deduction available"
+
+  - name: "Tip income deduction - available in 2028 (last year)"
+    tax_year: 2028
+    inputs:
+      wages: 30000
+      tips: 10000
+      filing_status: single
+    expected:
+      tip_income_deduction: 10000
+      adjusted_gross_income: 30000
+    notes: "2028 is the last year the tip deduction is available"
+
+  - name: "Tip income deduction - Head of Household"
+    tax_year: 2025
+    inputs:
+      wages: 130000
+      tips: 20000
+      filing_status: head_of_household
+    expected:
+      # MAGI = $150,000, exactly at threshold, no phase-out
+      tip_income_deduction: 20000
+      adjusted_gross_income: 130000
+    notes: "HoH at exactly $150,000 threshold - no phase-out yet"
+
+  - name: "Tip income deduction - zero tips"
+    tax_year: 2025
+    inputs:
+      wages: 50000
+      tips: 0
+      filing_status: single
+    expected:
+      tip_income_deduction: 0
+      adjusted_gross_income: 50000
+    notes: "No tips, no deduction"
+
+  - name: "Tip income deduction - combined with other deductions"
+    tax_year: 2025
+    inputs:
+      wages: 40000
+      tips: 15000
+      is_educator: true
+      educator_expenses: 300
+      traditional_ira_contributions: 7000
+      filing_status: single
+    expected:
+      tip_income_deduction: 15000
+      educator_expense_deduction: 300
+      ira_deduction: 7000
+      total_above_the_line_deductions: 22300
+      adjusted_gross_income: 32700  # 55000 - 22300
+    notes: "Tip deduction stacks with other above-the-line deductions"

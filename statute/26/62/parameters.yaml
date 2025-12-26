@@ -210,3 +210,99 @@ student_loan_interest:
             value: 185000
           - date: 2024-01-01
             value: 195000
+
+# =============================================================================
+# Section 62(a)(23) - Qualified Tip Income Deduction (OBBBA)
+# =============================================================================
+# Added by the One Big Beautiful Bill Act (H.R.1, Pub. L. 119-XX)
+# Signed July 4, 2025, effective for tax years 2025-2028.
+# Sunsets after 2028 - deduction not available for 2029+.
+#
+# Reference: https://www.congress.gov/bill/119th-congress/house-bill/1/text
+tip_income_deduction:
+  description: "Qualified tip income deduction (above-the-line) per OBBBA"
+
+  max_deduction:
+    description: "Maximum annual tip income deduction"
+    unit: USD
+    values:
+      # Not available before 2025
+      - date: 2000-01-01
+        value: 0
+      # OBBBA effective 2025-2028
+      - date: 2025-01-01
+        value: 25000
+        reference: "H.R.1 - One Big Beautiful Bill Act, Section 74A(b)(1)"
+      # Sunset after 2028
+      - date: 2029-01-01
+        value: 0
+        reference: "H.R.1 - One Big Beautiful Bill Act sunset provision"
+
+  phaseout:
+    description: "Income-based phase-out of tip income deduction"
+    reference: "H.R.1 - One Big Beautiful Bill Act, Section 74A(b)(2)"
+
+    rate:
+      description: "Phase-out rate per dollar of MAGI above threshold"
+      unit: rate
+      values:
+        - date: 2025-01-01
+          value: 0.10
+        - date: 2029-01-01
+          value: 0
+          reference: "Sunset - no phase-out when deduction is not available"
+
+    single:
+      description: "Phase-out threshold for single filers"
+      start:
+        unit: USD
+        values:
+          - date: 2025-01-01
+            value: 150000
+          - date: 2029-01-01
+            value: 0
+            reference: "Sunset"
+
+    joint:
+      description: "Phase-out threshold for MFJ"
+      start:
+        unit: USD
+        values:
+          - date: 2025-01-01
+            value: 300000
+          - date: 2029-01-01
+            value: 0
+            reference: "Sunset"
+
+    head_of_household:
+      description: "Phase-out threshold for Head of Household"
+      start:
+        unit: USD
+        values:
+          - date: 2025-01-01
+            value: 150000
+          - date: 2029-01-01
+            value: 0
+            reference: "Sunset"
+
+    mfs:
+      description: "Phase-out threshold for MFS"
+      start:
+        unit: USD
+        values:
+          - date: 2025-01-01
+            value: 150000
+          - date: 2029-01-01
+            value: 0
+            reference: "Sunset"
+
+    surviving_spouse:
+      description: "Phase-out threshold for Surviving Spouse"
+      start:
+        unit: USD
+        values:
+          - date: 2025-01-01
+            value: 150000
+          - date: 2029-01-01
+            value: 0
+            reference: "Sunset"

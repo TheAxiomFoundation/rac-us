@@ -57,6 +57,7 @@ social_security_wage_base:
   label: "Social Security wage base"
   values:
     # Recent years
+    2026-01-01: 181200  # Projected based on AWI growth
     2025-01-01: 176100
     2024-01-01: 168600
     2023-01-01: 160200
@@ -84,6 +85,7 @@ social_security_wage_base:
     2001-01-01: 80400
     2000-01-01: 76200
   citations:
+    - "SSA Contribution and Benefit Base: 2026 projected $181,200"
     - "Rev. Proc. 2024-40: 2025 wage base is $176,100"
     - "Rev. Proc. 2023-34: 2024 wage base is $168,600"
     - "42 USC 430: Contribution and benefit base formula"

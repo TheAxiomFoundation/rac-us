@@ -1,0 +1,38 @@
+# 26 USC Section 1(h) - Capital Gains Tax Rate Thresholds for Tax Year 2025
+#
+# These thresholds determine the applicable capital gains tax rate (0%, 15%, or 20%).
+# The rate depends on taxable income, not just capital gains amount.
+# Thresholds are adjusted for inflation per Section 1(h)(1)(B)-(D).
+# Published in Rev. Proc. 2024-40 (IRS, October 22, 2024).
+#
+# Note: These thresholds apply to "adjusted net capital gain" and "qualified dividend income."
+
+reference: "26 USC Section 1(h)(1)(B)-(D); Rev. Proc. 2024-40"
+description: Capital gains tax rate thresholds for tax year 2025
+
+tax_year: 2025
+
+# 0% rate applies up to these thresholds (Section 1(h)(1)(B))
+# The 0% rate applies to the extent taxable income is below the threshold
+zero_percent_max:
+  single: 48350
+  married_filing_jointly: 96700
+  head_of_household: 64750
+  married_filing_separately: 48350
+  surviving_spouse: 96700
+
+# 15% rate applies from the 0% threshold up to these thresholds (Section 1(h)(1)(C))
+# Above these thresholds, the 20% rate applies (Section 1(h)(1)(D))
+fifteen_percent_max:
+  single: 533400
+  married_filing_jointly: 600050
+  head_of_household: 566700
+  married_filing_separately: 300000
+  surviving_spouse: 600050
+
+# Source reference
+source:
+  publication: "Rev. Proc. 2024-40"
+  date: "2024-10-22"
+  url: "https://www.irs.gov/pub/irs-drop/rp-24-40.pdf"
+  section: "Section 3.10"

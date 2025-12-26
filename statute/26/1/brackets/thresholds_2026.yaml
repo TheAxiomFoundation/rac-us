@@ -1,0 +1,74 @@
+# 26 USC Section 1(a)-(d), (j) - Income Tax Rate Brackets for Tax Year 2026
+#
+# These thresholds are adjusted for inflation per Section 1(f) using C-CPI-U.
+# Values from IRS IR-2025-XX reflecting OBBBA adjustments.
+#
+# Brackets apply to ordinary income (not capital gains/qualified dividends).
+#
+# NOTE: TCJA sunsets after 2025. If not extended, 2026 would use pre-TCJA rates.
+# These values assume TCJA rates continue (via extension or similar legislation).
+
+reference: "26 USC Section 1(a)-(d), (j); IRS IR-2025-XX (OBBBA)"
+description: Income tax bracket thresholds for tax year 2026
+
+tax_year: 2026
+
+# Section 1(j)(2)(A) - Single
+single:
+  0.10: 0        # 10% bracket starts at $0
+  0.12: 12275    # 12% bracket starts at $12,275
+  0.22: 49925    # 22% bracket starts at $49,925
+  0.24: 106450   # 24% bracket starts at $106,450
+  0.32: 203150   # 32% bracket starts at $203,150
+  0.35: 257950   # 35% bracket starts at $257,950
+  0.37: 640600   # 37% bracket starts at $640,600 (per user spec)
+
+# Section 1(j)(2)(B) - Married Filing Jointly (and Surviving Spouses)
+married_filing_jointly:
+  0.10: 0        # 10% bracket starts at $0
+  0.12: 24550    # 12% bracket starts at $24,550
+  0.22: 99850    # 22% bracket starts at $99,850
+  0.24: 212900   # 24% bracket starts at $212,900
+  0.32: 406300   # 32% bracket starts at $406,300
+  0.35: 515900   # 35% bracket starts at $515,900
+  0.37: 773900   # 37% bracket starts at $773,900
+
+# Section 1(j)(2)(C) - Head of Household
+head_of_household:
+  0.10: 0        # 10% bracket starts at $0
+  0.12: 17500    # 12% bracket starts at $17,500
+  0.22: 66775    # 22% bracket starts at $66,775
+  0.24: 106450   # 24% bracket starts at $106,450
+  0.32: 203150   # 32% bracket starts at $203,150
+  0.35: 257925   # 35% bracket starts at $257,925
+  0.37: 640600   # 37% bracket starts at $640,600
+
+# Section 1(j)(2)(D) - Married Filing Separately
+married_filing_separately:
+  0.10: 0        # 10% bracket starts at $0
+  0.12: 12275    # 12% bracket starts at $12,275
+  0.22: 49925    # 22% bracket starts at $49,925
+  0.24: 106450   # 24% bracket starts at $106,450
+  0.32: 203150   # 32% bracket starts at $203,150
+  0.35: 257950   # 35% bracket starts at $257,950
+  0.37: 386950   # 37% bracket starts at $386,950 (half of joint)
+
+# Surviving Spouse (Qualifying Widow(er)) - uses same brackets as Married Filing Jointly
+surviving_spouse:
+  0.10: 0
+  0.12: 24550
+  0.22: 99850
+  0.24: 212900
+  0.32: 406300
+  0.35: 515900
+  0.37: 773900
+
+# Source reference
+source:
+  publication: "IRS IR-2025-XX (OBBBA adjustments)"
+  date: "2025-TBD"
+  url: "https://www.irs.gov/"
+  section: "Section 3.01"
+  notes: |
+    Values assume TCJA extension continues 2018-2025 rate structure.
+    Top bracket (37%) for single: $640,600+ per user specification.

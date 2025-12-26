@@ -24,9 +24,12 @@ basic_joint:
     2023-01-01: 27700
     2024-01-01: 29200
     2025-01-01: 30000
+    2026-01-01: 32200
   citations:
     - "§ 63(c)(2)(A): joint return amount"
     - "Rev. Proc. 2023-34: $29,200 for 2024"
+    - "Rev. Proc. 2024-40: $30,000 for 2025"
+    - "IRS IR-2025-XX (OBBBA): $32,200 for 2026"
 
 basic_head_of_household:
   description: "Standard deduction for head of household"
@@ -44,9 +47,12 @@ basic_head_of_household:
     2023-01-01: 20800
     2024-01-01: 21900
     2025-01-01: 22500
+    2026-01-01: 24150
   citations:
     - "§ 63(c)(2)(B): head of household"
     - "Rev. Proc. 2023-34: $21,900 for 2024"
+    - "Rev. Proc. 2024-40: $22,500 for 2025"
+    - "IRS IR-2025-XX (OBBBA): $24,150 for 2026"
 
 basic_single:
   description: "Standard deduction for single filers"
@@ -64,6 +70,9 @@ basic_single:
     2023-01-01: 13850
     2024-01-01: 14600
     2025-01-01: 15000
+    2026-01-01: 16100
   citations:
     - "§ 63(c)(2)(C): 50% of joint amount"
     - "Rev. Proc. 2023-34: $14,600 for 2024"
+    - "Rev. Proc. 2024-40: $15,000 for 2025"
+    - "IRS IR-2025-XX (OBBBA): $16,100 for 2026"

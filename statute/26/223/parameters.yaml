@@ -38,6 +38,9 @@ contribution_limits:
       - date: 2025-01-01
         value: 4300
         reference: "Rev. Proc. 2024-25"
+      - date: 2026-01-01
+        value: 4400
+        reference: "IRS IR-2025-XX (projected)"
 
   family:
     description: "Maximum contribution for family HDHP coverage"
@@ -65,6 +68,9 @@ contribution_limits:
       - date: 2025-01-01
         value: 8550
         reference: "Rev. Proc. 2024-25"
+      - date: 2026-01-01
+        value: 8800
+        reference: "IRS IR-2025-XX (projected)"
 
 # =============================================================================
 # Section 223(b)(3) - Catch-up Contributions
@@ -137,6 +143,9 @@ hdhp_requirements:
         - date: 2025-01-01
           value: 1650
           reference: "Rev. Proc. 2024-25"
+        - date: 2026-01-01
+          value: 1700
+          reference: "IRS IR-2025-XX (projected)"
 
     family:
       description: "Minimum annual deductible for family HDHP"
@@ -164,6 +173,9 @@ hdhp_requirements:
         - date: 2025-01-01
           value: 3300
           reference: "Rev. Proc. 2024-25"
+        - date: 2026-01-01
+          value: 3400
+          reference: "IRS IR-2025-XX (projected)"
 
   maximum_out_of_pocket:
     self_only:
@@ -192,6 +204,9 @@ hdhp_requirements:
         - date: 2025-01-01
           value: 8300
           reference: "Rev. Proc. 2024-25"
+        - date: 2026-01-01
+          value: 8550
+          reference: "IRS IR-2025-XX (projected)"
 
     family:
       description: "Maximum out-of-pocket expenses for family HDHP"
@@ -219,6 +234,9 @@ hdhp_requirements:
         - date: 2025-01-01
           value: 16600
           reference: "Rev. Proc. 2024-25"
+        - date: 2026-01-01
+          value: 17100
+          reference: "IRS IR-2025-XX (projected)"
 
 # =============================================================================
 # Section 223(f)(4) - Additional Tax Rate

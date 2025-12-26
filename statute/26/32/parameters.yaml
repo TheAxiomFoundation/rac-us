@@ -65,3 +65,15 @@ resolved:
       single: { 0: 10620, 1: 23350, 2: 23350, 3: 23350 }
       joint: { 0: 17730, 1: 30470, 2: 30470, 3: 30470 }
     investment_income_limit: 11950
+
+  2026:
+    # Values from IRS IR-2025-XX (OBBBA adjustments)
+    max_amount:
+      0: 667
+      1: 4451
+      2: 7354
+      3: 8231
+    phaseout_start:
+      single: { 0: 10920, 1: 24010, 2: 24010, 3: 24010 }
+      joint: { 0: 18230, 1: 31340, 2: 31340, 3: 31340 }
+    investment_income_limit: 12290

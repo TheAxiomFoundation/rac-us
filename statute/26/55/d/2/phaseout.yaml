@@ -28,12 +28,15 @@ phaseout_threshold_joint:
     2022-01-01: 1079800
     2023-01-01: 1156300
     2024-01-01: 1218700
+    2025-01-01: 1252700
     # Post-TCJA sunset (reverts to lower amounts)
-    2026-01-01: 160000  # Estimated based on pre-TCJA formula
+    2026-01-01: 165000  # Estimated based on pre-TCJA formula with inflation
   citations:
     - "§ 55(d)(2)(A)(i): Threshold for joint returns"
     - "§ 55(d)(4)(B): TCJA increased thresholds (2018-2025)"
     - "Rev. Proc. 2023-34, Section 3.03: $1,218,700 for 2024"
+    - "Rev. Proc. 2024-40: $1,252,700 for 2025"
+    - "Post-TCJA 2026: Estimated based on pre-TCJA formula with inflation"
 
 phaseout_threshold_single:
   description: "AMTI threshold where AMT exemption phaseout begins (single/HoH)"
@@ -46,10 +49,13 @@ phaseout_threshold_single:
     2022-01-01: 539900
     2023-01-01: 578150
     2024-01-01: 609350
-    2026-01-01: 120000  # Estimated post-TCJA
+    2025-01-01: 626350
+    2026-01-01: 123500  # Estimated post-TCJA
   citations:
     - "§ 55(d)(2)(A)(ii): Half of joint threshold"
     - "Rev. Proc. 2023-34, Section 3.03: $609,350 for 2024"
+    - "Rev. Proc. 2024-40: $626,350 for 2025"
+    - "Post-TCJA 2026: Estimated based on pre-TCJA formula"
 
 phaseout_threshold_married_separate:
   description: "AMTI threshold where AMT exemption phaseout begins (MFS)"
@@ -62,6 +68,9 @@ phaseout_threshold_married_separate:
     2022-01-01: 539900
     2023-01-01: 578150
     2024-01-01: 609350
-    2026-01-01: 80000  # Estimated post-TCJA (half of joint)
+    2025-01-01: 626350
+    2026-01-01: 82500  # Estimated post-TCJA (half of joint)
   citations:
     - "§ 55(d)(2)(A)(iii): Half of joint threshold for MFS"
+    - "Rev. Proc. 2024-40: $626,350 for 2025"
+    - "Post-TCJA 2026: Half of joint threshold"

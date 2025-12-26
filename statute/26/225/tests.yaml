@@ -1,0 +1,397 @@
+# 26 USC Section 225 - Qualified Overtime Compensation Deduction Tests
+#
+# Tests for the overtime deduction added by the One Big Beautiful Bill Act
+# (Pub. L. 119-21, July 4, 2025).
+#
+# Effective for taxable years beginning after December 31, 2024.
+# Terminates after taxable years beginning after December 31, 2028.
+
+reference: "26 USC Section 225"
+tax_year: 2025
+
+tests:
+  # ==========================================================================
+  # BASIC OVERTIME DEDUCTION - Section 225(a)
+  # ==========================================================================
+
+  - name: "Basic overtime deduction - single filer"
+    inputs:
+      filing_status: single
+      wages: 50000
+      qualified_overtime_compensation: 3000
+      adjusted_gross_income: 50000
+    expected:
+      qualified_overtime_deduction: 3000
+    notes: "Full deduction when under cap and no phase-out"
+    citations:
+      - "26 USC 225(a): deduction equal to qualified overtime compensation"
+
+  - name: "Basic overtime deduction - joint filers"
+    inputs:
+      filing_status: joint
+      wages: 80000
+      qualified_overtime_compensation: 5000
+      adjusted_gross_income: 80000
+    expected:
+      qualified_overtime_deduction: 5000
+    notes: "Full deduction for MFJ when under cap and no phase-out"
+
+  - name: "No overtime compensation - zero deduction"
+    inputs:
+      filing_status: single
+      wages: 60000
+      qualified_overtime_compensation: 0
+      adjusted_gross_income: 60000
+    expected:
+      qualified_overtime_deduction: 0
+    notes: "No deduction if no qualified overtime received"
+
+  # ==========================================================================
+  # DEDUCTION CAP - Section 225(b)(1)
+  # ==========================================================================
+
+  - name: "Cap at $12,500 - single filer"
+    inputs:
+      filing_status: single
+      wages: 100000
+      qualified_overtime_compensation: 20000
+      adjusted_gross_income: 100000
+    expected:
+      qualified_overtime_deduction: 12500
+    notes: "Deduction capped at $12,500 for single/HoH filers"
+    citations:
+      - "26 USC 225(b)(1): shall not exceed $12,500"
+
+  - name: "Cap at $25,000 - joint filers"
+    inputs:
+      filing_status: joint
+      wages: 180000
+      qualified_overtime_compensation: 40000
+      adjusted_gross_income: 180000
+    expected:
+      qualified_overtime_deduction: 25000
+    notes: "Deduction capped at $25,000 for MFJ"
+    citations:
+      - "26 USC 225(b)(1): $25,000 in the case of a joint return"
+
+  - name: "Exactly at single cap"
+    inputs:
+      filing_status: single
+      wages: 75000
+      qualified_overtime_compensation: 12500
+      adjusted_gross_income: 75000
+    expected:
+      qualified_overtime_deduction: 12500
+    notes: "Overtime exactly at single cap receives full cap"
+
+  - name: "Exactly at joint cap"
+    inputs:
+      filing_status: joint
+      wages: 150000
+      qualified_overtime_compensation: 25000
+      adjusted_gross_income: 150000
+    expected:
+      qualified_overtime_deduction: 25000
+    notes: "Overtime exactly at joint cap receives full cap"
+
+  # ==========================================================================
+  # PHASE-OUT - Section 225(b)(2)
+  # ==========================================================================
+
+  - name: "Phase-out begins at $150,000 MAGI - single"
+    inputs:
+      filing_status: single
+      wages: 160000
+      qualified_overtime_compensation: 5000
+      adjusted_gross_income: 160000
+    expected:
+      # MAGI exceeds threshold by $10,000 = 10 increments
+      # Reduction = 10 * $100 = $1,000
+      # Deduction = min($5,000, $12,500) - $1,000 = $4,000
+      qualified_overtime_deduction: 4000
+    notes: "Phase-out reduces deduction by $100 per $1,000 over threshold"
+    citations:
+      - "26 USC 225(b)(2)(A): reduced by $100 for each $1,000 exceeding $150,000"
+
+  - name: "Phase-out begins at $300,000 MAGI - joint"
+    inputs:
+      filing_status: joint
+      wages: 320000
+      qualified_overtime_compensation: 15000
+      adjusted_gross_income: 320000
+    expected:
+      # MAGI exceeds threshold by $20,000 = 20 increments
+      # Reduction = 20 * $100 = $2,000
+      # Deduction = min($15,000, $25,000) - $2,000 = $13,000
+      qualified_overtime_deduction: 13000
+    notes: "MFJ phase-out threshold is $300,000"
+    citations:
+      - "26 USC 225(b)(2)(A): $300,000 in the case of a joint return"
+
+  - name: "Partial phase-out - single at $175,000"
+    inputs:
+      filing_status: single
+      wages: 175000
+      qualified_overtime_compensation: 12500
+      adjusted_gross_income: 175000
+    expected:
+      # MAGI exceeds threshold by $25,000 = 25 increments
+      # Reduction = 25 * $100 = $2,500
+      # Deduction = $12,500 - $2,500 = $10,000
+      qualified_overtime_deduction: 10000
+    notes: "Partial phase-out calculation"
+
+  - name: "Complete phase-out - single high earner"
+    inputs:
+      filing_status: single
+      wages: 290000
+      qualified_overtime_compensation: 10000
+      adjusted_gross_income: 290000
+    expected:
+      # MAGI exceeds threshold by $140,000 = 140 increments
+      # Reduction = 140 * $100 = $14,000 > $10,000 (capped overtime)
+      # Deduction = max(0, $10,000 - $14,000) = $0
+      qualified_overtime_deduction: 0
+    notes: "Phase-out fully eliminates deduction at high income"
+
+  - name: "Complete phase-out - single with max overtime"
+    inputs:
+      filing_status: single
+      wages: 280000
+      qualified_overtime_compensation: 20000
+      adjusted_gross_income: 280000
+    expected:
+      # MAGI exceeds threshold by $130,000 = 130 increments
+      # Reduction = 130 * $100 = $13,000 > $12,500 cap
+      # Deduction = max(0, $12,500 - $13,000) = $0
+      qualified_overtime_deduction: 0
+    notes: "Even max deduction is fully phased out at $275,000+"
+
+  - name: "Phase-out cliff - exactly at threshold"
+    inputs:
+      filing_status: single
+      wages: 150000
+      qualified_overtime_compensation: 5000
+      adjusted_gross_income: 150000
+    expected:
+      # MAGI at threshold - no reduction
+      qualified_overtime_deduction: 5000
+    notes: "No phase-out at exactly the threshold"
+
+  - name: "Phase-out - $1 over threshold"
+    inputs:
+      filing_status: single
+      wages: 150001
+      qualified_overtime_compensation: 5000
+      adjusted_gross_income: 150001
+    expected:
+      # MAGI exceeds by $1 - less than $1,000 increment
+      # floor($1 / $1,000) = 0 increments
+      qualified_overtime_deduction: 5000
+    notes: "Reduction only applies to full $1,000 increments"
+
+  - name: "Phase-out - $1,000 over threshold"
+    inputs:
+      filing_status: single
+      wages: 151000
+      qualified_overtime_compensation: 5000
+      adjusted_gross_income: 151000
+    expected:
+      # MAGI exceeds by $1,000 = 1 increment
+      # Reduction = 1 * $100 = $100
+      qualified_overtime_deduction: 4900
+    notes: "First $1,000 increment triggers $100 reduction"
+
+  # ==========================================================================
+  # MODIFIED ADJUSTED GROSS INCOME - Section 225(b)(2)(B)
+  # ==========================================================================
+
+  - name: "MAGI includes foreign earned income exclusion"
+    inputs:
+      filing_status: single
+      wages: 50000
+      qualified_overtime_compensation: 5000
+      adjusted_gross_income: 50000
+      foreign_earned_income_exclusion: 120000  # Section 911 exclusion
+    expected:
+      # MAGI = $50,000 + $120,000 = $170,000
+      # Exceeds threshold by $20,000 = 20 increments
+      # Reduction = 20 * $100 = $2,000
+      qualified_overtime_deduction: 3000
+    notes: "MAGI adds back Section 911 exclusion for phase-out calculation"
+    citations:
+      - "26 USC 225(b)(2)(B): MAGI = AGI + amounts excluded under 911, 931, 933"
+
+  # ==========================================================================
+  # FILING STATUS REQUIREMENTS - Section 225(e)
+  # ==========================================================================
+
+  - name: "Married filing separately - not allowed"
+    inputs:
+      filing_status: married_filing_separately
+      wages: 50000
+      qualified_overtime_compensation: 5000
+      adjusted_gross_income: 50000
+    expected:
+      qualified_overtime_deduction: 0
+    notes: "MFS cannot claim overtime deduction"
+    citations:
+      - "26 USC 225(e): married individuals must file joint return"
+
+  - name: "Head of household - allowed"
+    inputs:
+      filing_status: head_of_household
+      wages: 60000
+      qualified_overtime_compensation: 4000
+      adjusted_gross_income: 60000
+    expected:
+      qualified_overtime_deduction: 4000
+    notes: "HoH uses single filer limits ($12,500 cap, $150,000 threshold)"
+
+  # ==========================================================================
+  # W-2 EMPLOYEE REQUIREMENT - Section 225(c)
+  # ==========================================================================
+
+  - name: "Only FLSA Section 7 overtime qualifies"
+    description: |
+      Qualified overtime compensation is defined as overtime pay required
+      under FLSA Section 7 (29 USC 207) that exceeds the regular rate.
+
+      This means:
+      - The "half" in time-and-a-half qualifies
+      - The regular rate portion does NOT qualify
+      - State law overtime does NOT qualify
+      - CBA overtime does NOT qualify
+      - Company policy overtime does NOT qualify
+      - Independent contractor "overtime" does NOT qualify
+    inputs:
+      filing_status: single
+      wages: 50000
+      # Worker at $20/hr works 100 overtime hours at time-and-a-half
+      # Total overtime pay = 100 * $30 = $3,000
+      # But only premium qualifies: 100 * $10 = $1,000
+      qualified_overtime_compensation: 1000
+      adjusted_gross_income: 50000
+    expected:
+      qualified_overtime_deduction: 1000
+    notes: "Only the premium over regular rate qualifies, not total overtime pay"
+    citations:
+      - "26 USC 225(c)(1): compensation in excess of the regular rate"
+
+  # ==========================================================================
+  # TERMINATION - Section 225(g)
+  # ==========================================================================
+
+  - name: "Deduction available in 2025"
+    tax_year: 2025
+    inputs:
+      filing_status: single
+      wages: 50000
+      qualified_overtime_compensation: 3000
+      adjusted_gross_income: 50000
+    expected:
+      qualified_overtime_deduction: 3000
+    notes: "Deduction effective for taxable years beginning after Dec 31, 2024"
+    citations:
+      - "Pub. L. 119-21, § 70202(g): effective date"
+
+  - name: "Deduction available in 2028"
+    tax_year: 2028
+    inputs:
+      filing_status: single
+      wages: 50000
+      qualified_overtime_compensation: 3000
+      adjusted_gross_income: 50000
+    expected:
+      qualified_overtime_deduction: 3000
+    notes: "Deduction still available through tax year 2028"
+
+  - name: "Deduction NOT available in 2029 - termination"
+    tax_year: 2029
+    inputs:
+      filing_status: single
+      wages: 50000
+      qualified_overtime_compensation: 3000
+      adjusted_gross_income: 50000
+    expected:
+      qualified_overtime_deduction: 0
+    notes: "Deduction terminates after taxable years beginning after Dec 31, 2028"
+    citations:
+      - "26 USC 225(g): no deduction for taxable years beginning after Dec 31, 2028"
+
+  - name: "Deduction NOT available before 2025"
+    tax_year: 2024
+    inputs:
+      filing_status: single
+      wages: 50000
+      qualified_overtime_compensation: 3000
+      adjusted_gross_income: 50000
+    expected:
+      qualified_overtime_deduction: 0
+    notes: "Deduction not effective until taxable years beginning after Dec 31, 2024"
+
+  # ==========================================================================
+  # EDGE CASES AND COMBINATIONS
+  # ==========================================================================
+
+  - name: "Cap applied before phase-out"
+    inputs:
+      filing_status: single
+      wages: 200000
+      qualified_overtime_compensation: 50000
+      adjusted_gross_income: 200000
+    expected:
+      # Step 1: Cap at $12,500
+      # Step 2: MAGI exceeds threshold by $50,000 = 50 increments
+      # Reduction = 50 * $100 = $5,000
+      # Deduction = $12,500 - $5,000 = $7,500
+      qualified_overtime_deduction: 7500
+    notes: "Cap applies first, then phase-out reduces the capped amount"
+
+  - name: "Very low overtime amount"
+    inputs:
+      filing_status: single
+      wages: 45000
+      qualified_overtime_compensation: 50
+      adjusted_gross_income: 45000
+    expected:
+      qualified_overtime_deduction: 50
+    notes: "Small amounts fully deductible"
+
+  - name: "Zero income with overtime"
+    description: "Edge case where worker has only overtime (unusual but valid)"
+    inputs:
+      filing_status: single
+      wages: 0
+      qualified_overtime_compensation: 1000
+      adjusted_gross_income: 0
+    expected:
+      qualified_overtime_deduction: 1000
+    notes: "Deduction allowed even with zero AGI"
+
+  - name: "Joint filers with high overtime, partial phase-out"
+    inputs:
+      filing_status: joint
+      wages: 350000
+      qualified_overtime_compensation: 30000  # Over $25k cap
+      adjusted_gross_income: 350000
+    expected:
+      # Step 1: Cap at $25,000
+      # Step 2: MAGI exceeds $300,000 by $50,000 = 50 increments
+      # Reduction = 50 * $100 = $5,000
+      # Deduction = $25,000 - $5,000 = $20,000
+      qualified_overtime_deduction: 20000
+    notes: "Joint filers with capped overtime and partial phase-out"
+
+  - name: "Joint filers completely phased out"
+    inputs:
+      filing_status: joint
+      wages: 600000
+      qualified_overtime_compensation: 30000
+      adjusted_gross_income: 600000
+    expected:
+      # MAGI exceeds $300,000 by $300,000 = 300 increments
+      # Reduction = 300 * $100 = $30,000 > $25,000 cap
+      # Deduction = max(0, $25,000 - $30,000) = $0
+      qualified_overtime_deduction: 0
+    notes: "Joint filers completely phased out at $550,000+"

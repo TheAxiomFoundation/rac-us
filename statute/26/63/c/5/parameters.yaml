@@ -14,9 +14,13 @@ dependent_minimum:
     2022-01-01: 1150
     2023-01-01: 1250
     2024-01-01: 1300
+    2025-01-01: 1350
+    2026-01-01: 1400
   citations:
     - "§ 63(c)(5)(A)(i): minimum amount"
     - "Rev. Proc. 2023-34: $1,300 for 2024"
+    - "Rev. Proc. 2024-40: $1,350 for 2025"
+    - "IRS IR-2025-XX (OBBBA): $1,400 for 2026"
 
 dependent_earned_addon:
   description: "Amount added to dependent's earned income"
@@ -32,6 +36,10 @@ dependent_earned_addon:
     2022-01-01: 400
     2023-01-01: 400
     2024-01-01: 450
+    2025-01-01: 450
+    2026-01-01: 500
   citations:
     - "§ 63(c)(5)(A)(ii): earned income plus amount"
     - "Rev. Proc. 2023-34: $450 for 2024"
+    - "Rev. Proc. 2024-40: $450 for 2025"
+    - "IRS IR-2025-XX (OBBBA): $500 for 2026"

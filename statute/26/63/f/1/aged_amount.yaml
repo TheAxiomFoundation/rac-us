@@ -20,9 +20,12 @@ additional_aged_unmarried:
     2023-01-01: 1850
     2024-01-01: 1950
     2025-01-01: 2000
+    2026-01-01: 2150
   citations:
     - "§ 63(f)(1): additional for aged (unmarried)"
     - "Rev. Proc. 2023-34: $1,950 for 2024"
+    - "Rev. Proc. 2024-40: $2,000 for 2025"
+    - "IRS IR-2025-XX (OBBBA): $2,150 for 2026"
 
 additional_aged_married:
   description: "Additional deduction for taxpayers 65+ (married)"
@@ -40,6 +43,9 @@ additional_aged_married:
     2023-01-01: 1500
     2024-01-01: 1550
     2025-01-01: 1600
+    2026-01-01: 1700
   citations:
     - "§ 63(f)(1): additional for aged (married)"
     - "Rev. Proc. 2023-34: $1,550 for 2024"
+    - "Rev. Proc. 2024-40: $1,600 for 2025"
+    - "IRS IR-2025-XX (OBBBA): $1,700 for 2026"
