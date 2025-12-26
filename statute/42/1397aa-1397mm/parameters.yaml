@@ -564,3 +564,31 @@ calibration:
       2021-10-01: 2900
     citations:
       - "MACPAC MACStats: CHIP Expenditures"
+
+# =============================================================================
+# UTILIZATION AND BURDEN FACTORS
+# Modeling assumptions for benefit calculations
+# =============================================================================
+
+utilization:
+  description: "Utilization factors for benefit calculations"
+
+  # Estimated average utilization of max out-of-pocket
+  estimated_oop_utilization_rate:
+    description: "Estimated average utilization rate of maximum out-of-pocket costs"
+    unit: rate
+    values:
+      1997-08-05: 0.5  # 50% of max OOP as average utilization
+    citations:
+      - "Actuarial assumption for benefit modeling"
+      - "Based on typical healthcare utilization patterns"
+
+  # Threshold for determining if cost-sharing is burdensome
+  coverage_gap_burden_threshold:
+    description: "Threshold ratio of max OOP to benefit above which cost-sharing is considered burdensome"
+    unit: rate
+    values:
+      1997-08-05: 0.2  # 20% of benefit value
+    citations:
+      - "Policy analysis threshold for coverage gap identification"
+      - "42 USC 1397cc(e)(3): Cost-sharing affordability concerns"

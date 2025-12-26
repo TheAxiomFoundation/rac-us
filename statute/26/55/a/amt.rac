@@ -110,7 +110,7 @@ period Year
 dtype Money
 unit "USD"
 label "AMT Bracket Threshold"
-description "Threshold where AMT rate increases from 26% to 28%"
+description "Threshold where AMT rate increases from lower to higher rate"
 
 formula:
   # Section 55(b)(3): Bracket threshold varies by filing status
@@ -125,23 +125,23 @@ period Year
 dtype Money
 unit "USD"
 label "Tentative Minimum Tax Before FTC"
-description "TMT calculated at 26%/28% rates before foreign tax credit per Section 55(b)(1)"
+description "TMT calculated at two-tier rates before foreign tax credit per Section 55(b)(1)"
 
 formula:
   taxable_excess = amt_taxable_excess
   bracket = amt_bracket_threshold
 
   # Two-bracket rate structure:
-  # 26% on taxable excess up to bracket threshold
-  # 28% on taxable excess above bracket threshold
+  # Lower rate on taxable excess up to bracket threshold
+  # Higher rate on taxable excess above bracket threshold
 
-  amount_at_26_pct = min(taxable_excess, bracket)
-  amount_at_28_pct = max(0, taxable_excess - bracket)
+  amount_at_low_rate = min(taxable_excess, bracket)
+  amount_at_high_rate = max(0, taxable_excess - bracket)
 
-  tax_at_26 = amount_at_26_pct * amt_rate_low
-  tax_at_28 = amount_at_28_pct * amt_rate_high
+  tax_at_low_rate = amount_at_low_rate * amt_rate_low
+  tax_at_high_rate = amount_at_high_rate * amt_rate_high
 
-  return tax_at_26 + tax_at_28
+  return tax_at_low_rate + tax_at_high_rate
 
 default 0
 

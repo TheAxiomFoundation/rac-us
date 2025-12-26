@@ -36,6 +36,15 @@
 #   - Parameters (parameters.yaml)
 
 # =============================================================================
+# PARAMETERS
+# =============================================================================
+
+parameters:
+  per_capita_chip_benefit: statute/42/1397aa-1397mm/parameters.yaml#calibration.per_capita_spending
+  estimated_oop_utilization_rate: statute/42/1397aa-1397mm/parameters.yaml#utilization.estimated_oop_utilization_rate
+  coverage_gap_burden_threshold: statute/42/1397aa-1397mm/parameters.yaml#utilization.coverage_gap_burden_threshold
+
+# =============================================================================
 # MAIN CHIP VARIABLE
 # Annual estimated benefit value for CHIP-eligible person
 # =============================================================================
@@ -101,8 +110,8 @@ formula:
 
   # Net benefit is gross benefit minus potential cost-sharing
   # Actual cost-sharing depends on utilization
-  # Using 50% of max OOP as approximate average utilization
-  estimated_oop = max_oop * 0.5
+  # Using estimated utilization rate of max OOP as approximate average
+  estimated_oop = max_oop * estimated_oop_utilization_rate
 
   return max(0, benefit - estimated_oop)
 
@@ -131,9 +140,9 @@ formula:
   benefit = per_capita_chip_benefit
   max_oop = chip_max_out_of_pocket
 
-  # If max OOP is more than 20% of benefit, may be burdensome
+  # If max OOP is more than burden threshold of benefit, may be burdensome
   if benefit > 0:
-    return max_oop / benefit > 0.2
+    return max_oop / benefit > coverage_gap_burden_threshold
 
   return false
 

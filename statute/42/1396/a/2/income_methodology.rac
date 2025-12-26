@@ -25,6 +25,9 @@ imports:
   social_security_benefits: statute/26/86/social_security_benefits
   taxable_social_security: statute/26/86/taxable_social_security
 
+parameters:
+  months_per_year: statute/42/1396/parameters#months_per_year
+
 # =============================================================================
 # MAGI CALCULATION
 # 42 CFR 435.603(e) - Financial methodologies
@@ -61,7 +64,7 @@ dtype Money
 formula:
   # Medicaid uses monthly income, but MAGI is annual
   # Convert annual MAGI to monthly
-  return magi / 12
+  return magi / months_per_year
 
 # =============================================================================
 # HOUSEHOLD INCOME AGGREGATION

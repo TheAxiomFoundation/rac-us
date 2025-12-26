@@ -24,6 +24,21 @@
 # Reference: https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title42-section1396o
 
 # =============================================================================
+# PARAMETERS
+# =============================================================================
+
+parameters:
+  child_age_threshold: statute/42/1396/o/parameters.yaml#child_age_threshold
+  nominal_copayment_max: statute/42/1396/o/parameters.yaml#nominal_copayment_max
+  copayment_rate_100_150_fpl: statute/42/1396/o/parameters.yaml#copayment_rate_100_150_fpl
+  copayment_rate_150_plus_fpl: statute/42/1396/o/parameters.yaml#copayment_rate_150_plus_fpl
+  aggregate_cost_share_limit: statute/42/1396/o/parameters.yaml#aggregate_cost_share_limit
+  nominal_tier_fpl_threshold: statute/42/1396/o/parameters.yaml#nominal_tier_fpl_threshold
+  moderate_tier_fpl_threshold: statute/42/1396/o/parameters.yaml#moderate_tier_fpl_threshold
+  premium_fpl_threshold: statute/42/1396/o/parameters.yaml#premium_fpl_threshold
+  months_per_year: statute/42/1396/o/parameters.yaml#months_per_year
+
+# =============================================================================
 # EXEMPT FROM COST SHARING
 # 42 USC 1396o(a), 42 USC 1396o(b)(3)
 # =============================================================================
@@ -114,7 +129,7 @@ variable medicaid_nominal_cost_share_tier:
 
   formula:
     income_pct = household.magi_income_pct_fpl
-    return income_pct < 1.00
+    return income_pct < nominal_tier_fpl_threshold
 
   default true
 
@@ -124,11 +139,11 @@ variable medicaid_moderate_cost_share_tier:
   period Month
   dtype Boolean
   label "Moderate cost sharing tier"
-  description "Subject to up to 10% cost sharing (100-150% FPL)"
+  description "Subject to up to 10% cost sharing (100 to 150 percent FPL)"
 
   formula:
     income_pct = household.magi_income_pct_fpl
-    return income_pct >= 1.00 and income_pct < 1.50
+    return income_pct >= nominal_tier_fpl_threshold and income_pct < moderate_tier_fpl_threshold
 
   default false
 
@@ -142,7 +157,7 @@ variable medicaid_higher_cost_share_tier:
 
   formula:
     income_pct = household.magi_income_pct_fpl
-    return income_pct >= 1.50
+    return income_pct >= moderate_tier_fpl_threshold
 
   default false
 
@@ -237,7 +252,7 @@ variable medicaid_premium_applicable:
       return false
 
     # Below 150% FPL: no premiums for mandatory groups
-    if income_pct < 1.50:
+    if income_pct < premium_fpl_threshold:
       return false
 
     # Expansion adults above 150% FPL: state may charge premiums
@@ -300,7 +315,7 @@ variable medicaid_annual_cost_share_limit:
   description "Maximum total annual cost sharing for household"
 
   formula:
-    return medicaid_monthly_cost_share_limit * 12
+    return medicaid_monthly_cost_share_limit * months_per_year
 
   default 0
 

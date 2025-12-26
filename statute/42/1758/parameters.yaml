@@ -33,6 +33,23 @@ school_age:
       1946-01-01: 18
 
 # ==============================================================================
+# Federal Poverty Level Lookup Table Structure
+# Used for income eligibility determination
+# ==============================================================================
+
+fpl_lookup:
+  description: "Federal Poverty Level lookup table structure parameters"
+
+  max_household_size:
+    description: "Maximum household size with explicit FPL value in lookup table. Larger households use base + per-person additional amount."
+    unit: persons
+    values:
+      1965-01-01: 8  # FPL tables provide values for sizes 1-8
+    reference:
+      - title: "HHS Poverty Guidelines"
+        href: "https://aspe.hhs.gov/topics/poverty-economic-mobility/poverty-guidelines"
+
+# ==============================================================================
 # Income Eligibility Thresholds
 # 42 USC 1758(b)(1): Income eligibility guidelines
 # ==============================================================================

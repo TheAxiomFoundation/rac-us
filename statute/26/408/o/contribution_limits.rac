@@ -28,6 +28,8 @@ parameters:
   roth_ira_phaseout_joint: statute/26/408/parameters/roth_ira_phaseout_joint
   roth_ira_phaseout_separate: statute/26/408/parameters/roth_ira_phaseout_separate
   excess_contribution_penalty_rate: statute/26/408/parameters/excess_contribution_penalty_rate
+  roth_ira_minimum_contribution: statute/26/408/parameters/roth_ira_minimum_contribution
+  roth_ira_rounding_increment: statute/26/408/parameters/roth_ira_rounding_increment
 
 # Input: Traditional IRA contributions during year
 entity Person
@@ -182,19 +184,19 @@ formula:
   elif is_joint and agi >= roth_ira_phaseout_joint_end:
     return 0
   elif is_joint:
-    return max(200, (base_limit * (1 - (agi - roth_ira_phaseout_joint_start) / (roth_ira_phaseout_joint_end - roth_ira_phaseout_joint_start)) // 10 + 1) * 10)
+    return max(roth_ira_minimum_contribution, (base_limit * (1 - (agi - roth_ira_phaseout_joint_start) / (roth_ira_phaseout_joint_end - roth_ira_phaseout_joint_start)) // roth_ira_rounding_increment + 1) * roth_ira_rounding_increment)
   elif is_single_or_hoh and agi <= roth_ira_phaseout_single_start:
     return base_limit
   elif is_single_or_hoh and agi >= roth_ira_phaseout_single_end:
     return 0
   elif is_single_or_hoh:
-    return max(200, (base_limit * (1 - (agi - roth_ira_phaseout_single_start) / (roth_ira_phaseout_single_end - roth_ira_phaseout_single_start)) // 10 + 1) * 10)
+    return max(roth_ira_minimum_contribution, (base_limit * (1 - (agi - roth_ira_phaseout_single_start) / (roth_ira_phaseout_single_end - roth_ira_phaseout_single_start)) // roth_ira_rounding_increment + 1) * roth_ira_rounding_increment)
   elif agi <= roth_ira_phaseout_separate_start:
     return base_limit
   elif agi >= roth_ira_phaseout_separate_end:
     return 0
   else:
-    return max(200, (base_limit * (1 - (agi - roth_ira_phaseout_separate_start) / (roth_ira_phaseout_separate_end - roth_ira_phaseout_separate_start)) // 10 + 1) * 10)
+    return max(roth_ira_minimum_contribution, (base_limit * (1 - (agi - roth_ira_phaseout_separate_start) / (roth_ira_phaseout_separate_end - roth_ira_phaseout_separate_start)) // roth_ira_rounding_increment + 1) * roth_ira_rounding_increment)
 
 default 0
 

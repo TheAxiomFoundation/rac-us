@@ -32,6 +32,7 @@ imports:
 # Parameters
   farm_loss_threshold: parameters/statute/26/58/a/farm_loss#agi_threshold
   farm_loss_limit: parameters/statute/26/58/a/farm_loss#farm_loss_limit
+  mining_amortization_period: parameters/statute/26/58/parameters#mining_amortization_period
 
 # --- Section 58(a) - Farm Losses ---
 #
@@ -143,9 +144,9 @@ formula:
 
   current_year_deduction = mining_exploration_costs + mining_development_costs
 
-  # Simplified: assume straight-line amortization over 10 years
+  # Simplified: assume straight-line amortization over the statutory period
   # In practice, would need to track capitalized costs from prior years
-  annual_amortization = current_year_deduction / 10
+  annual_amortization = current_year_deduction / mining_amortization_period
 
   excess = current_year_deduction - annual_amortization
 

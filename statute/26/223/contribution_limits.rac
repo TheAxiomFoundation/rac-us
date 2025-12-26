@@ -61,6 +61,9 @@ parameters:
 # Age threshold for catch-up contributions
   catch_up_age: 55
 
+# Months per year for proration calculation
+  months_per_year: 12
+
 # Input variable: Individual's age at end of tax year
 entity Person
 period Year
@@ -165,7 +168,7 @@ formula:
 
   # Prorate based on months of coverage
   base = hsa_base_contribution_limit
-  monthly_limit = base / 12
+  monthly_limit = base / months_per_year
   return monthly_limit * months_hdhp_coverage
 
 # Derived: Total contribution limit including catch-up
@@ -182,7 +185,7 @@ formula:
   base = hsa_prorated_limit
 
   # Add catch-up contribution if age 55+ (prorated based on months eligible)
-  catch_up_monthly = catch_up_contribution / 12
+  catch_up_monthly = catch_up_contribution / months_per_year
   prorated_catch_up = catch_up_monthly * months_hdhp_coverage
   return is_hsa_catch_up_eligible ? (base + prorated_catch_up) : base
 

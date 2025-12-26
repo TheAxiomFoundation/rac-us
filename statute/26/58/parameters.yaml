@@ -15,6 +15,17 @@ farm_loss_agi_threshold:
     - "Section 58(a) - Farm loss limitation applies to tax shelter farm activities"
     - "Material participation determined under Section 469 regulations"
 
+# --- Section 58(c) Mining Cost Parameters ---
+
+mining_amortization_period:
+  description: "Amortization period for mining exploration/development costs under Section 58(c)"
+  unit: years
+  values:
+    1987-01-01: 10
+  citations:
+    - "Section 58(c): Mining costs capitalized and amortized over 10 years for AMT"
+    - "See also Section 59(e)(2)(D) for elected amortization period"
+
 # Note: Section 58 does not have many specific dollar thresholds
 # Most limitations are based on the character of activity (tax shelter vs. non-tax shelter)
 # and material participation rules under Section 469.

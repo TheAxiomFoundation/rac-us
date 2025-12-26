@@ -153,7 +153,7 @@ formula:
 
 enum CostSharingTier:
   EXEMPT,         # Below 150% FPL - Medicaid nominal rules
-  LIMITED,        # 150-200% FPL - moderate cost-sharing
+  LIMITED,        # 150 to 200 percent FPL, moderate cost-sharing
   STANDARD        # Above 200% FPL - up to 5% of income
 
 entity Person

@@ -43,7 +43,7 @@ period Year
 dtype Money
 unit "USD"
 label "Nonrefundable Education Credits"
-description "Nonrefundable portion of education credits (60% of AOC + 100% of LLC)"
+description "Nonrefundable portion of education credits (60% of AOC plus all of LLC)"
 
 formula:
   # 60% of AOC is nonrefundable, plus all of LLC

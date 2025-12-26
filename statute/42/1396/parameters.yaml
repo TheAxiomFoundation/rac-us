@@ -610,3 +610,15 @@ continuous_eligibility:
     citations:
       - "42 USC 1396a(e)(12): 12-month continuous eligibility for children"
       - "Consolidated Appropriations Act, 2023"
+
+# =============================================================================
+# TIME PERIOD CONSTANTS
+# Used for converting between annual and monthly amounts
+# =============================================================================
+
+months_per_year:
+  description: "Number of months in a year for prorating annual amounts"
+  unit: count
+  value: 12
+  citations:
+    - "Standard calendar months per year"

@@ -46,6 +46,9 @@ imports:
   income_lower_limit: statute/26/36B/income_eligibility/lower_limit
   income_upper_limit_ira: statute/26/36B/income_eligibility/upper_limit_ira
 
+parameters:
+  months_per_year: statute/26/36B/months_per_year
+
 # =============================================================================
 # HOUSEHOLD SIZE AND FPL CALCULATIONS
 # 26 USC 36B(d)(1) - "Household income"
@@ -236,7 +239,7 @@ label "Monthly SLCSP Premium"
 description "Monthly portion of SLCSP premium"
 
 formula:
-  return slcsp_premium / 12
+  return slcsp_premium / months_per_year
 
 # =============================================================================
 # PREMIUM ASSISTANCE CREDIT AMOUNT
@@ -278,11 +281,11 @@ formula:
   benchmark = slcsp_premium
   contribution = expected_contribution
 
-  # Annual credit = (Annual Benchmark - Annual Contribution) * (Coverage Months / 12)
+  # Annual credit = (Annual Benchmark - Annual Contribution) * (Coverage Months / months_per_year)
   annual_max_credit = max(0, benchmark - contribution)
 
   # Pro-rate for actual coverage months
-  return annual_max_credit * months / 12
+  return annual_max_credit * months / months_per_year
 
 # =============================================================================
 # PREMIUM TAX CREDIT (FINAL)

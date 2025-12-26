@@ -35,6 +35,10 @@ imports:
 # Intangible costs (for Section 59(e) election)
   qualified_expenditures: statute/26/59/e/qualified_expenditures
 
+# Parameters
+  amt_nol_limitation_rate: parameters/statute/26/59/parameters#amt_nol_limitation_rate
+  section_59e_amortization_period: parameters/statute/26/59/parameters#research_expenditure_amortization_period
+
 # --- Section 59(a) - Alternative Minimum Tax Foreign Tax Credit ---
 #
 # "(1) IN GENERAL.—The alternative minimum tax foreign tax credit for any
@@ -184,9 +188,9 @@ formula:
 
   if not section_59e_election_made: return 0
 
-  # Simplified: assume 10-year amortization (R&D/mining)
+  # Simplified: assume standard amortization period (R&D/mining)
   # In practice, different periods apply to different expenditure types
-  annual_amortization = qualified_expenditures / 10
+  annual_amortization = qualified_expenditures / section_59e_amortization_period
 
   return annual_amortization
 
@@ -246,8 +250,8 @@ formula:
   # AMTI before NOL deduction
   amti_before_nol = amti + regular_nol  # Add back regular NOL that was deducted
 
-  # 90% limitation
-  max_amt_nol = amti_before_nol * 0.90
+  # Section 59(i)(1)(A) limitation
+  max_amt_nol = amti_before_nol * amt_nol_limitation_rate
 
   # AMT NOL is the lesser of the carryforward and the 90% limit
   return min(nol_carryforward, max_amt_nol)

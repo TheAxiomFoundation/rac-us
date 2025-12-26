@@ -21,6 +21,10 @@ imports:
   phaseout_threshold_surviving: statute/26/24/h/phaseout#phaseout_threshold.surviving_spouse
   phaseout_rate: statute/26/24/h/phaseout#phaseout_rate
 
+parameters:
+# Phaseout increment from threshold.yaml - §24(b)(1): "for each $1,000"
+  phaseout_increment: 1000
+
 # Filing status values per §1
 enum FilingStatus:
 SINGLE
@@ -59,7 +63,7 @@ formula:
   if excess <= 0: return 0
 
   # Reduction is $50 for each $1,000 (or fraction thereof)
-  # ceiling(excess / 1000) gives us the number of $1,000 increments
-  increments = ceiling(excess / 1000)
+  # ceiling(excess / phaseout_increment) gives us the number of $1,000 increments
+  increments = ceiling(excess / phaseout_increment)
 
   return increments * phaseout_rate

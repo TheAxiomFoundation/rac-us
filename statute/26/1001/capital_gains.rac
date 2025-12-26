@@ -98,7 +98,7 @@ period Year
 dtype Money
 unit "USD"
 label "Adjusted Basis"
-description "Adjusted basis for gain/loss determination per 26 USC Sections 1011-1016"
+description "Adjusted basis for gain/loss determination per 26 USC Sections 1011 through 1016"
 
 formula:
   # Start with original cost basis (Section 1012)

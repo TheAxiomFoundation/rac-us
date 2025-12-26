@@ -39,6 +39,9 @@ imports:
   fpl_first_person: statute/26/36B/federal_poverty_level/2024/first_person
   fpl_additional_person: statute/26/36B/federal_poverty_level/2024/additional_person
 
+parameters:
+  months_per_year: statute/26/36B/months_per_year
+
 # =============================================================================
 # FAMILY SIZE / HOUSEHOLD SIZE
 # 26 USC 36B(d)(1)
@@ -197,4 +200,4 @@ variable slcsp_premium_monthly:
   description "Monthly portion of benchmark premium"
 
   formula:
-    return slcsp_premium / 12
+    return slcsp_premium / months_per_year

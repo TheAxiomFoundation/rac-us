@@ -13,8 +13,8 @@
 #   §62(a)(7)    - IRA deduction (Section 219)
 #   §62(a)(12)   - HSA deduction (Section 223)
 #   §62(a)(17)   - Student loan interest (up to $2,500)
-#   §62(a)(23)   - Qualified tip income (Section 74A, OBBBA 2025-2028)
-#   §62(a)(24)   - Qualified overtime compensation (Section 225, OBBBA 2025-2028)
+#   §62(a)(23)   - Qualified tip income (Section 74A, OBBBA temporary)
+#   §62(a)(24)   - Qualified overtime compensation (Section 225, OBBBA temporary)
 
 imports:
   # Gross income components from §61
@@ -63,8 +63,8 @@ formula:
     ira_deduction +                    # §62(a)(7) via §219
     hsa_deduction +                    # §62(a)(12) via §223
     student_loan_interest_deduction +  # §62(a)(17) via §221
-    tip_income_deduction +             # §62(a)(23) via §74A (OBBBA 2025-2028)
-    qualified_overtime_deduction       # §62(a)(24) via §225 (OBBBA 2025-2028)
+    tip_income_deduction +             # §62(a)(23) via §74A (OBBBA temporary)
+    qualified_overtime_deduction       # §62(a)(24) via §225 (OBBBA temporary)
   )
 
   # Step 3: AGI = Gross Income - Above-the-Line Deductions

@@ -20,6 +20,19 @@ imports:
   minimum_weekly_fee: statute/42/9858/parameters/copayment/minimum_weekly_fee
   weeks_per_year: statute/42/9858/parameters/time_periods/weeks_per_year
 
+parameters:
+  # SMI threshold brackets
+  smi_threshold_1: parameters#copayment.sliding_scale.smi_threshold_1
+  smi_threshold_2: parameters#copayment.sliding_scale.smi_threshold_2
+  smi_threshold_3: parameters#copayment.sliding_scale.smi_threshold_3
+  smi_threshold_4: parameters#copayment.sliding_scale.smi_threshold_4
+  # Copay rates for each bracket
+  copay_rate_1: parameters#copayment.sliding_scale.copay_rate_1
+  copay_rate_2: parameters#copayment.sliding_scale.copay_rate_2
+  copay_rate_3: parameters#copayment.sliding_scale.copay_rate_3
+  copay_rate_4: parameters#copayment.sliding_scale.copay_rate_4
+  copay_rate_5: parameters#copayment.sliding_scale.copay_rate_5
+
 # =============================================================================
 # COPAYMENT CALCULATION
 # =============================================================================
@@ -64,16 +77,16 @@ formula:
 
   # Graduated copay rate based on income level
   # (States set their own rates; this is illustrative)
-  if income_to_smi <= 0.50:
-    copay_rate = 0.05   # 50% SMI or below: 5%
-  else if income_to_smi <= 0.65:
-    copay_rate = 0.10   # 51-65% SMI: 10%
-  else if income_to_smi <= 0.75:
-    copay_rate = 0.15   # 66-75% SMI: 15%
-  else if income_to_smi <= 0.85:
-    copay_rate = 0.20   # 76-85% SMI: 20%
-  else if income_to_smi > 0.85:
-    copay_rate = 0.25   # Above 85% SMI: 25%
+  if income_to_smi <= smi_threshold_1:
+    copay_rate = copay_rate_1   # First threshold or below
+  else if income_to_smi <= smi_threshold_2:
+    copay_rate = copay_rate_2   # Between first and second threshold
+  else if income_to_smi <= smi_threshold_3:
+    copay_rate = copay_rate_3   # Between second and third threshold
+  else if income_to_smi <= smi_threshold_4:
+    copay_rate = copay_rate_4   # Between third and fourth threshold
+  else if income_to_smi > smi_threshold_4:
+    copay_rate = copay_rate_5   # Above fourth threshold
 
   # Annual copay based on income above FPL
   calculated_copay = income_above_fpl * copay_rate

@@ -170,3 +170,62 @@ maximum_income_limit:
   max_smi_percentage: 0.60
   citations:
     - "42 USC 8624(b)(2)(A): household income which does not exceed the greater of 150% FPL or 60% SMI"
+
+# Benefit Calculation Weights
+# 42 USC 8624(b)(5) - Targeting based on income and energy burden
+benefit_calculation:
+  description: "Weights for benefit targeting calculation per 42 USC 8624(b)(5)"
+
+  # Weight for income factor in targeting score
+  income_factor_weight:
+    description: "Weight applied to income factor in benefit calculation"
+    unit: rate
+    values:
+      1981-01-01: 0.5
+    citations:
+      - "42 USC 8624(b)(5): highest level of assistance to lowest incomes"
+
+  # Weight for energy burden factor in targeting score
+  burden_factor_weight:
+    description: "Weight applied to energy burden factor in benefit calculation"
+    unit: rate
+    values:
+      1981-01-01: 0.5
+    citations:
+      - "42 USC 8624(b)(5): highest energy costs in relation to income"
+
+  # Multiplier for priority households (vulnerable populations)
+  priority_multiplier:
+    description: "Benefit multiplier for priority households"
+    unit: rate
+    values:
+      1981-01-01: 1.25
+    citations:
+      - "42 USC 8624(b)(5)(A): priority for elderly, disabled, young children"
+
+  # Base benefit placeholder (state-specific)
+  base_benefit_placeholder:
+    description: "Placeholder base benefit amount (actual varies by state/year)"
+    unit: USD
+    values:
+      2024-01-01: 500
+    citations:
+      - "State LIHEAP plans - actual benefits vary $100 to $2,000+"
+
+  # Cooling assistance fraction (relative to heating)
+  cooling_assistance_fraction:
+    description: "Cooling assistance as fraction of total LIHEAP benefit"
+    unit: rate
+    values:
+      1981-01-01: 0.5
+    citations:
+      - "State LIHEAP plans - cooling typically smaller portion of benefit"
+
+  # Minimum income factor floor
+  income_factor_floor:
+    description: "Minimum value for income factor in benefit calculation"
+    unit: rate
+    values:
+      1981-01-01: 0.1
+    citations:
+      - "42 USC 8624(b)(5): ensures minimum benefit for all eligible households"

@@ -8,6 +8,7 @@ imports:
   phaseout_threshold_joint: statute/26/24/b/1/phaseout_threshold_joint
   phaseout_threshold_single: statute/26/24/b/1/phaseout_threshold_single
   phaseout_rate: statute/26/24/b/2/phaseout_rate
+  phaseout_increment: statute/26/24/ctc_phaseout_increment#phaseout_increment
 
 entity TaxUnit
 period Year
@@ -23,5 +24,5 @@ dtype Money
 
 formula:
   excess = max(0, adjusted_gross_income - phaseout_threshold)
-  units = ceil(excess / 1000)
+  units = ceil(excess / phaseout_increment)
   return units * phaseout_rate

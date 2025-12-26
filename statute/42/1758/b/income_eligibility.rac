@@ -19,16 +19,19 @@ imports:
   reduced_price_limit_pct_fpl: statute/42/1758/income/reduced_price_limit_pct_fpl
   fpl: statute/42/1758/fpl
 
+parameters:
+  fpl_max_size: statute/42/1758#fpl_lookup.max_household_size
+
 # Calculate annual FPL for household based on size
 entity Household
 period Year
 dtype Money
 
 formula:
-  # FPL = base for size 1-8, : additional per person for each beyond 8
-  size = min(household_size, 8)
+  # FPL = base for size 1-max, then additional per person for each beyond max
+  size = min(household_size, fpl_max_size)
   base = fpl.by_household_size[size]
-  extra_members = max(0, household_size - 8)
+  extra_members = max(0, household_size - fpl_max_size)
   additional = fpl.additional_per_person
 
   return base + (additional * extra_members)
@@ -39,9 +42,9 @@ period Year
 dtype Money
 
 formula:
-  size = min(household_size, 8)
+  size = min(household_size, fpl_max_size)
   base = free_meal_limit.by_household_size[size]
-  extra_members = max(0, household_size - 8)
+  extra_members = max(0, household_size - fpl_max_size)
   additional = free_meal_limit.additional_per_person
 
   return base + (additional * extra_members)
@@ -52,9 +55,9 @@ period Year
 dtype Money
 
 formula:
-  size = min(household_size, 8)
+  size = min(household_size, fpl_max_size)
   base = reduced_price_limit.by_household_size[size]
-  extra_members = max(0, household_size - 8)
+  extra_members = max(0, household_size - fpl_max_size)
   additional = reduced_price_limit.additional_per_person
 
   return base + (additional * extra_members)

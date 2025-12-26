@@ -13,20 +13,25 @@
 #                  shall be a net operating loss carryback to each of the 2 taxable
 #                  years preceding the taxable year of such loss."
 #
-# Post-TCJA (2018+): NOLs generally can only be carried forward indefinitely.
-# Exception: Farming losses may be carried back 2 years.
+# Post-TCJA: NOLs generally can only be carried forward indefinitely.
+# Exception: Farming losses may be carried back per 172(b)(1)(B).
 
 parameters:
-  # 80% taxable income limitation for post-2017 NOLs
-  nol_limitation_rate: statute/26/172/b/parameters
+  # 80% taxable income limitation for post-TCJA NOLs
+  nol_limitation_rate: statute/26/172/b/parameters#nol_limitation_rate
+  # Farming loss carryback period
+  farming_loss_carryback_years_param: statute/26/172/b/parameters#farming_loss_carryback_years
+  # TCJA effective year parameters
+  tcja_effective_year: statute/26/172/b/parameters#tcja_effective_year
+  pre_tcja_year: statute/26/172/b/parameters#pre_tcja_year
 
 imports:
   taxable_income: statute/26/63/a/taxable_income
   filing_status: statute/26/1/filing_status
 
   # Inputs for NOL carryforwards
-  nol_carryforward_pre_2018: statute/26/172/inputs
-  nol_carryforward_post_2017: statute/26/172/inputs
+  nol_carryforward_pre_tcja: statute/26/172/inputs
+  nol_carryforward_post_tcja: statute/26/172/inputs
   farming_loss_carryback: statute/26/172/inputs
   is_farming_business: statute/26/172/inputs
   current_year_farming_loss: statute/26/172/inputs
@@ -41,7 +46,7 @@ label "NOL Carryforward Allowed"
 description "Whether NOL can be carried forward per 172(b)(1)(A)"
 
 formula:
-  # Post-2017: NOLs can be carried forward indefinitely
+  # Post-TCJA: NOLs can be carried forward indefinitely
   # No limitation period on carryforwards
   return true
 
@@ -56,7 +61,7 @@ entity TaxUnit
 period Year
 dtype Boolean
 label "NOL Carryback Allowed"
-description "Whether NOL can be carried back (generally no for post-2017)"
+description "Whether NOL can be carried back (generally no for post-TCJA)"
 
 formula:
   # Post-TCJA: General carryback eliminated
@@ -74,10 +79,10 @@ entity TaxUnit
 period Year
 dtype Boolean
 label "Farming Loss Carryback Allowed"
-description "Whether farming loss qualifies for 2-year carryback per 172(b)(1)(B)"
+description "Whether farming loss qualifies for carryback per 172(b)(1)(B)"
 
 formula:
-  # Farming losses may be carried back 2 years
+  # Farming losses may be carried back per 172(b)(1)(B)
   # Taxpayer must have a farming business and farming loss
   return is_farming_business and current_year_farming_loss > 0
 
@@ -94,7 +99,7 @@ description "Number of years farming loss can be carried back"
 
 formula:
   if farming_loss_carryback_allowed:
-    return 2
+    return farming_loss_carryback_years_param
   else:
     return 0
 
@@ -113,16 +118,16 @@ label "Total NOL Carryforward Available"
 description "Total NOL carryforward from all prior years available for deduction"
 
 formula:
-  # Sum of pre-2018 and post-2017 NOL carryforwards
+  # Sum of pre-TCJA and post-TCJA NOL carryforwards
   # These are tracked separately due to different limitation rules
-  return nol_carryforward_pre_2018 + nol_carryforward_post_2017
+  return nol_carryforward_pre_tcja + nol_carryforward_post_tcja
 
 default 0
 
 ---
 
 # --- Taxable Income Limitation (80% Rule) ---
-# Post-2017 NOLs limited to 80% of taxable income
+# Post-TCJA NOLs limited to 80% of taxable income
 
 variable nol_taxable_income_for_limitation:
 entity TaxUnit
@@ -151,8 +156,8 @@ label "NOL Limitation Amount"
 description "Maximum NOL deduction based on 80% taxable income limitation"
 
 formula:
-  # Post-2017 NOLs limited to 80% of taxable income
-  # Pre-2018 NOLs not subject to this limitation
+  # Post-TCJA NOLs limited to 80% of taxable income
+  # Pre-TCJA NOLs not subject to this limitation
   ti = nol_taxable_income_for_limitation
 
   return ti * nol_limitation_rate
@@ -163,41 +168,41 @@ default 0
 
 # --- NOL Deduction Components ---
 
-variable nol_deduction_pre_2018:
+variable nol_deduction_pre_tcja:
 entity TaxUnit
 period Year
 dtype Money
 unit "USD"
-label "Pre-2018 NOL Deduction"
-description "NOL deduction from pre-2018 losses (not subject to 80% limit)"
+label "Pre-TCJA NOL Deduction"
+description "NOL deduction from pre-TCJA losses (not subject to 80% limit)"
 
 formula:
   ti = nol_taxable_income_for_limitation
-  available = nol_carryforward_pre_2018
+  available = nol_carryforward_pre_tcja
 
-  # Pre-2018 NOLs can offset 100% of taxable income
+  # Pre-TCJA NOLs can offset 100% of taxable income
   return min(available, ti)
 
 default 0
 
 ---
 
-variable nol_deduction_post_2017:
+variable nol_deduction_post_tcja:
 entity TaxUnit
 period Year
 dtype Money
 unit "USD"
-label "Post-2017 NOL Deduction"
-description "NOL deduction from post-2017 losses (subject to 80% limit)"
+label "Post-TCJA NOL Deduction"
+description "NOL deduction from post-TCJA losses (subject to 80% limit)"
 
 formula:
   ti = nol_taxable_income_for_limitation
-  available = nol_carryforward_post_2017
+  available = nol_carryforward_post_tcja
 
-  # First apply any pre-2018 NOL
-  remaining_ti = max(0, ti - nol_deduction_pre_2018)
+  # First apply any pre-TCJA NOL
+  remaining_ti = max(0, ti - nol_deduction_pre_tcja)
 
-  # Post-2017 NOLs limited to 80% of remaining taxable income
+  # Post-TCJA NOLs limited to 80% of remaining taxable income
   limitation = remaining_ti * nol_limitation_rate
 
   return min(available, limitation)
@@ -209,30 +214,30 @@ default 0
 # --- Remaining NOL Carryforward ---
 # Unused NOL carries to future years
 
-variable nol_carryforward_remaining_pre_2018:
+variable nol_carryforward_remaining_pre_tcja:
 entity TaxUnit
 period Year
 dtype Money
 unit "USD"
-label "Remaining Pre-2018 NOL Carryforward"
-description "Pre-2018 NOL remaining after current year deduction"
+label "Remaining Pre-TCJA NOL Carryforward"
+description "Pre-TCJA NOL remaining after current year deduction"
 
 formula:
-  return max(0, nol_carryforward_pre_2018 - nol_deduction_pre_2018)
+  return max(0, nol_carryforward_pre_tcja - nol_deduction_pre_tcja)
 
 default 0
 
 ---
 
-variable nol_carryforward_remaining_post_2017:
+variable nol_carryforward_remaining_post_tcja:
 entity TaxUnit
 period Year
 dtype Money
 unit "USD"
-label "Remaining Post-2017 NOL Carryforward"
-description "Post-2017 NOL remaining after current year deduction"
+label "Remaining Post-TCJA NOL Carryforward"
+description "Post-TCJA NOL remaining after current year deduction"
 
 formula:
-  return max(0, nol_carryforward_post_2017 - nol_deduction_post_2017)
+  return max(0, nol_carryforward_post_tcja - nol_deduction_post_tcja)
 
 default 0

@@ -6,6 +6,7 @@
 
 imports:
   acp_benefit: statute/47/1752/a/7/acp_benefit
+  months_per_year: statute/47/1752/parameters/months_per_year
 
 # Note: ACP benefit program ended April 2024. Frozen for historical reference.
 
@@ -19,6 +20,6 @@ description "Annualized ACP benefit for household"
 default 0
 
 formula:
-  # Sum monthly benefits across the year (12 months)
+  # Sum monthly benefits across the year
   # Note: ACP benefit ended April 2024
-  return acp_benefit * 12
+  return acp_benefit * months_per_year

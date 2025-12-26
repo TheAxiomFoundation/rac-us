@@ -20,6 +20,14 @@ imports:
   minimum_benefit: statute/42/8624/benefit_targeting/minimum_benefit
   high_energy_burden_threshold: statute/42/8624/benefit_targeting/high_energy_burden_threshold
 
+parameters:
+  income_factor_weight: parameters#benefit_calculation.income_factor_weight
+  burden_factor_weight: parameters#benefit_calculation.burden_factor_weight
+  priority_multiplier: parameters#benefit_calculation.priority_multiplier
+  base_benefit_placeholder: parameters#benefit_calculation.base_benefit_placeholder
+  cooling_assistance_fraction: parameters#benefit_calculation.cooling_assistance_fraction
+  income_factor_floor: parameters#benefit_calculation.income_factor_floor
+
 # Energy burden calculation - energy costs as proportion of income
 entity Household
 period Year
@@ -96,19 +104,19 @@ formula:
   # This is a simplified federal baseline. States implement specific formulas.
 
   # Base benefit proportional to energy burden and inversely to income
-  income_factor = max(0.1, 1.0 - (annual_gross_income / liheap_fpl_limit))
+  income_factor = max(income_factor_floor, 1.0 - (annual_gross_income / liheap_fpl_limit))
   burden_factor = liheap_energy_burden
 
   # Combined targeting score
-  targeting_score = (income_factor * 0.5) + (burden_factor * 0.5)
+  targeting_score = (income_factor * income_factor_weight) + (burden_factor * burden_factor_weight)
 
   # Priority adjustment for vulnerable households
-  priority_multiplier = if liheap_priority_household : 1.25 else 1.0
+  priority_adjustment = if liheap_priority_household : priority_multiplier else 1.0
 
   # Calculate benefit (state-specific; this is illustrative)
   # Actual benefits typically range from $100 to $2,000+ depending on state
-  base_benefit = 500  # Placeholder - actual varies by state/year
-  calculated_benefit = base_benefit * targeting_score * priority_multiplier
+  base_benefit = base_benefit_placeholder
+  calculated_benefit = base_benefit * targeting_score * priority_adjustment
 
   # Ensure minimum benefit per 42 USC 8624(b)(5)(B)
   return max(minimum_benefit, calculated_benefit)
@@ -144,6 +152,6 @@ formula:
 
   # Cooling assistance is typically a smaller portion
   # Some states have separate cooling programs
-  return liheap * 0.5  # Illustrative; varies by state
+  return liheap * cooling_assistance_fraction  # Illustrative; varies by state
 
 default 0

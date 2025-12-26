@@ -8,6 +8,7 @@
 imports:
   fpg_limit: statute/47/1752/parameters/income/fpg_limit
   fpl_by_household_size: statute/7/2014/c/fpl_by_household_size
+  months_per_year: statute/47/1752/parameters/months_per_year
 
 entity Household
 period Month
@@ -24,4 +25,4 @@ formula:
   extra_members = max(0, household_size - 1)
   annual_fpl = base_fpl + (additional_per_person * extra_members)
   # Return monthly threshold at 200% FPL
-  return (annual_fpl * fpg_limit) / 12
+  return (annual_fpl * fpg_limit) / months_per_year

@@ -22,6 +22,7 @@ parameters:
   phaseout_spouse_covered_end: 240000
   phaseout_mfs_start: 0
   phaseout_mfs_end: 10000
+  rounding_increment: 10
 
 imports:
   filing_status: statute/26/1/filing_status
@@ -158,4 +159,4 @@ formula:
   # Apply phase-out reduction
   # 219(g)(2)(C): Round UP to nearest $10 (favorable to taxpayer)
   reduced = max_deduction * (1 - phaseout_fraction)
-  return ceil(reduced / 10) * 10
+  return ceil(reduced / rounding_increment) * rounding_increment

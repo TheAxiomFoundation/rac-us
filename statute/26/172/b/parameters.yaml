@@ -43,3 +43,21 @@ farming_loss_carryback_years:
     2018-01-01: 2
   citations:
     - "26 USC 172(b)(1)(B)(i): 2 taxable years preceding the taxable year"
+
+# TCJA effective year parameters
+# Used for determining which NOL rules apply based on when the loss arose
+tcja_effective_year:
+  description: "First year TCJA NOL rules apply (losses arising in this year and after)"
+  unit: year
+  values:
+    2000-01-01: 2018
+  citations:
+    - "TCJA Section 13302: applies to losses arising in taxable years beginning after December 31, 2017"
+
+pre_tcja_year:
+  description: "Last year before TCJA NOL rules apply (losses arising in this year and before)"
+  unit: year
+  values:
+    2000-01-01: 2017
+  citations:
+    - "TCJA Section 13302: pre-TCJA rules apply to losses arising in taxable years beginning before January 1, 2018"

@@ -137,3 +137,13 @@ phaseout_mfs_end:
     2002-01-01: 10000
   citations:
     - "26 USC 219(g)(2)(A)(ii): MFS phase-out ends at $10,000"
+
+# Rounding increment for deduction calculation
+# 219(g)(2)(C): Round UP to nearest $10 (favorable to taxpayer)
+rounding_increment:
+  description: "Rounding increment for reduced deduction (rounded up to nearest this amount)"
+  unit: currency-USD
+  values:
+    2002-01-01: 10
+  citations:
+    - "26 USC 219(g)(2)(C): rounded to the next highest multiple of $10"

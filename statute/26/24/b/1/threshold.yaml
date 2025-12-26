@@ -18,3 +18,12 @@ phaseout_threshold_single:
     2018-01-01: 200000
   citations:
     - "§ 24(b)(1)(B): $200,000 for other than joint"
+
+# Phaseout increment (the denominator in the reduction calculation)
+phaseout_increment:
+  description: "Income increment for calculating credit reduction"
+  unit: currency-USD
+  values:
+    1998-01-01: 1000
+  citations:
+    - "§ 24(b)(1): for each $1,000 (or fraction thereof)"

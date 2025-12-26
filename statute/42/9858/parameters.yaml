@@ -248,6 +248,85 @@ copayment:
     citations:
       - "State CCDF plans typically set minimum fee of $1/week"
 
+  # Sliding fee scale SMI thresholds and copay rates
+  # 42 USC 9858c(c)(4)(A) - States set graduated copay rates based on income
+  sliding_scale:
+    description: "Graduated copayment rates based on income-to-SMI ratio"
+
+    # SMI threshold brackets (income as fraction of State Median Income)
+    smi_threshold_1:
+      description: "First SMI bracket threshold"
+      unit: rate
+      values:
+        2015-01-01: 0.50
+      citations:
+        - "42 USC 9858c(c)(4)(A): sliding fee scale based on income and family size"
+
+    smi_threshold_2:
+      description: "Second SMI bracket threshold"
+      unit: rate
+      values:
+        2015-01-01: 0.65
+      citations:
+        - "42 USC 9858c(c)(4)(A): sliding fee scale"
+
+    smi_threshold_3:
+      description: "Third SMI bracket threshold"
+      unit: rate
+      values:
+        2015-01-01: 0.75
+      citations:
+        - "42 USC 9858c(c)(4)(A): sliding fee scale"
+
+    smi_threshold_4:
+      description: "Fourth SMI bracket threshold"
+      unit: rate
+      values:
+        2015-01-01: 0.85
+      citations:
+        - "42 USC 9858c(c)(4)(A): sliding fee scale"
+
+    # Copay rates for each bracket
+    copay_rate_1:
+      description: "Copay rate for income at or below first SMI threshold"
+      unit: rate
+      values:
+        2015-01-01: 0.05
+      citations:
+        - "State CCDF plans - illustrative graduated copay schedule"
+
+    copay_rate_2:
+      description: "Copay rate for income between first and second SMI threshold"
+      unit: rate
+      values:
+        2015-01-01: 0.10
+      citations:
+        - "State CCDF plans - illustrative graduated copay schedule"
+
+    copay_rate_3:
+      description: "Copay rate for income between second and third SMI threshold"
+      unit: rate
+      values:
+        2015-01-01: 0.15
+      citations:
+        - "State CCDF plans - illustrative graduated copay schedule"
+
+    copay_rate_4:
+      description: "Copay rate for income between third and fourth SMI threshold"
+      unit: rate
+      values:
+        2015-01-01: 0.20
+      citations:
+        - "State CCDF plans - illustrative graduated copay schedule"
+
+    copay_rate_5:
+      description: "Copay rate for income above fourth SMI threshold"
+      unit: rate
+      values:
+        2015-01-01: 0.25
+      citations:
+        - "State CCDF plans - illustrative graduated copay schedule"
+
 # Provider Payment Rates
 # 42 USC 9858c(c)(4)(B) - Market rate surveys and payment rates
 payment_rates:

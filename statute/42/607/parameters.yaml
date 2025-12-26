@@ -157,3 +157,12 @@ core_work_activities:
       - vocational_education  # Max 12 months lifetime
   citations:
     - "42 USC 607(d)(1)-(8), 45 CFR 261.31"
+
+# Time conversion factors
+weeks_per_month:
+  description: "Average number of weeks per month (52 weeks / 12 months) for converting weekly to monthly hours"
+  unit: ratio
+  values:
+    1997-10-01: 4.33
+  citations:
+    - "Standard time conversion factor"

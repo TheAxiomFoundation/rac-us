@@ -208,3 +208,47 @@ tobacco_cessation_premium_reduction:
     2014-01-01: 0.00    # State option, not federally mandated
   citations:
     - "State option under Medicaid expansion waivers"
+
+# =============================================================================
+# INCOME TIER THRESHOLDS
+# FPL percentage thresholds for cost-sharing tiers
+# =============================================================================
+
+nominal_tier_fpl_threshold:
+  description: "FPL percentage threshold for nominal cost sharing tier (below this level)"
+  unit: rate
+  values:
+    2006-02-08: 1.00    # 100% FPL
+  citations:
+    - "42 USC 1396o(a)(3): Nominal cost sharing for those below 100% FPL"
+    - "42 CFR 447.52: Cost sharing tiered by income"
+
+moderate_tier_fpl_threshold:
+  description: "FPL percentage threshold for moderate cost sharing tier (100-150% FPL)"
+  unit: rate
+  values:
+    2006-02-08: 1.50    # 150% FPL
+  citations:
+    - "42 USC 1396o(c)(1): Cost sharing for 100-150% FPL"
+    - "42 CFR 447.53(b)"
+
+premium_fpl_threshold:
+  description: "FPL percentage threshold below which premiums cannot be charged for mandatory groups"
+  unit: rate
+  values:
+    2006-02-08: 1.50    # 150% FPL
+  citations:
+    - "42 USC 1396o(c)(3): Premium restrictions below 150% FPL"
+    - "42 CFR 447.55: Premium limitations"
+
+# =============================================================================
+# TIME CONVERSION FACTORS
+# =============================================================================
+
+months_per_year:
+  description: "Number of months in a year for annual calculations"
+  unit: months
+  values:
+    2006-02-08: 12
+  citations:
+    - "Standard calendar conversion"

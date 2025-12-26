@@ -265,3 +265,14 @@ medicare_age:
     - date: 2004-01-01
       value: 65
       reference: "26 USC 223(f)(4)(B): attainment of age 65"
+
+# =============================================================================
+# Section 223(b)(2) - Monthly Proration
+# =============================================================================
+months_per_year:
+  description: "Number of months in a year for monthly contribution limit proration"
+  unit: months
+  values:
+    - date: 2004-01-01
+      value: 12
+      reference: "26 USC 223(b)(2): 1/12 of annual limit"

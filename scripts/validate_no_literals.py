@@ -8,6 +8,13 @@ from pathlib import Path
 # Allowed small integers (for indexing, child counts, etc.)
 ALLOWED_INTEGERS = {-1, 0, 1, 2, 3}
 
+# Attributes that start new variable definitions (exit formula context)
+VARIABLE_ATTRIBUTES = {
+    "entity", "period", "dtype", "unit", "label", "description",
+    "default", "defined_for", "imports", "parameters", "exports",
+    "examples", "variable", "input", "enum", "values", "function",
+}
+
 def find_numeric_violations(filepath: Path) -> list[str]:
     """Find numeric literals in formula blocks that aren't allowed."""
     errors = []
@@ -19,20 +26,37 @@ def find_numeric_violations(filepath: Path) -> list[str]:
     for lineno, line in enumerate(lines, 1):
         stripped = line.strip()
 
-        # Skip comments
-        if stripped.startswith('#'):
+        # Skip empty lines and comments
+        if not stripped or stripped.startswith('#'):
             continue
 
-        # Track formula blocks
-        if re.match(r'^formula:', stripped):
+        # Skip lines that are just string literals (label, description, etc.)
+        if stripped.startswith('"') or stripped.startswith("'"):
+            continue
+
+        # Check for formula start
+        if stripped.startswith('formula:'):
             in_formula = True
             continue
-        elif in_formula and re.match(r'^[a-z_]+:', stripped) and not stripped.startswith('  '):
-            in_formula = False
-            continue
+
+        # Check for exit from formula (new attribute at indent 0)
+        indent = len(line) - len(line.lstrip())
+        if indent == 0:
+            first_word = stripped.split()[0].rstrip(':') if stripped.split() else ''
+            if first_word in VARIABLE_ATTRIBUTES:
+                in_formula = False
+                continue
 
         if not in_formula:
             continue
+
+        # Skip lines with string literals (contain quotes)
+        if '"' in stripped or "'" in stripped:
+            continue
+
+        # Skip inline comments
+        if '#' in stripped:
+            stripped = stripped[:stripped.index('#')]
 
         # Find numeric literals in comparisons and assignments
         # Match patterns like: >= 65, == 0.075, < 100

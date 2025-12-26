@@ -37,6 +37,9 @@ imports:
 # Medicaid income disregard
   magi_disregard: statute/42/1396/magi_disregard
 
+parameters:
+  months_per_year: statute/42/1396/parameters#months_per_year
+
 # =============================================================================
 # MAGI CALCULATION
 # 42 CFR 435.603(e) - MAGI-based income methodology
@@ -84,7 +87,7 @@ description "MAGI converted to monthly for Medicaid eligibility"
 formula:
   # Medicaid uses monthly income, but MAGI is annual
   # Convert annual MAGI to monthly
-  return magi / 12
+  return magi / months_per_year
 
 default 0
 

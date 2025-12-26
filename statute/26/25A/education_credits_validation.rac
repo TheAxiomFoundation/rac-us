@@ -263,7 +263,7 @@ period Year
 dtype Money
 unit "USD"
 label "Nonrefundable Education Credit"
-description "Nonrefundable portion (60% AOC + 100% LLC) limited by tax liability"
+description "Nonrefundable portion (60% AOC plus all of LLC) limited by tax liability"
 
 formula:
   aoc_nonref = aoc_nonrefundable_amount

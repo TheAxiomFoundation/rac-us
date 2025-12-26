@@ -142,6 +142,23 @@ macrs_table_mid_quarter:
   citations:
     - "IRS Publication 946, Appendix A, Table A-2"
 
+# Mid-month convention parameters (for real property)
+mid_month_proration_factor:
+  description: "Mid-month convention assumes property placed at middle of month"
+  unit: fraction
+  values:
+    1986-01-01: 0.5  # Property assumed placed at mid-point of month
+  citations:
+    - "26 USC 168(d)(2)(B): Mid-month convention"
+
+months_per_year:
+  description: "Number of months in a tax year for proration calculations"
+  unit: months
+  values:
+    1986-01-01: 12
+  citations:
+    - "26 USC 168(d)(4): Conventions for computing depreciation"
+
 # ADS recovery periods (Section 168(g))
 ads_recovery_periods:
   description: "Recovery periods under Alternative Depreciation System"

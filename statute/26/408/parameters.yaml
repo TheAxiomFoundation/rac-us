@@ -47,6 +47,23 @@ ira_catchup_age:
   citations:
     - "26 USC 219(b)(5)(B)(i): individual who has attained age 50"
 
+roth_ira_minimum_contribution:
+  description: "Minimum Roth IRA contribution after income phase-out"
+  unit: currency-USD
+  values:
+    1998-01-01: 200
+  citations:
+    - "26 USC 408A(c)(3)(A)(ii): reduced limit shall not be reduced below $200"
+    - "Note: This minimum applies before contribution rounds to zero"
+
+roth_ira_rounding_increment:
+  description: "Rounding increment for Roth IRA contribution phase-out calculation"
+  unit: currency-USD
+  values:
+    1998-01-01: 10
+  citations:
+    - "26 USC 408A(c)(3)(A): contribution limit rounded to next lowest multiple of $10"
+
 # ============================================================================
 # Roth IRA Income Phase-Out - 408A(c)(3)
 # ============================================================================

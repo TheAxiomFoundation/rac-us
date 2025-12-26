@@ -17,6 +17,11 @@ imports:
   bonus_depreciation_rate: statute/26/168/parameters/bonus_depreciation_rate
   ads_recovery_periods: statute/26/168/parameters/ads_recovery_periods
 
+parameters:
+  # Mid-month convention parameters
+  mid_month_proration_factor: statute/26/168/parameters#mid_month_proration_factor
+  months_per_year: statute/26/168/parameters#months_per_year
+
 # Input variables
 entity Asset
 period Year
@@ -202,12 +207,12 @@ function compute_real_property_rate(property_class, year, month):
 
   if year == 1:
     # Mid-month: placed in service at middle of month
-    full_months = 12 - month + 0.5
-    return annual_rate * (full_months / 12)
+    full_months = months_per_year - month + mid_month_proration_factor
+    return annual_rate * (full_months / months_per_year)
   if year == recovery + 1:
     # Final year: remaining half-month
-    remaining_months = month - 0.5
-    return annual_rate * (remaining_months / 12)
+    remaining_months = month - mid_month_proration_factor
+    return annual_rate * (remaining_months / months_per_year)
   if year <= recovery:
     return annual_rate
   return 0

@@ -166,6 +166,16 @@ gov.usda.fns.snap:
           2022-10-01: 263
           2021-10-01: 246
 
+    # Excess shelter rate - shelter costs exceeding this fraction of adjusted income
+    excess_shelter_rate:
+      description: "USDA defines excess shelter as costs exceeding this fraction of adjusted income."
+      unit: rate
+      period: month
+      label: "Excess Shelter Rate"
+      reference: "7 USC 2014(e)(6)(A)"
+      values:
+        1977-01-01: 0.50
+
     # Shelter deduction cap (non-elderly/disabled)
     shelter:
       cap:

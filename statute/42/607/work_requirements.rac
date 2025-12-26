@@ -21,6 +21,9 @@
 #
 # Reference: https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title42-section607
 
+parameters:
+  weeks_per_month: statute/42/607#weeks_per_month
+
 # =============================================================================
 # 607(c) - Individual Work Hours Requirements
 # =============================================================================
@@ -68,11 +71,11 @@ variable tanf_required_work_hours_monthly:
   dtype Integer
   unit "hours"
   label "TANF Required Monthly Work Hours"
-  description "Monthly work hours required (weekly hours * 4.33)"
+  description "Monthly work hours required (weekly hours * weeks_per_month)"
 
   formula:
-    # Approximate monthly hours from weekly (52 weeks / 12 months = 4.33)
-    return round(tanf_required_work_hours_weekly * 4.33)
+    # Approximate monthly hours from weekly (52 weeks / 12 months)
+    return round(tanf_required_work_hours_weekly * weeks_per_month)
 
   default 0
 

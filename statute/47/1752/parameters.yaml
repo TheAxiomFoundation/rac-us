@@ -156,6 +156,17 @@ tribal_categorical_programs:
       href: "https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title47-section1752"
 
 # ===========================================================================
+# TIME CONVERSION
+# ===========================================================================
+
+months_per_year:
+  description: "Number of months in a year for annual/monthly conversions"
+  unit: count
+  period: year
+  values:
+    2022-01-01: 12
+
+# ===========================================================================
 # HOUSEHOLD LIMITS - 47 USC 1752(a)(6)
 # ===========================================================================
 

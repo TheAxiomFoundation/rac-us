@@ -91,10 +91,13 @@ variable snap_shelter_deduction:
   label "SNAP Shelter Deduction"
   description "Deduction for shelter costs exceeding 50% of adjusted income"
 
+  parameters:
+    excess_shelter_rate: parameters#gov.usda.fns.snap.deductions.excess_shelter_rate
+
   formula:
     # Section 2014(e)(6)(A): Excess = shelter costs - 50% of adjusted income
     let adjusted = snap_adjusted_income
-    let excess = shelter_costs - (adjusted * 0.5)
+    let excess = shelter_costs - (adjusted * excess_shelter_rate)
 
     if excess <= 0:
       return 0
