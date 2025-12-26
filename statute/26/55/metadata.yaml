@@ -75,10 +75,21 @@ implementation:
 
   related_sections:
     - path: "../56/adjustments.cosilico"
-      description: "AMT adjustments (SALT, misc deductions, etc.)"
+      description: "AMT adjustments (SALT, misc deductions, ISO bargain element, etc.)"
+      variables:
+        - amt_salt_addback
+        - amt_miscellaneous_addback
+        - amt_medical_expense_adjustment
+        - amt_standard_deduction_addback
+        - amt_personal_exemption_addback
+        - amt_iso_adjustment
+        - amt_adjustments
 
     - path: "../57/preferences.cosilico"
       description: "Tax preference items (PAB interest, depletion, etc.)"
+
+    - path: "../422/b/iso_bargain_element.cosilico"
+      description: "ISO bargain element input variables for AMT adjustment"
 
 # Parameter sources
 parameters:

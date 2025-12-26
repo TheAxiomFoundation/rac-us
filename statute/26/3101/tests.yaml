@@ -1,0 +1,283 @@
+# 26 USC 3101 - Medicare Tax Tests
+#
+# Test cases for validating Medicare tax implementation.
+# Covers:
+# - Base Medicare tax (1.45% employee, 1.45% employer)
+# - Additional Medicare Tax (0.9% on wages above threshold)
+# - Self-employment Medicare tax (2.9% + 0.9% additional)
+# - Filing status threshold variations
+#
+# Key statutes:
+# - 26 USC 3101(b)(1): Employee base rate
+# - 26 USC 3101(b)(2): Additional Medicare Tax
+# - 26 USC 3111(b): Employer rate
+# - 26 USC 1401(b): Self-employment Medicare tax
+
+reference: "26 USC 3101, 3111, 1401"
+tax_year: 2024
+
+# =============================================================================
+# BASE MEDICARE TAX TESTS - 26 USC 3101(b)(1) and 3111(b)
+# =============================================================================
+
+tests:
+  # Test 1: Basic Medicare tax - employee only
+  - name: "Employee Medicare tax - typical W-2 wages"
+    description: "1.45% of all wages (no cap)"
+    inputs:
+      person:
+        irs_employment_income: 50000
+        taxable_self_employment_income: 0
+      tax_unit:
+        filing_status: SINGLE
+    expected:
+      employee_medicare_tax: 725  # $50,000 * 1.45% = $725
+      employer_medicare_tax: 725  # Employer matches
+      total_medicare_tax: 1450    # Combined 2.9%
+    citations:
+      - "26 USC 3101(b)(1): 1.45% of wages"
+      - "26 USC 3111(b): matching 1.45%"
+
+  # Test 2: High wage earner - no cap unlike Social Security
+  - name: "Medicare tax on high wages - no wage base limit"
+    description: "Unlike Social Security, Medicare has no wage cap"
+    inputs:
+      person:
+        irs_employment_income: 500000
+        taxable_self_employment_income: 0
+      tax_unit:
+        filing_status: SINGLE
+    expected:
+      employee_medicare_tax: 7250  # $500,000 * 1.45%
+      employer_medicare_tax: 7250
+      total_medicare_tax: 14500    # $500,000 * 2.9%
+    citations:
+      - "26 USC 3121(a): no wage base limit for Medicare"
+
+# =============================================================================
+# ADDITIONAL MEDICARE TAX TESTS - 26 USC 3101(b)(2)
+# =============================================================================
+
+  # Test 3: Below threshold - single filer
+  - name: "Single filer below $200k threshold - no Additional Medicare Tax"
+    inputs:
+      person:
+        irs_employment_income: 150000
+        taxable_self_employment_income: 0
+      tax_unit:
+        filing_status: SINGLE
+    expected:
+      employee_medicare_tax: 2175     # $150,000 * 1.45%
+      additional_medicare_tax: 0      # Below $200k threshold
+      medicare_wages: 150000
+    citations:
+      - "26 USC 3101(b)(2)(C): $200,000 threshold for single"
+
+  # Test 4: Above threshold - single filer
+  - name: "Single filer above $200k threshold - Additional Medicare Tax applies"
+    description: "0.9% tax on wages above $200,000"
+    inputs:
+      person:
+        irs_employment_income: 300000
+        taxable_self_employment_income: 0
+      tax_unit:
+        filing_status: SINGLE
+    expected:
+      employee_medicare_tax: 4350     # $300,000 * 1.45%
+      medicare_wages: 300000
+      additional_medicare_tax_threshold: 200000
+      # Additional = ($300k - $200k) * 0.9% = $100k * 0.9% = $900
+      additional_medicare_tax: 900
+    citations:
+      - "26 USC 3101(b)(2)(C): $200,000 threshold"
+      - "26 USC 3101(b)(2): 0.9% additional rate"
+
+  # Test 5: Joint filers at $250k threshold
+  - name: "Joint filers at threshold - no Additional Medicare Tax"
+    inputs:
+      person:
+        - irs_employment_income: 150000
+        - irs_employment_income: 100000
+      tax_unit:
+        filing_status: JOINT
+    expected:
+      medicare_wages: 250000
+      additional_medicare_tax_threshold: 250000
+      additional_medicare_tax: 0  # At threshold, not above
+    citations:
+      - "26 USC 3101(b)(2)(A): $250,000 threshold for joint"
+
+  # Test 6: Joint filers above $250k threshold
+  - name: "Joint filers above $250k threshold"
+    description: "Combined wages of $400k, 0.9% on excess over $250k"
+    inputs:
+      person:
+        - irs_employment_income: 250000
+        - irs_employment_income: 150000
+      tax_unit:
+        filing_status: JOINT
+    expected:
+      medicare_wages: 400000
+      additional_medicare_tax_threshold: 250000
+      # Additional = ($400k - $250k) * 0.9% = $150k * 0.9% = $1,350
+      additional_medicare_tax: 1350
+    citations:
+      - "26 USC 3101(b)(2)(A): joint threshold $250,000"
+
+  # Test 7: Married filing separately - $125k threshold
+  - name: "Married filing separately - lower $125k threshold"
+    inputs:
+      person:
+        irs_employment_income: 200000
+        taxable_self_employment_income: 0
+      tax_unit:
+        filing_status: SEPARATE
+    expected:
+      medicare_wages: 200000
+      additional_medicare_tax_threshold: 125000
+      # Additional = ($200k - $125k) * 0.9% = $75k * 0.9% = $675
+      additional_medicare_tax: 675
+    citations:
+      - "26 USC 3101(b)(2)(B): $125,000 for married filing separately"
+
+  # Test 8: Head of household - uses $200k threshold (same as single)
+  - name: "Head of household - $200k threshold"
+    inputs:
+      person:
+        irs_employment_income: 250000
+        taxable_self_employment_income: 0
+      tax_unit:
+        filing_status: HEAD_OF_HOUSEHOLD
+    expected:
+      medicare_wages: 250000
+      additional_medicare_tax_threshold: 200000
+      # Additional = ($250k - $200k) * 0.9% = $50k * 0.9% = $450
+      additional_medicare_tax: 450
+    citations:
+      - "26 USC 3101(b)(2)(C): $200,000 for 'any other case'"
+
+# =============================================================================
+# SELF-EMPLOYMENT MEDICARE TAX TESTS - 26 USC 1401(b)
+# =============================================================================
+
+  # Test 9: Self-employed person - both halves
+  - name: "Self-employed - 2.9% Medicare tax (both halves)"
+    description: "Self-employed pay both employee and employer shares"
+    inputs:
+      person:
+        irs_employment_income: 0
+        taxable_self_employment_income: 100000
+      tax_unit:
+        filing_status: SINGLE
+    expected:
+      medicare_wages: 100000
+      # SE Medicare = $100k * 2.9% = $2,900
+      # (No Additional Medicare Tax - below $200k threshold)
+      additional_medicare_tax: 0
+    citations:
+      - "26 USC 1401(b)(1): 2.9% of SE income"
+
+  # Test 10: Self-employed above threshold
+  - name: "Self-employed above $200k - Additional Medicare Tax applies"
+    inputs:
+      person:
+        irs_employment_income: 0
+        taxable_self_employment_income: 300000
+      tax_unit:
+        filing_status: SINGLE
+    expected:
+      medicare_wages: 300000
+      additional_medicare_tax_threshold: 200000
+      # Additional = ($300k - $200k) * 0.9% = $900
+      additional_medicare_tax: 900
+    citations:
+      - "26 USC 1401(b)(2): Additional 0.9% on SE income above threshold"
+
+  # Test 11: Mixed wages and self-employment
+  - name: "Combined W-2 and SE income - Additional Medicare Tax"
+    description: "Both wage and SE income count toward threshold"
+    inputs:
+      person:
+        irs_employment_income: 180000
+        taxable_self_employment_income: 50000
+      tax_unit:
+        filing_status: SINGLE
+    expected:
+      medicare_wages: 230000  # Combined for threshold
+      additional_medicare_tax_threshold: 200000
+      # Additional = ($230k - $200k) * 0.9% = $30k * 0.9% = $270
+      additional_medicare_tax: 270
+    citations:
+      - "26 USC 3101(b)(2): wages and SE income combined"
+
+# =============================================================================
+# EDGE CASES AND SPECIAL SCENARIOS
+# =============================================================================
+
+  # Test 12: Zero income
+  - name: "Zero income - no Medicare tax"
+    inputs:
+      person:
+        irs_employment_income: 0
+        taxable_self_employment_income: 0
+      tax_unit:
+        filing_status: SINGLE
+    expected:
+      employee_medicare_tax: 0
+      employer_medicare_tax: 0
+      additional_medicare_tax: 0
+      medicare_wages: 0
+    citations:
+      - "26 USC 3101(b): tax on wages received"
+
+  # Test 13: Exactly at threshold - no additional tax
+  - name: "Exactly at $200k threshold - no Additional Medicare Tax"
+    inputs:
+      person:
+        irs_employment_income: 200000
+        taxable_self_employment_income: 0
+      tax_unit:
+        filing_status: SINGLE
+    expected:
+      medicare_wages: 200000
+      additional_medicare_tax_threshold: 200000
+      additional_medicare_tax: 0  # "exceeds" means strictly greater than
+    citations:
+      - "26 USC 3101(b)(2)(C): wages that 'exceed' threshold"
+
+  # Test 14: Small excess over threshold
+  - name: "Just over threshold - small Additional Medicare Tax"
+    description: "$1 over threshold triggers the tax"
+    inputs:
+      person:
+        irs_employment_income: 200001
+        taxable_self_employment_income: 0
+      tax_unit:
+        filing_status: SINGLE
+    expected:
+      medicare_wages: 200001
+      additional_medicare_tax_threshold: 200000
+      # Additional = $1 * 0.9% = $0.009 (rounds to $0.01)
+      additional_medicare_tax: 0.01
+    citations:
+      - "26 USC 3101(b)(2): 0.9% on excess"
+
+  # Test 15: Very high earner - comprehensive calculation
+  - name: "High earner comprehensive Medicare tax calculation"
+    description: "$1 million wage earner, single"
+    inputs:
+      person:
+        irs_employment_income: 1000000
+        taxable_self_employment_income: 0
+      tax_unit:
+        filing_status: SINGLE
+    expected:
+      employee_medicare_tax: 14500    # $1M * 1.45%
+      employer_medicare_tax: 14500    # $1M * 1.45%
+      medicare_wages: 1000000
+      additional_medicare_tax_threshold: 200000
+      # Additional = ($1M - $200k) * 0.9% = $800k * 0.9% = $7,200
+      additional_medicare_tax: 7200
+      # Total employee Medicare burden = $14,500 + $7,200 = $21,700
+    citations:
+      - "26 USC 3101(b): base + additional Medicare tax"

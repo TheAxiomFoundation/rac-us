@@ -1,19 +1,28 @@
-# 26 USC § 164(b)(6) - SALT Deduction Cap
+# 26 USC § 164(b)(6) - SALT Deduction Cap (TCJA 2018-2025)
 #
-# This module implements the state and local tax (SALT) deduction
-# with the $10,000 cap imposed by the Tax Cuts and Jobs Act.
+# "(A) IN GENERAL.—In the case of an individual, the aggregate amount of taxes
+#      taken into account under subsection (a) for any taxable year shall not exceed
+#      $10,000 ($5,000 in the case of a married individual filing a separate return).
 #
-# Components of SALT per § 164(a):
-# (1) State and local real property taxes
-# (2) State and local personal property taxes
-# (3) State and local income taxes OR sales taxes (taxpayer election)
+#  (B) EXCEPTION FOR FOREIGN REAL PROPERTY TAXES.—Subparagraph (A) shall not
+#      apply to any foreign real property taxes described in subsection (a)(3).
 #
-# The cap applies to the aggregate of these taxes for individuals.
+#  (C) TERMINATION.—This paragraph shall not apply to taxable years beginning
+#      after December 31, 2025."
+#
+# This module applies the limitation from the Tax Cuts and Jobs Act (P.L. 115-97).
+# The deductible taxes under § 164(a) are defined in statute/26/164/a/.
 
 module statute.26.164.b.6
 version "2024.1"
 
-# --- Input Variables ---
+references {
+  deductible_taxes: statute/26/164/a/deductible_taxes
+  filing_status: statute/26/1/filing_status
+}
+
+# --- Input Variables (defined in § 164(a)) ---
+# These are re-declared here for standalone use; prefer imports from 164/a
 
 variable state_income_tax {
   entity TaxUnit
@@ -71,7 +80,7 @@ variable foreign_real_property_tax {
   dtype Money
   unit "USD"
   label "Foreign Real Property Tax Paid"
-  description "Foreign real property taxes (exempt from SALT cap)"
+  description "Foreign real property taxes (exempt from SALT cap per § 164(b)(6)(B))"
   reference "26 USC § 164(b)(6)(B)"
 }
 
@@ -115,8 +124,8 @@ variable salt_cap_amount {
 
   formula {
     case filing_status {
-      "MARRIED_SEPARATE" => parameters.statute.26.164.b.6.cap.salt_cap_married_separate
-      _ => parameters.statute.26.164.b.6.cap.salt_cap
+      "MARRIED_SEPARATE" => parameters.statute.26.164.b.6.salt_cap_married_separate
+      _ => parameters.statute.26.164.b.6.salt_cap
     }
   }
 }

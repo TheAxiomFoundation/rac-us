@@ -1,0 +1,69 @@
+# 26 USC 3111(b) - Employer Medicare (Hospital Insurance) Tax
+#
+# "(b) Hospital insurance -
+# In addition to the tax imposed by subsection (a), there is hereby imposed
+# on every employer an excise tax, with respect to having individuals in his
+# employ, equal to 1.45 percent of the wages (as defined in section 3121(a))
+# paid by him with respect to employment (as defined in section 3121(b))."
+#
+# Key features:
+# - Rate: 1.45% of wages (employer share, matching employee)
+# - NO wage base limit (unlike Social Security tax)
+# - Employee pays matching 1.45% under 26 USC 3101(b)
+# - Combined rate: 2.9% (employee + employer)
+# - Employer does NOT pay Additional Medicare Tax (that's employee-only)
+
+module statute.26.3111.b
+version "2024.1"
+
+references {
+  # Wages subject to FICA per 3121(a)
+  irs_employment_income: statute/26/3121/a/irs_employment_income
+}
+
+parameters {
+  # Load employer rate from parameters.yaml
+  employer_medicare_rate: statute/26/3111/parameters.yaml#employer_medicare_rate
+}
+
+# Employer Medicare tax on wages
+variable employer_medicare_tax {
+  entity Person
+  period Year
+  dtype Money
+  unit "USD"
+  label "Employer Medicare Tax"
+  description "Employer share of Medicare (HI) tax at 1.45% of wages per 26 USC 3111(b)"
+  reference "26 USC 3111(b)"
+
+  formula {
+    # Medicare tax applies to ALL wages - no cap unlike Social Security
+    # Employer rate matches employee rate
+    return irs_employment_income * employer_medicare_rate
+  }
+}
+
+# Combined employer and employee Medicare tax (for total cost analysis)
+variable total_medicare_tax {
+  entity Person
+  period Year
+  dtype Money
+  unit "USD"
+  label "Total Medicare Tax"
+  description "Combined employer and employee Medicare tax (2.9% of wages)"
+  reference (
+    "26 USC 3101(b)(1)",
+    "26 USC 3111(b)"
+  )
+
+  formula {
+    # Employee share: 1.45%
+    let employee_share = irs_employment_income * 0.0145
+
+    # Employer share: 1.45%
+    let employer_share = employer_medicare_tax
+
+    # Note: Additional Medicare Tax (0.9%) is employee-only, handled separately
+    return employee_share + employer_share
+  }
+}

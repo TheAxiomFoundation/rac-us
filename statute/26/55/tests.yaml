@@ -421,3 +421,118 @@ tests:
       tentative_minimum_tax: 230357.50
       alternative_minimum_tax: 10357.50  # 230357.50 - 220000
     notes: "MFS with partial phaseout"
+
+  # ==========================================================================
+  # ISO EXERCISE TESTS (Section 56(b)(3))
+  # ==========================================================================
+
+  - name: "ISO exercise - bargain element triggers AMT"
+    description: "Employee exercises ISOs and holds shares, triggering AMT on bargain element"
+    inputs:
+      filing_status: SINGLE
+      taxable_income: 150000
+      regular_tax: 30000
+      iso_exercise_bargain_element: 200000  # Exercised ISOs with $200k spread
+      uses_standard_deduction: true
+      standard_deduction: 14600
+    expected:
+      # AMTI = 150000 + 14600 (std ded addback) + 200000 (ISO) = 364600
+      amt_iso_adjustment: 200000
+      amt_standard_deduction_addback: 14600
+      amt_adjustments: 214600  # 14600 + 200000
+      alternative_minimum_taxable_income: 364600
+      amt_exemption: 85700  # Below phaseout threshold
+      amt_taxable_excess: 278900  # 364600 - 85700
+      # 116300 @ 26% = 30238
+      # 162600 @ 28% = 45528
+      # TMT = 75766
+      tentative_minimum_tax: 75766
+      alternative_minimum_tax: 45766  # 75766 - 30000
+    notes: "Classic ISO AMT scenario - moderate income with large ISO spread"
+
+  - name: "ISO exercise - small bargain element, no AMT"
+    description: "Small ISO bargain element that doesn't trigger AMT"
+    inputs:
+      filing_status: MARRIED_FILING_JOINTLY
+      taxable_income: 200000
+      regular_tax: 35000
+      iso_exercise_bargain_element: 20000  # Small ISO exercise
+      uses_standard_deduction: true
+      standard_deduction: 29200  # 2024 joint standard deduction
+    expected:
+      # AMTI = 200000 + 29200 + 20000 = 249200
+      amt_iso_adjustment: 20000
+      amt_standard_deduction_addback: 29200
+      amt_adjustments: 49200
+      alternative_minimum_taxable_income: 249200
+      amt_exemption: 133300  # Below phaseout
+      amt_taxable_excess: 115900  # 249200 - 133300
+      # All at 26% (below $232,600 threshold)
+      tentative_minimum_tax: 30134  # 115900 * 0.26
+      alternative_minimum_tax: 0  # 30134 < 35000
+    notes: "Small ISO exercise doesn't trigger AMT when regular tax is higher"
+
+  - name: "ISO exercise - high income in phaseout range"
+    description: "High-income taxpayer with ISO exercise in exemption phaseout range"
+    inputs:
+      filing_status: SINGLE
+      taxable_income: 500000
+      regular_tax: 140000
+      iso_exercise_bargain_element: 300000  # Large ISO exercise
+      uses_standard_deduction: false
+      state_local_taxes: 10000  # SALT capped at $10k
+    expected:
+      # AMTI = 500000 + 10000 (SALT) + 300000 (ISO) = 810000
+      amt_iso_adjustment: 300000
+      amt_salt_addback: 10000
+      amt_adjustments: 310000
+      alternative_minimum_taxable_income: 810000
+      # Phaseout: (810000 - 609350) * 0.25 = 50162.50
+      amt_exemption: 35537.50  # 85700 - 50162.50
+      amt_taxable_excess: 774462.50  # 810000 - 35537.50
+      # 116300 @ 26% = 30238
+      # 658162.50 @ 28% = 184285.50
+      # TMT = 214523.50
+      tentative_minimum_tax: 214523.50
+      alternative_minimum_tax: 74523.50  # 214523.50 - 140000
+    notes: "High ISO exercise with exemption phaseout creates substantial AMT"
+
+  - name: "ISO exercise - tech employee startup scenario"
+    description: "Realistic tech employee ISO exercise scenario"
+    inputs:
+      filing_status: MARRIED_FILING_JOINTLY
+      taxable_income: 350000  # Dual-income tech household
+      regular_tax: 75000
+      iso_exercise_bargain_element: 500000  # Startup ISO with large spread
+      uses_standard_deduction: true
+      standard_deduction: 29200
+    expected:
+      # AMTI = 350000 + 29200 + 500000 = 879200
+      amt_iso_adjustment: 500000
+      amt_standard_deduction_addback: 29200
+      amt_adjustments: 529200
+      alternative_minimum_taxable_income: 879200
+      amt_exemption: 133300  # Below phaseout ($1,218,700)
+      amt_taxable_excess: 745900  # 879200 - 133300
+      # 232600 @ 26% = 60476
+      # 513300 @ 28% = 143724
+      # TMT = 204200
+      tentative_minimum_tax: 204200
+      alternative_minimum_tax: 129200  # 204200 - 75000
+    notes: "Typical tech startup ISO scenario with significant AMT liability"
+
+  - name: "ISO exercise - zero bargain element"
+    description: "No ISO exercise in the tax year"
+    inputs:
+      filing_status: SINGLE
+      taxable_income: 200000
+      regular_tax: 40000
+      iso_exercise_bargain_element: 0
+      uses_standard_deduction: true
+      standard_deduction: 14600
+    expected:
+      amt_iso_adjustment: 0
+      amt_standard_deduction_addback: 14600
+      amt_adjustments: 14600
+      alternative_minimum_taxable_income: 214600
+    notes: "No ISO adjustment when no ISOs exercised"

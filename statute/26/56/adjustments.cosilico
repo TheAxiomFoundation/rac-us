@@ -10,6 +10,7 @@
 # - Medical expense threshold is adjusted
 # - Standard deduction is disallowed
 # - Personal exemptions are disallowed
+# - Incentive stock option bargain element is included (Section 56(b)(3))
 
 module statute.26.56
 version "2024.1"
@@ -33,6 +34,9 @@ references {
 
   # Filing status for medical expense calculation
   filing_status: statute/26/1/filing_status
+
+  # Incentive stock option data (Section 422)
+  iso_exercise_bargain_element: statute/26/422/b/iso_bargain_element
 }
 
 # --- Section 56(b)(1) - Itemized Deduction Adjustments ---
@@ -142,6 +146,42 @@ variable amt_personal_exemption_addback {
   }
 }
 
+# --- Section 56(b)(3) - Incentive Stock Options ---
+
+variable amt_iso_adjustment {
+  entity TaxUnit
+  period Year
+  dtype Money
+  unit "USD"
+  label "AMT ISO Bargain Element"
+  description "Incentive stock option spread included in AMTI per Section 56(b)(3)"
+  reference "26 USC Section 56(b)(3)"
+
+  formula {
+    # Section 56(b)(3): ISO Spread Included for AMT
+    #
+    # For regular tax purposes, the exercise of an incentive stock option
+    # under Section 422 is not a taxable event. However, for AMT purposes,
+    # the "bargain element" (FMV at exercise minus exercise price) must be
+    # included in AMTI.
+    #
+    # This is often the primary cause of AMT liability for employees of
+    # high-growth companies who exercise ISOs and hold the shares.
+    #
+    # The bargain element = (Fair Market Value at exercise) - (Exercise Price)
+    # This amount is added to taxable income for AMT purposes.
+    #
+    # Note: This adjustment only applies if the taxpayer holds the stock
+    # through the end of the tax year. If a disqualifying disposition occurs
+    # (sale before meeting holding requirements), the gain is taxed as
+    # ordinary income and this AMT adjustment does not apply.
+
+    return iso_exercise_bargain_element
+  }
+
+  default 0
+}
+
 # --- Total Adjustments under Section 56 ---
 
 variable amt_adjustments {
@@ -160,7 +200,8 @@ variable amt_adjustments {
     let medical_adj = amt_medical_expense_adjustment
     let std_ded_addback = amt_standard_deduction_addback
     let exemption_addback = amt_personal_exemption_addback
+    let iso_adj = amt_iso_adjustment
 
-    return salt_addback + misc_addback + medical_adj + std_ded_addback + exemption_addback
+    return salt_addback + misc_addback + medical_adj + std_ded_addback + exemption_addback + iso_adj
   }
 }
