@@ -1,25 +1,20 @@
 # 26 USC § 24(a) - Child Tax Credit Amount (Before Phase-Out)
 #
-# "There shall be allowed as a credit against the tax imposed by this
-# chapter for the taxable year with respect to each qualifying child
-# of the taxpayer for which the taxpayer is allowed a deduction under
-# section 151 an amount equal to $1,000."
-#
-# Note: Amount is $2,000 for 2018-2025 per TCJA.
 
-imports:
-# Number of qualifying children
-  num_ctc_qualifying_children: statute/26/24/c/3/num_qualifying_children
-
-# Credit amount per child
-  credit_per_child: statute/26/24/a/credit_amount#credit_per_child
-
-entity TaxUnit
-period Year
-dtype Money
-unit "USD"
-label "CTC Amount Before Phase-Out"
-description "Total Child Tax Credit amount before phase-out reduction per 26 USC § 24(a)"
-
-formula:
-  return num_ctc_qualifying_children * credit_per_child
+text: """
+There shall be allowed as a credit against the tax imposed by this
+chapter for the taxable year with respect to each qualifying child
+of the taxpayer for which the taxpayer is allowed a deduction under
+section 151 an amount equal to $1,000.
+"""
+variable child_tax_credit_amount:
+  imports:
+    - 26/24/c/3/num_qualifying_children#num_ctc_qualifying_children
+    - 26/24/a/credit_amount#credit_per_child
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: "USD"
+  label: "CTC Amount Before Phase-Out"
+  description: "Total Child Tax Credit amount before phase-out reduction per 26 USC § 24(a)"
+  formula: return num_ctc_qualifying_children * credit_per_child

@@ -1,12 +1,13 @@
 # 26 USC § 61(a)(4) - Interest
 #
-# Gross income includes "interest."
-# This includes taxable interest from bank accounts, bonds, loans, etc.
 
-entity Person
-period Year
-dtype Money
-unit "USD"
-label "Interest Income"
-description "Taxable interest income"
-# Input from CPS: INT_VAL (interest income)
+text: """
+Gross income includes "interest.
+"""
+variable interest_income:
+  entity: Person
+  period: Year
+  dtype: Money
+  unit: "USD"
+  label: "Interest Income"
+  description: "Taxable interest income"

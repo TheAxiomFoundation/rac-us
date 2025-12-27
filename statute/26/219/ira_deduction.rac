@@ -1,78 +1,35 @@
 # 26 USC Section 219 - Retirement Savings
 #
-# "(a) Allowance of deduction.--In the case of an individual, there shall be
-#      allowed as a deduction an amount equal to the qualified retirement
-#      contributions of the individual for the taxable year."
-#
-# "(b) Maximum amount of deduction.--
-#      (1) The amount allowable as a deduction shall not exceed the lesser of--
-#          (A) the deductible amount, or
-#          (B) an amount equal to compensation includible in gross income."
-#
-# "(c) Special rules for certain married individuals."
-#
-# "(g) Limitation on deduction for active participants in certain pension plans."
-#
-# Note: SECURE Act of 2019 removed the age 70-1/2 contribution limit.
-# Contributions are now allowed at any age if the individual has earned income.
 
-imports:
-# Contribution limits from 219(b)
-  ira_contribution_limit: statute/26/219/b/contribution_limits
-  ira_max_deductible_contribution: statute/26/219/b/contribution_limits
-  traditional_ira_contributions: statute/26/219/b/contribution_limits
-
-# Phase-out rules from 219(g)
-  ira_phaseout_ratio: statute/26/219/g/phaseout
-  ira_deduction_after_phaseout: statute/26/219/g/phaseout
-  is_active_retirement_plan_participant: statute/26/219/g/phaseout
-
-# Other references
-  earned_income: statute/26/32/c/2/A/earned_income
-  filing_status: statute/26/1/filing_status
-  adjusted_gross_income: statute/26/62/a/adjusted_gross_income
-
-# 219(a): The deduction for traditional IRA contributions (Person level)
-entity Person
-period Year
-dtype Money
-unit "USD"
-label "IRA Deduction"
-description "Above-the-line deduction for traditional IRA contributions per 26 USC 219"
-
-formula:
-  # Must have earned income to contribute (post-SECURE, no age limit)
-  if earned_income <= 0:
-  return 0
-
-# Apply phase-out if applicable (from 219(g))
-return ira_deduction_after_phaseout
-
-# Tax unit aggregation for above-the-line deduction
-entity TaxUnit
-period Year
-dtype Money
-unit "USD"
-label "Total IRA Deduction"
-description "Combined IRA deduction for all members of tax unit"
-
-formula:
-  # Sum individual IRA deductions
-  return sum(members.ira_deduction)
-
-# 219(c): Spousal IRA rules
-# Allows non-working spouse to contribute based on working spouse's compensation
-entity Person
-period Year
-dtype Boolean
-label "Eligible for Spousal IRA"
-description "Whether individual can contribute to IRA using spouse's compensation"
-
-formula:
-  # Must be married filing jointly
-  if filing_status != JOINT:
-  return false
-
-# Individual has little or no earned income but spouse does
-# The spouse must have compensation >= sum of both spouses' contributions
-return earned_income < ira_contribution_limit
+text: """
+(a) Allowance of deduction.--In the case of an individual, there shall be
+allowed as a deduction an amount equal to the qualified retirement
+contributions of the individual for the taxable year.
+(b) Maximum amount of deduction.--
+(1) The amount allowable as a deduction shall not exceed the lesser of--
+(A) the deductible amount, or
+(B) an amount equal to compensation includible in gross income.
+(c) Special rules for certain married individuals.
+(g) Limitation on deduction for active participants in certain pension plans.
+"""
+variable ira_deduction:
+  imports:
+    - 26/219/b/contribution_limits#ira_contribution_limit
+    - 26/219/b/contribution_limits#ira_max_deductible_contribution
+    - 26/219/b/contribution_limits#traditional_ira_contributions
+    - 26/219/g/phaseout#ira_phaseout_ratio
+    - 26/219/g/phaseout#ira_deduction_after_phaseout
+    - 26/219/g/phaseout#is_active_retirement_plan_participant
+    - 26/32/c/2/A/earned_income#earned_income
+    - 26/1/filing_status#filing_status
+    - 26/62/a/adjusted_gross_income#adjusted_gross_income
+  entity: Person
+  period: Year
+  dtype: Boolean
+  unit: "USD"
+  label: "Eligible for Spousal IRA"
+  description: "Whether individual can contribute to IRA using spouse's compensation"
+  formula: |
+    # Must have earned income to contribute (post-SECURE, no age limit)
+    if earned_income <= 0:
+    return 0

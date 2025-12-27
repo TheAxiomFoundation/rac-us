@@ -1,42 +1,25 @@
 # 20 USC 1070a - Expected Family Contribution (EFC) Calculation
 #
-# The EFC determines the family's expected contribution toward education costs.
-# Calculation varies by formula type (A, B, or C) based on dependency status.
-#
-# Key components:
-# 1. Parent/Head Contribution (from income and assets)
-# 2. Student/Dependent Contribution (for dependent students)
-# 3. Number of family members in college (for Formula A/C)
-#
-# References:
-# - THE EFC FORMULA Guide (annual publication from ED)
-# - https://fsapartners.ed.gov/knowledge-center/fsa-handbook
-
-imports:
-  pell_grant_formula: statute/20/1070a/formula_type
-  adjusted_gross_income: statute/26/62/a/adjusted_gross_income
-  head_contribution: statute/20/1070a/head_contribution
-  dependent_contribution: statute/20/1070a/dependent_contribution
-  efc_params: statute/20/1070a/parameters#efc
-
-entity Person
-period Year
-dtype Money
-unit "USD"
-label "Expected Family Contribution"
-description "Family's expected contribution toward education costs per EFC formula"
-
-formula:
-  formula_type = pell_grant_formula
-
-  # Check for automatic zero EFC
-  qualifies_auto_zero = adjusted_gross_income <= efc_params.automatic_zero
-
-  # Apply automatic zero if eligible (Formula B never gets auto-zero)
-  if qualifies_auto_zero and (formula_type != B): return 0
-
-  # Final EFC calculation: Formula A adds dependent contribution, B and C do not
-  if formula_type == A: return max(0, head_contribution + dependent_contribution)
-  return max(0, head_contribution)
-
-default 0
+variable efc:
+  imports:
+    - 20/1070a/formula_type#pell_grant_formula
+    - 26/62/a/adjusted_gross_income#adjusted_gross_income
+    - 20/1070a/head_contribution#head_contribution
+    - 20/1070a/dependent_contribution#dependent_contribution
+    - 20/1070a/parameters#efc as efc_params
+  entity: Person
+  period: Year
+  dtype: Money
+  unit: "USD"
+  label: "Expected Family Contribution"
+  description: "Family's expected contribution toward education costs per EFC formula"
+  formula: |
+    formula_type = pell_grant_formula
+    # Check for automatic zero EFC
+    qualifies_auto_zero = adjusted_gross_income <= efc_params.automatic_zero
+    # Apply automatic zero if eligible (Formula B never gets auto-zero)
+    if qualifies_auto_zero and (formula_type != B): return 0
+    # Final EFC calculation: Formula A adds dependent contribution, B and C do not
+    if formula_type == A: return max(0, head_contribution + dependent_contribution)
+    return max(0, head_contribution)
+  default: 0

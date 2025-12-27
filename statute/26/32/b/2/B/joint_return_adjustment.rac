@@ -1,6 +1,5 @@
 # 26 USC §32(b)(2)(B) - Joint Return Adjustment
-
-entity TaxUnit
-period Year
-dtype Money
-# Parameter: $6,920 for 2024
+variable joint_return_adjustment:
+  entity: TaxUnit
+  period: Year
+  dtype: Money

@@ -1,144 +1,116 @@
 # 7 USC Section 2014(e) - Deductions from Income
 #
-# Net income = Gross income - deductions
-# Deductions in order of application:
-#   (1) 20% earned income deduction + standard deduction
-#   (3) Dependent care (actual costs for work/training)
-#   (4) Child support payments (legally obligated and paid)
-#   (5) Medical expenses over $35 (elderly/disabled only)
-#   (6) Excess shelter (shelter costs - 50% adjusted income)
-#
-# Reference: https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title7-section2014
 
-# Section 2014(e)(1): Standard deduction by household size
+parameter standard_deduction_schedule:
+  description: "SNAP standard deduction by household size, for use with cut()"
+  unit: currency-USD
+  source: "7 USC 2014(e)(1)"
+  values:
+    2024-10-01: [200, 211, 247, 283]
+    2023-10-01: [198, 208, 244, 279]
+    2022-10-01: [193, 197, 230, 263]
+    2021-10-01: [177, 184, 215, 246]
+
+parameter excess_shelter_rate:
+  description: "USDA defines excess shelter as costs exceeding this fraction of adjusted income."
+  unit: rate
+  source: "7 USC 2014(e)(6)(A)"
+  values:
+    1977-01-01: 0.5
+
 variable snap_standard_deduction:
-  entity Household
-  period Month
-  dtype Money
-  unit "USD"
-  label "SNAP Standard Deduction"
-  description "Monthly standard deduction based on household size"
-
-  imports:
-    cut: statute/26/1#cut
-
-  parameters:
-    standard_deduction_schedule: parameters#gov.usda.fns.snap.deductions.standard_deduction_schedule
-
-  formula:
+  imports: [26/1#cut]
+  entity: Household
+  period: Month
+  dtype: Money
+  unit: "USD"
+  label: "SNAP Standard Deduction"
+  description: "Monthly standard deduction based on household size"
+  formula: |
     # Standard deduction varies by household size: 1-3 same, 4, 5, 6+ maximum
     # Use cut() to look up amount from schedule by household size
     return cut(household_size, standard_deduction_schedule)
+  default: 0
 
-  default 0
-
-# Section 2014(e)(1): Earned income deduction - 20%
 variable snap_earned_income_deduction:
-  entity Household
-  period Month
-  dtype Money
-  unit "USD"
-  label "SNAP Earned Income Deduction"
-  description "20% of gross earned income deducted before other calculations"
-
-  formula:
+  entity: Household
+  period: Month
+  dtype: Money
+  unit: "USD"
+  label: "SNAP Earned Income Deduction"
+  description: "20% of gross earned income deducted before other calculations"
+  formula: |
     let rate = parameter(gov.usda.fns.snap.deductions.earned_income_rate)
     return earned_income * rate
+  default: 0
 
-  default 0
-
-# Total deductions before shelter calculation
 variable snap_pre_shelter_deductions:
-  entity Household
-  period Month
-  dtype Money
-  unit "USD"
-  label "SNAP Pre-Shelter Deductions"
-  description "Sum of all deductions before excess shelter calculation"
-
-  formula:
+  entity: Household
+  period: Month
+  dtype: Money
+  unit: "USD"
+  label: "SNAP Pre-Shelter Deductions"
+  description: "Sum of all deductions before excess shelter calculation"
+  formula: |
     # Sum all deductions that apply before shelter
     let earned_ded = snap_earned_income_deduction
     let std_ded = snap_standard_deduction
     let care_ded = snap_dependent_care_deduction
     let support_ded = snap_child_support_deduction
     let medical_ded = snap_medical_expense_deduction
-
     return earned_ded + std_ded + care_ded + support_ded + medical_ded
+  default: 0
 
-  default 0
-
-# Adjusted income after pre-shelter deductions
 variable snap_adjusted_income:
-  entity Household
-  period Month
-  dtype Money
-  unit "USD"
-  label "SNAP Adjusted Income"
-  description "Gross income minus pre-shelter deductions, used for shelter calculation"
+  entity: Household
+  period: Month
+  dtype: Money
+  unit: "USD"
+  label: "SNAP Adjusted Income"
+  description: "Gross income minus pre-shelter deductions, used for shelter calculation"
+  formula: return max(0, gross_income - snap_pre_shelter_deductions)
+  default: 0
 
-  formula:
-    return max(0, gross_income - snap_pre_shelter_deductions)
-
-  default 0
-
-# Section 2014(e)(6): Excess shelter expense deduction
 variable snap_shelter_deduction:
-  entity Household
-  period Month
-  dtype Money
-  unit "USD"
-  label "SNAP Shelter Deduction"
-  description "Deduction for shelter costs exceeding 50% of adjusted income"
-
-  parameters:
-    excess_shelter_rate: parameters#gov.usda.fns.snap.deductions.excess_shelter_rate
-
-  formula:
+  entity: Household
+  period: Month
+  dtype: Money
+  unit: "USD"
+  label: "SNAP Shelter Deduction"
+  description: "Deduction for shelter costs exceeding 50% of adjusted income"
+  formula: |
     # Section 2014(e)(6)(A): Excess = shelter costs - 50% of adjusted income
     let adjusted = snap_adjusted_income
     let excess = shelter_costs - (adjusted * excess_shelter_rate)
-
     if excess <= 0:
-      return 0
-
+    return 0
     # Section 2014(e)(6)(C): No cap for elderly/disabled households
     if has_elderly_disabled:
-      return excess
-
+    return excess
     # Section 2014(e)(6)(B): Cap for non-elderly/disabled households
     let cap = parameter(gov.usda.fns.snap.deductions.shelter.cap)
     return min(excess, cap)
+  default: 0
 
-  default 0
-
-# Net monthly income after all deductions
 variable snap_net_income:
-  entity Household
-  period Month
-  dtype Money
-  unit "USD"
-  label "SNAP Net Income"
-  description "Monthly income after all SNAP deductions, used for benefit calculation"
-
-  formula:
+  entity: Household
+  period: Month
+  dtype: Money
+  unit: "USD"
+  label: "SNAP Net Income"
+  description: "Monthly income after all SNAP deductions, used for benefit calculation"
+  formula: |
     let adjusted = snap_adjusted_income
     let shelter_ded = snap_shelter_deduction
-
     return max(0, adjusted - shelter_ded)
+  default: 0
 
-  default 0
-
-# Total SNAP deductions (for reporting/transparency)
 variable snap_total_deductions:
-  entity Household
-  period Month
-  dtype Money
-  unit "USD"
-  label "SNAP Total Deductions"
-  description "Sum of all SNAP income deductions"
-
-  formula:
-    return snap_pre_shelter_deductions + snap_shelter_deduction
-
-  default 0
+  entity: Household
+  period: Month
+  dtype: Money
+  unit: "USD"
+  label: "SNAP Total Deductions"
+  description: "Sum of all SNAP income deductions"
+  formula: return snap_pre_shelter_deductions + snap_shelter_deduction
+  default: 0

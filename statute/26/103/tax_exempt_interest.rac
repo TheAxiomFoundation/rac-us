@@ -1,24 +1,16 @@
 # 26 USC §103 - Interest on State and Local Bonds
 #
-# "(a) Exclusion.—Gross income does not include interest on any State or
-# local bond."
-#
-# While tax-exempt interest is excluded from gross income for income tax
-# purposes, it IS counted as disqualified income for EITC purposes under
-# §32(i)(2)(B): "tax-exempt interest received or accrued during the taxable
-# year".
-#
-# This includes interest from:
-# - Municipal bonds
-# - State and local government bonds
-# - Private activity bonds meeting requirements
 
-entity TaxUnit
-period Year
-dtype Money
-unit "USD"
-label "Tax-Exempt Interest Income"
-description "Interest from state and local bonds excluded from gross income under 26 USC §103, but counted for EITC investment income test"
-
-# Input: Amount from Form 1040 line 2a (tax-exempt interest).
-# This is reported for informational purposes even though not taxable.
+text: """
+(a) Exclusion.—Gross income does not include interest on any State or
+local bond.
+§32(i)(2)(B): "tax-exempt interest received or accrued during the taxable
+year".
+"""
+variable tax_exempt_interest:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: "USD"
+  label: "Tax-Exempt Interest Income"
+  description: "Interest from state and local bonds excluded from gross income under 26 USC §103, but counted for EITC investment income test"

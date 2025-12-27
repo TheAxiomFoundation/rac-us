@@ -1,171 +1,53 @@
 # 42 USC 1786(f) - WIC Food Packages
 #
-# "The Secretary shall prescribe by regulation... the supplemental foods to
-# be made available in the program under this section."
-#
-# WIC provides seven distinct food packages based on participant category,
-# defined in 7 CFR 246.10:
-#
-# Food Package I - Fully Breastfeeding (Infant)
-# Food Package II - Partially Breastfeeding/Fully Formula Fed (Infant)
-# Food Package III - Children
-# Food Package IV - Pregnant and Partially Breastfeeding Women
-# Food Package V - Postpartum Women (Non-Breastfeeding)
-# Food Package VI - Postpartum Women (Fully Breastfeeding) - Enhanced
-# Food Package VII - Fully Breastfeeding Women (up to 1 year)
-#
-# Note: WIC benefits are provided as food vouchers/EBT, not cash.
-# The value varies by state and food prices. This module encodes the
-# food package assignment rules, not dollar values.
-#
-# Reference: 7 CFR 246.10 - Supplemental foods
 
-imports:
-  wic_category: statute/42/1786/d/1/wic_category
-  is_wic_eligible: statute/42/1786/d/is_wic_eligible
-  postpartum_max_months_breastfeeding: statute/42/1786/postpartum/max_months_breastfeeding
-  postpartum_max_months_non_breastfeeding: statute/42/1786/postpartum/max_months_non_breastfeeding
-
-# =============================================================================
-# FOOD PACKAGE ASSIGNMENT
-# 7 CFR 246.10 - Assignment to appropriate food package
-# =============================================================================
-
-# Determine food package category for each participant
-entity Person
-period Month
-dtype Category  # I, II, III, IV, V, VI, VII, none
-
-formula:
-  # Must be WIC eligible to receive a food package
-  if not is_wic_eligible:
+text: """
+The Secretary shall prescribe by regulation... the supplemental foods to
+be made available in the program under this section.
+"""
+variable food_package:
+  imports:
+    - 42/1786/d/1/wic_category#wic_category
+    - 42/1786/d/is_wic_eligible#is_wic_eligible
+    - 42/1786/postpartum/max_months_breastfeeding#postpartum_max_months_breastfeeding
+    - 42/1786/postpartum/max_months_non_breastfeeding#postpartum_max_months_non_breastfeeding
+  entity: Household
+  period: Month
+  dtype: Integer
+  formula: |
+    # Must be WIC eligible to receive a food package
+    if not is_wic_eligible:
     return "none"
-
-  category = wic_category
-
-  # 7 CFR 246.10(c)(1): Food Package III - Children ages 1-4
-  if category == "child":
+    category = wic_category
+    # 7 CFR 246.10(c)(1): Food Package III - Children ages 1-4
+    if category == "child":
     return "III"
-
-  # 7 CFR 246.10(c)(4): Food Package IV - Pregnant women
-  if category == "pregnant_woman":
+    # 7 CFR 246.10(c)(4): Food Package IV - Pregnant women
+    if category == "pregnant_woman":
     return "IV"
-
-  # Breastfeeding and postpartum women have multiple package options
-  # based on breastfeeding intensity and duration
-
-  # 7 CFR 246.10(c)(7): Food Package VII - Fully breastfeeding women
-  if category == "breastfeeding_woman" and is_fully_breastfeeding:
+    # Breastfeeding and postpartum women have multiple package options
+    # based on breastfeeding intensity and duration
+    # 7 CFR 246.10(c)(7): Food Package VII - Fully breastfeeding women
+    if category == "breastfeeding_woman" and is_fully_breastfeeding:
     return "VII"
-  elif category == "breastfeeding_woman":
+    elif category == "breastfeeding_woman":
     # Partially breastfeeding - Food Package IV
     return "IV"
-  elif category == "postpartum_woman" and is_breastfeeding and is_fully_breastfeeding:
+    elif category == "postpartum_woman" and is_breastfeeding and is_fully_breastfeeding:
     # 7 CFR 246.10(c)(6): Food Package VI - Fully breastfeeding postpartum
     return "VI"
-  elif category == "postpartum_woman" and is_breastfeeding:
+    elif category == "postpartum_woman" and is_breastfeeding:
     # Partially breastfeeding postpartum
     return "IV"
-  elif category == "postpartum_woman":
+    elif category == "postpartum_woman":
     # 7 CFR 246.10(c)(5): Food Package V - Non-breastfeeding postpartum
     return "V"
-  elif category == "infant" and is_fully_breastfed:
+    elif category == "infant" and is_fully_breastfed:
     # 7 CFR 246.10(c)(1): Package I - Fully breastfed infants
     return "I"
-  elif category == "infant":
+    elif category == "infant":
     # 7 CFR 246.10(c)(2): Package II - Formula-fed or partially breastfed
     return "II"
-  else:
+    else:
     return "none"
-
-default "none"
-
----
-
-# =============================================================================
-# FOOD PACKAGE DESCRIPTIONS
-# Human-readable descriptions for UI display
-# =============================================================================
-
-entity Person
-period Month
-dtype String
-
-formula:
-  pkg = wic_food_package
-
-  if pkg == "I":
-    return "Fully Breastfed Infant Package"
-  elif pkg == "II":
-    return "Formula Fed/Partially Breastfed Infant Package"
-  elif pkg == "III":
-    return "Children's Package"
-  elif pkg == "IV":
-    return "Pregnant/Partially Breastfeeding Women's Package"
-  elif pkg == "V":
-    return "Postpartum Non-Breastfeeding Women's Package"
-  elif pkg == "VI":
-    return "Postpartum Fully Breastfeeding Women's Package"
-  elif pkg == "VII":
-    return "Fully Breastfeeding Women's Package"
-  elif pkg == "none":
-    return "Not Eligible"
-
-# =============================================================================
-# FOOD PACKAGE ENHANCED STATUS
-# Some packages provide enhanced benefits (more food) to encourage breastfeeding
-# =============================================================================
-
-entity Person
-period Month
-dtype Boolean
-
-formula:
-  pkg = wic_food_package
-  # Packages VI and VII provide enhanced foods to encourage breastfeeding
-  # Package I also considered enhanced as baby food is provided later
-  return pkg == "I" or pkg == "VI" or pkg == "VII"
-
-# =============================================================================
-# HOUSEHOLD FOOD PACKAGE SUMMARY
-# =============================================================================
-
-# Count of WIC participants receiving food packages by type
-entity Household
-period Month
-dtype Integer
-
-formula:
-  return sum(members.wic_food_package == "III")
-
-entity Household
-period Month
-dtype Integer
-
-formula:
-  count = 0
-  for member in members do
-    pkg = member.wic_food_package
-    if pkg == "I" or pkg == "II":
-      count = count + 1
-  return count
-
-entity Household
-period Month
-dtype Integer
-
-formula:
-  count = 0
-  for member in members do
-    pkg = member.wic_food_package
-    if pkg == "IV" or pkg == "V" or pkg == "VI" or pkg == "VII":
-      count = count + 1
-  return count
-
-# Total WIC participants in household
-entity Household
-period Month
-dtype Integer
-
-formula:
-  return wic_children_count + wic_infants_count + wic_women_count
+  default: "none"

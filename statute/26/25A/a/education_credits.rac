@@ -1,82 +1,26 @@
 # 26 USC § 25A(a) - Allowance of Credit
 #
-# "In the case of an individual, there shall be allowed as a credit against
-# the tax imposed by this chapter for the taxable year the amount equal to
-# the sum of—
-#  (1) the American Opportunity Tax Credit, plus
-#  (2) the Lifetime Learning Credit."
-#
-# This file combines the AOC and LLC credits per § 25A(a).
-#
-# Key rules:
-# - Cannot claim both credits for the same student in the same year
-# - AOC is partially refundable (40%), LLC is entirely nonrefundable
-# - Each has separate phaseout thresholds based on MAGI
 
-imports:
-# Component credits
-  american_opportunity_credit: statute/26/25A/b/american_opportunity_credit
-  aoc_refundable: statute/26/25A/b/aoc_refundable
-  aoc_nonrefundable: statute/26/25A/b/aoc_nonrefundable
-  lifetime_learning_credit: statute/26/25A/c/lifetime_learning_credit
-
-# Other sections
-  adjusted_gross_income: statute/26/62/a/adjusted_gross_income
-  tax_liability_before_credits: statute/26/1/income_tax
-
-# --- Combined Education Credits per § 25A(a) ---
-
-entity TaxUnit
-period Year
-dtype Money
-unit "USD"
-label "Total Education Credits"
-description "Sum of American Opportunity Credit and Lifetime Learning Credit per § 25A(a)"
-
-formula:
-  return american_opportunity_credit + lifetime_learning_credit
-
-# --- Nonrefundable Portion ---
-
-entity TaxUnit
-period Year
-dtype Money
-unit "USD"
-label "Nonrefundable Education Credits"
-description "Nonrefundable portion of education credits (60% of AOC plus all of LLC)"
-
-formula:
-  # 60% of AOC is nonrefundable, plus all of LLC
-  aoc_nonref = aoc_nonrefundable
-  llc_amount = lifetime_learning_credit
-
-  # Total nonrefundable portion is limited by tax liability per § 26(a)
-  total_nonrefundable = aoc_nonref + llc_amount
-  return min(total_nonrefundable, tax_liability_before_credits)
-
-# --- Refundable Portion ---
-
-entity TaxUnit
-period Year
-dtype Money
-unit "USD"
-label "Refundable Education Credits"
-description "Refundable portion of education credits (40% of AOC per § 25A(i))"
-
-formula:
-  # Only AOC has a refundable portion (40%)
-  return aoc_refundable
-
-# --- Final Credit Claimed ---
-
-entity TaxUnit
-period Year
-dtype Money
-unit "USD"
-label "Education Credit"
-description "Total education credit claimed (nonrefundable + refundable) per 26 USC § 25A"
-
-formula:
-  return education_credits_nonrefundable + education_credits_refundable
-
-default 0
+text: """
+In the case of an individual, there shall be allowed as a credit against
+the tax imposed by this chapter for the taxable year the amount equal to
+the sum of—
+(1) the American Opportunity Tax Credit, plus
+(2) the Lifetime Learning Credit.
+"""
+variable education_credits:
+  imports:
+    - 26/25A/b/american_opportunity_credit#american_opportunity_credit
+    - 26/25A/b/aoc_refundable#aoc_refundable
+    - 26/25A/b/aoc_nonrefundable#aoc_nonrefundable
+    - 26/25A/c/lifetime_learning_credit#lifetime_learning_credit
+    - 26/62/a/adjusted_gross_income#adjusted_gross_income
+    - 26/1/income_tax#tax_liability_before_credits
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: "USD"
+  label: "Education Credit"
+  description: "Total education credit claimed (nonrefundable + refundable) per 26 USC § 25A"
+  formula: return american_opportunity_credit + lifetime_learning_credit
+  default: 0

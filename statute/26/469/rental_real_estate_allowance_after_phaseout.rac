@@ -1,17 +1,13 @@
 # Allowance After Phaseout - Section 469(i)(2) and (3)
-
-imports:
-  base_rental_real_estate_allowance: statute/26/469/base_rental_real_estate_allowance
-  rental_real_estate_allowance_phaseout: statute/26/469/rental_real_estate_allowance_phaseout
-
-entity TaxUnit
-period Year
-dtype Money
-unit "USD"
-label "Rental Real Estate Allowance After Phaseout"
-description "Allowance remaining after AGI-based phaseout per 26 USC 469(i)"
-
-formula:
-  return max(0, base_rental_real_estate_allowance - rental_real_estate_allowance_phaseout)
-
-default 0
+variable rental_real_estate_allowance_after_phaseout:
+  imports:
+    - 26/469/base_rental_real_estate_allowance#base_rental_real_estate_allowance
+    - 26/469/rental_real_estate_allowance_phaseout#rental_real_estate_allowance_phaseout
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: "USD"
+  label: "Rental Real Estate Allowance After Phaseout"
+  description: "Allowance remaining after AGI-based phaseout per 26 USC 469(i)"
+  formula: return max(0, base_rental_real_estate_allowance - rental_real_estate_allowance_phaseout)
+  default: 0

@@ -1,49 +1,37 @@
 # Dependent Student Contribution
 #
-# For dependent students (Formula A), the student's own income and assets
-# also contribute to the EFC.
-
-imports:
-  student_income: statute/20/1091/student_income
-  student_assets: statute/20/1091/student_assets
-  pell_grant_formula: statute/20/1070a/formula_type
-  simplified_formula_applies: statute/20/1070a/simplified_applies
-  head_available_income: statute/20/1070a/head_contribution#head_available_income
-  dependent_other_allowances: statute/20/1070a/dependent_other_allowances
-  dependent_params: statute/20/1070a/parameters#dependent
-
-entity Person
-period Year
-dtype Money
-unit "USD"
-label "Dependent Student Contribution"
-description "Dependent student's contribution from income and assets for Formula A"
-
-formula:
-  formula_type = pell_grant_formula
-
-  # Only applies to Formula A (dependent students)
-  if formula_type != A: return 0
-
-  # Income Protection Allowance
-  ipa = dependent_params.ipa
-
-  # Additional allowance from negative parent available income
-  parent_income_allowance = max(0, -head_available_income)
-
-  # Total allowances
-  total_allowances = ipa + parent_income_allowance + dependent_other_allowances
-
-  # Available income calculation
-  income = student_income
-  available_income = (income - total_allowances) * dependent_params.income_assessment_rate
-
-  # Asset contribution (zero if simplified formula applies)
-  assets = student_assets
-  use_assets = not simplified_formula_applies
-  asset_contribution = assets * dependent_params.asset_assessment_rate * use_assets
-
-  # Total contribution
-  return available_income + asset_contribution
-
-default 0
+variable dependent_contribution:
+  imports:
+    - 20/1091/student_income#student_income
+    - 20/1091/student_assets#student_assets
+    - 20/1070a/formula_type#pell_grant_formula
+    - 20/1070a/simplified_applies#simplified_formula_applies
+    - 20/1070a/head_contribution#head_available_income
+    - 20/1070a/dependent_other_allowances#dependent_other_allowances
+    - 20/1070a/parameters#dependent as dependent_params
+  entity: Person
+  period: Year
+  dtype: Money
+  unit: "USD"
+  label: "Dependent Student Contribution"
+  description: "Dependent student's contribution from income and assets for Formula A"
+  formula: |
+    formula_type = pell_grant_formula
+    # Only applies to Formula A (dependent students)
+    if formula_type != A: return 0
+    # Income Protection Allowance
+    ipa = dependent_params.ipa
+    # Additional allowance from negative parent available income
+    parent_income_allowance = max(0, -head_available_income)
+    # Total allowances
+    total_allowances = ipa + parent_income_allowance + dependent_other_allowances
+    # Available income calculation
+    income = student_income
+    available_income = (income - total_allowances) * dependent_params.income_assessment_rate
+    # Asset contribution (zero if simplified formula applies)
+    assets = student_assets
+    use_assets = not simplified_formula_applies
+    asset_contribution = assets * dependent_params.asset_assessment_rate * use_assets
+    # Total contribution
+    return available_income + asset_contribution
+  default: 0

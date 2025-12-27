@@ -1,18 +1,14 @@
 # 26 USC §32(c)(1)(B) - Ineligibility as Qualifying Child
 #
-# "An individual shall not be treated as an eligible individual for a taxable
-# year if such individual is a qualifying child of another taxpayer for such
-# taxable year."
-#
-# This prevents a dependent child who could be claimed by another taxpayer
-# from also claiming their own EITC, even if that child has earned income.
 
-entity TaxUnit
-period Year
-dtype Bool
-label "Is Qualifying Child of Another Taxpayer"
-description "Whether taxpayer could be claimed as qualifying child of another, disqualifying them from EITC per 26 USC §32(c)(1)(B)"
-
-# Input: This is determined from tax return data or household composition.
-# If the individual is under the age limit and lives with a parent or
-# other adult who could claim them as a qualifying child, this is true.
+text: """
+An individual shall not be treated as an eligible individual for a taxable
+year if such individual is a qualifying child of another taxpayer for such
+taxable year.
+"""
+variable is_qualifying_child_of_other:
+  entity: TaxUnit
+  period: Year
+  dtype: Bool
+  label: "Is Qualifying Child of Another Taxpayer"
+  description: "Whether taxpayer could be claimed as qualifying child of another, disqualifying them from EITC per 26 USC §32(c)(1)(B)"

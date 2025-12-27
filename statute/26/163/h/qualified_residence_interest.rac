@@ -1,66 +1,44 @@
 # 26 USC 163(h) - Qualified Residence Interest
 #
-# "(3) Qualified residence interest.-- For purposes of this subsection--
-#   (A) In general.-- The term 'qualified residence interest' means any
-#       interest which is paid or accrued during the taxable year on--
-#       (i) acquisition indebtedness with respect to any qualified residence
-#           of the taxpayer, or
-#       (ii) home equity indebtedness with respect to any qualified residence
-#            of the taxpayer.
-#   (B) Acquisition indebtedness.--
-#       (ii) Limitation.-- The aggregate amount treated as acquisition
-#            indebtedness for any period shall not exceed $1,000,000
-#            ($500,000 in the case of a married individual filing a
-#            separate return)."
-#
-# TCJA Section 11043 modifications (2018-2025):
-# - Reduces acquisition debt limit to $750,000 ($375,000 MFS) for debt
-#   incurred after December 15, 2017
-# - Suspends home equity interest deduction entirely (unless used for
-#   home acquisition or improvement)
 
-imports:
-  filing_status: statute/26/1/filing_status
-  mortgage_interest_paid: inputs/mortgage_interest
-  acquisition_debt: inputs/acquisition_debt_amount
-  home_equity_debt: inputs/home_equity_debt_amount
-  debt_incurred_before_tcja: inputs/mortgage_originated_before_12_16_2017
-  home_equity_used_for_improvement: inputs/home_equity_used_for_home_improvement
-
-parameters:
-  p: statute/26/163/parameters/qualified_residence
-
-entity TaxUnit
-period Year
-dtype Money
-unit "USD"
-label "Qualified Residence Interest Deduction"
-description "Deductible interest on qualified residence per 26 USC 163(h)"
-"TCJA Section 11043",
-"IRS Publication 936"
-
-formula:
-  # Determine applicable acquisition debt limit
-  is_mfs = filing_status == "married_separate"
-
-  # Use pre-TCJA limit ($1M) for grandfathered debt
-  pre_tcja_limit = is_mfs ? 500000 : 1000000
-  tcja_limit = is_mfs ? p.acquisition_debt_limit_mfs : p.acquisition_debt_limit
-
-  applicable_limit = debt_incurred_before_tcja ? pre_tcja_limit : tcja_limit
-
-  # Calculate deductible acquisition interest
-  acquisition_ratio = min(1, applicable_limit / max(1, acquisition_debt))
-  acquisition_interest = mortgage_interest_paid * acquisition_ratio
-
-  # Home equity interest: only deductible if used for home improvement (TCJA)
-  home_equity_limit = is_mfs ? p.home_equity_debt_limit_mfs : p.home_equity_debt_limit
-  he_deductible = home_equity_used_for_improvement and home_equity_limit > 0
-  home_equity_ratio = he_deductible ? min(1, home_equity_limit / max(1, home_equity_debt)) : 0
-  home_equity_interest = mortgage_interest_paid * home_equity_ratio
-
-  # Note: In practice, mortgage interest is usually just acquisition debt
-  # Home equity is tracked separately
-  return acquisition_interest
-
-default 0
+text: """
+(3) Qualified residence interest.-- For purposes of this subsection--
+(A) In general.-- The term 'qualified residence interest' means any
+interest which is paid or accrued during the taxable year on--
+(i) acquisition indebtedness with respect to any qualified residence
+of the taxpayer, or
+(ii) home equity indebtedness with respect to any qualified residence
+of the taxpayer.
+(B) Acquisition indebtedness.--
+(ii) Limitation.-- The aggregate amount treated as acquisition
+indebtedness for any period shall not exceed $1,000,000
+($500,000 in the case of a married individual filing a
+separate return).
+"""
+variable qualified_residence_interest:
+  imports: [26/1/filing_status#filing_status]
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: "USD"
+  label: "Qualified Residence Interest Deduction"
+  description: "Deductible interest on qualified residence per 26 USC 163(h)"
+  formula: |
+    # Determine applicable acquisition debt limit
+    is_mfs = filing_status == "married_separate"
+    # Use pre-TCJA limit ($1M) for grandfathered debt
+    pre_tcja_limit = is_mfs ? 500000 : 1000000
+    tcja_limit = is_mfs ? p.acquisition_debt_limit_mfs : p.acquisition_debt_limit
+    applicable_limit = debt_incurred_before_tcja ? pre_tcja_limit : tcja_limit
+    # Calculate deductible acquisition interest
+    acquisition_ratio = min(1, applicable_limit / max(1, acquisition_debt))
+    acquisition_interest = mortgage_interest_paid * acquisition_ratio
+    # Home equity interest: only deductible if used for home improvement (TCJA)
+    home_equity_limit = is_mfs ? p.home_equity_debt_limit_mfs : p.home_equity_debt_limit
+    he_deductible = home_equity_used_for_improvement and home_equity_limit > 0
+    home_equity_ratio = he_deductible ? min(1, home_equity_limit / max(1, home_equity_debt)) : 0
+    home_equity_interest = mortgage_interest_paid * home_equity_ratio
+    # Note: In practice, mortgage interest is usually just acquisition debt
+    # Home equity is tracked separately
+    return acquisition_interest
+  default: 0

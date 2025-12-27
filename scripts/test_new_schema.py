@@ -733,5 +733,39 @@ variable ctc_refundable:
         assert errors == []
 
 
+class TestFolderStructure:
+    """Test that statute/ folder only contains valid files."""
+
+    def test_statute_folder_only_has_rac_files(self):
+        """All files in statute/ must be .rac files."""
+        import os
+        statute_dir = Path(__file__).parent.parent / "statute"
+
+        invalid_files = []
+        for root, dirs, files in os.walk(statute_dir):
+            # Skip __pycache__ directories
+            dirs[:] = [d for d in dirs if d != '__pycache__']
+
+            for f in files:
+                if not f.endswith('.rac'):
+                    rel_path = os.path.relpath(os.path.join(root, f), statute_dir)
+                    invalid_files.append(rel_path)
+
+        assert invalid_files == [], f"Found {len(invalid_files)} non-.rac files in statute/:\n" + "\n".join(invalid_files[:20])
+
+    def test_no_pycache_in_statute(self):
+        """No __pycache__ directories in statute/."""
+        import os
+        statute_dir = Path(__file__).parent.parent / "statute"
+
+        pycache_dirs = []
+        for root, dirs, files in os.walk(statute_dir):
+            if '__pycache__' in dirs:
+                rel_path = os.path.relpath(os.path.join(root, '__pycache__'), statute_dir)
+                pycache_dirs.append(rel_path)
+
+        assert pycache_dirs == [], f"Found __pycache__ directories: {pycache_dirs}"
+
+
 if __name__ == "__main__":
     pytest.main([__file__, "-v"])

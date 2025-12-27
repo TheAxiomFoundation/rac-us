@@ -1,57 +1,42 @@
 # 26 USC 21(b) - Applicable Percentage
 #
-# "(b) APPLICABLE PERCENTAGE DEFINED. -- For purposes of subsection (a), the term
-# 'applicable percentage' means 35 percent reduced (but not below 20 percent) by
-# 1 percentage point for each $2,000 (or fraction thereof) by which the taxpayer's
-# adjusted gross income for the taxable year exceeds $15,000."
-#
-# Rate calculation:
-#   - Starts at 35% for AGI <= $15,000
-#   - Decreases 1% for each $2,000 (or fraction) above $15,000
-#   - Floors at 20% for AGI >= $43,000
-#
-# ARPA 2021: Temporarily increased to 50%, threshold to $125,000
 
-imports:
-# AGI
-  adjusted_gross_income: statute/26/62/a/adjusted_gross_income
-
-# Rate parameters
-  maximum_rate: statute/26/21/b/credit_rate#maximum_rate
-  minimum_rate: statute/26/21/b/credit_rate#minimum_rate
-  phase_down_threshold: statute/26/21/b/credit_rate#phase_down_threshold
-  phase_down_rate: statute/26/21/b/credit_rate#phase_down_rate
-  phase_down_increment: statute/26/21/b/credit_rate#phase_down_increment
-  arpa_complete_phaseout_threshold: statute/26/21/b/credit_rate#arpa_complete_phaseout_threshold
-
-entity TaxUnit
-period Year
-dtype Rate
-label "CDCC Applicable Percentage"
-description "Credit rate for Child and Dependent Care Credit per 26 USC 21(b)"
-"P.L. 117-2 Sec. 9632: 50% for AGI <= $125,000 in 2021"
-
-formula:
-  agi = adjusted_gross_income
-
-  # For ARPA 2021 complete phaseout above $400,000
-  # Note: This applies only when arpa_complete_phaseout_threshold is finite
-  if agi > arpa_complete_phaseout_threshold:
-  # Secondary phase-out from 20% to 0%
-  # AGI $400,000 to $438,000 (phasing out $50 per $1,000)
-  excess_over_phaseout = agi - arpa_complete_phaseout_threshold
-  phaseout_increments = ceil(excess_over_phaseout / phase_down_increment)
-  secondary_reduction = phaseout_increments * phase_down_rate
-  return max(0, minimum_rate - secondary_reduction)
-
-  # Calculate excess AGI over threshold
-  excess_agi = max(0, agi - phase_down_threshold)
-
-  # Number of $2,000 increments (or fraction thereof) using ceiling
-  increments = ceil(excess_agi / phase_down_increment)
-
-  # Total rate reduction (1 percentage point per increment)
-  rate_reduction = increments * phase_down_rate
-
-  # Apply reduction but floor at minimum rate
-  return max(minimum_rate, maximum_rate - rate_reduction)
+text: """
+(b) APPLICABLE PERCENTAGE DEFINED. -- For purposes of subsection (a), the term
+'applicable percentage' means 35 percent reduced (but not below 20 percent) by
+1 percentage point for each $2,000 (or fraction thereof) by which the taxpayer's
+adjusted gross income for the taxable year exceeds $15,000.
+"""
+variable applicable_percentage:
+  imports:
+    - 26/62/a/adjusted_gross_income#adjusted_gross_income
+    - 26/21/b/credit_rate#maximum_rate
+    - 26/21/b/credit_rate#minimum_rate
+    - 26/21/b/credit_rate#phase_down_threshold
+    - 26/21/b/credit_rate#phase_down_rate
+    - 26/21/b/credit_rate#phase_down_increment
+    - 26/21/b/credit_rate#arpa_complete_phaseout_threshold
+  entity: TaxUnit
+  period: Year
+  dtype: Rate
+  label: "CDCC Applicable Percentage"
+  description: "Credit rate for Child and Dependent Care Credit per 26 USC 21(b)"
+  formula: |
+    agi = adjusted_gross_income
+    # For ARPA 2021 complete phaseout above $400,000
+    # Note: This applies only when arpa_complete_phaseout_threshold is finite
+    if agi > arpa_complete_phaseout_threshold:
+    # Secondary phase-out from 20% to 0%
+    # AGI $400,000 to $438,000 (phasing out $50 per $1,000)
+    excess_over_phaseout = agi - arpa_complete_phaseout_threshold
+    phaseout_increments = ceil(excess_over_phaseout / phase_down_increment)
+    secondary_reduction = phaseout_increments * phase_down_rate
+    return max(0, minimum_rate - secondary_reduction)
+    # Calculate excess AGI over threshold
+    excess_agi = max(0, agi - phase_down_threshold)
+    # Number of $2,000 increments (or fraction thereof) using ceiling
+    increments = ceil(excess_agi / phase_down_increment)
+    # Total rate reduction (1 percentage point per increment)
+    rate_reduction = increments * phase_down_rate
+    # Apply reduction but floor at minimum rate
+    return max(minimum_rate, maximum_rate - rate_reduction)

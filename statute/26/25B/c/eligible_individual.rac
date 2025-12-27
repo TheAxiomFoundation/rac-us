@@ -1,58 +1,35 @@
 # 26 USC 25B(c) - Eligible Individual
 #
-# "(c) ELIGIBLE INDIVIDUAL.--For purposes of this section--
-#   (1) IN GENERAL.--The term 'eligible individual' means any individual if such
-#       individual has attained the age of 18 as of the close of the taxable year.
-#   (2) DEPENDENTS AND FULL-TIME STUDENTS NOT ELIGIBLE.--The term 'eligible
-#       individual' shall not include--
-#       (A) any individual with respect to whom a deduction under section 151 is
-#           allowed to another taxpayer for a taxable year beginning in the
-#           calendar year in which such individual's taxable year begins, and
-#       (B) any individual who is a student (as defined in section 152(f)(2))."
-#
-# Eligibility requirements:
-#   - Age 18 or older at end of tax year
-#   - Head of household or spouse (only filers claim the credit)
-#   - Not claimed as a dependent on ANOTHER return (25B(c)(2)(A))
-#   - Not a full-time student (25B(c)(2)(B))
-#
-# Note: The statute says "with respect to whom a deduction under section 151
-# is allowed to another taxpayer" - this means the person cannot be claimed
-# as a dependent on someone else's return, but can still be a filer.
 
-imports:
-# Age at end of tax year
-  age: inputs/person/age
-# Whether this person is head or spouse (filer status)
-  is_tax_unit_head_or_spouse: statute/26/1/is_tax_unit_head_or_spouse
-# Whether claimed as dependent on ANOTHER return (not this one)
-  claimed_as_dependent_on_another_return: inputs/person/claimed_as_dependent_on_another_return
-# Whether full-time student
-  is_full_time_student: inputs/person/is_full_time_student
-
-# Minimum age threshold from parameter
-  minimum_age: params/savers_credit/2024#minimum_age
-
-entity Person
-period Year
-dtype Boolean
-label "Eligible for Saver's Credit"
-description "Whether individual is an eligible individual for the Saver's Credit per 26 USC 25B(c)"
-
-formula:
-  # 25B(c)(1): Must be at least 18 at end of tax year
-  meets_age_requirement = age >= minimum_age
-
-  # Only head of household or spouse can claim (they are the filers)
-  is_filer = is_tax_unit_head_or_spouse
-
-  # 25B(c)(2)(A): Not claimed as dependent on ANOTHER taxpayer's return
-  not_dependent_elsewhere = not claimed_as_dependent_on_another_return
-
-  # 25B(c)(2)(B): Not a full-time student (as defined in 152(f)(2))
-  not_a_student = not is_full_time_student
-
-  # All conditions must be met
-  return meets_age_requirement and is_filer and not_dependent_elsewhere and not_a_student
-
-default False
+text: """
+(c) ELIGIBLE INDIVIDUAL.--For purposes of this section--
+(1) IN GENERAL.--The term 'eligible individual' means any individual if such
+individual has attained the age of 18 as of the close of the taxable year.
+(2) DEPENDENTS AND FULL-TIME STUDENTS NOT ELIGIBLE.--The term 'eligible
+individual' shall not include--
+(A) any individual with respect to whom a deduction under section 151 is
+allowed to another taxpayer for a taxable year beginning in the
+calendar year in which such individual's taxable year begins, and
+(B) any individual who is a student (as defined in section 152(f)(2)).
+Note: The statute says "with respect to whom a deduction under section 151
+is allowed to another taxpayer" - this means the person cannot be claimed
+"""
+variable eligible_individual:
+  imports: [26/1/is_tax_unit_head_or_spouse#is_tax_unit_head_or_spouse]
+  entity: Person
+  period: Year
+  dtype: Boolean
+  label: "Eligible for Saver's Credit"
+  description: "Whether individual is an eligible individual for the Saver's Credit per 26 USC 25B(c)"
+  formula: |
+    # 25B(c)(1): Must be at least 18 at end of tax year
+    meets_age_requirement = age >= minimum_age
+    # Only head of household or spouse can claim (they are the filers)
+    is_filer = is_tax_unit_head_or_spouse
+    # 25B(c)(2)(A): Not claimed as dependent on ANOTHER taxpayer's return
+    not_dependent_elsewhere = not claimed_as_dependent_on_another_return
+    # 25B(c)(2)(B): Not a full-time student (as defined in 152(f)(2))
+    not_a_student = not is_full_time_student
+    # All conditions must be met
+    return meets_age_requirement and is_filer and not_dependent_elsewhere and not_a_student
+  default: False

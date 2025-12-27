@@ -1,50 +1,23 @@
 # 26 USC 3101(b)(1) - Employee Medicare (Hospital Insurance) Tax
 #
-# "(b) Hospital insurance -
-# (1) In general - In addition to the tax imposed by subsection (a), there is
-# hereby imposed on the income of every individual a tax equal to 1.45 percent
-# of the wages (as defined in section 3121(a)) received by him with respect to
-# employment (as defined in section 3121(b))."
-#
-# Key features:
-# - Rate: 1.45% of wages (employee share)
-# - NO wage base limit (unlike Social Security tax)
-# - Employer pays matching 1.45% under 26 USC 3111(b)
-# - Combined rate: 2.9% (employee + employer)
 
-imports:
-# Wages subject to FICA per 3121(a)
-  irs_employment_income: statute/26/3121/a/irs_employment_income
-
-# Self-employment income subject to SE tax per 1401(b)
-  taxable_self_employment_income: statute/26/1401/taxable_self_employment_income
-
-parameters:
-# Load rates from parameters.yaml
-  employee_rate: statute/26/3101/parameters.yaml#employee_rate
-
-# Employee Medicare tax on wages
-entity Person
-period Year
-dtype Money
-unit "USD"
-label "Employee Medicare Tax"
-description "Employee share of Medicare (HI) tax at 1.45% of wages per 26 USC 3101(b)(1)"
-
-formula:
-  # Medicare tax applies to ALL wages - no cap unlike Social Security
-  return irs_employment_income * employee_rate
-
-# Total Medicare tax withheld (employee share only, for W-2 purposes)
-# Note: Employer share is reported separately under 3111(b)
-entity Person
-period Year
-dtype Money
-unit "USD"
-label "Medicare Tax Withheld"
-description "Total Medicare tax withheld from wages (employee share) per 26 USC 3101(b)"
-
-formula:
-  # Base Medicare tax (1.45%)
-  # Additional Medicare Tax (0.9% above threshold) is handled in 3101/b/2
-  return employee_medicare_tax
+text: """
+(b) Hospital insurance -
+(1) In general - In addition to the tax imposed by subsection (a), there is
+hereby imposed on the income of every individual a tax equal to 1.45 percent
+of the wages (as defined in section 3121(a)) received by him with respect to
+employment (as defined in section 3121(b)).
+"""
+variable medicare_tax:
+  imports:
+    - 26/3121/a/irs_employment_income#irs_employment_income
+    - 26/1401/taxable_self_employment_income#taxable_self_employment_income
+  entity: Person
+  period: Year
+  dtype: Money
+  unit: "USD"
+  label: "Medicare Tax Withheld"
+  description: "Total Medicare tax withheld from wages (employee share) per 26 USC 3101(b)"
+  formula: |
+    # Medicare tax applies to ALL wages - no cap unlike Social Security
+    return irs_employment_income * employee_rate

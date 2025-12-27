@@ -1,235 +1,144 @@
 # 42 USC 1437f(o)(2) & 24 CFR 982.505 - Housing Assistance Payment
 #
-# The Housing Assistance Payment (HAP) is the subsidy paid by the PHA
-# to the landlord on behalf of the tenant.
-#
-# HAP Calculation:
-# HAP = lesser of:
-#   (1) Payment standard - TTP, OR
-#   (2) Gross rent - TTP
-#
-# Where:
-# - Payment standard = PHA-determined amount (90-110% of FMR)
-# - TTP = Total Tenant Payment
-# - Gross rent = Contract rent + utility allowance
-#
-# HAP cannot exceed gross rent and cannot be negative.
-#
-# Reference: https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title42-section1437f
-
-# ============================================================
-# VOUCHER SIZE - 24 CFR 982.402
-# ============================================================
-
-# Determine appropriate voucher (bedroom) size based on family composition
 variable hcv_voucher_size:
-  entity Household
-  period Year
-  dtype Integer
-  label "HCV Voucher Size"
-  description "Number of bedrooms for voucher based on family composition"
-
-  formula:
+  entity: Household
+  period: Year
+  dtype: Integer
+  label: "HCV Voucher Size"
+  description: "Number of bedrooms for voucher based on family composition"
+  formula: |
     # PHA subsidy standards determine bedroom size
     # Typical standards:
     # - Head of household and spouse: 1 bedroom
     # - Each 2 additional family members: 1 bedroom
     # - Children of opposite sex may share until certain age
-
     # Simplified formula for modeling:
     # Bedrooms = head_spouse_bedrooms + ceiling((members - base_voucher_bedroom_count) / persons_per_bedroom)
-
     if household_size <= base_voucher_bedroom_count:
-      return head_spouse_bedrooms
-
+    return head_spouse_bedrooms
     let additional_members = household_size - base_voucher_bedroom_count
     let additional_bedrooms = ceil(additional_members / persons_per_bedroom)
     return head_spouse_bedrooms + additional_bedrooms
+  default: 1
 
-  default 1
-
-# ============================================================
-# PAYMENT STANDARD - 24 CFR 982.503
-# ============================================================
-
-# Payment standard for the voucher size
 variable hcv_payment_standard:
-  entity Household
-  period Month
-  dtype Money
-  unit "USD"
-  label "HCV Payment Standard"
-  description "Payment standard amount based on voucher bedroom size"
-
-  formula:
+  entity: Household
+  period: Month
+  dtype: Money
+  unit: "USD"
+  label: "HCV Payment Standard"
+  description: "Payment standard amount based on voucher bedroom size"
+  formula: |
     let voucher_size = hcv_voucher_size
-
     # Look up payment standard by bedroom size from parameter table
     let standards = parameter(gov.hud.hcv.payment_standards.by_bedroom)
     let additional = parameter(gov.hud.hcv.payment_standards.additional_per_bedroom)
-
     if voucher_size < max_bedroom_count:
-      return standards[voucher_size]
+    return standards[voucher_size]
     else:
-      # For larger units, use max BR base + additional per bedroom
-      let base = standards[max_bedroom_count]
-      return base + ((voucher_size - max_bedroom_count) * additional)
+    # For larger units, use max BR base + additional per bedroom
+    let base = standards[max_bedroom_count]
+    return base + ((voucher_size - max_bedroom_count) * additional)
+  default: 0
 
-  default 0
-
-# ============================================================
-# GROSS RENT - 24 CFR 982.503
-# ============================================================
-
-# Gross rent = Contract rent + Utility allowance
 variable hcv_gross_rent:
-  entity Household
-  period Month
-  dtype Money
-  unit "USD"
-  label "HCV Gross Rent"
-  description "Contract rent plus utility allowance"
-
-  formula:
+  entity: Household
+  period: Month
+  dtype: Money
+  unit: "USD"
+  label: "HCV Gross Rent"
+  description: "Contract rent plus utility allowance"
+  formula: |
     # Contract rent = rent paid to owner
     # Utility allowance = PHA estimate of tenant-paid utilities
     return contract_rent + utility_allowance
+  default: 0
 
-  default 0
-
-# ============================================================
-# HOUSING ASSISTANCE PAYMENT - 24 CFR 982.505
-# ============================================================
-
-# HAP calculation - the main subsidy amount
 variable hcv_housing_assistance_payment:
-  entity Household
-  period Month
-  dtype Money
-  unit "USD"
-  label "HCV Housing Assistance Payment"
-  description "Monthly subsidy paid by PHA to landlord"
-
-  formula:
+  entity: Household
+  period: Month
+  dtype: Money
+  unit: "USD"
+  label: "HCV Housing Assistance Payment"
+  description: "Monthly subsidy paid by PHA to landlord"
+  formula: |
     # First check eligibility
     if not hcv_eligible:
-      return 0
-
+    return 0
     let ttp = hcv_total_tenant_payment
-
     # HAP = lesser of:
     # (1) Payment standard minus TTP
     # (2) Gross rent minus TTP
-
     let hap_from_standard = hcv_payment_standard - ttp
     let hap_from_rent = hcv_gross_rent - ttp
-
     let hap = min(hap_from_standard, hap_from_rent)
-
     # HAP cannot be negative
     return max(0, hap)
+  default: 0
 
-  default 0
-
-# ============================================================
-# RENT REASONABLENESS - 24 CFR 982.507
-# ============================================================
-
-# Check if gross rent is reasonable (not modeled in detail)
-# PHAs must determine that rent is reasonable compared to
-# comparable unassisted units in the market
 variable hcv_rent_reasonable:
-  entity Household
-  period Month
-  dtype Boolean
-  label "HCV Rent Reasonable"
-  description "Whether rent is reasonable compared to market"
-
-  formula:
+  entity: Household
+  period: Month
+  dtype: Boolean
+  label: "HCV Rent Reasonable"
+  description: "Whether rent is reasonable compared to market"
+  formula: |
     # Rent reasonableness is determined by PHA comparison
     # to comparable market units. For modeling, we assume
     # rent is reasonable if within the reasonableness threshold of payment standard.
     let reasonableness_limit = hcv_payment_standard * rent_reasonableness_threshold
     return hcv_gross_rent <= reasonableness_limit
+  default: true
 
-  default true
-
-# ============================================================
-# AFFORDABILITY CHECK - 24 CFR 982.508
-# ============================================================
-
-# At initial occupancy, family share cannot exceed 40% of adjusted monthly income
 variable hcv_initial_affordability_check:
-  entity Household
-  period Month
-  dtype Boolean
-  label "HCV Initial Affordability Check"
-  description "Whether family share is affordable at initial lease-up (40% limit)"
-
-  formula:
+  entity: Household
+  period: Month
+  dtype: Boolean
+  label: "HCV Initial Affordability Check"
+  description: "Whether family share is affordable at initial lease-up (40% limit)"
+  formula: |
     let family_share = hcv_gross_rent - hcv_housing_assistance_payment
     let max_share_rate = parameter(gov.hud.hcv.housing_assistance.maximum_family_share.at_initial_lease)
     let max_share = hcv_monthly_adjusted_income * max_share_rate
-
     # Family share at move-in cannot exceed 40% of adjusted income
     return family_share <= max_share
+  default: true
 
-  default true
-
-# Total family payment (what tenant actually pays)
 variable hcv_family_payment:
-  entity Household
-  period Month
-  dtype Money
-  unit "USD"
-  label "HCV Family Payment"
-  description "Total amount tenant pays (gross rent minus HAP)"
-
-  formula:
+  entity: Household
+  period: Month
+  dtype: Money
+  unit: "USD"
+  label: "HCV Family Payment"
+  description: "Total amount tenant pays (gross rent minus HAP)"
+  formula: |
     # Family pays: Gross rent - HAP
     # Or equivalently: TTP + any excess rent over payment standard
     let family_share = hcv_gross_rent - hcv_housing_assistance_payment
     return max(0, family_share)
+  default: 0
 
-  default 0
-
-# ============================================================
-# PAYMENT TO OWNER - 24 CFR 982.451
-# ============================================================
-
-# Amount PHA pays to owner (contract rent minus tenant rent)
 variable hcv_payment_to_owner:
-  entity Household
-  period Month
-  dtype Money
-  unit "USD"
-  label "HCV Payment to Owner"
-  description "HAP amount paid directly to landlord"
-
-  formula:
+  entity: Household
+  period: Month
+  dtype: Money
+  unit: "USD"
+  label: "HCV Payment to Owner"
+  description: "HAP amount paid directly to landlord"
+  formula: |
     # HAP paid directly to owner
     # May be less than full HAP if utility allowance creates reimbursement
     let hap = hcv_housing_assistance_payment
-
     # Payment to owner cannot exceed contract rent
     return min(hap, contract_rent)
+  default: 0
 
-  default 0
-
-# ============================================================
-# MAIN HCV BENEFIT VARIABLE
-# ============================================================
-
-# The main Section 8 HCV benefit - alias for HAP
 variable hcv:
-  entity Household
-  period Month
-  dtype Money
-  unit "USD"
-  label "Section 8 Housing Choice Voucher"
-  description "Monthly Housing Choice Voucher benefit (Housing Assistance Payment)"
-
-  formula:
-    return hcv_housing_assistance_payment
-
-  default 0
+  entity: Household
+  period: Month
+  dtype: Money
+  unit: "USD"
+  label: "Section 8 Housing Choice Voucher"
+  description: "Monthly Housing Choice Voucher benefit (Housing Assistance Payment)"
+  formula: return hcv_housing_assistance_payment
+  default: 0

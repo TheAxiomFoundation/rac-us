@@ -1,101 +1,20 @@
 # 42 USC 1382a(b) - Income Exclusions
 #
-# (b)(2): "the first $20 of any income" (general exclusion)
-# (b)(4): "if the individual... is blind or disabled, the first $65
-#         of earned income... plus one-half of the remainder"
-#
-# Per SSA POMS SI 00810.000, the $20 general exclusion is applied to
-# unearned income first. If unearned income is less than $20, the
-# remainder applies to earned income before the $65 exclusion.
 
-imports:
-  general_exclusion: statute/42/1382/parameters/unearned_income/general_exclusion
-  earned_exclusion: statute/42/1382/parameters/earned_income/general_exclusion
-  remainder_rate: statute/42/1382/parameters/earned_income/remainder_exclusion_rate
-
-# General income exclusion ($20)
-entity Person
-period Month
-dtype Money
-unit "USD"
-label "SSI general income exclusion"
-description "First $20 of any income excluded per 42 USC 1382a(b)(2)"
-
-formula:
-  return general_exclusion
-
-# Earned income exclusion ($65)
-entity Person
-period Month
-dtype Money
-unit "USD"
-label "SSI earned income $65 exclusion"
-description "First $65 of earned income excluded per 42 USC 1382a(b)(4)"
-
-formula:
-  return earned_exclusion
-
-# Calculate earned income remainder exclusion (50% of remainder after $65)
-entity Person
-period Month
-dtype Money
-unit "USD"
-label "SSI earned income 50% exclusion"
-description "50% of earned income after $65 exclusion per 42 USC 1382a(b)(4)"
-
-formula:
-  # Per SSA POMS: $20 applied to unearned first
-  unearned_after_general = max(0, gross_unearned_income - general_exclusion)
-  unused_general = max(0, general_exclusion - gross_unearned_income)
-
-  # Earned income after applying any unused general exclusion
-  earned_after_general = max(0, gross_earned_income - unused_general)
-
-  # Apply $65 earned income exclusion
-  earned_after_65 = max(0, earned_after_general - earned_exclusion)
-
-  # 50% of remainder is excluded
-  return earned_after_65 * remainder_rate
-
-# Countable unearned income
-entity Person
-period Month
-dtype Money
-unit "USD"
-label "SSI countable unearned income"
-description "Unearned income after $20 general exclusion per 42 USC 1382a(b)(2)"
-
-formula:
-  return max(0, gross_unearned_income - general_exclusion)
-
-# Countable earned income
-entity Person
-period Month
-dtype Money
-unit "USD"
-label "SSI countable earned income"
-description "Earned income after exclusions per 42 USC 1382a(b)(4)"
-
-formula:
-  # Per SSA POMS: $20 applied to unearned first
-  unused_general = max(0, general_exclusion - gross_unearned_income)
-
-  # Earned income after applying any unused general exclusion
-  earned_after_general = max(0, gross_earned_income - unused_general)
-
-  # Apply $65 earned income exclusion
-  earned_after_65 = max(0, earned_after_general - earned_exclusion)
-
-  # Countable = 50% of remainder (the other 50% is excluded)
-  return earned_after_65 * (1 - remainder_rate)
-
-# Total countable income for SSI
-entity Person
-period Month
-dtype Money
-unit "USD"
-label "SSI total countable income"
-description "Sum of countable earned and unearned income per 42 USC 1382a"
-
-formula:
-  return countable_unearned_income + countable_earned_income
+text: """
+(b)(2): "the first $20 of any income" (general exclusion)
+(b)(4): "if the individual... is blind or disabled, the first $65
+of earned income... plus one-half of the remainder
+"""
+variable income_exclusions:
+  imports:
+    - 42/1382/parameters/unearned_income/general_exclusion#general_exclusion
+    - 42/1382/parameters/earned_income/general_exclusion#earned_exclusion
+    - 42/1382/parameters/earned_income/remainder_exclusion_rate#remainder_rate
+  entity: Person
+  period: Month
+  dtype: Money
+  unit: "USD"
+  label: "SSI total countable income"
+  description: "Sum of countable earned and unearned income per 42 USC 1382a"
+  formula: return general_exclusion

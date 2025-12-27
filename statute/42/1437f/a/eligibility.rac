@@ -1,170 +1,117 @@
 # 42 USC 1437f(a) - Eligibility for Housing Choice Voucher
 #
-# "The Secretary may enter into annual contributions contracts with
-# public housing agencies pursuant to which such agencies may enter
-# into contracts to make assistance payments to owners..."
-#
-# Income eligibility: Family income must not exceed 50% of area median
-# income (AMI), as defined in 24 CFR 5.603.
-#
-# Targeting requirement (42 USC 1437f(o)(4)): At least 75% of new
-# admissions must be "extremely low income" (30% AMI or below).
-#
-# Reference: https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title42-section1437f
 
-# ============================================================
-# INCOME LIMITS - 24 CFR 5.603
-# ============================================================
+text: """
+The Secretary may enter into annual contributions contracts with
+public housing agencies pursuant to which such agencies may enter
+into contracts to make assistance payments to owners...
+admissions must be "extremely low income" (30% AMI or below).
+"""
 
-# Very Low Income limit (50% AMI) based on household size
+parameter max_table_size:
+  description: "Maximum household size with specific income limit in tables"
+  unit: persons
+  values:
+    1937-01-01: 8
+
 variable hcv_very_low_income_limit:
-  entity Household
-  period Year
-  dtype Money
-  unit "USD"
-  label "HCV Very Low Income Limit"
-  description "50% of Area Median Income limit for HCV eligibility"
-
-  parameters:
-    max_table_size: parameters#income_limits.max_table_size
-
-  formula:
+  entity: Household
+  period: Year
+  dtype: Money
+  unit: "USD"
+  label: "HCV Very Low Income Limit"
+  description: "50% of Area Median Income limit for HCV eligibility"
+  formula: |
     # Income limit varies by household size
     # For sizes > max_table_size, add per-person amount
     let limits = parameter(gov.hud.hcv.income_limits.very_low_income)
     let additional = parameter(gov.hud.hcv.income_limits.very_low_income.additional_per_person)
-
     if household_size <= max_table_size:
-      return limits[household_size]
+    return limits[household_size]
     else:
-      let base = limits[max_table_size]
-      let extra_members = household_size - max_table_size
-      return base + (additional * extra_members)
+    let base = limits[max_table_size]
+    let extra_members = household_size - max_table_size
+    return base + (additional * extra_members)
+  default: 0
 
-  default 0
-
-# Extremely Low Income limit (30% AMI) based on household size
 variable hcv_extremely_low_income_limit:
-  entity Household
-  period Year
-  dtype Money
-  unit "USD"
-  label "HCV Extremely Low Income Limit"
-  description "30% of Area Median Income limit for targeting requirement"
-
-  parameters:
-    max_table_size: parameters#income_limits.max_table_size
-
-  formula:
+  entity: Household
+  period: Year
+  dtype: Money
+  unit: "USD"
+  label: "HCV Extremely Low Income Limit"
+  description: "30% of Area Median Income limit for targeting requirement"
+  formula: |
     let limits = parameter(gov.hud.hcv.income_limits.extremely_low_income)
     let additional = parameter(gov.hud.hcv.income_limits.extremely_low_income.additional_per_person)
-
     if household_size <= max_table_size:
-      return limits[household_size]
+    return limits[household_size]
     else:
-      let base = limits[max_table_size]
-      let extra_members = household_size - max_table_size
-      return base + (additional * extra_members)
+    let base = limits[max_table_size]
+    let extra_members = household_size - max_table_size
+    return base + (additional * extra_members)
+  default: 0
 
-  default 0
-
-# Low Income limit (80% AMI) for continued occupancy
 variable hcv_low_income_limit:
-  entity Household
-  period Year
-  dtype Money
-  unit "USD"
-  label "HCV Low Income Limit"
-  description "80% of Area Median Income limit for continued occupancy"
-
-  parameters:
-    max_table_size: parameters#income_limits.max_table_size
-
-  formula:
+  entity: Household
+  period: Year
+  dtype: Money
+  unit: "USD"
+  label: "HCV Low Income Limit"
+  description: "80% of Area Median Income limit for continued occupancy"
+  formula: |
     let limits = parameter(gov.hud.hcv.income_limits.low_income)
     let additional = parameter(gov.hud.hcv.income_limits.low_income.additional_per_person)
-
     if household_size <= max_table_size:
-      return limits[household_size]
+    return limits[household_size]
     else:
-      let base = limits[max_table_size]
-      let extra_members = household_size - max_table_size
-      return base + (additional * extra_members)
+    let base = limits[max_table_size]
+    let extra_members = household_size - max_table_size
+    return base + (additional * extra_members)
+  default: 0
 
-  default 0
-
-# ============================================================
-# INCOME ELIGIBILITY - 42 USC 1437f(a)
-# ============================================================
-
-# 42 USC 1437f(a) / 24 CFR 5.603 - Very Low Income eligibility
-# Primary eligibility: income <= 50% AMI
 variable hcv_income_eligible:
-  entity Household
-  period Year
-  dtype Boolean
-  label "HCV Income Eligible"
-  description "Whether household meets 50% AMI income eligibility for HCV"
+  entity: Household
+  period: Year
+  dtype: Boolean
+  label: "HCV Income Eligible"
+  description: "Whether household meets 50% AMI income eligibility for HCV"
+  formula: return hcv_annual_income <= hcv_very_low_income_limit
+  default: false
 
-  formula:
-    return hcv_annual_income <= hcv_very_low_income_limit
-
-  default false
-
-# 42 USC 1437f(o)(4) - Extremely Low Income determination
-# Used for 75% targeting requirement
 variable hcv_extremely_low_income:
-  entity Household
-  period Year
-  dtype Boolean
-  label "HCV Extremely Low Income"
-  description "Whether household is at or below 30% AMI for targeting purposes"
+  entity: Household
+  period: Year
+  dtype: Boolean
+  label: "HCV Extremely Low Income"
+  description: "Whether household is at or below 30% AMI for targeting purposes"
+  formula: return hcv_annual_income <= hcv_extremely_low_income_limit
+  default: false
 
-  formula:
-    return hcv_annual_income <= hcv_extremely_low_income_limit
-
-  default false
-
-# ============================================================
-# FAMILY COMPOSITION ELIGIBILITY - 24 CFR 5.403
-# ============================================================
-
-# Family composition eligibility
-# 24 CFR 5.403 - Definition of family
 variable hcv_family_eligible:
-  entity Household
-  period Year
-  dtype Boolean
-  label "HCV Family Composition Eligible"
-  description "Whether household constitutes a family under HCV rules"
-
-  formula:
+  entity: Household
+  period: Year
+  dtype: Boolean
+  label: "HCV Family Composition Eligible"
+  description: "Whether household constitutes a family under HCV rules"
+  formula: |
     # A family includes:
     # (1) Two or more persons who intend to share residency
     # (2) Single person who is elderly, disabled, displaced, or other
     #     category determined by PHA
     # (3) Remaining member of tenant family
-
     # For modeling, we assume any household constitutes a family
     # PHAs have discretion in family definitions
     return household_size >= 1
+  default: false
 
-  default false
-
-# ============================================================
-# CITIZENSHIP/IMMIGRATION ELIGIBILITY - 42 USC 1436a
-# ============================================================
-
-# Citizenship/immigration eligibility
-# 42 USC 1436a - Restriction on use of assisted housing by non-residents
 variable hcv_citizenship_eligible:
-  entity Household
-  period Year
-  dtype Boolean
-  label "HCV Citizenship/Immigration Eligible"
-  description "Whether at least one household member has eligible immigration status"
-
-  formula:
+  entity: Household
+  period: Year
+  dtype: Boolean
+  label: "HCV Citizenship/Immigration Eligible"
+  description: "Whether at least one household member has eligible immigration status"
+  formula: |
     # At least one family member must be:
     # - U.S. citizen
     # - National
@@ -172,27 +119,18 @@ variable hcv_citizenship_eligible:
     #
     # For modeling, we check for presence of eligible member
     return has_eligible_citizen_or_immigrant
+  default: false
 
-  default false
-
-# ============================================================
-# COMBINED ELIGIBILITY - 42 USC 1437f
-# ============================================================
-
-# Combined eligibility determination
 variable hcv_eligible:
-  entity Household
-  period Year
-  dtype Boolean
-  label "HCV Eligible"
-  description "Whether household meets all HCV eligibility requirements"
-
-  formula:
+  entity: Household
+  period: Year
+  dtype: Boolean
+  label: "HCV Eligible"
+  description: "Whether household meets all HCV eligibility requirements"
+  formula: |
     # Must meet all eligibility requirements:
     # (1) Income eligibility (50% AMI)
     # (2) Family composition
     # (3) Citizenship/immigration status
-
     return hcv_income_eligible and hcv_family_eligible and hcv_citizenship_eligible
-
-  default false
+  default: false

@@ -1,17 +1,10 @@
 # 26 USC § 24 - Number of Qualifying Children for CTC
 #
-# Count of children who meet CTC qualifying child requirements.
-# Used to calculate the total credit amount.
-
-imports:
-# CTC qualifying child status per §24(c)
-  is_ctc_qualifying_child: statute/26/24/c/1/is_ctc_qualifying_child
-
-entity TaxUnit
-period Year
-dtype Count
-label "Number of CTC Qualifying Children"
-description "Count of qualifying children for Child Tax Credit per 26 USC § 24(c)"
-
-formula:
-  return person.count(is_ctc_qualifying_child)
+variable num_qualifying_children:
+  imports: [26/24/c/1/is_ctc_qualifying_child#is_ctc_qualifying_child]
+  entity: TaxUnit
+  period: Year
+  dtype: Count
+  label: "Number of CTC Qualifying Children"
+  description: "Count of qualifying children for Child Tax Credit per 26 USC § 24(c)"
+  formula: return person.count(is_ctc_qualifying_child)

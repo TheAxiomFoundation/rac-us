@@ -1,64 +1,39 @@
 # 26 USC Section 1 - Tax Imposed (Ordinary Income Tax)
 #
-# "There is hereby imposed on the taxable income of every individual...
-# a tax determined in accordance with the following table"
-#
-# This implements the progressive marginal rate brackets for ordinary income.
-# Capital gains and qualified dividends are taxed separately under Section 1(h).
 
-imports:
-# Input: taxable income (AGI minus deductions)
-  taxable_income: statute/26/63/c/taxable_income
+text: """
+There is hereby imposed on the taxable income of every individual...
+a tax determined in accordance with the following table
+"""
 
-# Filing status determines which rate schedule to use
-  filing_status: statute/26/1/filing_status
+parameter brackets:
+  values:
+    # TODO: add values
 
-parameters:
-# Bracket structure with rates and thresholds by filing status
-# - rates: [0.10, 0.12, 0.22, 0.24, 0.32, 0.35, 0.37]
-# - thresholds: {single: [...], joint: [...], ...}
-  brackets: parameters#gov.irs.income_tax.brackets
-
-# =============================================================================
-# Ordinary Income Tax
-# =============================================================================
-# Main income tax calculation using progressive marginal brackets.
-# The marginal_agg function handles all bracket math:
-# - Splits income into bracket portions
-# - Applies each rate to its portion
-# - Sums the results
+variable income_tax:
+  imports:
+    - 26/63/c/taxable_income#taxable_income
+    - 26/1/filing_status#filing_status
 
 variable income_tax_before_credits:
-  entity TaxUnit
-  period Year
-  dtype Money
-  unit "USD"
-  label "Income Tax Before Credits"
-  description "Federal income tax on ordinary income before credits per 26 USC Section 1"
-
-  formula:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: "USD"
+  label: "Income Tax Before Credits"
+  description: "Federal income tax on ordinary income before credits per 26 USC Section 1"
+  formula: |
     return marginal_agg(taxable_income, brackets, threshold_by=filing_status)
-
-  defined_for:
+    defined_for:
     taxable_income > 0
-
-  default 0
-
----
-
-# =============================================================================
-# Vectorized version (same formula - marginal_agg is already vectorized)
-# =============================================================================
+  default: 0
 
 variable income_tax_before_credits_vectorized:
-  entity TaxUnit
-  period Year
-  dtype Money
-  unit "USD"
-  label "Income Tax Before Credits (Vectorized)"
-  description "Vectorized implementation for microsimulation"
-
-  formula:
-    return marginal_agg(taxable_income, brackets, threshold_by=filing_status)
-
-  default 0
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: "USD"
+  label: "Income Tax Before Credits (Vectorized)"
+  description: "Vectorized implementation for microsimulation"
+  formula: return marginal_agg(taxable_income, brackets, threshold_by=filing_status)
+  default: 0

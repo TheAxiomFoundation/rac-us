@@ -1,171 +1,24 @@
 # 26 USC Section 62(a)(23) - Qualified Tip Income Deduction
 #
-# Added by the One Big Beautiful Bill Act (H.R.1, Pub. L. 119-XX)
-# Signed July 4, 2025, effective for tax years 2025-2028.
-#
-# "(23) Qualified tip income.—In the case of an individual, the deduction
-#       allowed by section 74A (relating to exclusion for qualified tips)."
-#
-# Section 74A allows a deduction for qualified tip income received by
-# employees in occupations that customarily receive tips.
-#
-# Key provisions:
-# - Maximum deduction: $25,000 per year
-# - Phase-out: Begins at $150,000 MAGI ($300,000 MFJ)
-# - Phase-out rate: 10% of income above threshold
-# - Available to both itemizers and non-itemizers (above-the-line)
-# - Still subject to FICA taxes (only exempt from federal income tax)
-# - Sunsets after 2028 (not available for 2029+)
 
-parameters:
-  # 26 USC 74A(b)(1) - Maximum deduction cap
-  max_deduction: statute/26/62/parameters#tip_income_deduction.max_deduction
-
-  # Phase-out thresholds by filing status
-  phaseout_joint_start: statute/26/62/parameters#tip_income_deduction.phaseout.joint.start
-  phaseout_single_start: statute/26/62/parameters#tip_income_deduction.phaseout.single.start
-  phaseout_hoh_start: statute/26/62/parameters#tip_income_deduction.phaseout.head_of_household.start
-  phaseout_mfs_start: statute/26/62/parameters#tip_income_deduction.phaseout.mfs.start
-
-  # Phase-out rate (applies to all filing statuses)
-  phaseout_rate: statute/26/62/parameters#tip_income_deduction.phaseout.rate
-
-imports:
-  tips: statute/26/61/a/1/tips
-  filing_status: statute/26/1/filing_status
-  adjusted_gross_income: statute/26/62/a/adjusted_gross_income
-  self_employment_income: statute/26/1402/a/net_earnings_self_employment
-
-# =============================================================================
-# INPUT VARIABLES
-# =============================================================================
-
-# Whether person has valid SSN (required for deduction)
-entity Person
-period Year
-dtype Boolean
-label "Has Valid SSN for Tip Deduction"
-description "Whether person has a valid SSN that qualifies for tip income deduction"
-
-# Input variable - cardholder type check per OBBBA requirements
-
-# =============================================================================
-# SELF-EMPLOYMENT LIMIT
-# =============================================================================
-
-# For self-employed individuals, the deduction cannot exceed net earnings
-entity Person
-period Year
-dtype Money
-unit "USD"
-label "Self-Employment Tip Income Limit"
-description "Maximum tip deduction allowed for self-employed based on net earnings"
-
-formula:
-  # For employees, no limit from self-employment
-  # For self-employed, cannot exceed net earnings from trade/business
-  if self_employment_income <= 0: return max_deduction  # Not self-employed, use full cap
-  return min(self_employment_income, max_deduction)
-
-# =============================================================================
-# PHASE-OUT CALCULATION
-# =============================================================================
-
-entity TaxUnit
-period Year
-dtype Money
-unit "USD"
-label "Tip Income Deduction Phase-out Start"
-description "MAGI threshold where tip income deduction phase-out begins"
-
-formula:
-  # Per OBBBA: $300,000 for MFJ, $150,000 for all others
-  if filing_status == MARRIED_FILING_JOINTLY: return phaseout_joint_start
-  if filing_status == HEAD_OF_HOUSEHOLD: return phaseout_hoh_start
-  if filing_status == MARRIED_FILING_SEPARATELY: return phaseout_mfs_start
-  return phaseout_single_start
-
-entity TaxUnit
-period Year
-dtype Rate
-label "Tip Income Deduction Phase-out Ratio"
-description "Portion of tip income deduction phased out based on MAGI"
-
-formula:
-  # MAGI for this deduction = AGI
-  magi = adjusted_gross_income
-  start = tip_income_deduction_phaseout_start
-
-  if magi <= start: return 0  # No phase-out
-
-  # 10% phase-out rate per dollar above threshold
-  # Fully phased out when excess * 0.10 >= max_deduction ($25,000)
-  # Full phase-out at $250,000 excess, i.e., $400k for single, $550k for MFJ
-  excess = magi - start
-  phaseout_amount = excess * phaseout_rate
-
-  # Calculate ratio (capped at 1 = fully phased out)
-  ratio = phaseout_amount / max_deduction
-  return min(ratio, 1)
-
-# =============================================================================
-# DEDUCTION CALCULATION
-# =============================================================================
-
-entity TaxUnit
-period Year
-dtype Money
-unit "USD"
-label "Qualified Tip Income (Before Cap)"
-description "Total qualified tip income from all tax unit members"
-
-formula:
-  # Sum tips from all members who have valid SSN
-  # Note: Only tips from qualifying occupations count
-  # For simplicity, we assume all tip income is from qualifying occupations
-  return sum(Person.tips)
-
-entity TaxUnit
-period Year
-dtype Money
-unit "USD"
-label "Tip Income Deduction (Before Phase-out)"
-description "Tip income deduction before applying income-based phase-out"
-
-formula:
-  # Cap at maximum deduction
-  total_tips = qualified_tip_income_before_cap
-  return min(total_tips, max_deduction)
-
-entity TaxUnit
-period Year
-dtype Money
-unit "USD"
-label "Tip Income Deduction"
-description "Above-the-line deduction for qualified tip income per 26 USC 62(a)(23)"
-
-formula:
-  # Get base deduction (capped)
-  base = tip_income_deduction_before_phaseout
-
-  # Apply phase-out based on MAGI
-  phaseout = tip_income_deduction_phaseout_ratio
-
-  # Final deduction after phase-out
-  return base * (1 - phaseout)
-
-# =============================================================================
-# SUNSET CHECK (POST-2028)
-# =============================================================================
-
-entity TaxUnit
-period Year
-dtype Boolean
-label "Tip Income Deduction Available"
-description "Whether the tip income deduction is available in this tax year"
-
-formula:
-  # OBBBA sunset: deduction only available 2025-2028
-  # After 2028, the deduction is not available
-  # This is handled via parameters that set to 0 after 2028
-  return max_deduction > 0
+text: """
+(23) Qualified tip income.—In the case of an individual, the deduction
+allowed by section 74A (relating to exclusion for qualified tips).
+"""
+variable tip_income_deduction:
+  imports:
+    - 26/61/a/1/tips#tips
+    - 26/1/filing_status#filing_status
+    - 26/62/a/adjusted_gross_income#adjusted_gross_income
+    - 26/1402/a/net_earnings_self_employment#self_employment_income
+  entity: TaxUnit
+  period: Year
+  dtype: Boolean
+  unit: "USD"
+  label: "Tip Income Deduction Available"
+  description: "Whether the tip income deduction is available in this tax year"
+  formula: |
+    # For employees, no limit from self-employment
+    # For self-employed, cannot exceed net earnings from trade/business
+    if self_employment_income <= 0: return max_deduction  # Not self-employed, use full cap
+    return min(self_employment_income, max_deduction)

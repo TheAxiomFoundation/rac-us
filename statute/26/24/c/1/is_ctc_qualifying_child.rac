@@ -1,25 +1,20 @@
 # 26 USC § 24(c)(1) - Qualifying Child Definition for CTC
 #
-# "The term 'qualifying child' means a qualifying child of the taxpayer
-# (as defined in section 152(c)) who has not attained age 17."
 
-imports:
-# Qualifying child from §152(c)
-  is_qualifying_child: statute/26/152/c/is_qualifying_child
-
-# Age from person-level data
-  age: inputs/person/age
-
-# Age limit parameter
-  age_limit: statute/26/24/c/qualifying_child#age_limit
-
-entity Person
-period Year
-dtype Boolean
-label "CTC Qualifying Child"
-description "Whether this person is a qualifying child for Child Tax Credit purposes per 26 USC § 24(c)(1)"
-
-formula:
-  # Must be a qualifying child per §152(c)
-  # AND must not have attained age 17 by end of tax year
-  return is_qualifying_child and age < age_limit
+text: """
+The term 'qualifying child' means a qualifying child of the taxpayer
+(as defined in section 152(c)) who has not attained age 17.
+"""
+variable is_ctc_qualifying_child:
+  imports:
+    - 26/152/c/is_qualifying_child#is_qualifying_child
+    - 26/24/c/qualifying_child#age_limit
+  entity: Person
+  period: Year
+  dtype: Boolean
+  label: "CTC Qualifying Child"
+  description: "Whether this person is a qualifying child for Child Tax Credit purposes per 26 USC § 24(c)(1)"
+  formula: |
+    # Must be a qualifying child per §152(c)
+    # AND must not have attained age 17 by end of tax year
+    return is_qualifying_child and age < age_limit

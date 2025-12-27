@@ -1,98 +1,60 @@
 # 42 USC 607 - TANF Work Participation Requirements
 #
-# "(a) Participation rate requirements
-#     (1) All families
-#         A State to which a grant is made under section 603 of this title
-#         for a fiscal year shall achieve the minimum participation rate..."
-#
-# This section establishes:
-# - State-level participation rate requirements (607(a))
-# - Individual work hours requirements (607(c))
-# - Definition of countable work activities (607(d))
-# - Sanction requirements for non-compliance (607(e))
-#
-# SIMULATION LIMITATIONS:
-# Work requirements cannot be fully simulated as they require:
-# - Tracking actual hours worked over time
-# - Monitoring participation in specific activities
-# - State-level exemption and good cause determinations
-#
-# This encoding captures the RULES for reference and partial simulation.
-#
-# Reference: https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title42-section607
 
-parameters:
-  weeks_per_month: statute/42/607#weeks_per_month
-
-# =============================================================================
-# 607(c) - Individual Work Hours Requirements
-# =============================================================================
-
-# Required weekly work hours based on family type
+text: """
+(a) Participation rate requirements
+(1) All families
+A State to which a grant is made under section 603 of this title
+for a fiscal year shall achieve the minimum participation rate...
+"""
 variable tanf_required_work_hours_weekly:
-  entity Person
-  period Week
-  dtype Integer
-  unit "hours"
-  label "TANF Required Weekly Work Hours"
-  description "Weekly work hours required for TANF participation based on family composition"
-
-  formula:
+  entity: Person
+  period: Week
+  dtype: Integer
+  unit: "hours"
+  label: "TANF Required Weekly Work Hours"
+  description: "Weekly work hours required for TANF participation based on family composition"
+  formula: |
     # Not all TANF recipients have work requirements
     if tanf_work_requirement_exempt:
-      return 0
-
+    return 0
     let young_child_age = parameter(gov.hhs.acf.tanf.work.young_child_age_threshold)
-
     # 607(c)(1)(A): Single parent or caretaker with child under 6
     if is_tanf_single_parent and has_child_under_age(young_child_age):
-      return parameter(gov.hhs.acf.tanf.work.hours_single_parent_young_child)
-
+    return parameter(gov.hhs.acf.tanf.work.hours_single_parent_young_child)
     # 607(c)(1)(B): General single parent requirement
     if is_tanf_single_parent:
-      return parameter(gov.hhs.acf.tanf.work.hours_single_parent)
-
+    return parameter(gov.hhs.acf.tanf.work.hours_single_parent)
     # 607(c)(2): Two-parent families
     if is_tanf_two_parent_family:
-      # 607(c)(2)(B): Higher requirement if receiving federal child care
-      if receives_federal_childcare_assistance:
-        return parameter(gov.hhs.acf.tanf.work.hours_two_parent_with_childcare)
-      else if not receives_federal_childcare_assistance:
-        return parameter(gov.hhs.acf.tanf.work.hours_two_parent)
-
+    # 607(c)(2)(B): Higher requirement if receiving federal child care
+    if receives_federal_childcare_assistance:
+    return parameter(gov.hhs.acf.tanf.work.hours_two_parent_with_childcare)
+    else if not receives_federal_childcare_assistance:
+    return parameter(gov.hhs.acf.tanf.work.hours_two_parent)
     return 0
+  default: 0
 
-  default 0
-
-# Monthly equivalent of required hours
 variable tanf_required_work_hours_monthly:
-  entity Person
-  period Month
-  dtype Integer
-  unit "hours"
-  label "TANF Required Monthly Work Hours"
-  description "Monthly work hours required (weekly hours * weeks_per_month)"
-
-  formula:
+  entity: Person
+  period: Month
+  dtype: Integer
+  unit: "hours"
+  label: "TANF Required Monthly Work Hours"
+  description: "Monthly work hours required (weekly hours * weeks_per_month)"
+  formula: |
     # Approximate monthly hours from weekly (52 weeks / 12 months)
     return round(tanf_required_work_hours_weekly * weeks_per_month)
+  default: 0
 
-  default 0
-
-# =============================================================================
-# 607(d) - Countable Work Activities
-# =============================================================================
-
-# Whether person's hours are in qualifying work activities
 variable tanf_hours_in_core_activities:
-  entity Person
-  period Week
-  dtype Integer
-  unit "hours"
-  label "TANF Core Work Activity Hours"
-  description "Hours in core work activities (unsubsidized employment, on-the-job training, etc.)"
-
-  formula:
+  entity: Person
+  period: Week
+  dtype: Integer
+  unit: "hours"
+  label: "TANF Core Work Activity Hours"
+  description: "Hours in core work activities (unsubsidized employment, on-the-job training, etc.)"
+  formula: |
     # Core activities per 607(d):
     # (1) Unsubsidized employment
     # (2) Subsidized private sector employment
@@ -102,148 +64,84 @@ variable tanf_hours_in_core_activities:
     # (6) Job search and job readiness (limited)
     # (7) Community service programs
     # (8) Vocational educational training (12-month limit)
-
     return work_hours_unsubsidized + work_hours_subsidized_private +
-           work_hours_subsidized_public + work_hours_work_experience +
-           work_hours_on_the_job_training + work_hours_job_search_limited +
-           work_hours_community_service + work_hours_vocational
+    work_hours_subsidized_public + work_hours_work_experience +
+    work_hours_on_the_job_training + work_hours_job_search_limited +
+    work_hours_community_service + work_hours_vocational
+  default: 0
 
-  default 0
-
-# Whether person meets work participation requirement
 variable tanf_work_requirement_met:
-  entity Person
-  period Month
-  dtype Bool
-  label "TANF Work Requirement Met"
-  description "Whether individual meets TANF work participation requirement"
-
-  formula:
+  entity: Person
+  period: Month
+  dtype: Bool
+  label: "TANF Work Requirement Met"
+  description: "Whether individual meets TANF work participation requirement"
+  formula: |
     # Exempt individuals automatically meet requirement
     if tanf_work_requirement_exempt:
-      return true
-
+    return true
     let required_hours = tanf_required_work_hours_monthly
     let actual_hours = work_hours_monthly
-
     return actual_hours >= required_hours
+  default: true
 
-  default true
-
-# =============================================================================
-# Work Requirement Exemptions
-# =============================================================================
-
-# Federal exemption categories
 variable tanf_work_requirement_exempt:
-  entity Person
-  period Month
-  dtype Bool
-  label "TANF Work Requirement Exempt"
-  description "Whether individual is exempt from TANF work requirements"
-
-  formula:
+  entity: Person
+  period: Month
+  dtype: Bool
+  label: "TANF Work Requirement Exempt"
+  description: "Whether individual is exempt from TANF work requirements"
+  formula: |
     # 607(c)(2)(B): Caring for child under 6 with unavailable child care
     # (This is an exemption from full hours, not from work entirely in most states)
-
     # States define most exemptions; common federal-recognized exemptions:
     # - Disabled (unable to work)
     # - Caring for disabled family member
     # - Pregnant (third trimester)
     # - Single parent with infant (varies by state, up to 12 months)
-
     # 607(b)(5): Single parent caring for child under 1
     # State may disregard from participation rate for up to 12 months lifetime
     if has_child_under_1 and is_single_parent:
-      return tanf_infant_care_exemption_available
-
+    return tanf_infant_care_exemption_available
     return is_disabled_unable_to_work or is_caring_for_disabled_family_member or
-           (is_pregnant and pregnancy_trimester == 3)
+    (is_pregnant and pregnancy_trimester == 3)
+  default: false
 
-  default false
-
-# =============================================================================
-# 607(c)(1)(A)(ii) - Teen Parent Education Requirement
-# =============================================================================
-
-# Whether person is subject to teen parent school requirement
 variable tanf_teen_parent_education_required:
-  entity Person
-  period Month
-  dtype Bool
-  label "TANF Teen Parent Education Required"
-  description "Whether teen parent must attend school or education program"
-
-  formula:
+  entity: Person
+  period: Month
+  dtype: Bool
+  label: "TANF Teen Parent Education Required"
+  description: "Whether teen parent must attend school or education program"
+  formula: |
     let max_age = parameter(gov.hhs.acf.tanf.age.teen_parent_max_age)
-
     # Minor parent without diploma/GED must attend school
     return age < max_age and has_minor_child and not has_high_school_diploma
+  default: false
 
-  default false
-
-# Whether teen parent education requirement met
 variable tanf_teen_parent_education_met:
-  entity Person
-  period Month
-  dtype Bool
-  label "TANF Teen Parent Education Requirement Met"
-  description "Whether teen parent meets education/training requirement"
-
-  formula:
+  entity: Person
+  period: Month
+  dtype: Bool
+  label: "TANF Teen Parent Education Requirement Met"
+  description: "Whether teen parent meets education/training requirement"
+  formula: |
     if not tanf_teen_parent_education_required:
-      return true
-
+    return true
     # Must be enrolled in school, GED, or alternative education
     return is_enrolled_in_school or is_enrolled_in_ged_program or
-           is_enrolled_in_alternative_education
+    is_enrolled_in_alternative_education
+  default: true
 
-  default true
-
-# =============================================================================
-# Family/Unit Level Work Status
-# =============================================================================
-
-# Whether TANF unit meets work participation requirements
 variable tanf_unit_work_requirement_met:
-  entity TanfUnit
-  period Month
-  dtype Bool
-  label "TANF Unit Work Requirement Met"
-  description "Whether all non-exempt adults in TANF unit meet work requirements"
-
-  formula:
+  entity: TanfUnit
+  period: Month
+  dtype: Bool
+  label: "TANF Unit Work Requirement Met"
+  description: "Whether all non-exempt adults in TANF unit meet work requirements"
+  formula: |
     # All non-exempt adults must meet requirements
     # At least one adult must meet if two-parent family
     return all(tanf_work_requirement_met or tanf_work_requirement_exempt
-               for adult in tanf_unit_adults)
-
-  default true
-
-# =============================================================================
-# NOTES ON SIMULATION LIMITATIONS
-# =============================================================================
-
-# The following aspects CANNOT be fully implemented in static simulation:
-#
-# 1. STATE-LEVEL PARTICIPATION RATE CALCULATIONS
-#    - 607(a) rates are aggregate state metrics
-#    - Caseload reduction credit reduces effective requirement
-#    - Cannot calculate in individual-level simulation
-#
-# 2. ACTIVITY TRACKING
-#    - Requires weekly/monthly logs of actual participation
-#    - Job search limited to 6/12 weeks per year
-#    - Vocational education limited to 12 months lifetime
-#
-# 3. CORE VS NON-CORE ACTIVITY SPLITS
-#    - Must have 20 hours in core before non-core counts
-#    - Tracking cumulative hours over time
-#
-# 4. GOOD CAUSE AND EXEMPTIONS
-#    - State-determined on case-by-case basis
-#    - Cannot model individual circumstances
-#
-# 5. SANCTION IMPOSITION AND CURING
-#    - Progressive sanctions over time
-#    - Cure provisions require action tracking
+    for adult in tanf_unit_adults)
+  default: true

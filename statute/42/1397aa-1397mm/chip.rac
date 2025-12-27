@@ -1,161 +1,23 @@
 # 42 USC 1397aa-1397mm - Children's Health Insurance Program (CHIP)
 #
-# Title XXI of the Social Security Act
-# Originally enacted: Balanced Budget Act of 1997 (P.L. 105-33)
-# Reauthorized: CHIPRA 2009 (P.L. 111-3), MACRA 2015 (P.L. 114-10)
-#
-# "SEC. 2101. [42 U.S.C. 1397aa] PURPOSE; STATE CHILD HEALTH PLANS.
-#   (a) PURPOSE.--The purpose of this title is to provide funds to States
-#       to enable them to initiate and expand the provision of child health
-#       assistance to uninsured, low-income children in an effective and
-#       efficient manner..."
-#
-# CHIP provides health coverage for children and, in some states, pregnant
-# women whose family income is too high for Medicaid but who cannot afford
-# private health insurance.
-#
-# Key statutory sections:
-#   1397aa (Section 2101) - Purpose and allotments
-#   1397bb (Section 2102) - State child health plans
-#   1397cc (Section 2103) - Coverage requirements and cost-sharing
-#   1397dd (Section 2104) - Allotments
-#   1397ee (Section 2105) - Payments to States
-#   1397ff (Section 2106) - Process for submission and approval of plans
-#   1397gg (Section 2107) - Strategic objectives and performance goals
-#   1397hh (Section 2108) - Annual reports and evaluations
-#   1397ii (Section 2109) - Application of certain general provisions
-#   1397jj (Section 2110) - Definitions
-#   1397kk (Section 2111) - Dental-only supplemental coverage
-#   1397ll (Section 2112) - Optional coverage of targeted low-income pregnant women
-#   1397mm (Section 2113) - Electronic enrollment application
-#
-# This file aggregates the main CHIP components:
-#   - Eligibility (1397aa/eligibility.rac)
-#   - Benefits (1397bb/benefits.rac)
-#   - Cost-sharing (1397cc/cost_sharing.rac)
-#   - Parameters (parameters.yaml)
 
-# =============================================================================
-# PARAMETERS
-# =============================================================================
-
-parameters:
-  per_capita_chip_benefit: statute/42/1397aa-1397mm/parameters.yaml#calibration.per_capita_spending
-  estimated_oop_utilization_rate: statute/42/1397aa-1397mm/parameters.yaml#utilization.estimated_oop_utilization_rate
-  coverage_gap_burden_threshold: statute/42/1397aa-1397mm/parameters.yaml#utilization.coverage_gap_burden_threshold
-
-# =============================================================================
-# MAIN CHIP VARIABLE
-# Annual estimated benefit value for CHIP-eligible person
-# =============================================================================
-
-entity Person
-period Year
-dtype Money
-unit "USD"
-label "CHIP"
-description "Children's Health Insurance Program - estimated annual benefit value"
-
-formula:
-  # Not eligible: no benefit
-  if not is_chip_eligible:
+text: """
+SEC. 2101. [42 U.S.C. 1397aa] PURPOSE; STATE CHILD HEALTH PLANS.
+(a) PURPOSE.--The purpose of this title is to provide funds to States
+to enable them to initiate and expand the provision of child health
+assistance to uninsured, low-income children in an effective and
+efficient manner...
+"""
+variable chip:
+  entity: Household
+  period: Year
+  dtype: Integer
+  unit: "USD"
+  label: "CHIP Coverage Gap Count"
+  description: "Number of CHIP-eligible persons facing cost-sharing burden"
+  formula: |
+    # Not eligible: no benefit
+    if not is_chip_eligible:
     return 0
-
-  # Eligible: return per-capita benefit value
-  return per_capita_chip_benefit
-
-# =============================================================================
-# HOUSEHOLD AGGREGATES
-# =============================================================================
-
-# Total household CHIP benefits
-entity Household
-period Year
-dtype Money
-unit "USD"
-label "Household CHIP"
-description "Total CHIP benefits for all eligible household members"
-
-formula:
-  return sum(members.chip)
-
-# Count of eligible persons
-entity Household
-period Year
-dtype Integer
-label "Household CHIP Eligible Count"
-description "Number of CHIP-eligible persons in household"
-
-formula:
-  return sum(members.is_chip_eligible)
-
-# =============================================================================
-# NET BENEFIT (After Cost-Sharing)
-# =============================================================================
-
-# Net CHIP benefit after estimated cost-sharing
-entity Person
-period Year
-dtype Money
-unit "USD"
-label "CHIP Net Benefit"
-description "CHIP benefit value minus estimated out-of-pocket costs"
-
-formula:
-  if not is_chip_eligible:
-    return 0
-
-  benefit = per_capita_chip_benefit
-  max_oop = chip_max_out_of_pocket
-
-  # Net benefit is gross benefit minus potential cost-sharing
-  # Actual cost-sharing depends on utilization
-  # Using estimated utilization rate of max OOP as approximate average
-  estimated_oop = max_oop * estimated_oop_utilization_rate
-
-  return max(0, benefit - estimated_oop)
-
-# =============================================================================
-# COVERAGE GAP INDICATORS
-# People above Medicaid limits but potentially priced out of CHIP
-# =============================================================================
-
-# Is in CHIP coverage gap (too high for Medicaid, CHIP cost-sharing burdensome)
-entity Person
-period Year
-dtype Boolean
-label "In CHIP Coverage Gap"
-description "Above Medicaid but CHIP cost-sharing may be burdensome"
-
-formula:
-  # Not applicable if not CHIP eligible
-  if not is_chip_eligible:
-    return false
-
-  # If cost-sharing exempt, not in coverage gap
-  if is_chip_cost_sharing_exempt:
-    return false
-
-  # Check if cost-sharing is significant relative to benefit
-  benefit = per_capita_chip_benefit
-  max_oop = chip_max_out_of_pocket
-
-  # If max OOP is more than burden threshold of benefit, may be burdensome
-  if benefit > 0:
-    return max_oop / benefit > coverage_gap_burden_threshold
-
-  return false
-
-# =============================================================================
-# SUMMARY STATISTICS
-# =============================================================================
-
-# Eligible but potentially underinsured
-entity Household
-period Year
-dtype Integer
-label "CHIP Coverage Gap Count"
-description "Number of CHIP-eligible persons facing cost-sharing burden"
-
-formula:
-  return sum(members.chip_coverage_gap)
+    # Eligible: return per-capita benefit value
+    return per_capita_chip_benefit

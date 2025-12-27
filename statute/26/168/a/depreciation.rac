@@ -1,218 +1,28 @@
 # 26 USC Section 168 - Accelerated Cost Recovery System (MACRS)
 #
-# "(a) GENERAL RULE.—Except as otherwise provided in this section, the
-# depreciation deduction provided by section 167(a) for any tangible property
-# shall be determined by using—
-#   (1) the applicable depreciation method,
-#   (2) the applicable recovery period, and
-#   (3) the applicable convention."
-#
-# This is the primary depreciation system for tangible property.
 
-imports:
-# MACRS tables
-  macrs_table_half_year: statute/26/168/parameters/macrs_table_half_year
-  macrs_table_mid_quarter: statute/26/168/parameters/macrs_table_mid_quarter
-  recovery_periods: statute/26/168/parameters/recovery_periods
-  bonus_depreciation_rate: statute/26/168/parameters/bonus_depreciation_rate
-  ads_recovery_periods: statute/26/168/parameters/ads_recovery_periods
-
-parameters:
-  # Mid-month convention parameters
-  mid_month_proration_factor: statute/26/168/parameters#mid_month_proration_factor
-  months_per_year: statute/26/168/parameters#months_per_year
-
-# Input variables
-entity Asset
-period Year
-dtype Money
-unit "USD"
-label "Property Cost Basis"
-description "Original cost basis of depreciable property"
-
-default 0
-
----
-
-entity Asset
-period Year
-dtype Enum
-label "Property Class"
-description "MACRS property class (3,5,7,10,15,20,25,27.5,39 year)"
-values: [3_year, 5_year, 7_year, 10_year, 15_year, 20_year, 25_year, 27_5_year, 39_year]
-
----
-
-entity Asset
-period Year
-dtype Integer
-label "Year Placed in Service"
-description "Tax year when property was placed in service"
-
----
-
-entity Asset
-period Year
-dtype Integer
-label "Month Placed in Service"
-description "Month (1-12) when real property was placed in service"
-default 1
-
----
-
-entity Asset
-period Year
-dtype Integer
-label "Quarter Placed in Service"
-description "Quarter (1-4) when property was placed in service for mid-quarter convention"
-default 0  # 0 means not using mid-quarter
-
----
-
-entity Asset
-period Year
-dtype Boolean
-label "Qualifies for Bonus Depreciation"
-description "Whether property qualifies for Section 168(k) bonus depreciation"
-default true
-
----
-
-entity Asset
-period Year
-dtype Enum
-label "Depreciation System"
-description "GDS (general) or ADS (alternative) depreciation system"
-values: [gds, ads]
-default gds
-
----
-
-entity Asset
-period Year
-dtype Enum
-label "Convention"
-description "Depreciation convention (half-year, mid-quarter, mid-month)"
-values: [half_year, mid_quarter, mid_month]
-default half_year
-
----
-
-# Calculate which year of recovery we're in
-entity Asset
-period Year
-dtype Integer
-label "Recovery Year"
-description "Current year of the recovery period (1-based)"
-
-formula:
-  if current_year < year_placed_in_service: return 0  # Not yet placed in service
-
-  return current_year - year_placed_in_service + 1
-
-# Calculate bonus depreciation
-entity Asset
-period Year
-dtype Money
-unit "USD"
-label "Bonus Depreciation"
-description "Section 168(k) bonus depreciation amount"
-
-formula:
-  # Only in first year
-  if recovery_year != 1: return 0
-
-  # Must qualify for bonus
-  if not qualifies_for_bonus: return 0
-
-  # ADS property generally not eligible
-  if depreciation_system == ads: return 0
-
-  # Real property not eligible for bonus (27.5 and 39 year)
-  if property_class == residential_rental or property_class == nonresidential:
-    return 0
-  else:
-    # Apply bonus rate to cost basis
-    return cost_basis * bonus_depreciation_rate
-
-default 0
-
----
-
-# Calculate regular MACRS depreciation
-entity Asset
-period Year
-dtype Money
-unit "USD"
-label "Regular MACRS Depreciation"
-description "MACRS depreciation excluding bonus"
-
-formula:
-  # Not yet in service or beyond recovery period
-  if recovery_year <= 0: return 0
-
-  max_years = lookup_recovery_period(property_class, depreciation_system)
-  # MACRS tables have one extra year due to conventions
-  if recovery_year > max_years + 1: return 0
-
-  # Basis for regular MACRS = cost - bonus
-  depreciable_basis = cost_basis - bonus_depreciation
-
-  # Get depreciation rate from table
-  rate = lookup_macrs_rate(
-  property_class,
-  recovery_year,
-  convention,
-  quarter_placed_in_service,
-  month_placed_in_service
-  )
-
-  return depreciable_basis * rate
-
-# Total depreciation
-entity Asset
-period Year
-dtype Money
-unit "USD"
-label "MACRS Depreciation"
-description "Total depreciation deduction under Section 168"
-
-formula:
-  return bonus_depreciation + regular_macrs
-
-# Helper: Lookup recovery period
-
-function lookup_recovery_period(property_class, system):
-  if system == ads:
-    return ads_recovery_periods[property_class]
-  return recovery_periods[property_class]
-
-# Helper: Lookup MACRS depreciation rate
-
-function lookup_macrs_rate(property_class, year, convention, quarter, month):
-  # Real property uses mid-month
-  if property_class in [27_5_year, 39_year]:
-    return compute_real_property_rate(property_class, year, month)
-
-  # Personal property
-  if convention == mid_quarter and quarter > 0:
-    return macrs_table_mid_quarter[property_class][quarter][year - 1]
-  return macrs_table_half_year[property_class][year - 1] or 0
-
-# Helper: Compute real property depreciation rate
-
-function compute_real_property_rate(property_class, year, month):
-  recovery = recovery_periods[property_class]
-  annual_rate = 1 / recovery
-
-  if year == 1:
-    # Mid-month: placed in service at middle of month
-    full_months = months_per_year - month + mid_month_proration_factor
-    return annual_rate * (full_months / months_per_year)
-  if year == recovery + 1:
-    # Final year: remaining half-month
-    remaining_months = month - mid_month_proration_factor
-    return annual_rate * (remaining_months / months_per_year)
-  if year <= recovery:
-    return annual_rate
-  return 0
+text: """
+(a) GENERAL RULE.—Except as otherwise provided in this section, the
+depreciation deduction provided by section 167(a) for any tangible property
+shall be determined by using—
+(1) the applicable depreciation method,
+(2) the applicable recovery period, and
+(3) the applicable convention.
+"""
+variable depreciation:
+  imports:
+    - 26/168/parameters/macrs_table_half_year#macrs_table_half_year
+    - 26/168/parameters/macrs_table_mid_quarter#macrs_table_mid_quarter
+    - 26/168/parameters/recovery_periods#recovery_periods
+    - 26/168/parameters/bonus_depreciation_rate#bonus_depreciation_rate
+    - 26/168/parameters/ads_recovery_periods#ads_recovery_periods
+  entity: Asset
+  period: Year
+  dtype: Money
+  unit: "USD"
+  label: "MACRS Depreciation"
+  description: "Total depreciation deduction under Section 168"
+  formula: |
+    if current_year < year_placed_in_service: return 0  # Not yet placed in service
+    return current_year - year_placed_in_service + 1
+  default: 0

@@ -1,92 +1,47 @@
 # Title 42 USC 1396 - Medicaid (Grants to States for Medical Assistance Programs)
 #
-# Medicaid provides health coverage to low-income individuals through a
-# federal-state partnership. The Affordable Care Act (ACA) significantly
-# expanded Medicaid eligibility and standardized income methodology.
-#
-# Key statutory sections:
-# - 42 USC 1396a: State plan requirements (eligibility, coverage, administration)
-# - 42 USC 1396b: Federal matching payments (FMAP)
-# - 42 USC 1396d: Definition of medical assistance, ACA expansion
-# - 42 USC 1396o: Cost sharing (premiums, copayments, deductibles)
-# - 42 USC 1396u-1: Section 1931 parent/caretaker eligibility
-#
-# Eligibility pathways:
-# 1. MAGI-based (ACA): Children, pregnant women, parents, expansion adults
-# 2. Non-MAGI: SSI recipients, aged, blind, disabled, medically needy
-#
-# Reference: https://uscode.house.gov/view.xhtml?path=/prelim@title42/chapter7/subchapterXIX
-
-# =============================================================================
-# MAIN MEDICAID ELIGIBILITY
-# =============================================================================
-
-# Medicaid eligibility (all pathways)
 variable medicaid:
-  entity Person
-  period Month
-  dtype Boolean
-  label "Medicaid Eligible"
-  description "Eligible for Medicaid coverage under any pathway"
+  entity: Person
+  period: Month
+  dtype: Boolean
+  label: "Medicaid Eligible"
+  description: "Eligible for Medicaid coverage under any pathway"
+  formula: return medicaid_eligible
+  default: false
 
-  formula:
-    return medicaid_eligible
-
-  default false
-
-# CHIP eligibility (Children's Health Insurance Program)
 variable chip:
-  entity Person
-  period Month
-  dtype Boolean
-  label "CHIP Eligible"
-  description "Eligible for Children's Health Insurance Program"
+  entity: Person
+  period: Month
+  dtype: Boolean
+  label: "CHIP Eligible"
+  description: "Eligible for Children's Health Insurance Program"
+  formula: return chip_eligible
+  default: false
 
-  formula:
-    return chip_eligible
-
-  default false
-
-# Combined public coverage eligibility
 variable public_health_coverage_eligible:
-  entity Person
-  period Month
-  dtype Boolean
-  label "Public Health Coverage Eligible"
-  description "Eligible for Medicaid or CHIP"
+  entity: Person
+  period: Month
+  dtype: Boolean
+  label: "Public Health Coverage Eligible"
+  description: "Eligible for Medicaid or CHIP"
+  formula: return medicaid_eligible or chip_eligible
+  default: false
 
-  formula:
-    return medicaid_eligible or chip_eligible
-
-  default false
-
-# =============================================================================
-# MAGI INCOME (for Medicaid and ACA marketplace)
-# =============================================================================
-
-# Modified Adjusted Gross Income at household level
 variable household_magi:
-  entity Household
-  period Month
-  dtype Money
-  unit "USD"
-  label "Household MAGI"
-  description "Household Modified Adjusted Gross Income for Medicaid/ACA eligibility"
+  entity: Household
+  period: Month
+  dtype: Money
+  unit: "USD"
+  label: "Household MAGI"
+  description: "Household Modified Adjusted Gross Income for Medicaid/ACA eligibility"
+  formula: return magi_income
+  default: 0
 
-  formula:
-    return magi_income
-
-  default 0
-
-# MAGI as percentage of Federal Poverty Level
 variable household_magi_pct_fpl:
-  entity Household
-  period Month
-  dtype Rate
-  label "Household MAGI as % FPL"
-  description "Household MAGI income as percentage of Federal Poverty Level"
-
-  formula:
-    return magi_income_pct_fpl
-
-  default 0
+  entity: Household
+  period: Month
+  dtype: Rate
+  label: "Household MAGI as % FPL"
+  description: "Household MAGI income as percentage of Federal Poverty Level"
+  formula: return magi_income_pct_fpl
+  default: 0

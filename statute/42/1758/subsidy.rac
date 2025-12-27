@@ -1,190 +1,36 @@
 # 42 USC 1751 et seq. - School Meal Subsidy Calculation
 #
-# This file calculates the annual value of school meal subsidies
-# for the National School Lunch Program (NSLP) and School Breakfast
-# Program (SBP).
-#
-# The subsidy value depends on:
-# 1. Eligibility tier (Free, Reduced, Paid)
-# 2. Geographic location (Contiguous US, Alaska, Hawaii)
-# 3. Number of school days (typically 180/year)
-# 4. Number of children in school
-#
-# NSLP established: 42 USC 1751 (National School Lunch Act)
-# SBP established: 42 USC 1773 (School Breakfast Program)
-#
-# Reimbursement rates published annually by USDA FNS in Federal Register
-#
-# References:
-# - https://www.law.cornell.edu/uscode/text/42/1751
-# - https://www.law.cornell.edu/uscode/text/42/1773
-# - https://www.fns.usda.gov/cn/child-nutrition-programs-income-eligibility-guidelines
-
-# ------------------------------------------------------------------------------
-# school_meal_daily_subsidy
-# Daily reimbursement value per child based on tier and location
-# Combines NSLP (lunch) and SBP (breakfast) rates
-# ------------------------------------------------------------------------------
-
-entity Household
-period Year
-dtype Money
-label "School Meal Daily Subsidy"
-description "Daily reimbursement value per child based on tier and location"
-
-formula:
-  # Get state group and tier for rate lookup
-  state = household.state
-  tier = household.school_meal_tier
-  is_ak = state == "AK"
-  is_hi = state == "HI"
-  is_free = tier == FREE
-  is_reduced = tier == REDUCED
-
-  # Flattened lookup: state x tier combinations
-  if is_ak and is_free:
+variable subsidy:
+  entity: Household
+  period: Year
+  dtype: Money
+  label: "Reduced Price School Meals"
+  description: "Annual value of REDUCED-PRICE school meals for household"
+  formula: |
+    # Get state group and tier for rate lookup
+    state = household.state
+    tier = household.school_meal_tier
+    is_ak = state == "AK"
+    is_hi = state == "HI"
+    is_free = tier == FREE
+    is_reduced = tier == REDUCED
+    # Flattened lookup: state x tier combinations
+    if is_ak and is_free:
     return nslp.alaska.free + sbp.alaska.free
-  elif is_ak and is_reduced:
+    elif is_ak and is_reduced:
     return nslp.alaska.reduced + sbp.alaska.reduced
-  elif is_ak:
+    elif is_ak:
     return nslp.alaska.paid + sbp.alaska.paid
-  elif is_hi and is_free:
+    elif is_hi and is_free:
     return nslp.hawaii.free + sbp.hawaii.free
-  elif is_hi and is_reduced:
+    elif is_hi and is_reduced:
     return nslp.hawaii.reduced + sbp.hawaii.reduced
-  elif is_hi:
+    elif is_hi:
     return nslp.hawaii.paid + sbp.hawaii.paid
-  elif is_free:
+    elif is_free:
     return nslp.contiguous_us.free + sbp.contiguous_us.free
-  elif is_reduced:
+    elif is_reduced:
     return nslp.contiguous_us.reduced + sbp.contiguous_us.reduced
-  else:
+    else:
     return nslp.contiguous_us.paid + sbp.contiguous_us.paid
-
-default 0
-
-# ------------------------------------------------------------------------------
-# school_meal_paid_daily_subsidy
-# Daily reimbursement value for PAID tier (baseline)
-# Used to calculate NET subsidy (tier rate - paid rate)
-# ------------------------------------------------------------------------------
-
----
-
-entity Household
-period Year
-dtype Money
-label "School Meal Paid Daily Subsidy"
-description "Daily reimbursement value for PAID tier (baseline)"
-
-formula:
-  # Get state group for rate lookup
-  state = household.state
-
-  # Look up PAID tier rates - return sum directly
-  if state == "AK":
-    return nslp.alaska.paid + sbp.alaska.paid
-  elif state == "HI":
-    return nslp.hawaii.paid + sbp.hawaii.paid
-  else:
-    return nslp.contiguous_us.paid + sbp.contiguous_us.paid
-
-default 0
-
----
-
-# ------------------------------------------------------------------------------
-# school_meal_net_daily_subsidy
-# Net daily subsidy = tier subsidy - paid baseline
-# This is the additional value from being in free/reduced tier
-# ------------------------------------------------------------------------------
-
----
-
-entity Household
-period Year
-dtype Money
-label "School Meal Net Daily Subsidy"
-description "Net daily subsidy = tier subsidy - paid baseline"
-
-formula:
-  gross_subsidy = school_meal_daily_subsidy
-  paid_baseline = school_meal_paid_daily_subsidy
-
-  return max(gross_subsidy - paid_baseline, 0)
-
-default 0
-
-# ------------------------------------------------------------------------------
-# school_meal_annual_subsidy
-# Annual value of school meal subsidies for household
-# = (daily net subsidy) * (school days) * (number of K-12 children)
-# ------------------------------------------------------------------------------
-
----
-
-entity Household
-period Year
-dtype Money
-label "School Meal Annual Subsidy"
-description "Annual value of school meal subsidies for household"
-
-formula:
-  # Net daily subsidy per child
-  daily_subsidy = school_meal_net_daily_subsidy
-
-  # Number of school days per year
-  days = school_days
-
-  # Count children in K-12 school in household
-  children_in_school = sum(household.members.is_in_k12_school)
-
-  return daily_subsidy * days * children_in_school
-
-default 0
-
-# ------------------------------------------------------------------------------
-# free_school_meals
-# Annual value of FREE school meals for household
-# Only counts if household is in FREE tier
-# ------------------------------------------------------------------------------
-
----
-
-entity Household
-period Year
-dtype Money
-label "Free School Meals"
-description "Annual value of FREE school meals for household"
-
-formula:
-  tier = household.school_meal_tier
-  is_free = tier == FREE
-
-  if is_free:
-    return school_meal_annual_subsidy
-  else:
-    return 0
-
-# ------------------------------------------------------------------------------
-# reduced_price_school_meals
-# Annual value of REDUCED-PRICE school meals for household
-# Only counts if household is in REDUCED tier
-# ------------------------------------------------------------------------------
-
----
-
-entity Household
-period Year
-dtype Money
-label "Reduced Price School Meals"
-description "Annual value of REDUCED-PRICE school meals for household"
-
-formula:
-  tier = household.school_meal_tier
-  is_reduced = tier == REDUCED
-
-  if is_reduced:
-    return school_meal_annual_subsidy
-  else:
-    return 0
+  default: 0

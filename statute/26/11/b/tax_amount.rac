@@ -1,54 +1,29 @@
 # 26 USC Section 11(b) - Amount of Tax
 #
-# Post-TCJA (2018+):
-# "(b) Amount of tax.—The amount of the tax imposed by subsection (a) shall be
-# 21 percent of taxable income."
-#
-# Pre-TCJA (1993-2017): Graduated rates from 15% to 35% with "bubble" rates
-# to recapture benefits of lower brackets for high-income corporations.
 
-imports:
-  flat_rate: statute/26/11/parameters/flat_rate
-  graduated_brackets: statute/26/11/parameters/graduated_brackets
-  is_subject_to_corporate_tax: statute/26/11/a/is_subject_to_corporate_tax
-  tcja_effective_year: statute/26/11/parameters/tcja_effective_year
-
-entity Corporation
-period Year
-dtype Money
-unit "USD"
-label "Corporate Income Tax"
-description "Federal corporate income tax under 26 USC 11"
-
-formula:
-  # Only C corporations pay corporate income tax
-  if not is_subject_to_corporate_tax: return 0
-
-  # No tax on zero or negative income
-  if taxable_income <= 0: return 0
-
-  # Post-TCJA: flat 21% rate
-  if tax_year >= tcja_effective_year: return taxable_income * flat_rate
-
-  # Pre-TCJA: graduated rates with bubbles
-  return compute_graduated_tax(taxable_income, graduated_brackets)
-
-# Helper function for pre-TCJA graduated rate calculation
-
-function compute_graduated_tax(income, brackets):
-tax = 0
-remaining = income
-
-for i in 0..len(brackets) - 1 {
-bracket = brackets[i]
-next_threshold = if i < len(brackets) - 1 : brackets[i + 1].threshold else infinity
-
-bracket_income = min(remaining, next_threshold - bracket.threshold)
-if bracket_income > 0:
-tax = tax + (bracket_income * bracket.rate)
-remaining = remaining - bracket_income
-
-if remaining <= 0:
-break
-
-return tax
+text: """
+(b) Amount of tax.—The amount of the tax imposed by subsection (a) shall be
+21 percent of taxable income.
+Pre-TCJA (1993-2017): Graduated rates from 15% to 35% with "bubble" rates
+"""
+variable tax_amount:
+  imports:
+    - 26/11/parameters/flat_rate#flat_rate
+    - 26/11/parameters/graduated_brackets#graduated_brackets
+    - 26/11/a/is_subject_to_corporate_tax#is_subject_to_corporate_tax
+    - 26/11/parameters/tcja_effective_year#tcja_effective_year
+  entity: Corporation
+  period: Year
+  dtype: Money
+  unit: "USD"
+  label: "Corporate Income Tax"
+  description: "Federal corporate income tax under 26 USC 11"
+  formula: |
+    # Only C corporations pay corporate income tax
+    if not is_subject_to_corporate_tax: return 0
+    # No tax on zero or negative income
+    if taxable_income <= 0: return 0
+    # Post-TCJA: flat 21% rate
+    if tax_year >= tcja_effective_year: return taxable_income * flat_rate
+    # Pre-TCJA: graduated rates with bubbles
+    return compute_graduated_tax(taxable_income, graduated_brackets)

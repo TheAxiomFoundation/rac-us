@@ -1,64 +1,14 @@
 # 26 USC Section 422 - Incentive Stock Options
 #
-# Section 422(a) provides that if statutory holding period requirements are met,
-# no income is recognized when an ISO is exercised. However, Section 56(b)(3)
-# requires that the "bargain element" be included in AMTI.
-#
-# The bargain element is the excess of the fair market value of the stock at
-# the time of exercise over the exercise price paid.
 
-entity TaxUnit
-period Year
-dtype Money
-unit "USD"
-label "ISO Bargain Element"
-description "The spread between FMV at exercise and exercise price for incentive stock options exercised during the year"
-
-# This is an input variable - the actual bargain element is computed as:
-# (FMV at exercise date) - (Exercise price) for each ISO exercise
-#
-# For AMT purposes, this amount is added to taxable income when computing AMTI.
-# This adjustment only applies if:
-# 1. The employee exercised ISOs during the tax year
-# 2. The shares were held through the end of the tax year (no disqualifying disposition)
-#
-# If a disqualifying disposition occurs (sale before meeting 2-year grant / 1-year exercise
-# holding periods), the gain is taxed as ordinary income and no AMT adjustment is needed.
-
-default 0
-
-entity TaxUnit
-period Year
-dtype Money
-unit "USD"
-label "ISO Fair Market Value at Exercise"
-description "Fair market value of shares acquired through ISO exercise"
-
-# This is an input variable representing the total FMV of all shares
-# acquired through ISO exercises during the year.
-
-default 0
-
-entity TaxUnit
-period Year
-dtype Money
-unit "USD"
-label "ISO Exercise Price Paid"
-description "Total exercise price paid for ISO shares during the year"
-
-# This is an input variable representing the total amount paid to
-# exercise ISOs during the year.
-
-default 0
-
-entity TaxUnit
-period Year
-dtype Boolean
-label "ISO Shares Held at Year End"
-description "Whether ISO shares were held through the end of the tax year"
-
-# For the AMT adjustment to apply, the shares must be held through
-# year-end. A disqualifying disposition (sale before meeting holding
-# requirements) converts the gain to ordinary income instead.
-
-default true
+text: """
+requires that the "bargain element" be included in AMTI.
+"""
+variable iso_bargain_element:
+  entity: TaxUnit
+  period: Year
+  dtype: Boolean
+  unit: "USD"
+  label: "ISO Shares Held at Year End"
+  description: "Whether ISO shares were held through the end of the tax year"
+  default: true

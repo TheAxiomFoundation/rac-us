@@ -1,13 +1,14 @@
 # 26 USC § 61(a)(1) - Tips
 #
-# Gross income includes "compensation for services, including fees, commissions,
-# fringe benefits, and similar items." Tips are includible in gross income.
-# See also 26 USC § 6053 for tip reporting requirements.
 
-entity Person
-period Year
-dtype Money
-unit "USD"
-label "Tips"
-description "Gratuities received for services"
-# Input from CPS: included in WSAL_VAL or separately tracked
+text: """
+Gross income includes "compensation for services, including fees, commissions,
+fringe benefits, and similar items." Tips are includible in gross income.
+"""
+variable tips:
+  entity: Person
+  period: Year
+  dtype: Money
+  unit: "USD"
+  label: "Tips"
+  description: "Gratuities received for services"

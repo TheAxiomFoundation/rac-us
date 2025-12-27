@@ -1,148 +1,41 @@
 # 26 USC 170(b) - Percentage Limitations
 #
-# "(1) Individuals.-- In the case of an individual, the deduction provided
-#      in subsection (a) shall be limited as provided in the succeeding
-#      subparagraphs.
-#
-#  (A) General rule.-- Any charitable contribution to--
-#      (i) a church or a convention or association of churches,
-#      (ii) an educational organization...
-#      [public charities, 50%/60% limit organizations]
-#      shall be allowed to the extent that the aggregate of such contributions
-#      does not exceed 50 percent [60% under TCJA] of the taxpayer's
-#      contribution base for the taxable year.
-#
-#  (B) [30% organizations - private non-operating foundations]
-#
-#  (C) Special limitation with respect to contributions... of certain
-#      capital gain property.-- [30% limit for property to 50% orgs]
-#
-#  (D) Special limitation with respect to contributions of capital gain
-#      property to organizations not described in subparagraph (A).--
-#      [20% limit for property to 30% orgs]"
 
-imports:
-  adjusted_gross_income: statute/26/62/a/adjusted_gross_income
-
-# Input amounts
-  cash_contributions_public_charity: inputs/charitable_cash_public_charity
-  cash_contributions_private_foundation: inputs/charitable_cash_private_foundation
-  property_contributions_public_charity: inputs/charitable_property_public_charity
-  property_contributions_private_foundation: inputs/charitable_property_private_foundation
-
-# Carryforwards
-  carryforward_prior: inputs/charitable_carryforward_prior
-
-parameters:
-  p: statute/26/170/parameters/percentage_limits
-  cf: statute/26/170/parameters/carryforward
-
-entity TaxUnit
-period Year
-dtype Money
-unit "USD"
-label "Charitable Contribution AGI Limit"
-description "Maximum charitable deduction based on AGI per 26 USC 170(b)(1)"
-
-formula:
-  # Contribution base is generally AGI for individuals
-  agi = adjusted_gross_income
-
-  # Calculate limits for each category
-  cash_public_limit = agi * p.cash_to_public_charity
-  property_public_limit = agi * p.property_to_public_charity
-  cash_private_limit = agi * p.cash_to_private_foundation
-  property_private_limit = agi * p.property_to_private_foundation
-
-  # Overall limit
-  overall = agi * p.overall_limit
-
-  return overall
-
-default 0
-
-entity TaxUnit
-period Year
-dtype Money
-unit "USD"
-label "Charitable Deduction (Current Year)"
-description "Deductible charitable contributions before carryforward per 26 USC 170(b)"
-
-formula:
-  agi = adjusted_gross_income
-
-  # Step 1: Cash to public charities (60% limit under TCJA)
-  cash_public_limit = agi * p.cash_to_public_charity
-  cash_public_deduction = min(cash_contributions_public_charity, cash_public_limit)
-  remaining_after_cash = cash_public_limit - cash_public_deduction
-
-  # Step 2: Property to public charities (30% limit)
-  property_public_limit = agi * p.property_to_public_charity
-  property_public_deduction = min(property_contributions_public_charity, property_public_limit)
-
-  # Step 3: Cash to private foundations (30% limit)
-  cash_private_limit = agi * p.cash_to_private_foundation
-  cash_private_deduction = min(cash_contributions_private_foundation, cash_private_limit)
-
-  # Step 4: Property to private foundations (20% limit)
-  property_private_limit = agi * p.property_to_private_foundation
-  property_private_deduction = min(property_contributions_private_foundation, property_private_limit)
-
-  # Sum all deductions (subject to overall limit)
-  total = cash_public_deduction + property_public_deduction +
-  cash_private_deduction + property_private_deduction
-
-  # Apply overall limit
-  overall_limit = agi * p.overall_limit
-
-  return min(total, overall_limit)
-
-default 0
-
-entity TaxUnit
-period Year
-dtype Money
-unit "USD"
-label "Charitable Carryforward Used"
-description "Prior year carryforward applied this year per 26 USC 170(d)"
-
-formula:
-  agi = adjusted_gross_income
-  overall_limit = agi * p.overall_limit
-
-  # Current year deduction
-  current_deduction = charitable_deduction_before_carryforward
-
-  # Remaining capacity after current year
-  remaining_capacity = max(0, overall_limit - current_deduction)
-
-  # Carryforward used is limited by remaining capacity
-  return min(carryforward_prior, remaining_capacity)
-
-default 0
-
-entity TaxUnit
-period Year
-dtype Money
-unit "USD"
-label "Charitable Contribution Carryforward"
-description "Excess contributions to carry forward per 26 USC 170(d)(1)"
-
-formula:
-  agi = adjusted_gross_income
-  overall_limit = agi * p.overall_limit
-
-  # Total contributions
-  total_contributions = cash_contributions_public_charity +
-  property_contributions_public_charity +
-  cash_contributions_private_foundation +
-  property_contributions_private_foundation +
-  carryforward_prior
-
-  # Deduction taken
-  deduction = charitable_deduction_before_carryforward + charitable_carryforward_used
-
-  # Excess carries forward (up to 5 years - not tracked at variable level)
-  return max(0, total_contributions - deduction)
-
-default 0
+text: """
+(1) Individuals.-- In the case of an individual, the deduction provided
+in subsection (a) shall be limited as provided in the succeeding
+subparagraphs.
+(A) General rule.-- Any charitable contribution to--
+(i) a church or a convention or association of churches,
+(ii) an educational organization...
+[public charities, 50%/60% limit organizations]
+shall be allowed to the extent that the aggregate of such contributions
+does not exceed 50 percent [60% under TCJA] of the taxpayer's
+contribution base for the taxable year.
+(B) [30% organizations - private non-operating foundations]
+(C) Special limitation with respect to contributions... of certain
+capital gain property.-- [30% limit for property to 50% orgs]
+(D) Special limitation with respect to contributions of capital gain
+property to organizations not described in subparagraph (A).--
+[20% limit for property to 30% orgs]
+"""
+variable percentage_limitations:
+  imports: [26/62/a/adjusted_gross_income#adjusted_gross_income]
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: "USD"
+  label: "Charitable Contribution Carryforward"
+  description: "Excess contributions to carry forward per 26 USC 170(d)(1)"
+  formula: |
+    # Contribution base is generally AGI for individuals
+    agi = adjusted_gross_income
+    # Calculate limits for each category
+    cash_public_limit = agi * p.cash_to_public_charity
+    property_public_limit = agi * p.property_to_public_charity
+    cash_private_limit = agi * p.cash_to_private_foundation
+    property_private_limit = agi * p.property_to_private_foundation
+    # Overall limit
+    overall = agi * p.overall_limit
+    return overall
+  default: 0

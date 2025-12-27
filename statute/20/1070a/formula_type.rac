@@ -1,35 +1,26 @@
 # 20 USC 1070a - Pell Grant Formula Type
 #
-# Determines which EFC formula applies based on dependency and parental status:
-# - Formula A: Dependent student (parents contribute)
-# - Formula B: Independent student without dependents other than spouse
-# - Formula C: Independent student with dependents other than spouse
-
-imports:
-  is_tax_unit_dependent: statute/26/152/dependent_status
-  has_dependents: statute/26/151/has_dependents
-  is_tax_unit_head: statute/26/1/filing_status#is_tax_unit_head
-  is_tax_unit_spouse: statute/26/1/filing_status#is_tax_unit_spouse
-
-entity Person
-period Year
-dtype Enum["A", "B", "C"]
-label "Pell Grant Formula Type"
-description "EFC formula type based on dependency status per THE EFC FORMULA guide"
-
-formula:
-  # For Pell purposes:
-  # A = Dependent student (uses parent financials)
-  # B = Independent without dependents (single independent)
-  # C = Independent with dependents (independent parent/supporting family)
-
-  is_head_or_spouse = is_tax_unit_head | is_tax_unit_spouse
-  unit_has_dependents = has_dependents
-
-  # Determine formula type
-  if unit_has_dependents and (not is_head_or_spouse): return A
-  if (not unit_has_dependents) and is_head_or_spouse: return B
-  # Independent with dependents = Formula C
-  return C
-
-default A
+variable formula_type:
+  imports:
+    - 26/152/dependent_status#is_tax_unit_dependent
+    - 26/151/has_dependents#has_dependents
+    - 26/1/filing_status#is_tax_unit_head
+    - 26/1/filing_status#is_tax_unit_spouse
+  entity: Person
+  period: Year
+  dtype: Enum["A",
+  label: "Pell Grant Formula Type"
+  description: "EFC formula type based on dependency status per THE EFC FORMULA guide"
+  formula: |
+    # For Pell purposes:
+    # A = Dependent student (uses parent financials)
+    # B = Independent without dependents (single independent)
+    # C = Independent with dependents (independent parent/supporting family)
+    is_head_or_spouse = is_tax_unit_head | is_tax_unit_spouse
+    unit_has_dependents = has_dependents
+    # Determine formula type
+    if unit_has_dependents and (not is_head_or_spouse): return A
+    if (not unit_has_dependents) and is_head_or_spouse: return B
+    # Independent with dependents = Formula C
+    return C
+  default: A

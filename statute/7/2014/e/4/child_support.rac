@@ -1,25 +1,18 @@
 # 7 USC Section 2014(e)(4) - Child Support Deduction
 #
-# "(4) legally obligated and actually paid child support payments"
-#
-# Deduction for child support payments made by a household member
-# to a child not living in the household. Must be legally obligated
-# (e.g., court order) and actually paid during the month.
-#
-# Reference: https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title7-section2014
 
-# Child support deduction
+text: """
+(4) legally obligated and actually paid child support payments
+"""
 variable snap_child_support_deduction:
-  entity Household
-  period Month
-  dtype Money
-  unit "USD"
-  label "SNAP Child Support Deduction"
-  description "Deduction for legally obligated child support payments actually made"
-
-  formula:
+  entity: Household
+  period: Month
+  dtype: Money
+  unit: "USD"
+  label: "SNAP Child Support Deduction"
+  description: "Deduction for legally obligated child support payments actually made"
+  formula: |
     # Section 2014(e)(4): Legally obligated child support payments actually made
     # No cap on this deduction
     return child_support_paid
-
-  default 0
+  default: 0

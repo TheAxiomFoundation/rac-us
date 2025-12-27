@@ -1,39 +1,31 @@
 # Simplified EFC Formula Eligibility
 #
-# Families with income below threshold who receive certain means-tested
-# benefits may use simplified formula (assets excluded).
-
-imports:
-  adjusted_gross_income: statute/26/62/a/adjusted_gross_income
-  receives_ssi: statute/42/1382/receives_ssi
-  receives_snap: statute/7/2013/receives_snap
-  receives_tanf: statute/42/601/receives_tanf
-  receives_free_lunch: statute/42/1758/receives_free_lunch
-  receives_medicaid: statute/42/1396/receives_medicaid
-  simplified_params: statute/20/1070a/parameters#efc.simplified
-
-entity Person
-period Year
-dtype Boolean
-label "Simplified EFC Formula Applies"
-description "Whether family qualifies for simplified EFC formula (assets excluded)"
-
-formula:
-  # Income eligibility
-  income_eligible = adjusted_gross_income < simplified_params.income_limit
-
-  # Benefit receipt (any qualifying benefit)
-  receives_benefits = (
+variable simplified_applies:
+  imports:
+    - 26/62/a/adjusted_gross_income#adjusted_gross_income
+    - 42/1382/receives_ssi#receives_ssi
+    - 7/2013/receives_snap#receives_snap
+    - 42/601/receives_tanf#receives_tanf
+    - 42/1758/receives_free_lunch#receives_free_lunch
+    - 42/1396/receives_medicaid#receives_medicaid
+    - 20/1070a/parameters#efc.simplified#simplified_params
+  entity: Person
+  period: Year
+  dtype: Boolean
+  label: "Simplified EFC Formula Applies"
+  description: "Whether family qualifies for simplified EFC formula (assets excluded)"
+  formula: |
+    # Income eligibility
+    income_eligible = adjusted_gross_income < simplified_params.income_limit
+    # Benefit receipt (any qualifying benefit)
+    receives_benefits = (
     receives_ssi |
     receives_snap |
     receives_tanf |
     receives_free_lunch |
     receives_medicaid
-  )
-
-  # Formula availability (phased out 2024+)
-  formula_available = simplified_params.applies
-
-  return income_eligible & receives_benefits & formula_available
-
-default false
+    )
+    # Formula availability (phased out 2024+)
+    formula_available = simplified_params.applies
+    return income_eligible & receives_benefits & formula_available
+  default: false

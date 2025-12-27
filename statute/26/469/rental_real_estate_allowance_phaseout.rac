@@ -1,20 +1,16 @@
 # Phaseout Reduction - Section 469(i)(3)(A)
-
-imports:
-  adjusted_gross_income: statute/26/62/a/adjusted_gross_income
-  rental_real_estate_phaseout_threshold: statute/26/469/rental_real_estate_phaseout_threshold
-  phaseout_rate: parameters#rental_real_estate.phaseout_rate
-
-entity TaxUnit
-period Year
-dtype Money
-unit "USD"
-label "Rental Real Estate Allowance Phaseout"
-description "Reduction in allowance due to AGI phaseout per 26 USC 469(i)(3)"
-
-formula:
-  # Per 469(i)(3)(A): Reduce by 50% of AGI over threshold
-  excess_agi = max(0, adjusted_gross_income - rental_real_estate_phaseout_threshold)
-  return excess_agi * phaseout_rate
-
-default 0
+variable rental_real_estate_allowance_phaseout:
+  imports:
+    - 26/62/a/adjusted_gross_income#adjusted_gross_income
+    - 26/469/rental_real_estate_phaseout_threshold#rental_real_estate_phaseout_threshold
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: "USD"
+  label: "Rental Real Estate Allowance Phaseout"
+  description: "Reduction in allowance due to AGI phaseout per 26 USC 469(i)(3)"
+  formula: |
+    # Per 469(i)(3)(A): Reduce by 50% of AGI over threshold
+    excess_agi = max(0, adjusted_gross_income - rental_real_estate_phaseout_threshold)
+    return excess_agi * phaseout_rate
+  default: 0

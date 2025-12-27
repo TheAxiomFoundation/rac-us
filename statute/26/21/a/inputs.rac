@@ -1,15 +1,10 @@
 # 26 USC 21 - Input Variables
 #
-# Employment-related expenses paid by the taxpayer during the taxable year.
-# These are expenses for the care of a qualifying individual that enable the
-# taxpayer to be gainfully employed.
-
-entity TaxUnit
-period Year
-dtype Money
-unit "USD"
-label "CDCC Expenses Paid"
-description "Employment-related child/dependent care expenses paid during the year"
-
-# Input variable - no formula
-default 0
+variable inputs:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: "USD"
+  label: "CDCC Expenses Paid"
+  description: "Employment-related child/dependent care expenses paid during the year"
+  default: 0

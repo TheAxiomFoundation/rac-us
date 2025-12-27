@@ -1,88 +1,31 @@
 # 26 USC 3101(b)(2) - Additional Medicare Tax
 #
-# "(2) Additional tax -
-# In addition to the tax imposed by paragraph (1), there is hereby imposed
-# on the income of every individual a tax equal to 0.9 percent of so much
-# of the wages (as defined in section 3121(a)) received by him with respect
-# to employment (as defined in section 3121(b)) during any calendar year as
-# exceeds -
-#   (A) in the case of a joint return, $250,000,
-#   (B) in the case of a married individual (as defined in section 7703)
-#       filing a separate return, $125,000, and
-#   (C) in any other case, $200,000."
-#
-# Key features:
-# - Rate: 0.9% on wages ABOVE threshold (in addition to base 1.45%)
-# - Thresholds are NOT indexed for inflation
-# - Only employee pays this; employer does NOT pay additional Medicare
-# - Also applies to self-employment income per 26 USC 1401(b)(2)
-# - Enacted by Affordable Care Act (2010), effective 2013
 
-# Filing status values per 26 USC 1
-enum FilingStatus:
-SINGLE
-JOINT
-SEPARATE
-HEAD_OF_HOUSEHOLD
-SURVIVING_SPOUSE
-
-imports:
-# Wages subject to Medicare tax per 3121(a)
-  irs_employment_income: statute/26/3121/a/irs_employment_income
-
-# Taxable self-employment income per 1401(b)(2)
-  taxable_self_employment_income: statute/26/1401/taxable_self_employment_income
-
-# Filing status for threshold determination
-  filing_status: statute/26/1/filing_status
-
-parameters:
-# Load rates and thresholds from parameters.yaml
-  additional_rate: statute/26/3101/parameters.yaml#additional_rate
-  threshold_joint: statute/26/3101/parameters.yaml#additional_threshold_joint
-  threshold_separate: statute/26/3101/parameters.yaml#additional_threshold_separate
-  threshold_single: statute/26/3101/parameters.yaml#additional_threshold_single
-
-# Combined wages and SE income for Additional Medicare Tax
-entity TaxUnit
-period Year
-dtype Money
-unit "USD"
-label "Medicare Wages"
-description "Combined wages and SE income subject to Additional Medicare Tax"
-
-formula:
-  # Both wages and self-employment income are subject to the tax
-  total_wages = sum(members, irs_employment_income)
-  total_se = sum(members, taxable_self_employment_income)
-
-  return total_wages + total_se
-
-# Filing-status-based threshold
-entity TaxUnit
-period Year
-dtype Money
-unit "USD"
-label "Additional Medicare Tax Threshold"
-description "Income threshold for Additional Medicare Tax based on filing status"
-
-formula:
-  # (A) Joint return = $250k
-  # (B) Married filing separately = $125k
-  # (C) Any other case = $200k (Single, HOH, Surviving Spouse)
-  if filing_status == JOINT: return threshold_joint
-  if filing_status == SEPARATE: return threshold_separate
-  return threshold_single
-
-entity TaxUnit
-period Year
-dtype Money
-unit "USD"
-label "Additional Medicare Tax"
-description "0.9% additional Medicare tax on wages above threshold per 26 USC 3101(b)(2)"
-
-formula:
-  # Tax applies only to wages exceeding threshold
-  excess_wages = max(0, medicare_wages - additional_medicare_tax_threshold)
-
-  return additional_rate * excess_wages
+text: """
+(2) Additional tax -
+In addition to the tax imposed by paragraph (1), there is hereby imposed
+on the income of every individual a tax equal to 0.9 percent of so much
+of the wages (as defined in section 3121(a)) received by him with respect
+to employment (as defined in section 3121(b)) during any calendar year as
+exceeds -
+(A) in the case of a joint return, $250,000,
+(B) in the case of a married individual (as defined in section 7703)
+filing a separate return, $125,000, and
+(C) in any other case, $200,000.
+"""
+variable additional_medicare_tax:
+  imports:
+    - 26/3121/a/irs_employment_income#irs_employment_income
+    - 26/1401/taxable_self_employment_income#taxable_self_employment_income
+    - 26/1/filing_status#filing_status
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: "USD"
+  label: "Additional Medicare Tax"
+  description: "0.9% additional Medicare tax on wages above threshold per 26 USC 3101(b)(2)"
+  formula: |
+    # Both wages and self-employment income are subject to the tax
+    total_wages = sum(members, irs_employment_income)
+    total_se = sum(members, taxable_self_employment_income)
+    return total_wages + total_se

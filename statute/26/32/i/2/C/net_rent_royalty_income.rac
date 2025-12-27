@@ -1,24 +1,15 @@
 # 26 USC §32(i)(2)(C) - Net Rent and Royalty Income
 #
-# "The term 'disqualified income' means—
-#   (C) the net income or loss from rents or royalties which is not derived
-#       in the ordinary course of a trade or business"
-#
-# This includes passive rental income (e.g., from rental properties where
-# the taxpayer is not actively involved in the business) and royalty income
-# (e.g., from mineral rights, patents, copyrights).
-#
-# If the taxpayer is a real estate professional or otherwise derives rental
-# income in the ordinary course of business, that income is excluded from
-# disqualified income.
 
-entity TaxUnit
-period Year
-dtype Money
-unit "USD"
-label "Net Rent and Royalty Income"
-description "Passive rental and royalty income not from trade or business, counted for EITC investment income test per 26 USC §32(i)(2)(C)"
-
-# Input: Net income (or zero if net loss) from rents and royalties
-# reported on Schedule E that are not from active trade or business.
-# Losses cannot reduce other disqualified income.
+text: """
+The term 'disqualified income' means—
+(C) the net income or loss from rents or royalties which is not derived
+in the ordinary course of a trade or business
+"""
+variable net_rent_royalty_income:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: "USD"
+  label: "Net Rent and Royalty Income"
+  description: "Passive rental and royalty income not from trade or business, counted for EITC investment income test per 26 USC §32(i)(2)(C)"
