@@ -1,0 +1,94 @@
+text: """Earned Income Tax Credit (EITC) computation"""
+
+# Enum for filing status
+enum filing_status_enum:
+  values: ["single", "joint", "head_of_household", "married_separate"]
+
+# Parameters for key EITC thresholds (2023 values)
+parameter max_credit_with_children:
+  description: "Maximum EITC for taxpayers with qualifying children"
+  unit: USD
+  values:
+    2023-01-01: 7430
+
+parameter max_credit_no_children:
+  description: "Maximum EITC for taxpayers without qualifying children"
+  unit: USD
+  values:
+    2023-01-01: 560
+
+parameter phaseout_start_single:
+  description: "Income level where EITC starts phasing out for single filers"
+  unit: USD
+  values:
+    2023-01-01: 21560
+
+parameter phaseout_start_joint:
+  description: "Income level where EITC starts phasing out for joint filers"
+  unit: USD
+  values:
+    2023-01-01: 27220
+
+parameter phaseout_end_single:
+  description: "Income level where EITC fully phases out for single filers"
+  unit: USD
+  values:
+    2023-01-01: 53070
+
+parameter phaseout_end_joint:
+  description: "Income level where EITC fully phases out for joint filers"
+  unit: USD
+  values:
+    2023-01-01: 59760
+
+# Inputs needed for EITC calculation
+input earned_income:
+  description: "Taxpayer's earned income"
+  type: float
+  unit: USD
+
+input filing_status:
+  description: "Taxpayer's filing status"
+  type: filing_status_enum
+
+input num_children:
+  description: "Number of qualifying children"
+  type: integer
+
+# Core EITC calculation variable
+variable eitc:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  formula: |
+    # Determine max credit based on number of children
+    max_credit = (
+        max_credit_with_children if num_children > 0 
+        else max_credit_no_children
+    )
+    
+    # Determine phaseout start and end based on filing status
+    if filing_status == "joint":
+        phaseout_start = phaseout_start_joint
+        phaseout_end = phaseout_end_joint
+    else:
+        phaseout_start = phaseout_start_single
+        phaseout_end = phaseout_end_single
+    
+    # If earned income is below phaseout start, calculate credit
+    if earned_income <= phaseout_start:
+        credit = max_credit * (earned_income / phaseout_start)
+        return round(credit)
+    
+    # If earned income is between phaseout start and end, 
+    # gradually reduce credit
+    if phaseout_start < earned_income and earned_income <= phaseout_end:
+        credit_reduction = max_credit * (
+            (earned_income - phaseout_start) / 
+            (phaseout_end - phaseout_start)
+        )
+        credit = max_credit - credit_reduction
+        return round(max(0, credit))
+    
+    # If earned income is above phaseout end, no credit
+    return 0
