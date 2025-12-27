@@ -1,0 +1,42 @@
+# 26 USC 21 - Child and Dependent Care Credit
+#
+
+text: """
+(a) ALLOWANCE OF CREDIT. --
+(1) IN GENERAL. -- In the case of an individual who maintains a household which
+includes as a member one or more qualifying individuals (as defined in
+subsection (b)(1)), there shall be allowed as a credit against the tax
+imposed by this chapter for the taxable year an amount equal to the
+applicable percentage of the employment-related expenses (as defined in
+subsection (b)(2)) paid by such individual during the taxable year.
+"""
+variable child_dependent_care_credit:
+  imports:
+    - 26/21/e#num_cdcc_qualifying_individuals
+    - 26/21/b#cdcc_applicable_percentage
+    - 26/21/c#cdcc_maximum_expense_limit
+    - 26/21/d#cdcc_earned_income_limit
+    - 26/21/a#cdcc_expenses_paid
+    - 26/26/a#tax_liability_before_credits
+    - 26/21/a/refundability#is_refundable
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: "USD"
+  label: "Child and Dependent Care Credit"
+  description: "Credit for employment-related expenses for care of qualifying individuals per 26 USC 21"
+  formula: |
+    # No qualifying individuals = no credit
+    if num_cdcc_qualifying_individuals == 0: return 0
+    # Apply all limitations: actual expenses, statutory limit, earned income limit
+    return min(cdcc_expenses_paid, cdcc_maximum_expense_limit, cdcc_earned_income_limit)
+  default: 0
+
+variable inputs:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: "USD"
+  label: "CDCC Expenses Paid"
+  description: "Employment-related child/dependent care expenses paid during the year"
+  default: 0

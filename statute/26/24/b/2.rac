@@ -1,14 +1,20 @@
-# 26 USC § 24(b)(2) - CTC Phaseout Rate
+# 26 USC § 24(b)(2) - Reduction of Credit
 #
-# Reference: IRC Section 24(b)(1)
 
 text: """
-The credit is reduced by $50 for each $1,000 (or fraction thereof) by which
-MAGI exceeds the threshold.
+The credit allowable... shall be reduced by $50 for each $1,000
+(or fraction thereof) by which the taxpayer's modified adjusted
+gross income exceeds the threshold amount.
 """
-
-parameter phaseout_rate:
-  description: "CTC phaseout amount per $1,000 over threshold"
-  unit: USD
-  values:
-    1998-01-01: 50
+variable phaseout:
+  imports:
+    - 26/24/b/1/phaseout_threshold_joint#phaseout_threshold_joint
+    - 26/24/b/1/phaseout_threshold_single#phaseout_threshold_single
+    - 26/24/b/2/phaseout_rate#phaseout_rate
+    - 26/24/ctc_phaseout_increment#phaseout_increment
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  formula: |
+    if filing_status == JOINT: return phaseout_threshold_joint
+    return phaseout_threshold_single

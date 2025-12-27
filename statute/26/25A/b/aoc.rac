@@ -22,8 +22,8 @@ variable aoc:
     - 26/25A/d/phaseout_parameters#aoc_phaseout_range_single as phaseout_range_single
     - 26/25A/d/phaseout_parameters#aoc_phaseout_range_joint as phaseout_range_joint
     - 26/25A/i/refundable_parameters#aoc_refundable_rate as refundable_rate
-    - 26/1/filing_status#filing_status
-    - 26/62/a/adjusted_gross_income#adjusted_gross_income
+    - 26/1#filing_status
+    - 26/62/a#adjusted_gross_income
   entity: TaxUnit
   period: Year
   dtype: Money

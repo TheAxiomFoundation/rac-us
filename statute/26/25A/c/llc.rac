@@ -16,8 +16,8 @@ variable llc:
     - 26/25A/d/phaseout_parameters#llc_phaseout_start_joint as phaseout_start_joint
     - 26/25A/d/phaseout_parameters#llc_phaseout_range_single as phaseout_range_single
     - 26/25A/d/phaseout_parameters#llc_phaseout_range_joint as phaseout_range_joint
-    - 26/1/filing_status#filing_status
-    - 26/62/a/adjusted_gross_income#adjusted_gross_income
+    - 26/1#filing_status
+    - 26/62/a#adjusted_gross_income
   entity: TaxUnit
   period: Year
   dtype: Money

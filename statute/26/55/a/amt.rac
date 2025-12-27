@@ -9,10 +9,10 @@ subtitle) a tax equal to the excess (if any) of—
 """
 variable amt:
   imports:
-    - 26/55/b/2/amti#alternative_minimum_taxable_income as amti
-    - 26/1/income_tax#income_tax_before_credits as regular_tax
-    - 26/1/filing_status#filing_status
-    - 26/59/special_rules#amt_foreign_tax_credit
+    - 26/55/b/2#alternative_minimum_taxable_income as amti
+    - 26/1#income_tax_before_credits as regular_tax
+    - 26/1#filing_status
+    - 26/59#amt_foreign_tax_credit
   entity: TaxUnit
   period: Year
   dtype: Money

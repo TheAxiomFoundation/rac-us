@@ -1,8 +1,0 @@
-# 26 USC § 1 - Filing Status
-#
-variable filing_status:
-  entity: TaxUnit
-  period: Year
-  dtype: Enum(FilingStatus)
-  label: "Filing Status"
-  description: "Tax filing status determining applicable rate schedule"
