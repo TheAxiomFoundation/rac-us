@@ -23,11 +23,13 @@ ALLOWED_ATTRIBUTES = {
     "parameters",
     "exports",
     "examples",
+    "tests",
     # Multi-variable file constructs (followed by identifier)
     "variable",
     "input",
     "enum",
     "values",
+    "parameter",  # Named parameter declaration
     # Helper functions (followed by identifier)
     "function",
     # Raw statute text
@@ -40,9 +42,64 @@ CODE_KEYWORDS = {
     "and", "or", "not", "in",
 }
 
+def validate_filename(filepath: Path) -> list[str]:
+    """Validate filename matches citation pattern.
+
+    Valid: statute/26/32/a/1.rac -> 26 USC 32(a)(1)
+    Invalid: statute/26/32/eitc.rac (descriptive name, not citation)
+    """
+    errors = []
+
+    # Get path relative to statute/
+    try:
+        rel_path = filepath.relative_to(filepath.parent.parent.parent.parent / "statute")
+    except ValueError:
+        return errors  # Not under statute/
+
+    parts = rel_path.parts
+
+    # First part should be title number
+    if not parts[0].isdigit():
+        errors.append(f"{filepath}: first directory must be title number, got '{parts[0]}'")
+        return errors
+
+    # Filename (without .rac) should be a valid subsection identifier
+    filename = filepath.stem
+
+    # Valid: single letter (a-z), single digit (1-9), roman numeral (i, ii, iii, iv, v)
+    valid_patterns = [
+        r'^[a-z]$',           # Single letter: a, b, c
+        r'^[1-9][0-9]*$',     # Number: 1, 2, 10
+        r'^[ivxlcdm]+$',      # Roman numeral: i, ii, iii, iv
+        r'^[A-Z]$',           # Capital letter: A, B, C
+    ]
+
+    import re
+    is_valid = any(re.match(p, filename) for p in valid_patterns)
+
+    if not is_valid:
+        # Check if it's a descriptive name (invalid)
+        if filename.lower() in ['eitc', 'ctc', 'snap', 'standard_deduction', 'agi']:
+            errors.append(
+                f"{filepath}: filename must be citation identifier, not descriptive name. "
+                f"Use the subsection letter/number instead of '{filename}'"
+            )
+        elif len(filename) > 3 and not filename.isdigit():
+            errors.append(
+                f"{filepath}: filename '{filename}' doesn't look like a citation identifier. "
+                f"Expected letter (a-z), number (1-9), or roman numeral (i, ii, iii)"
+            )
+
+    return errors
+
+
 def validate_file(filepath: Path) -> list[str]:
     """Validate a single .rac file."""
     errors = []
+
+    # Check filename first
+    errors.extend(validate_filename(filepath))
+
     content = filepath.read_text()
     lines = content.split('\n')
 
