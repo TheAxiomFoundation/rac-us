@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Complete .rac Format with Versioning</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      background: #0a0a0f;
+      color: #e0e0e0;
+      line-height: 1.5;
+      padding: 30px;
+    }
+    h1 { color: #00d4ff; margin-bottom: 10px; font-size: 22px; }
+    .subtitle { color: #888; margin-bottom: 25px; font-size: 13px; }
+
+    .tabs { display: flex; gap: 5px; margin-bottom: 0; }
+    .tab {
+      padding: 12px 24px;
+      background: #1a1a2a;
+      border: 1px solid #2a2a3a;
+      border-bottom: none;
+      border-radius: 8px 8px 0 0;
+      cursor: pointer;
+      color: #888;
+      font-size: 13px;
+    }
+    .tab:hover { background: #2a2a3a; color: #fff; }
+    .tab.active { background: #12121a; border-color: #00d4ff; color: #00d4ff; }
+
+    .panel {
+      display: none;
+      background: #12121a;
+      border: 1px solid #2a2a3a;
+      border-radius: 0 8px 8px 8px;
+      padding: 20px;
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+    .panel.active { display: block; }
+
+    pre {
+      font-size: 11px;
+      line-height: 1.4;
+      white-space: pre;
+    }
+    .c { color: #5a5a6a; }
+    .k { color: #ff6b9d; }
+    .s { color: #a8ff60; }
+    .n { color: #ffcc00; }
+    .p { color: #00d4ff; }
+    .v { color: #ff9d00; }
+
+    .section-header {
+      background: #1a1a2a;
+      padding: 8px 12px;
+      margin: 15px -20px;
+      margin-top: 20px;
+      color: #00d4ff;
+      font-size: 12px;
+      border-left: 3px solid #00d4ff;
+      cursor: pointer;
+      user-select: none;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .section-header:hover { background: #252535; }
+    .section-header:first-of-type { margin-top: 0; }
+    .section-header::after {
+      content: '▼';
+      font-size: 10px;
+      transition: transform 0.2s;
+    }
+    .section-header.collapsed::after {
+      transform: rotate(-90deg);
+    }
+    .section-content {
+      overflow: hidden;
+      transition: max-height 0.3s ease-out;
+    }
+    .section-content.collapsed {
+      max-height: 0 !important;
+    }
+
+    .note {
+      background: #1a1a0a;
+      border: 1px solid #3a3a1a;
+      padding: 10px;
+      margin: 15px 0;
+      font-size: 11px;
+      border-radius: 4px;
+    }
+    .note strong { color: #ffaa00; }
+
+    .controls {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+    .controls button {
+      background: #2a2a3a;
+      border: 1px solid #3a3a4a;
+      color: #00d4ff;
+      padding: 6px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 11px;
+      font-family: inherit;
+    }
+    .controls button:hover {
+      background: #3a3a4a;
+    }
+    .controls .hint {
+      color: #666;
+      font-size: 11px;
+      margin-left: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Complete Self-Contained .rac with Versioning</h1>
+  <p class="subtitle">statute/26/24/d/1/B.rac - Additional Child Tax Credit (showing all eras)</p>
+
+  <div class="controls">
+    <button onclick="expandAll()">Expand All</button>
+    <button onclick="collapseAll()">Collapse All</button>
+    <span class="hint">Click section headers to toggle</span>
+  </div>
+
+  <div class="tabs">
+    <div class="tab active" onclick="showTab(0)">Option B: Date-keyed versions</div>
+    <div class="tab" onclick="showTab(1)">Option A: Conditionals (current)</div>
+    <div class="tab" onclick="showTab(2)">Option C: P.L.-keyed versions</div>
+  </div>
+
+  <div class="panel active" id="panel0">
+    <div class="section-header" onclick="toggleSection(this)">FILE HEADER & STATUTE TEXT</div>
+    <div class="section-content">
+<pre><span class="c"># statute/26/24/d/1/B.rac</span>
+<span class="c"># 26 USC Section 24(d)(1)(B) - Additional Child Tax Credit (Refundable)</span>
+
+<span class="k">text:</span> <span class="s">"""
+(d) Portion of credit refundable.--
+
+(1) In general.--The aggregate credits allowed to a taxpayer under
+    subpart C shall be increased by the lesser of--
+
+    (A) the credit which would be allowed under this section without
+        regard to this subsection and the limitation under section 26(a), or
+
+    (B) the amount by which the aggregate amount of credits allowed by
+        this subpart (determined without regard to this subsection) would
+        increase if the limitation imposed by section 26(a) were increased
+        by the greater of--
+
+        (i) 15 percent of so much of the taxpayer's earned income
+            (within the meaning of section 32) as exceeds $2,500, or
+
+        (ii) in the case of a taxpayer with 3 or more qualifying children,
+             the excess (if any) of--
+             (I) the taxpayer's social security taxes for the taxable year, over
+             (II) the credit allowed under section 32 for the taxable year.
+
+(h)(5) Limitation on refundable portion.--
+       The amount determined under subsection (d) shall not exceed $1,400
+       per qualifying child.
+"""</span></pre>
+    </div>
+
+    <div class="section-header" onclick="toggleSection(this)">IMPORTS (shared across all versions)</div>
+    <div class="section-content">
+<pre><span class="k">imports:</span>
+  tentative_child_tax_credit: statute/26/24/a/2/tentative_credit
+  child_tax_credit: statute/26/24/child_tax_credit
+  num_ctc_qualifying_children: statute/26/24/c/3/num_qualifying_children
+  earned_income: statute/26/32/c/2/A/earned_income
+  social_security_taxes: statute/26/3101/social_security_taxes
+  earned_income_credit: statute/26/32/a/1/earned_income_credit</pre>
+    </div>
+
+    <div class="section-header" onclick="toggleSection(this)">AMENDMENTS (legislative history)</div>
+    <div class="section-content">
+<pre><span class="k">amendments:</span>
+  - law: <span class="s">"P.L. 107-16"</span>
+    title: <span class="s">"Economic Growth and Tax Relief Reconciliation Act (EGTRRA)"</span>
+    effective: <span class="n">2001-01-01</span>
+
+  - law: <span class="s">"P.L. 115-97"</span>
+    title: <span class="s">"Tax Cuts and Jobs Act (TCJA)"</span>
+    effective: <span class="n">2018-01-01</span>
+    sunset: <span class="n">2025-12-31</span></pre>
+    </div>
+
+    <div class="section-header" onclick="toggleSection(this)">VARIABLE WITH VERSIONED FORMULAS</div>
+    <div class="section-content">
+<pre><span class="k">variable</span> <span class="v">additional_child_tax_credit</span>:
+  entity TaxUnit
+  period Year
+  dtype Money
+  unit <span class="s">"USD"</span>
+  label <span class="s">"Additional Child Tax Credit (Refundable)"</span>
+  description <span class="s">"Refundable portion of CTC per 26 USC 24(d)"</span>
+
+  <span class="k">versions:</span>
+    <span class="c"># =========================================================</span>
+    <span class="c"># EGTRRA (2001-2017): No per-child cap on refundable amount</span>
+    <span class="c"># =========================================================</span>
+    <span class="p">2001-01-01</span>:
+      enacted_by: <span class="s">"P.L. 107-16 § 201"</span>
+
+      <span class="k">text:</span> <span class="s">"""
+      (B) 15 percent of so much of the taxpayer's earned income
+          as exceeds $3,000
+      """</span>
+
+      <span class="k">parameters:</span>
+        earned_income_threshold: <span class="n">3000</span>
+        refundable_rate: <span class="n">0.15</span>
+        ss_children_threshold: <span class="n">3</span>
+
+      <span class="k">formula:</span>
+        unused_credit = tentative_child_tax_credit - child_tax_credit
+        <span class="k">if</span> unused_credit <= <span class="n">0</span>: <span class="k">return</span> <span class="n">0</span>
+
+        <span class="c"># Earned income portion: 15% of (EI - $3,000)</span>
+        ei_portion = max(<span class="n">0</span>, earned_income - earned_income_threshold) * refundable_rate
+
+        <span class="c"># Social security portion (3+ children only)</span>
+        <span class="k">if</span> num_ctc_qualifying_children >= ss_children_threshold:
+          ss_portion = max(<span class="n">0</span>, social_security_taxes - earned_income_credit)
+        <span class="k">else</span>:
+          ss_portion = <span class="n">0</span>
+
+        limit_b = max(ei_portion, ss_portion)
+
+        <span class="c"># Pre-TCJA: NO per-child cap</span>
+        <span class="k">return</span> min(unused_credit, limit_b)
+
+    <span class="c"># =========================================================</span>
+    <span class="c"># TCJA (2018-2025): Adds per-child cap, lowers threshold</span>
+    <span class="c"># =========================================================</span>
+    <span class="p">2018-01-01</span>:
+      enacted_by: <span class="s">"P.L. 115-97 § 11022"</span>
+
+      <span class="k">text:</span> <span class="s">"""
+      (B)(i) 15 percent of so much of the taxpayer's earned income
+             as exceeds $2,500
+      (h)(5) shall not exceed $1,400 per qualifying child
+      """</span>
+
+      <span class="k">parameters:</span>
+        earned_income_threshold: <span class="n">2500</span>
+        refundable_rate: <span class="n">0.15</span>
+        ss_children_threshold: <span class="n">3</span>
+        <span class="c"># Per-child cap is indexed!</span>
+        refundable_maximum:
+          <span class="n">2018-01-01</span>: <span class="n">1400</span>
+          <span class="n">2019-01-01</span>: <span class="n">1400</span>
+          <span class="n">2020-01-01</span>: <span class="n">1400</span>
+          <span class="n">2021-01-01</span>: <span class="n">1400</span>
+          <span class="n">2022-01-01</span>: <span class="n">1500</span>
+          <span class="n">2023-01-01</span>: <span class="n">1600</span>
+          <span class="n">2024-01-01</span>: <span class="n">1700</span>
+
+      <span class="k">formula:</span>
+        unused_credit = tentative_child_tax_credit - child_tax_credit
+        <span class="k">if</span> unused_credit <= <span class="n">0</span>: <span class="k">return</span> <span class="n">0</span>
+
+        <span class="c"># Earned income portion: 15% of (EI - $2,500)</span>
+        ei_portion = max(<span class="n">0</span>, earned_income - earned_income_threshold) * refundable_rate
+
+        <span class="c"># Social security portion (3+ children only)</span>
+        <span class="k">if</span> num_ctc_qualifying_children >= ss_children_threshold:
+          ss_portion = max(<span class="n">0</span>, social_security_taxes - earned_income_credit)
+        <span class="k">else</span>:
+          ss_portion = <span class="n">0</span>
+
+        limit_b = max(ei_portion, ss_portion)
+
+        <span class="c"># TCJA: Per-child cap from 24(h)(5)</span>
+        per_child_cap = num_ctc_qualifying_children * refundable_maximum
+
+        <span class="k">return</span> min(unused_credit, limit_b, per_child_cap)
+
+    <span class="c"># =========================================================</span>
+    <span class="c"># Post-TCJA sunset (2026+): Reverts to EGTRRA rules</span>
+    <span class="c"># =========================================================</span>
+    <span class="p">2026-01-01</span>:
+      enacted_by: <span class="s">"P.L. 115-97 § 11022 (sunset provision)"</span>
+      <span class="k">reverts_to:</span> <span class="p">2001-01-01</span></pre>
+    </div>
+
+    <div class="section-header" onclick="toggleSection(this)">EXAMPLES (tests for each era)</div>
+    <div class="section-content">
+<pre><span class="k">examples:</span>
+  <span class="c"># Pre-TCJA tests</span>
+  - name: <span class="s">"Pre-TCJA: No per-child cap"</span>
+    period: <span class="n">2017</span>
+    inputs:
+      tax_unit:
+        tentative_child_tax_credit: <span class="n">3000</span>
+        child_tax_credit: <span class="n">500</span>  <span class="c"># Only $500 used against liability</span>
+        earned_income: <span class="n">50000</span>
+        num_ctc_qualifying_children: <span class="n">3</span>
+    outputs:
+      additional_child_tax_credit: <span class="n">2500</span>  <span class="c"># Full unused amount</span>
+    notes: <span class="s">"No cap - gets full $2,500 unused credit"</span>
+
+  <span class="c"># TCJA tests</span>
+  - name: <span class="s">"TCJA: Per-child cap limits refund"</span>
+    period: <span class="n">2024</span>
+    inputs:
+      tax_unit:
+        tentative_child_tax_credit: <span class="n">6000</span>  <span class="c"># 3 kids x $2,000</span>
+        child_tax_credit: <span class="n">1000</span>
+        earned_income: <span class="n">50000</span>
+        num_ctc_qualifying_children: <span class="n">3</span>
+    outputs:
+      additional_child_tax_credit: <span class="n">5000</span>  <span class="c"># min($5000 unused, $7125 EI, $5100 cap)</span>
+    notes: <span class="s">"Cap is 3 x $1,700 = $5,100"</span>
+
+  - name: <span class="s">"TCJA: Low earner hits EI limit"</span>
+    period: <span class="n">2024</span>
+    inputs:
+      tax_unit:
+        tentative_child_tax_credit: <span class="n">4000</span>
+        child_tax_credit: <span class="n">0</span>
+        earned_income: <span class="n">15000</span>
+        num_ctc_qualifying_children: <span class="n">2</span>
+    outputs:
+      additional_child_tax_credit: <span class="n">1875</span>  <span class="c"># 0.15 x (15000 - 2500)</span>
+    notes: <span class="s">"EI portion is limiting factor"</span>
+
+  <span class="c"># Post-sunset tests</span>
+  - name: <span class="s">"Post-sunset: Reverts to no cap"</span>
+    period: <span class="n">2027</span>
+    inputs:
+      tax_unit:
+        tentative_child_tax_credit: <span class="n">3000</span>
+        child_tax_credit: <span class="n">500</span>
+        earned_income: <span class="n">50000</span>
+        num_ctc_qualifying_children: <span class="n">3</span>
+    outputs:
+      additional_child_tax_credit: <span class="n">2500</span>  <span class="c"># Same as 2017</span>
+    notes: <span class="s">"Uses 2001-01-01 formula via reverts_to"</span></pre>
+    </div>
+
+    <div class="note">
+      <strong>Key Features of Option B:</strong><br>
+      • Date keys (2001-01-01, 2018-01-01, 2026-01-01) for version ordering<br>
+      • <code>enacted_by</code> provides P.L. citation for each version<br>
+      • <code>text:</code> per version shows the statutory language at that time<br>
+      • <code>parameters:</code> per version - can still have time series within (refundable_maximum)<br>
+      • <code>reverts_to:</code> handles sunsets cleanly without duplicating formulas<br>
+      • <code>examples:</code> can test each era with <code>period:</code> field
+    </div>
+  </div>
+
+  <div class="panel" id="panel1">
+    <div class="section-header">OPTION A: Single formula with conditionals</div>
+<pre><span class="c"># statute/26/24/d/1/B.rac</span>
+<span class="c"># Uses @vintage refs and conditionals per references.md design</span>
+
+<span class="k">text:</span> <span class="s">"""
+[Current TCJA text only - no historical versions]
+"""</span>
+
+<span class="k">imports:</span>
+  tentative_child_tax_credit: statute/26/24/a/2/tentative_credit
+  child_tax_credit: statute/26/24/child_tax_credit
+  num_ctc_qualifying_children: statute/26/24/c/3/num_qualifying_children
+  earned_income: statute/26/32/c/2/A/earned_income
+  social_security_taxes: statute/26/3101/social_security_taxes
+  earned_income_credit: statute/26/32/a/1/earned_income_credit
+
+  <span class="c"># TCJA params (current)</span>
+  tcja_threshold: params/ctc#earned_income_threshold
+  tcja_rate: params/ctc#refundable_rate
+  tcja_max: params/ctc#refundable_maximum
+
+  <span class="c"># Pre-TCJA params (vintage-pinned)</span>
+  pre_threshold: params/ctc#earned_income_threshold<span class="p">@2017-12-31</span>
+  pre_rate: params/ctc#refundable_rate<span class="p">@2017-12-31</span>
+
+<span class="k">parameters:</span>
+  tcja_sunset_year:
+    <span class="n">2017-12-22</span>: <span class="n">2026</span>
+  ss_children_threshold:
+    <span class="n">2001-01-01</span>: <span class="n">3</span>
+
+<span class="k">variable</span> <span class="v">additional_child_tax_credit</span>:
+  entity TaxUnit
+  period Year
+  dtype Money
+  unit <span class="s">"USD"</span>
+
+  <span class="k">formula:</span>
+    unused_credit = tentative_child_tax_credit - child_tax_credit
+    <span class="k">if</span> unused_credit <= <span class="n">0</span>: <span class="k">return</span> <span class="n">0</span>
+
+    <span class="c"># Choose parameters based on era</span>
+    <span class="k">if</span> year >= tcja_sunset_year:
+      <span class="c"># Post-sunset: use pre-TCJA rules</span>
+      threshold = pre_threshold
+      rate = pre_rate
+      has_cap = <span class="n">false</span>
+    <span class="k">else</span>:
+      <span class="c"># TCJA era</span>
+      threshold = tcja_threshold
+      rate = tcja_rate
+      has_cap = <span class="n">true</span>
+
+    <span class="c"># Earned income portion</span>
+    ei_portion = max(<span class="n">0</span>, earned_income - threshold) * rate
+
+    <span class="c"># Social security portion (3+ children)</span>
+    <span class="k">if</span> num_ctc_qualifying_children >= ss_children_threshold:
+      ss_portion = max(<span class="n">0</span>, social_security_taxes - earned_income_credit)
+    <span class="k">else</span>:
+      ss_portion = <span class="n">0</span>
+
+    limit_b = max(ei_portion, ss_portion)
+
+    <span class="c"># Apply per-child cap only in TCJA era</span>
+    <span class="k">if</span> has_cap:
+      per_child_cap = num_ctc_qualifying_children * tcja_max
+      <span class="k">return</span> min(unused_credit, limit_b, per_child_cap)
+    <span class="k">else</span>:
+      <span class="k">return</span> min(unused_credit, limit_b)
+
+<span class="k">examples:</span>
+  <span class="c"># Same tests but less clear which version is being tested</span>
+  - name: <span class="s">"2017 calculation"</span>
+    period: <span class="n">2017</span>
+    inputs: ...
+    outputs: ...</pre>
+
+    <div class="note">
+      <strong>Problems with Option A:</strong><br>
+      • Single formula mixes all eras - hard to read<br>
+      • No P.L. citations - which law enacted which branch?<br>
+      • Only current text: block - historical text lost<br>
+      • @vintage refs require separate parameter files<br>
+      • Conditional logic grows with each amendment
+    </div>
+  </div>
+
+  <div class="panel" id="panel2">
+    <div class="section-header">OPTION C: P.L. as version key</div>
+<pre><span class="c"># statute/26/24/d/1/B.rac</span>
+<span class="c"># Uses Public Law numbers as version keys</span>
+
+<span class="k">text:</span> <span class="s">"""
+[Current consolidated text]
+"""</span>
+
+<span class="k">imports:</span>
+  <span class="c"># Same as Option B</span>
+
+<span class="k">amendments:</span>
+  - law: <span class="s">"P.L. 107-16"</span>
+    title: <span class="s">"EGTRRA"</span>
+    effective: <span class="n">2001-01-01</span>
+  - law: <span class="s">"P.L. 115-97"</span>
+    title: <span class="s">"TCJA"</span>
+    effective: <span class="n">2018-01-01</span>
+    sunset: <span class="n">2025-12-31</span>
+
+<span class="k">variable</span> <span class="v">additional_child_tax_credit</span>:
+  entity TaxUnit
+  period Year
+  dtype Money
+
+  <span class="k">versions:</span>
+    <span class="p">P.L. 107-16</span>:
+      <span class="k">text:</span> <span class="s">"""15% of (EI - $3,000)"""</span>
+      <span class="k">formula:</span>
+        ei_portion = max(<span class="n">0</span>, earned_income - <span class="n">3000</span>) * <span class="n">0.15</span>
+        <span class="k">return</span> min(unused_credit, ei_portion)
+
+    <span class="p">P.L. 115-97</span>:
+      <span class="k">text:</span> <span class="s">"""15% of (EI - $2,500), cap $1,400/child"""</span>
+      <span class="k">formula:</span>
+        ei_portion = max(<span class="n">0</span>, earned_income - <span class="n">2500</span>) * <span class="n">0.15</span>
+        cap = num_children * <span class="n">1400</span>
+        <span class="k">return</span> min(unused_credit, ei_portion, cap)</pre>
+
+    <div class="note">
+      <strong>Problems with Option C:</strong><br>
+      • <span style="color:#ff4466">HARDCODED VALUES</span> - breaks "no literals" rule<br>
+      • Can't handle inflation within a P.L. (1400→1700 during TCJA)<br>
+      • P.L. lookup adds cognitive load for AI authors<br>
+      • How to order versions? P.L. numbers aren't chronological across Congresses
+    </div>
+  </div>
+
+  <script>
+    function showTab(index) {
+      document.querySelectorAll('.tab').forEach((t, i) => t.classList.toggle('active', i === index));
+      document.querySelectorAll('.panel').forEach((p, i) => p.classList.toggle('active', i === index));
+    }
+
+    function toggleSection(header) {
+      header.classList.toggle('collapsed');
+      const content = header.nextElementSibling;
+      if (content && content.classList.contains('section-content')) {
+        if (content.classList.contains('collapsed')) {
+          content.classList.remove('collapsed');
+          content.style.maxHeight = content.scrollHeight + 'px';
+        } else {
+          content.classList.add('collapsed');
+        }
+      }
+    }
+
+    function expandAll() {
+      const activePanel = document.querySelector('.panel.active');
+      if (!activePanel) return;
+      activePanel.querySelectorAll('.section-header').forEach(function(header) {
+        header.classList.remove('collapsed');
+      });
+      activePanel.querySelectorAll('.section-content').forEach(function(content) {
+        content.classList.remove('collapsed');
+        content.style.maxHeight = content.scrollHeight + 'px';
+      });
+    }
+
+    function collapseAll() {
+      const activePanel = document.querySelector('.panel.active');
+      if (!activePanel) return;
+      activePanel.querySelectorAll('.section-header').forEach(function(header) {
+        header.classList.add('collapsed');
+      });
+      activePanel.querySelectorAll('.section-content').forEach(function(content) {
+        content.classList.add('collapsed');
+      });
+    }
+
+    // Set initial max-height for smooth animations
+    document.addEventListener('DOMContentLoaded', function() {
+      document.querySelectorAll('.section-content').forEach(function(content) {
+        content.style.maxHeight = content.scrollHeight + 'px';
+      });
+    });
+  </script>
+</body>
+</html>
