@@ -11,10 +11,10 @@ source:
   effective_date: 2024-01-01
   url: "https://www.irs.gov/pub/irs-drop/rp-23-34.pdf"
 
-# Overrides for statute/26/1/brackets
+# Overrides for statute/26/1
 
 parameter single:
-  overrides: statute/26/1/brackets#single
+  overrides: statute/26/1#single
   description: "2024 tax bracket thresholds for single filers"
   brackets:
     0.10: 0
@@ -26,7 +26,7 @@ parameter single:
     0.37: 609350
 
 parameter married_filing_jointly:
-  overrides: statute/26/1/brackets#married_filing_jointly
+  overrides: statute/26/1#married_filing_jointly
   description: "2024 tax bracket thresholds for married filing jointly"
   brackets:
     0.10: 0
