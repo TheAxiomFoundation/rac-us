@@ -19,8 +19,19 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Validate .rac schema
-        run: python3 scripts/validate_schema.py
+      - name: Checkout cosilico-engine
+        uses: actions/checkout@v4
+        with:
+          repository: CosilicoAI/cosilico-engine
+          path: engine
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install engine and run format tests
+        run: |
+          cd engine
+          pip install -e .
+          pip install pytest
+          STATUTE_DIR=$GITHUB_WORKSPACE/statute pytest tests/test_rac_format.py -v
 
       - name: Checkout cosilico-validators
         uses: actions/checkout@v4
