@@ -46,12 +46,30 @@ variable nol_modification_prior_nol:
     - name: "No modification when no NOL deduction claimed"
       period: 2024
       inputs:
-        taxable_income: -30000
+        taxable_income: -30_000
         capital_gains: 0
         capital_losses: 0
         personal_exemption: 0
         prior_nol_deduction_claimed: 0
       expect: 0
+    - name: "Large NOL deduction add-back"
+      period: 2024
+      inputs:
+        taxable_income: -200_000
+        capital_gains: 0
+        capital_losses: 0
+        personal_exemption: 0
+        prior_nol_deduction_claimed: 150_000
+      expect: 150_000
+    - name: "Small NOL deduction add-back"
+      period: 2024
+      inputs:
+        taxable_income: -10_000
+        capital_gains: 0
+        capital_losses: 0
+        personal_exemption: 0
+        prior_nol_deduction_claimed: 5_000
+      expect: 5_000
 
 variable nol_modification_capital_losses:
   entity: TaxUnit
@@ -108,12 +126,39 @@ variable nol_modification_capital_losses:
     - name: "Full capital loss modification with no gains"
       period: 2024
       inputs:
-        taxable_income: -50000
+        taxable_income: -50_000
         capital_gains: 0
-        capital_losses: 35000
+        capital_losses: 35_000
         personal_exemption: 0
         prior_nol_deduction_claimed: 0
-      expect: 35000
+      expect: 35_000
+    - name: "Capital losses slightly exceed gains"
+      period: 2024
+      inputs:
+        taxable_income: -60_000
+        capital_gains: 20_000
+        capital_losses: 25_000
+        personal_exemption: 0
+        prior_nol_deduction_claimed: 0
+      expect: 5_000
+    - name: "Large capital loss excess"
+      period: 2024
+      inputs:
+        taxable_income: -100_000
+        capital_gains: 10_000
+        capital_losses: 100_000
+        personal_exemption: 0
+        prior_nol_deduction_claimed: 0
+      expect: 90_000
+    - name: "Net capital gain no modification"
+      period: 2024
+      inputs:
+        taxable_income: 25_000
+        capital_gains: 40_000
+        capital_losses: 15_000
+        personal_exemption: 0
+        prior_nol_deduction_claimed: 0
+      expect: 0
 
 variable nol_modification_exemptions:
   entity: TaxUnit
@@ -141,12 +186,30 @@ variable nol_modification_exemptions:
     - name: "Exemptions suspended during TCJA (2018-2025)"
       period: 2024
       inputs:
-        taxable_income: -30000
+        taxable_income: -30_000
         capital_gains: 0
         capital_losses: 0
         personal_exemption: 0
         prior_nol_deduction_claimed: 0
       expect: 0
+    - name: "Multiple exemptions pre-TCJA family"
+      period: 2016
+      inputs:
+        taxable_income: -50_000
+        capital_gains: 0
+        capital_losses: 0
+        personal_exemption: 16_200
+        prior_nol_deduction_claimed: 0
+      expect: 16_200
+    - name: "Large family exemption add-back"
+      period: 2017
+      inputs:
+        taxable_income: -100_000
+        capital_gains: 0
+        capital_losses: 0
+        personal_exemption: 20_250
+        prior_nol_deduction_claimed: 0
+      expect: 20_250
 
 variable nol_modification_nonbusiness:
   entity: TaxUnit
@@ -170,7 +233,25 @@ variable nol_modification_nonbusiness:
     - name: "Nonbusiness modification simplified to zero"
       period: 2024
       inputs:
-        taxable_income: -50000
+        taxable_income: -50_000
+        capital_gains: 0
+        capital_losses: 0
+        personal_exemption: 0
+        prior_nol_deduction_claimed: 0
+      expect: 0
+    - name: "Nonbusiness modification with positive income"
+      period: 2024
+      inputs:
+        taxable_income: 100_000
+        capital_gains: 0
+        capital_losses: 0
+        personal_exemption: 0
+        prior_nol_deduction_claimed: 0
+      expect: 0
+    - name: "Nonbusiness modification with large loss"
+      period: 2024
+      inputs:
+        taxable_income: -250_000
         capital_gains: 0
         capital_losses: 0
         personal_exemption: 0
@@ -217,9 +298,54 @@ variable nol_modifications:
     - name: "Total NOL modifications zero"
       period: 2024
       inputs:
-        taxable_income: 50000
-        capital_gains: 10000
-        capital_losses: 10000
+        taxable_income: 50_000
+        capital_gains: 10_000
+        capital_losses: 10_000
         personal_exemption: 0
         prior_nol_deduction_claimed: 0
       expect: 0
+    - name: "Total modifications with prior NOL and capital losses"
+      period: 2024
+      inputs:
+        taxable_income: -75_000
+        capital_gains: 5_000
+        capital_losses: 25_000
+        personal_exemption: 0
+        prior_nol_deduction_claimed: 30_000
+      expect: 50_000
+    - name: "Total modifications pre-TCJA all categories"
+      period: 2016
+      inputs:
+        taxable_income: -100_000
+        capital_gains: 0
+        capital_losses: 15_000
+        personal_exemption: 8_100
+        prior_nol_deduction_claimed: 20_000
+      expect: 43_100
+    - name: "Large total modifications"
+      period: 2024
+      inputs:
+        taxable_income: -500_000
+        capital_gains: 50_000
+        capital_losses: 200_000
+        personal_exemption: 0
+        prior_nol_deduction_claimed: 100_000
+      expect: 250_000
+    - name: "Total modifications with only prior NOL"
+      period: 2024
+      inputs:
+        taxable_income: -80_000
+        capital_gains: 20_000
+        capital_losses: 20_000
+        personal_exemption: 0
+        prior_nol_deduction_claimed: 45_000
+      expect: 45_000
+    - name: "Total modifications with only capital loss excess"
+      period: 2024
+      inputs:
+        taxable_income: -60_000
+        capital_gains: 0
+        capital_losses: 40_000
+        personal_exemption: 0
+        prior_nol_deduction_claimed: 0
+      expect: 40_000

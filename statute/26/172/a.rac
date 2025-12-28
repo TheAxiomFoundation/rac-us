@@ -67,11 +67,43 @@ variable nol_deduction:
     - name: "No NOL deduction with zero carryforwards"
       period: 2024
       inputs:
-        taxable_income: 100000
+        taxable_income: 100_000
         nol_deduction_pre_2018: 0
         nol_deduction_post_2017: 0
         farming_loss_carryback: 0
       expect: 0
+    - name: "NOL deduction with large carryforwards exceeding income"
+      period: 2024
+      inputs:
+        taxable_income: 200_000
+        nol_deduction_pre_2018: 150_000
+        nol_deduction_post_2017: 300_000
+        farming_loss_carryback: 0
+      expect: 200_000
+    - name: "NOL deduction with only farming carryback"
+      period: 2024
+      inputs:
+        taxable_income: 75_000
+        nol_deduction_pre_2018: 0
+        nol_deduction_post_2017: 0
+        farming_loss_carryback: 50_000
+      expect: 50_000
+    - name: "NOL deduction with zero taxable income"
+      period: 2024
+      inputs:
+        taxable_income: 0
+        nol_deduction_pre_2018: 100_000
+        nol_deduction_post_2017: 50_000
+        farming_loss_carryback: 25_000
+      expect: 0
+    - name: "NOL deduction with small amounts"
+      period: 2024
+      inputs:
+        taxable_income: 5_000
+        nol_deduction_pre_2018: 2_000
+        nol_deduction_post_2017: 1_500
+        farming_loss_carryback: 500
+      expect: 4_000
 
 variable nol_deduction_claimed:
   entity: TaxUnit
@@ -93,11 +125,27 @@ variable nol_deduction_claimed:
     - name: "NOL deduction not claimed when deduction is zero"
       period: 2024
       inputs:
-        taxable_income: 100000
+        taxable_income: 100_000
         nol_deduction_pre_2018: 0
         nol_deduction_post_2017: 0
         farming_loss_carryback: 0
       expect: false
+    - name: "NOL deduction claimed with post-2017 carryforward only"
+      period: 2024
+      inputs:
+        taxable_income: 80_000
+        nol_deduction_pre_2018: 0
+        nol_deduction_post_2017: 30_000
+        farming_loss_carryback: 0
+      expect: true
+    - name: "NOL deduction claimed with farming loss only"
+      period: 2024
+      inputs:
+        taxable_income: 50_000
+        nol_deduction_pre_2018: 0
+        nol_deduction_post_2017: 0
+        farming_loss_carryback: 15_000
+      expect: true
 
 variable taxable_income_before_nol:
   entity: TaxUnit
@@ -123,11 +171,27 @@ variable taxable_income_before_nol:
     - name: "Taxable income before NOL without deduction"
       period: 2024
       inputs:
-        taxable_income: 100000
+        taxable_income: 100_000
         nol_deduction_pre_2018: 0
         nol_deduction_post_2017: 0
         farming_loss_carryback: 0
-      expect: 100000
+      expect: 100_000
+    - name: "Taxable income before NOL with large deduction"
+      period: 2024
+      inputs:
+        taxable_income: 50_000
+        nol_deduction_pre_2018: 40_000
+        nol_deduction_post_2017: 60_000
+        farming_loss_carryback: 0
+      expect: 100_000
+    - name: "Taxable income before NOL with all component types"
+      period: 2024
+      inputs:
+        taxable_income: 25_000
+        nol_deduction_pre_2018: 10_000
+        nol_deduction_post_2017: 5_000
+        farming_loss_carryback: 10_000
+      expect: 50_000
 
 variable amt_nol_deduction:
   entity: TaxUnit
@@ -157,8 +221,24 @@ variable amt_nol_deduction:
     - name: "AMT NOL deduction zero when no carryforwards"
       period: 2024
       inputs:
-        taxable_income: 100000
+        taxable_income: 100_000
         nol_deduction_pre_2018: 0
         nol_deduction_post_2017: 0
         farming_loss_carryback: 0
       expect: 0
+    - name: "AMT NOL deduction with pre-2018 carryforward only"
+      period: 2024
+      inputs:
+        taxable_income: 150_000
+        nol_deduction_pre_2018: 60_000
+        nol_deduction_post_2017: 0
+        farming_loss_carryback: 0
+      expect: 60_000
+    - name: "AMT NOL deduction capped at taxable income"
+      period: 2024
+      inputs:
+        taxable_income: 40_000
+        nol_deduction_pre_2018: 25_000
+        nol_deduction_post_2017: 30_000
+        farming_loss_carryback: 0
+      expect: 40_000

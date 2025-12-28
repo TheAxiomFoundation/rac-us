@@ -54,10 +54,38 @@ variable net_operating_loss:
     - name: "No NOL with break-even position"
       period: 2024
       inputs:
-        taxable_income: -20000
+        taxable_income: -20_000
         adjusted_gross_income: 0
-        nol_modifications: 20000
+        nol_modifications: 20_000
       expect: 0
+    - name: "Large NOL from significant business loss"
+      period: 2024
+      inputs:
+        taxable_income: -500_000
+        adjusted_gross_income: 0
+        nol_modifications: 0
+      expect: 500_000
+    - name: "NOL with modifications reducing loss"
+      period: 2024
+      inputs:
+        taxable_income: -100_000
+        adjusted_gross_income: 0
+        nol_modifications: 30_000
+      expect: 70_000
+    - name: "Modifications completely offset loss"
+      period: 2024
+      inputs:
+        taxable_income: -25_000
+        adjusted_gross_income: 0
+        nol_modifications: 50_000
+      expect: 0
+    - name: "Small NOL from marginal loss"
+      period: 2024
+      inputs:
+        taxable_income: -5_000
+        adjusted_gross_income: 0
+        nol_modifications: 0
+      expect: 5_000
 
 variable has_net_operating_loss:
   entity: TaxUnit
@@ -78,7 +106,28 @@ variable has_net_operating_loss:
     - name: "No NOL when taxable income positive"
       period: 2024
       inputs:
-        taxable_income: 100000
-        adjusted_gross_income: 150000
+        taxable_income: 100_000
+        adjusted_gross_income: 150_000
         nol_modifications: 0
       expect: false
+    - name: "Has NOL with large loss"
+      period: 2024
+      inputs:
+        taxable_income: -300_000
+        adjusted_gross_income: 0
+        nol_modifications: 0
+      expect: true
+    - name: "No NOL when modifications wipe out loss"
+      period: 2024
+      inputs:
+        taxable_income: -40_000
+        adjusted_gross_income: 0
+        nol_modifications: 50_000
+      expect: false
+    - name: "Has NOL with modifications but still negative"
+      period: 2024
+      inputs:
+        taxable_income: -75_000
+        adjusted_gross_income: 0
+        nol_modifications: 25_000
+      expect: true

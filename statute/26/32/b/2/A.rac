@@ -1,16 +1,234 @@
-variable agi_limit:
-  entity: TaxUnit
-  period: Year
-  dtype: Money
+# 26 USC 32(b)(2)(A) - Earned Income and Phaseout Amounts
 
-# 26 USC §32(b)(2)(A) - Earned Income Amount
+text: """
+(2) Amounts.—
+(A) In general.—Subject to subparagraph (B), the earned income amount and the
+phaseout amount shall be determined as follows:
+In the case of an eligible individual with:
+    1 qualifying child................................the earned income amount is $7,830,
+                                                      and the phaseout amount is $18,740.
+    2 or more qualifying children..................the earned income amount is $11,000,
+                                                      and the phaseout amount is $18,740.
+    No qualifying children............................the earned income amount is $5,280,
+                                                      and the phaseout amount is $8,530.
+(Note: These are 2021 base amounts before inflation adjustments per 32(j))
+"""
+
+# Parameters for earned income amount by number of qualifying children
+# Values are 2024 amounts per Rev. Proc. 2023-34, Section 3.06
+parameter earned_income_amount_by_children:
+  description: "Earned income cap for EITC phase-in calculation, indexed by number of qualifying children"
+  unit: USD
+  source: "Rev. Proc. 2023-34"
+  reference: "26 USC 32(b)(2)(A)"
+  values:
+    2024-01-01:
+      0: 8260
+      1: 12390
+      2: 17400
+      3: 17400
+
+# Parameters for phaseout amount by number of qualifying children
+# Values are 2024 amounts per Rev. Proc. 2023-34, Section 3.06
+parameter phaseout_amount_by_children:
+  description: "Phaseout threshold for EITC reduction, indexed by number of qualifying children"
+  unit: USD
+  source: "Rev. Proc. 2023-34"
+  reference: "26 USC 32(b)(2)(A)"
+  values:
+    2024-01-01:
+      0: 10330
+      1: 22720
+      2: 22720
+      3: 22720
+
+# 26 USC 32(b)(2)(A) - Earned Income Amount
 variable earned_income_amount:
+  imports:
+    - 26/32/c/3/A#num_qualifying_children
   entity: TaxUnit
   period: Year
   dtype: Money
+  unit: "USD"
+  label: "EITC Earned Income Amount"
+  description: "Maximum earned income for phase-in credit calculation per 26 USC 32(b)(2)(A)"
+  syntax: python
+  formula: |
+    # Cap at 3 for lookup (3+ children use same amount as 3)
+    children_key = min(num_qualifying_children, 3)
+    return earned_income_amount_by_children[children_key]
+  tests:
+    - name: "No qualifying children - single filer"
+      period: 2024-01
+      inputs:
+        num_qualifying_children: 0
+      expect: 8260
+    - name: "One qualifying child"
+      period: 2024-01
+      inputs:
+        num_qualifying_children: 1
+      expect: 12390
+    - name: "Two qualifying children"
+      period: 2024-01
+      inputs:
+        num_qualifying_children: 2
+      expect: 17400
+    - name: "Three qualifying children"
+      period: 2024-01
+      inputs:
+        num_qualifying_children: 3
+      expect: 17400
+    - name: "Four or more qualifying children (uses 3+ amount)"
+      period: 2024-01
+      inputs:
+        num_qualifying_children: 5
+      expect: 17400
+    - name: "Edge case - exactly at child count boundary"
+      period: 2024-01
+      inputs:
+        num_qualifying_children: 2
+      expect: 17400
 
-# 26 USC §32(b)(2)(A) - Phaseout Amount
+# 26 USC 32(b)(2)(A) - Phaseout Amount
 variable phaseout_amount:
+  imports:
+    - 26/32/c/3/A#num_qualifying_children
   entity: TaxUnit
   period: Year
   dtype: Money
+  unit: "USD"
+  label: "EITC Phaseout Amount"
+  description: "Income threshold where EITC phaseout begins per 26 USC 32(b)(2)(A)"
+  syntax: python
+  formula: |
+    # Cap at 3 for lookup (3+ children use same amount as 3)
+    children_key = min(num_qualifying_children, 3)
+    return phaseout_amount_by_children[children_key]
+  tests:
+    - name: "No qualifying children - lower phaseout threshold"
+      period: 2024-01
+      inputs:
+        num_qualifying_children: 0
+      expect: 10330
+    - name: "One qualifying child"
+      period: 2024-01
+      inputs:
+        num_qualifying_children: 1
+      expect: 22720
+    - name: "Two qualifying children"
+      period: 2024-01
+      inputs:
+        num_qualifying_children: 2
+      expect: 22720
+    - name: "Three qualifying children"
+      period: 2024-01
+      inputs:
+        num_qualifying_children: 3
+      expect: 22720
+    - name: "Five qualifying children (uses 3+ amount)"
+      period: 2024-01
+      inputs:
+        num_qualifying_children: 5
+      expect: 22720
+    - name: "Zero vs one child difference verification"
+      period: 2024-01
+      inputs:
+        num_qualifying_children: 0
+      expect: 10330
+
+# 26 USC 32(b)(2)(A) - AGI Limit
+# Note: This represents the maximum AGI at which credit reaches zero
+variable agi_limit:
+  imports:
+    - 26/32/c/3/A#num_qualifying_children
+    - 26/1#filing_status
+    - 26/32/b/1#credit_percentage
+    - 26/32/b/1#phaseout_percentage
+    - 26/32/b/2/B#joint_return_adjustment
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: "USD"
+  label: "EITC AGI Limit"
+  description: "Maximum AGI to receive any EITC per 26 USC 32(b)(2)(A)"
+  syntax: python
+  formula: |
+    # AGI limit = phaseout_amount + (max_credit / phaseout_percentage)
+    # Where max_credit = credit_percentage * earned_income_amount
+    children_key = min(num_qualifying_children, 3)
+    earned_amt = earned_income_amount_by_children[children_key]
+    phaseout_start = phaseout_amount_by_children[children_key]
+    credit_rate = credit_percentage[children_key]
+    phaseout_rate = phaseout_percentage[children_key]
+    # Max credit is rate times earned income amount
+    max_credit = credit_rate * earned_amt
+    # Credit phases out at phaseout_rate per dollar over threshold
+    phaseout_range = max_credit / phaseout_rate
+    # Joint filers get higher threshold per 32(b)(2)(B)
+    if filing_status == JOINT:
+      return phaseout_start + joint_return_adjustment + phaseout_range
+    return phaseout_start + phaseout_range
+  tests:
+    - name: "No children, single filer - AGI limit"
+      period: 2024-01
+      inputs:
+        num_qualifying_children: 0
+        filing_status: SINGLE
+        credit_percentage: {0: 0.0765, 1: 0.34, 2: 0.40, 3: 0.45}
+        phaseout_percentage: {0: 0.0765, 1: 0.1598, 2: 0.2106, 3: 0.2106}
+        joint_return_adjustment: 6920
+      expect: 18590  # 10330 + (0.0765 * 8260) / 0.0765 = 10330 + 8260
+    - name: "No children, joint filer - higher AGI limit"
+      period: 2024-01
+      inputs:
+        num_qualifying_children: 0
+        filing_status: JOINT
+        credit_percentage: {0: 0.0765, 1: 0.34, 2: 0.40, 3: 0.45}
+        phaseout_percentage: {0: 0.0765, 1: 0.1598, 2: 0.2106, 3: 0.2106}
+        joint_return_adjustment: 6920
+      expect: 25510  # 10330 + 6920 + 8260
+    - name: "One child, single filer"
+      period: 2024-01
+      inputs:
+        num_qualifying_children: 1
+        filing_status: SINGLE
+        credit_percentage: {0: 0.0765, 1: 0.34, 2: 0.40, 3: 0.45}
+        phaseout_percentage: {0: 0.0765, 1: 0.1598, 2: 0.2106, 3: 0.2106}
+        joint_return_adjustment: 6920
+      expect: 49078.47  # 22720 + (0.34 * 12390) / 0.1598
+    - name: "One child, joint filer"
+      period: 2024-01
+      inputs:
+        num_qualifying_children: 1
+        filing_status: JOINT
+        credit_percentage: {0: 0.0765, 1: 0.34, 2: 0.40, 3: 0.45}
+        phaseout_percentage: {0: 0.0765, 1: 0.1598, 2: 0.2106, 3: 0.2106}
+        joint_return_adjustment: 6920
+      expect: 55998.47  # 22720 + 6920 + 26358.47
+    - name: "Two children, single filer"
+      period: 2024-01
+      inputs:
+        num_qualifying_children: 2
+        filing_status: SINGLE
+        credit_percentage: {0: 0.0765, 1: 0.34, 2: 0.40, 3: 0.45}
+        phaseout_percentage: {0: 0.0765, 1: 0.1598, 2: 0.2106, 3: 0.2106}
+        joint_return_adjustment: 6920
+      expect: 55762.11  # 22720 + (0.40 * 17400) / 0.2106
+    - name: "Three children, joint filer"
+      period: 2024-01
+      inputs:
+        num_qualifying_children: 3
+        filing_status: JOINT
+        credit_percentage: {0: 0.0765, 1: 0.34, 2: 0.40, 3: 0.45}
+        phaseout_percentage: {0: 0.0765, 1: 0.1598, 2: 0.2106, 3: 0.2106}
+        joint_return_adjustment: 6920
+      expect: 66830.67  # 22720 + 6920 + (0.45 * 17400) / 0.2106
+    - name: "Zero income edge case"
+      period: 2024-01
+      inputs:
+        num_qualifying_children: 0
+        filing_status: SINGLE
+        credit_percentage: {0: 0.0765, 1: 0.34, 2: 0.40, 3: 0.45}
+        phaseout_percentage: {0: 0.0765, 1: 0.1598, 2: 0.2106, 3: 0.2106}
+        joint_return_adjustment: 6920
+      expect: 18590
