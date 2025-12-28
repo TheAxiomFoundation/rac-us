@@ -61,6 +61,25 @@ ENTITY_PATTERN = re.compile(r"^\s*entity:\s*(\w+)")
 # Period type declarations only - exclude date-like values (2024-01, etc.)
 PERIOD_PATTERN = re.compile(r"^\s*period:\s*(Year|Month|Week|Day|[A-Z][a-z]+)$")
 DTYPE_PATTERN = re.compile(r"^\s*dtype:\s*(\w+)")
+FORMULA_START = re.compile(r"^\s*formula:\s*\|")
+FORMULA_LINE = re.compile(r"^\s{4,}")  # Indented lines in formula
+
+# Hardcoded literals - only -1, 0, 1, 2, 3 allowed in formulas
+ALLOWED_INTEGERS = {-1, 0, 1, 2, 3}
+LITERAL_PATTERN = re.compile(
+    r"""
+    (?<![a-zA-Z_])  # Not preceded by identifier char
+    (
+        \d+\.\d+    # Float like 0.075
+        |
+        [4-9]\d*    # Integer 4+
+        |
+        [1-9]\d{1,} # Integer 10+
+    )
+    (?![a-zA-Z_])   # Not followed by identifier char
+    """,
+    re.VERBOSE,
+)
 
 def validate_file(filepath: Path) -> list[str]:
     """Validate a single .rac file."""
@@ -69,6 +88,7 @@ def validate_file(filepath: Path) -> list[str]:
     lines = content.split('\n')
 
     in_code_section = False  # Inside formula/function/defined_for
+    in_formula = False  # Inside formula block specifically
     in_multiline_string = False  # Inside """ block
 
     for lineno, line in enumerate(lines, 1):
@@ -81,6 +101,30 @@ def validate_file(filepath: Path) -> list[str]:
             continue
         if in_multiline_string:
             continue
+
+        # Track formula blocks for literal checking
+        if FORMULA_START.match(line):
+            in_formula = True
+            continue
+        elif in_formula and not FORMULA_LINE.match(line) and line.strip():
+            in_formula = False
+
+        # Check for hardcoded literals in formulas
+        if in_formula:
+            # Strip comments and strings before checking
+            code_line = re.sub(r"#.*$", "", line)  # Remove comments
+            code_line = re.sub(r"['\"].*?['\"]", "", code_line)  # Remove strings
+
+            for match in LITERAL_PATTERN.finditer(code_line):
+                literal = match.group(1)
+                # Check if it's an allowed value (integers -1,0,1,2,3 or their float equivalents)
+                try:
+                    val = float(literal)
+                    if val in {-1.0, 0.0, 1.0, 2.0, 3.0}:
+                        continue
+                except ValueError:
+                    pass
+                errors.append(f"{filepath}:{lineno}: hardcoded literal '{literal}' - use a parameter instead")
 
         # Skip empty lines
         if not line.strip():
