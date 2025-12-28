@@ -11,6 +11,21 @@ title XVIII (Medicare), and
 (E) has household income that does not exceed 133 percent of the
 poverty line applicable to the size of the household.
 """
+
+parameter age_child_max:
+  description: "Maximum age for child classification (exclusive)"
+  unit: years
+  reference: "42 USC 1396d(a)(10)(A)(i)(VIII)"
+  values:
+    2010-03-23: 19
+
+parameter age_elderly_min:
+  description: "Minimum age for elderly/Medicare classification (inclusive)"
+  unit: years
+  reference: "42 USC 1396d(a)(10)(A)(i)(VIII)"
+  values:
+    2010-03-23: 65
+
 variable expansion:
   entity: Person
   period: Month
@@ -27,3 +42,51 @@ variable expansion:
         return False
     return True
   default: false
+  tests:
+    - name: "child_under_19_not_eligible"
+      period: 2024-01
+      inputs:
+        age: 17
+        age_child_max: 19
+        age_elderly_min: 65
+      expect: false
+
+    - name: "young_adult_at_exactly_19_eligible"
+      period: 2024-01
+      inputs:
+        age: 19
+        age_child_max: 19
+        age_elderly_min: 65
+      expect: true
+
+    - name: "working_age_adult_40_eligible"
+      period: 2024-01
+      inputs:
+        age: 40
+        age_child_max: 19
+        age_elderly_min: 65
+      expect: true
+
+    - name: "adult_at_64_last_eligible_age"
+      period: 2024-01
+      inputs:
+        age: 64
+        age_child_max: 19
+        age_elderly_min: 65
+      expect: true
+
+    - name: "senior_at_exactly_65_not_eligible"
+      period: 2024-01
+      inputs:
+        age: 65
+        age_child_max: 19
+        age_elderly_min: 65
+      expect: false
+
+    - name: "senior_over_65_not_eligible"
+      period: 2024-01
+      inputs:
+        age: 72
+        age_child_max: 19
+        age_elderly_min: 65
+      expect: false

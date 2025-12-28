@@ -23,3 +23,82 @@ variable work_requirements:
     if tanf_two_parent_family:
         return work_activities_hours_two_parent  # 35 hours/week (55 if child care)
     return 0
+  tests:
+    - name: "Single parent with young child - reduced hours"
+      period: 2024-01
+      inputs:
+        tanf_head_of_household: true
+        tanf_two_parent_family: false
+        children:
+          - age: 4
+        child_under_age_threshold: 6
+        work_activities_hours_reduced: 20
+        work_activities_hours_single_parent: 30
+        work_activities_hours_two_parent: 35
+      expect: 20
+
+    - name: "Single parent with older child - full hours"
+      period: 2024-01
+      inputs:
+        tanf_head_of_household: true
+        tanf_two_parent_family: false
+        children:
+          - age: 10
+        child_under_age_threshold: 6
+        work_activities_hours_reduced: 20
+        work_activities_hours_single_parent: 30
+        work_activities_hours_two_parent: 35
+      expect: 30
+
+    - name: "Two-parent family - higher hours requirement"
+      period: 2024-01
+      inputs:
+        tanf_head_of_household: false
+        tanf_two_parent_family: true
+        children:
+          - age: 8
+        child_under_age_threshold: 6
+        work_activities_hours_reduced: 20
+        work_activities_hours_single_parent: 30
+        work_activities_hours_two_parent: 35
+      expect: 35
+
+    - name: "Non-TANF family - no work requirement"
+      period: 2024-01
+      inputs:
+        tanf_head_of_household: false
+        tanf_two_parent_family: false
+        children:
+          - age: 5
+        child_under_age_threshold: 6
+        work_activities_hours_reduced: 20
+        work_activities_hours_single_parent: 30
+        work_activities_hours_two_parent: 35
+      expect: 0
+
+    - name: "Single parent with child at threshold age - full hours"
+      period: 2024-01
+      inputs:
+        tanf_head_of_household: true
+        tanf_two_parent_family: false
+        children:
+          - age: 6
+        child_under_age_threshold: 6
+        work_activities_hours_reduced: 20
+        work_activities_hours_single_parent: 30
+        work_activities_hours_two_parent: 35
+      expect: 30
+
+    - name: "Single parent with multiple children including young child"
+      period: 2024-01
+      inputs:
+        tanf_head_of_household: true
+        tanf_two_parent_family: false
+        children:
+          - age: 2
+          - age: 12
+        child_under_age_threshold: 6
+        work_activities_hours_reduced: 20
+        work_activities_hours_single_parent: 30
+        work_activities_hours_two_parent: 35
+      expect: 20

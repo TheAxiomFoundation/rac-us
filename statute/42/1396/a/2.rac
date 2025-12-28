@@ -24,3 +24,55 @@ variable income_methodology:
     # Foreign earned income exclusion (26 USC 911)
     # TODO: Add foreign_earned_income_exclusion when implemented
     return agi + exempt_interest + nontaxable_ss
+  tests:
+    - name: "Zero income baseline"
+      period: 2024-01
+      inputs:
+        adjusted_gross_income: 0
+        tax_exempt_interest: 0
+        social_security_benefits: 0
+        taxable_social_security: 0
+      expect: 0
+    - name: "AGI only with no adjustments"
+      period: 2024-01
+      inputs:
+        adjusted_gross_income: 3_500
+        tax_exempt_interest: 0
+        social_security_benefits: 0
+        taxable_social_security: 0
+      expect: 3_500
+    - name: "AGI plus tax-exempt interest"
+      period: 2024-01
+      inputs:
+        adjusted_gross_income: 2_500
+        tax_exempt_interest: 500
+        social_security_benefits: 0
+        taxable_social_security: 0
+      expect: 3_000
+    - name: "AGI plus non-taxable Social Security"
+      period: 2024-01
+      inputs:
+        adjusted_gross_income: 1_200
+        tax_exempt_interest: 0
+        social_security_benefits: 1_800
+        taxable_social_security: 800
+      # MAGI = 1200 + 0 + (1800 - 800) = 1200 + 1000 = 2200
+      expect: 2_200
+    - name: "All MAGI components combined"
+      period: 2024-01
+      inputs:
+        adjusted_gross_income: 2_000
+        tax_exempt_interest: 300
+        social_security_benefits: 1_500
+        taxable_social_security: 500
+      # MAGI = 2000 + 300 + (1500 - 500) = 2000 + 300 + 1000 = 3300
+      expect: 3_300
+    - name: "Fully taxable Social Security adds nothing"
+      period: 2024-01
+      inputs:
+        adjusted_gross_income: 4_000
+        tax_exempt_interest: 200
+        social_security_benefits: 1_000
+        taxable_social_security: 1_000
+      # MAGI = 4000 + 200 + (1000 - 1000) = 4000 + 200 + 0 = 4200
+      expect: 4_200

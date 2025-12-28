@@ -1,4 +1,10 @@
 text: """
+(b) Participation rate requirements
+(5) Single parent with child under 1
+(A) In general
+A State may disregard from the determination of participation rates
+under this section a single parent of a child under 1 year of age.
+
 (7) No assistance for more than 5 years
 (A) In general
 A State to which a grant is made under section 603 shall not use
@@ -7,9 +13,241 @@ includes an adult who has received assistance under any State
 program funded under this part attributable to funds provided by
 the Federal Government... for 60 months (whether or not consecutive)
 after the date the State program... becomes effective
+
+(B) Exception
+Subparagraph (A) shall not apply with respect to a family if the
+State determines that hardship circumstances exist...
+
+(C) Hardship exception limitation
+The average number of families with respect to which an exception
+applies under subparagraph (B) for any fiscal year shall not
+exceed 20 percent of the average monthly number of families to
+which assistance is provided...
 """
-variable time_limits:
+
+# Inputs for time limits
+input tanf_months_received:
+  entity: Person
+  period: Month
+  dtype: Integer
+  label: "TANF Months Received"
+  description: "Total months of federally-funded TANF assistance received"
+  default: 0
+
+input tanf_hardship_exception:
   entity: Person
   period: Month
   dtype: Boolean
-  formula: return federal_time_limit_months  # 60 months
+  label: "TANF Hardship Exception"
+  description: "Whether person qualifies for hardship exception per 607(b)(7)(B)"
+  default: false
+
+input is_minor:
+  entity: Person
+  period: Month
+  dtype: Boolean
+  label: "Is Minor"
+  description: "Whether person is under age 18"
+  default: false
+
+input is_adult_tanf_recipient:
+  entity: Person
+  period: Month
+  dtype: Boolean
+  label: "Is Adult TANF Recipient"
+  description: "Whether person is an adult receiving TANF assistance"
+  default: false
+
+# Parameters for time limits
+parameter federal_time_limit_months:
+  description: "Federal lifetime limit on TANF assistance for adults"
+  unit: months
+  values:
+    1996-08-22: 60
+  label: "Federal Time Limit"
+  reference: "42 USC 607(a)(7)(A)"
+
+parameter hardship_exemption_cap:
+  description: "Maximum percentage of caseload that can receive hardship exemption"
+  unit: rate
+  values:
+    1996-08-22: 0.20
+  label: "Hardship Exemption Cap"
+  reference: "42 USC 607(a)(7)(C)"
+
+variable tanf_time_limit_reached:
+  entity: Person
+  period: Month
+  dtype: Boolean
+  label: "TANF Time Limit Reached"
+  description: "Whether adult has reached the 60-month federal time limit"
+  syntax: python
+  formula: |
+    # Only adults are subject to time limits
+    if not is_adult_tanf_recipient:
+        return False
+    # Check if months received meets or exceeds limit
+    return tanf_months_received >= federal_time_limit_months
+  default: false
+  tests:
+    - name: "Adult at exactly 60 months reaches limit"
+      period: 2024-01
+      inputs:
+        is_adult_tanf_recipient: true
+        tanf_months_received: 60
+      expect: true
+
+    - name: "Adult below 60 months has not reached limit"
+      period: 2024-01
+      inputs:
+        is_adult_tanf_recipient: true
+        tanf_months_received: 59
+      expect: false
+
+    - name: "Adult exceeding 60 months reached limit"
+      period: 2024-01
+      inputs:
+        is_adult_tanf_recipient: true
+        tanf_months_received: 72
+      expect: true
+
+    - name: "Minor never reaches time limit"
+      period: 2024-01
+      inputs:
+        is_adult_tanf_recipient: false
+        is_minor: true
+        tanf_months_received: 100
+      expect: false
+
+    - name: "Adult at zero months has not reached limit"
+      period: 2024-01
+      inputs:
+        is_adult_tanf_recipient: true
+        tanf_months_received: 0
+      expect: false
+
+variable tanf_time_limit_eligible:
+  entity: Person
+  period: Month
+  dtype: Boolean
+  label: "TANF Time Limit Eligible"
+  description: "Whether person can continue receiving federally-funded TANF"
+  syntax: python
+  formula: |
+    # Minors are always eligible (time limits apply to adults only)
+    if is_minor:
+        return True
+    # Check if time limit reached
+    if not tanf_time_limit_reached:
+        return True
+    # Hardship exception per 607(b)(7)(B)
+    if tanf_hardship_exception:
+        return True
+    return False
+  default: true
+  tests:
+    - name: "Adult under time limit is eligible"
+      period: 2024-01
+      inputs:
+        is_minor: false
+        is_adult_tanf_recipient: true
+        tanf_months_received: 30
+        tanf_hardship_exception: false
+      expect: true
+
+    - name: "Adult at time limit without exception is ineligible"
+      period: 2024-01
+      inputs:
+        is_minor: false
+        is_adult_tanf_recipient: true
+        tanf_months_received: 60
+        tanf_hardship_exception: false
+      expect: false
+
+    - name: "Adult at time limit with hardship exception remains eligible"
+      period: 2024-01
+      inputs:
+        is_minor: false
+        is_adult_tanf_recipient: true
+        tanf_months_received: 60
+        tanf_hardship_exception: true
+      expect: true
+
+    - name: "Minor always eligible regardless of months"
+      period: 2024-01
+      inputs:
+        is_minor: true
+        is_adult_tanf_recipient: false
+        tanf_months_received: 120
+        tanf_hardship_exception: false
+      expect: true
+
+    - name: "Adult exceeding limit with exception still eligible"
+      period: 2024-01
+      inputs:
+        is_minor: false
+        is_adult_tanf_recipient: true
+        tanf_months_received: 84
+        tanf_hardship_exception: true
+      expect: true
+
+    - name: "Adult just below limit eligible"
+      period: 2024-01
+      inputs:
+        is_minor: false
+        is_adult_tanf_recipient: true
+        tanf_months_received: 59
+        tanf_hardship_exception: false
+      expect: true
+
+variable tanf_months_remaining:
+  entity: Person
+  period: Month
+  dtype: Integer
+  label: "TANF Months Remaining"
+  description: "Months of federally-funded TANF assistance remaining"
+  syntax: python
+  formula: |
+    # Minors don't have limits
+    if is_minor:
+        return federal_time_limit_months
+    remaining = federal_time_limit_months - tanf_months_received
+    if remaining < 0:
+        return 0
+    return remaining
+  default: 60
+  tests:
+    - name: "Full 60 months remaining with zero received"
+      period: 2024-01
+      inputs:
+        is_minor: false
+        tanf_months_received: 0
+      expect: 60
+
+    - name: "30 months remaining after 30 received"
+      period: 2024-01
+      inputs:
+        is_minor: false
+        tanf_months_received: 30
+      expect: 30
+
+    - name: "Zero months remaining at 60 received"
+      period: 2024-01
+      inputs:
+        is_minor: false
+        tanf_months_received: 60
+      expect: 0
+
+    - name: "Zero months remaining when exceeding limit"
+      period: 2024-01
+      inputs:
+        is_minor: false
+        tanf_months_received: 72
+      expect: 0
+
+    - name: "Minor has full months available"
+      period: 2024-01
+      inputs:
+        is_minor: true
+        tanf_months_received: 50
+      expect: 60
