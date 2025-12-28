@@ -45,3 +45,38 @@ variable federal_benefit_rate:
     if has_eligible_spouse:
         return fbr_couple
     return fbr_individual
+  tests:
+    - name: "Individual without spouse receives individual FBR"
+      period: 2024-01
+      inputs:
+        has_eligible_spouse: false
+      expect: 943
+
+    - name: "Individual with eligible spouse receives couple FBR"
+      period: 2024-01
+      inputs:
+        has_eligible_spouse: true
+      expect: 1_415
+
+    - name: "Individual FBR for 2023"
+      period: 2023-01
+      inputs:
+        has_eligible_spouse: false
+      expect: 914
+
+    - name: "Couple FBR for 2023"
+      period: 2023-01
+      inputs:
+        has_eligible_spouse: true
+      expect: 1_371
+
+    - name: "Default has_eligible_spouse is false"
+      period: 2024-01
+      inputs: {}
+      expect: 943
+
+    - name: "Couple rate is higher than individual rate"
+      period: 2024-01
+      inputs:
+        has_eligible_spouse: true
+      expect: 1_415

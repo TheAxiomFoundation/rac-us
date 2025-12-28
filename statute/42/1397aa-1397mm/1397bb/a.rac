@@ -45,3 +45,40 @@ variable benefits:
     #
     # Using calibration data as best available estimate
     return per_capita_spending
+  tests:
+    - name: "household_not_chip_eligible"
+      period: 2024-01
+      inputs:
+        is_chip_eligible: false
+        per_capita_spending: 3_500
+      expect: 0
+    - name: "household_chip_eligible_standard_spending"
+      period: 2024-01
+      inputs:
+        is_chip_eligible: true
+        per_capita_spending: 3_500
+      expect: 3_500
+    - name: "household_chip_eligible_low_cost_state"
+      period: 2024-01
+      inputs:
+        is_chip_eligible: true
+        per_capita_spending: 2_000
+      expect: 2_000
+    - name: "household_chip_eligible_high_cost_state"
+      period: 2024-01
+      inputs:
+        is_chip_eligible: true
+        per_capita_spending: 5_000
+      expect: 5_000
+    - name: "household_chip_eligible_zero_spending"
+      period: 2024-01
+      inputs:
+        is_chip_eligible: true
+        per_capita_spending: 0
+      expect: 0
+    - name: "ineligible_household_ignores_spending"
+      period: 2024-01
+      inputs:
+        is_chip_eligible: false
+        per_capita_spending: 4_200
+      expect: 0

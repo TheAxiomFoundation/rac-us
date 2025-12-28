@@ -32,3 +32,42 @@ variable premium_tax_credit:
     # - All dependents claimed
     return tax_unit_size
   default: 0
+  tests:
+    # Premium Tax Credit - 26 USC § 36B(a)
+    # Tests verify tax unit size pass-through (stub implementation)
+    # 2024 FPL: $15_060 (single), add $5_380 per additional person
+
+    - name: "Single taxpayer - tax unit size 1"
+      period: 2024
+      inputs:
+        tax_unit_size: 1
+      expect: 1
+
+    - name: "Married couple no dependents - tax unit size 2"
+      period: 2024
+      inputs:
+        tax_unit_size: 2
+      expect: 2
+
+    - name: "Family of 4 - two adults, two children"
+      period: 2024
+      inputs:
+        tax_unit_size: 4
+      expect: 4
+
+    - name: "Large family - tax unit size 6"
+      period: 2024
+      inputs:
+        tax_unit_size: 6
+      expect: 6
+
+    - name: "Single parent with one child - tax unit size 2"
+      period: 2024
+      inputs:
+        tax_unit_size: 2
+      expect: 2
+
+    - name: "Default tax unit size - single taxpayer"
+      period: 2024
+      inputs: {}
+      expect: 1

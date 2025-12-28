@@ -29,3 +29,63 @@ variable income_methodology:
     foreign_exclusion = foreign_earned_income_exclusion
     return agi + exempt_interest + nontaxable_ss + foreign_exclusion
   default: 0
+  tests:
+    - name: "agi_only_no_additions"
+      period: 2024-01
+      inputs:
+        adjusted_gross_income: 3_000
+        tax_exempt_interest: 0
+        social_security_benefits: 0
+        taxable_social_security: 0
+        foreign_earned_income_exclusion: 0
+      expect: 3_000
+
+    - name: "agi_with_tax_exempt_interest"
+      period: 2024-01
+      inputs:
+        adjusted_gross_income: 2_500
+        tax_exempt_interest: 200
+        social_security_benefits: 0
+        taxable_social_security: 0
+        foreign_earned_income_exclusion: 0
+      expect: 2_700
+
+    - name: "agi_with_nontaxable_social_security"
+      period: 2024-01
+      inputs:
+        adjusted_gross_income: 1_500
+        tax_exempt_interest: 0
+        social_security_benefits: 1_800
+        taxable_social_security: 500
+        foreign_earned_income_exclusion: 0
+      expect: 2_800
+
+    - name: "agi_with_foreign_earned_income_exclusion"
+      period: 2024-01
+      inputs:
+        adjusted_gross_income: 4_000
+        tax_exempt_interest: 0
+        social_security_benefits: 0
+        taxable_social_security: 0
+        foreign_earned_income_exclusion: 1_000
+      expect: 5_000
+
+    - name: "all_magi_components"
+      period: 2024-01
+      inputs:
+        adjusted_gross_income: 3_000
+        tax_exempt_interest: 150
+        social_security_benefits: 2_000
+        taxable_social_security: 800
+        foreign_earned_income_exclusion: 500
+      expect: 4_850
+
+    - name: "fully_taxable_social_security"
+      period: 2024-01
+      inputs:
+        adjusted_gross_income: 5_000
+        tax_exempt_interest: 100
+        social_security_benefits: 1_200
+        taxable_social_security: 1_200
+        foreign_earned_income_exclusion: 0
+      expect: 5_100
