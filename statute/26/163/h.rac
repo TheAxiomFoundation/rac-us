@@ -29,6 +29,32 @@ parameter acquisition_debt_limit_mfs:
     1987-01-01: 500000
     2017-12-15: 375000  # TCJA reduced limit for debt incurred after this date
 
+input married_separate:
+  entity: TaxUnit
+  period: Year
+  dtype: Boolean
+  label: "Married Filing Separately"
+  description: "Whether filing status is married filing separately"
+  default: false
+
+input acquisition_debt:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: "USD"
+  label: "Acquisition Debt"
+  description: "Total acquisition indebtedness on qualified residence"
+  default: 0
+
+input mortgage_interest_paid:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: "USD"
+  label: "Mortgage Interest Paid"
+  description: "Total mortgage interest paid during the year"
+  default: 0
+
 variable qualified_residence_interest:
   imports: [26/1#filing_status]
   entity: TaxUnit

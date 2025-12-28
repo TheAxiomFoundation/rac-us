@@ -82,20 +82,14 @@ variable total_federal_income_tax:
   description: "Final federal income tax liability (negative = refund) per 26 USC Section 1"
   syntax: python
   formula: |
-    # Regular income tax (on ordinary income)
-    regular_tax = income_tax_before_credits
-    # Capital gains are taxed at preferential rates under Section 1(h)
-    # For taxpayers with capital gains, the actual tax is computed
-    # as the lesser of regular tax or the Section 1(h) calculation
-    # For simplicity, we use the capital gains tax as an add-on here
-    cap_gains_tax = capital_gains_tax
-    # AMT is only the excess over regular tax per Section 55(a)
-    amt = alternative_minimum_tax
-    # NIIT applies in addition to all other taxes
-    niit = net_investment_income_tax
-    # Self-employment tax - aggregate from Person level
+    # Self-employment tax aggregated from Person level
     se_tax = sum(Person.self_employment_tax)
-    # Additional Medicare Tax
-    add_medicare = additional_medicare_tax
-    return regular_tax + cap_gains_tax + amt + niit + se_tax + add_medicare
+    return (
+        income_tax_before_credits
+        + capital_gains_tax
+        + alternative_minimum_tax
+        + net_investment_income_tax
+        + se_tax
+        + additional_medicare_tax
+    )
   default: 0
