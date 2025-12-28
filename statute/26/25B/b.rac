@@ -33,13 +33,13 @@ variable applicable_percentage:
     # Apply rate based on adjusted AGI against joint thresholds
     # 50% rate: AGI at or below first threshold
     if adjusted_agi <= joint_threshold_50:
-    return 0.50
+        return 0.50
     # 20% rate: AGI above first but at or below second threshold
     if adjusted_agi <= joint_threshold_20:
-    return 0.20
+        return 0.20
     # 10% rate: AGI above second but at or below third threshold
     if adjusted_agi <= joint_threshold_10:
-    return 0.10
+        return 0.10
     # 0% rate: AGI above third threshold - no credit
     return 0
   default: 0

@@ -19,7 +19,7 @@ variable hcv_contribution_30_adjusted:
   label: "HCV 30% Adjusted Income Contribution"
   description: "30% of monthly adjusted income per 24 CFR 5.628(a)(1)"
   formula: |
-    let rate = parameter(gov.hud.hcv.tenant_contribution.income_rate)
+    rate = parameter(gov.hud.hcv.tenant_contribution.income_rate)
     return round(hcv_monthly_adjusted_income * rate)
   default: 0
 
@@ -31,8 +31,8 @@ variable hcv_contribution_10_gross:
   label: "HCV 10% Gross Income Contribution"
   description: "10% of monthly gross income per 24 CFR 5.628(a)(2)"
   formula: |
-    let rate = parameter(gov.hud.hcv.tenant_contribution.gross_income_rate)
-    let monthly_gross = hcv_annual_income / months_per_year
+    rate = parameter(gov.hud.hcv.tenant_contribution.gross_income_rate)
+    monthly_gross = hcv_annual_income / months_per_year
     return round(monthly_gross * rate)
   default: 0
 
@@ -75,14 +75,14 @@ variable hcv_total_tenant_payment:
     # (B) 10% of monthly gross income
     # (C) Welfare rent (if applicable)
     # (D) Minimum rent
-    let ttp_adjusted = hcv_contribution_30_adjusted
-    let ttp_gross = hcv_contribution_10_gross
-    let ttp_welfare = hcv_welfare_rent
-    let ttp_minimum = hcv_minimum_rent
+    ttp_adjusted = hcv_contribution_30_adjusted
+    ttp_gross = hcv_contribution_10_gross
+    ttp_welfare = hcv_welfare_rent
+    ttp_minimum = hcv_minimum_rent
     # Take the greatest
-    let ttp = max(ttp_adjusted, ttp_gross)
-    let ttp = max(ttp, ttp_welfare)
-    let ttp = max(ttp, ttp_minimum)
+    ttp = max(ttp_adjusted, ttp_gross)
+    ttp = max(ttp, ttp_welfare)
+    ttp = max(ttp, ttp_minimum)
     return ttp
   default: 0
 
@@ -98,10 +98,10 @@ variable hcv_tenant_rent_to_owner:
     # (1) TTP - utility allowance, OR
     # (2) Gross rent - HAP
     # First calculate based on TTP
-    let rent_from_ttp = max(0, hcv_total_tenant_payment - utility_allowance)
+    rent_from_ttp = max(0, hcv_total_tenant_payment - utility_allowance)
     # If gross rent exceeds payment standard, tenant pays the excess
-    let excess_rent = max(0, gross_rent - payment_standard)
-    let rent_with_excess = rent_from_ttp + excess_rent
+    excess_rent = max(0, gross_rent - payment_standard)
+    rent_with_excess = rent_from_ttp + excess_rent
     return rent_with_excess
   default: 0
 
@@ -114,6 +114,6 @@ variable hcv_utility_reimbursement:
   description: "Reimbursement when utility allowance exceeds TTP"
   formula: |
     # If utility allowance > TTP, family receives the difference
-    let reimbursement = utility_allowance - hcv_total_tenant_payment
+    reimbursement = utility_allowance - hcv_total_tenant_payment
     return max(0, reimbursement)
   default: 0

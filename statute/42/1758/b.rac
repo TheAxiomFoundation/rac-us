@@ -136,14 +136,9 @@ variable school_meal_categorically_eligible:
     # Section 9(b)(2)(A) - Head Start
     head_start_eligible = school_meal_head_start_categorically_eligible
     # Any categorical pathway qualifies
-    return snap_eligible or
-    tanf_eligible or
-    fdpir_eligible or
-    foster_eligible or
-    homeless_eligible or
-    runaway_eligible or
-    migrant_eligible or
-    head_start_eligible
+    return (snap_eligible or tanf_eligible or fdpir_eligible or
+            foster_eligible or homeless_eligible or runaway_eligible or
+            migrant_eligible or head_start_eligible)
 
 variable school_meal_cep_eligible:
   entity: Person
@@ -197,7 +192,7 @@ variable free_eligibility:
     income_ratio = household_income / fpl
     # Free meal eligibility: at or below 130% FPL
     return income_ratio <= free_meal_limit_pct_fpl
-  default: false
+  default: False
 
 
 # ---- Merged from reduced_eligibility.rac ----
@@ -229,7 +224,7 @@ variable reduced_eligibility:
     above_free_threshold = income_ratio > free_meal_limit_pct_fpl
     at_or_below_reduced_threshold = income_ratio <= reduced_price_limit_pct_fpl
     return above_free_threshold and at_or_below_reduced_threshold
-  default: false
+  default: False
 
 
 # ---- Merged from subsidy.rac ----
@@ -252,23 +247,23 @@ variable subsidy:
     is_reduced = tier == REDUCED
     # Flattened lookup: state x tier combinations
     if is_ak and is_free:
-    return nslp.alaska.free + sbp.alaska.free
+        return nslp.alaska.free + sbp.alaska.free
     elif is_ak and is_reduced:
-    return nslp.alaska.reduced + sbp.alaska.reduced
+        return nslp.alaska.reduced + sbp.alaska.reduced
     elif is_ak:
-    return nslp.alaska.paid + sbp.alaska.paid
+        return nslp.alaska.paid + sbp.alaska.paid
     elif is_hi and is_free:
-    return nslp.hawaii.free + sbp.hawaii.free
+        return nslp.hawaii.free + sbp.hawaii.free
     elif is_hi and is_reduced:
-    return nslp.hawaii.reduced + sbp.hawaii.reduced
+        return nslp.hawaii.reduced + sbp.hawaii.reduced
     elif is_hi:
-    return nslp.hawaii.paid + sbp.hawaii.paid
+        return nslp.hawaii.paid + sbp.hawaii.paid
     elif is_free:
-    return nslp.contiguous_us.free + sbp.contiguous_us.free
+        return nslp.contiguous_us.free + sbp.contiguous_us.free
     elif is_reduced:
-    return nslp.contiguous_us.reduced + sbp.contiguous_us.reduced
+        return nslp.contiguous_us.reduced + sbp.contiguous_us.reduced
     else:
-    return nslp.contiguous_us.paid + sbp.contiguous_us.paid
+        return nslp.contiguous_us.paid + sbp.contiguous_us.paid
   default: 0
 
 
@@ -294,13 +289,13 @@ variable tier:
     # Tier determination with precedence
     # 1. Categorical/CEP -> FREE
     if categorical or cep_school:
-    return FREE
+        return FREE
     # 2. Income <= 130% FPL -> FREE
     if income_ratio <= free_meal_limit_pct_fpl:
-    return FREE
+        return FREE
     # 3. 130% < Income <= 185% FPL -> REDUCED
     if income_ratio <= reduced_price_limit_pct_fpl:
-    return REDUCED
+        return REDUCED
     # 4. Income > 185% FPL -> PAID
     return PAID
-  default: false
+  default: False

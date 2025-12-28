@@ -47,7 +47,7 @@ variable ctc_phaseout_threshold:
   label: "CTC Phaseout Threshold"
   description: "Income threshold where CTC phaseout begins per 26 USC 24(b)(2) and 24(h)(3)"
   formula: |
-    if filing_status == JOINT:
+    if filing_status == 'JOINT':
       return phaseout_threshold_joint
     return phaseout_threshold_other
   tests:

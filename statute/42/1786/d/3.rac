@@ -20,4 +20,8 @@ variable adjunctive:
   dtype: Boolean
   formula: |
     # Person or household receives SNAP benefits
-    return receives_snap or household.receives_snap
+    if receives_snap:
+        return True
+    if household.receives_snap:
+        return True
+    return False

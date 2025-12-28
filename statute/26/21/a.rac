@@ -27,7 +27,8 @@ variable child_dependent_care_credit:
   description: "Credit for employment-related expenses for care of qualifying individuals per 26 USC 21"
   formula: |
     # No qualifying individuals = no credit
-    if num_cdcc_qualifying_individuals == 0: return 0
+    if num_cdcc_qualifying_individuals == 0:
+        return 0
     # Apply all limitations: actual expenses, statutory limit, earned income limit
     return min(cdcc_expenses_paid, cdcc_maximum_expense_limit, cdcc_earned_income_limit)
   default: 0

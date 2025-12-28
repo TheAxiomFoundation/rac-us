@@ -38,47 +38,53 @@ variable applicable_percentage:
     income_pct = household_income_pct_fpl
     # Under IRA (2021-2025): Income above 400% FPL still eligible at 8.5%
     # Below 100% FPL: No credit (Medicaid eligible in expansion states)
-    if income_pct < min_eligibility_pct_fpl: return 0
+    if income_pct < min_eligibility_pct_fpl:
+        return 0
     # Bracket 1: 100-150% FPL (0% contribution under IRA)
-    if income_pct < bracket_150_pct: return interpolate_bracket(
-    income_pct,
-    bracket_1.lower_fpl,
-    bracket_1.upper_fpl,
-    bracket_1.initial_pct,
-    bracket_1.final_pct
-    )
+    if income_pct < bracket_150_pct:
+        return interpolate_bracket(
+            income_pct,
+            bracket_1.lower_fpl,
+            bracket_1.upper_fpl,
+            bracket_1.initial_pct,
+            bracket_1.final_pct
+        )
     # Bracket 2: 150-200% FPL (0% to 2% under IRA)
-    if income_pct < bracket_200_pct: return interpolate_bracket(
-    income_pct,
-    bracket_2.lower_fpl,
-    bracket_2.upper_fpl,
-    bracket_2.initial_pct,
-    bracket_2.final_pct
-    )
+    if income_pct < bracket_200_pct:
+        return interpolate_bracket(
+            income_pct,
+            bracket_2.lower_fpl,
+            bracket_2.upper_fpl,
+            bracket_2.initial_pct,
+            bracket_2.final_pct
+        )
     # Bracket 3: 200-250% FPL (2% to 4% under IRA)
-    if income_pct < bracket_250_pct: return interpolate_bracket(
-    income_pct,
-    bracket_3.lower_fpl,
-    bracket_3.upper_fpl,
-    bracket_3.initial_pct,
-    bracket_3.final_pct
-    )
+    if income_pct < bracket_250_pct:
+        return interpolate_bracket(
+            income_pct,
+            bracket_3.lower_fpl,
+            bracket_3.upper_fpl,
+            bracket_3.initial_pct,
+            bracket_3.final_pct
+        )
     # Bracket 4: 250-300% FPL (4% to 6% under IRA)
-    if income_pct < bracket_300_pct: return interpolate_bracket(
-    income_pct,
-    bracket_4.lower_fpl,
-    bracket_4.upper_fpl,
-    bracket_4.initial_pct,
-    bracket_4.final_pct
-    )
+    if income_pct < bracket_300_pct:
+        return interpolate_bracket(
+            income_pct,
+            bracket_4.lower_fpl,
+            bracket_4.upper_fpl,
+            bracket_4.initial_pct,
+            bracket_4.final_pct
+        )
     # Bracket 5: 300-400% FPL (6% to 8.5% under IRA)
-    if income_pct < bracket_400_pct: return interpolate_bracket(
-    income_pct,
-    bracket_5.lower_fpl,
-    bracket_5.upper_fpl,
-    bracket_5.initial_pct,
-    bracket_5.final_pct
-    )
+    if income_pct < bracket_400_pct:
+        return interpolate_bracket(
+            income_pct,
+            bracket_5.lower_fpl,
+            bracket_5.upper_fpl,
+            bracket_5.initial_pct,
+            bracket_5.final_pct
+        )
     # Bracket 6: 400%+ FPL (8.5% flat under IRA - no cliff!)
     return bracket_6.initial_pct
   default: 0

@@ -8,8 +8,10 @@ variable medicaid_child_cost_share_exempt:
   description: "Children under 18 are exempt from cost sharing per 42 USC 1396o(b)(3)(A)"
   formula: |
     # Children under child_age_threshold are fully exempt
-    return age < child_age_threshold
-  default: true
+    if age < child_age_threshold:
+        return True
+    return False
+  default: True
 
 variable medicaid_pregnant_cost_share_exempt:
   entity: Person
@@ -18,7 +20,7 @@ variable medicaid_pregnant_cost_share_exempt:
   label: "Pregnant exempt from cost sharing"
   description: "Pregnant women are exempt from cost sharing per 42 USC 1396o(b)(3)(B)"
   formula: return is_pregnant
-  default: false
+  default: False
 
 variable medicaid_institutionalized_cost_share_exempt:
   entity: Person
@@ -28,8 +30,10 @@ variable medicaid_institutionalized_cost_share_exempt:
   description: "Institutionalized individuals exempt per 42 USC 1396o(b)(3)(C)"
   formula: |
     # Nursing home residents, ICF residents, etc.
-    return is_institutionalized
-  default: false
+    if is_institutionalized:
+        return True
+    return False
+  default: False
 
 variable medicaid_hospice_cost_share_exempt:
   entity: Person
@@ -38,7 +42,7 @@ variable medicaid_hospice_cost_share_exempt:
   label: "Hospice exempt from cost sharing"
   description: "Individuals in hospice exempt per 42 USC 1396o(b)(3)(D)"
   formula: return is_hospice_enrolled
-  default: false
+  default: False
 
 variable medicaid_cost_share_exempt:
   entity: Person
@@ -48,11 +52,16 @@ variable medicaid_cost_share_exempt:
   description: "Individual is fully exempt from Medicaid cost sharing"
   formula: |
     # Any exempt category means no cost sharing
-    return medicaid_child_cost_share_exempt
-    or medicaid_pregnant_cost_share_exempt
-    or medicaid_institutionalized_cost_share_exempt
-    or medicaid_hospice_cost_share_exempt
-  default: false
+    if medicaid_child_cost_share_exempt:
+        return True
+    if medicaid_pregnant_cost_share_exempt:
+        return True
+    if medicaid_institutionalized_cost_share_exempt:
+        return True
+    if medicaid_hospice_cost_share_exempt:
+        return True
+    return False
+  default: False
 
 variable medicaid_nominal_cost_share_tier:
   entity: Person
@@ -63,7 +72,7 @@ variable medicaid_nominal_cost_share_tier:
   formula: |
     income_pct = household.magi_income_pct_fpl
     return income_pct < nominal_tier_fpl_threshold
-  default: true
+  default: True
 
 variable medicaid_moderate_cost_share_tier:
   entity: Person
@@ -74,7 +83,7 @@ variable medicaid_moderate_cost_share_tier:
   formula: |
     income_pct = household.magi_income_pct_fpl
     return income_pct >= nominal_tier_fpl_threshold and income_pct < moderate_tier_fpl_threshold
-  default: false
+  default: False
 
 variable medicaid_higher_cost_share_tier:
   entity: Person
@@ -85,7 +94,7 @@ variable medicaid_higher_cost_share_tier:
   formula: |
     income_pct = household.magi_income_pct_fpl
     return income_pct >= moderate_tier_fpl_threshold
-  default: false
+  default: False
 
 variable medicaid_max_copayment_rate:
   entity: Person
@@ -96,16 +105,16 @@ variable medicaid_max_copayment_rate:
   formula: |
     # Exempt individuals pay nothing
     if medicaid_cost_share_exempt:
-    return 0
+        return 0
     # Nominal tier: up to $4 per service (not percentage-based)
     if medicaid_nominal_cost_share_tier:
-    return 0  # Handled by nominal_copayment instead
+        return 0  # Handled by nominal_copayment instead
     # 100-150% FPL: up to 10% of service cost
     if medicaid_moderate_cost_share_tier:
-    return copayment_rate_100_150_fpl
+        return copayment_rate_100_150_fpl
     # Above 150% FPL: up to 20% of service cost
     if medicaid_higher_cost_share_tier:
-    return copayment_rate_150_plus_fpl
+        return copayment_rate_150_plus_fpl
     return 0
   default: 0
 
@@ -119,10 +128,10 @@ variable medicaid_nominal_copayment:
   formula: |
     # Exempt individuals pay nothing
     if medicaid_cost_share_exempt:
-    return 0
+        return 0
     # Only applies to nominal tier
     if not medicaid_nominal_cost_share_tier:
-    return 0
+        return 0
     # Federal maximum nominal copayment
     return nominal_copayment_max
   default: 0
@@ -136,25 +145,25 @@ variable medicaid_premium_applicable:
   formula: |
     # Exempt groups cannot be charged premiums
     if medicaid_cost_share_exempt:
-    return false
+        return False
     # Premiums not allowed for mandatory groups below 150% FPL
     income_pct = household.magi_income_pct_fpl
     category = medicaid_category
     # Children, pregnant women: no premiums regardless of income
     if category == "infant":
-    return false
+        return False
     if category == "child_1_5":
-    return false
+        return False
     if category == "child_6_18":
-    return false
+        return False
     if category == "pregnant":
-    return false
+        return False
     # Below 150% FPL: no premiums for mandatory groups
     if income_pct < premium_fpl_threshold:
-    return false
+        return False
     # Expansion adults above 150% FPL: state may charge premiums
-    return true
-  default: false
+    return True
+  default: False
 
 variable medicaid_max_monthly_premium:
   entity: Person
@@ -165,7 +174,7 @@ variable medicaid_max_monthly_premium:
   description: "Maximum monthly premium that may be charged"
   formula: |
     if not medicaid_premium_applicable:
-    return 0
+        return 0
     # Premium capped at percentage of income
     # Varies by state, federal maximum is typically tied to 5% aggregate limit
     # State-specific implementation needed
@@ -206,8 +215,8 @@ variable medicaid_emergency_cost_share_exempt:
   formula: |
     # This is always true - emergency services are always exempt
     # The variable exists to flag this protection
-    return true
-  default: true
+    return True
+  default: True
 
 variable medicaid_preventive_cost_share_exempt:
   entity: Person
@@ -218,5 +227,5 @@ variable medicaid_preventive_cost_share_exempt:
   formula: |
     # Preventive services are exempt for most Medicaid populations
     # This includes immunizations, screenings, well-child visits
-    return true
-  default: true
+    return True
+  default: True

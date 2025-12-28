@@ -39,5 +39,6 @@ variable total_itemized_deductions:
   unit: "USD"
   label: "Total Itemized Deductions"
   description: "Alias for itemized_taxable_income_deductions"
-  formula: return itemized_taxable_income_deductions
+  formula: |
+    return itemized_taxable_income_deductions
   default: 0

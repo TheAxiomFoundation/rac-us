@@ -39,17 +39,33 @@ variable additional_standard_deduction:
   description: "Additional standard deduction amounts for aged and blind taxpayers per 26 USC 63(f)"
   formula: |
     # 63(f)(3): "married" includes surviving spouse per statute text
-    is_married = (filing_status == MARRIED_FILING_JOINTLY) or (filing_status == MARRIED_FILING_SEPARATELY) or (filing_status == QUALIFYING_WIDOW)
+    is_married = (filing_status == "MARRIED_FILING_JOINTLY") or (filing_status == "MARRIED_FILING_SEPARATELY") or (filing_status == "QUALIFYING_WIDOW")
     # Select amounts based on marital status
-    aged_amount = is_married ? additional_aged_married : additional_aged_unmarried
-    blind_amount = is_married ? additional_blind_married : additional_blind_unmarried
+    if is_married:
+      aged_amount = additional_aged_married
+      blind_amount = additional_blind_married
+    else:
+      aged_amount = additional_aged_unmarried
+      blind_amount = additional_blind_unmarried
     # 63(f)(1): Primary taxpayer aged 65+
-    primary_aged = age >= aged_threshold ? aged_amount : 0
+    if age >= aged_threshold:
+      primary_aged = aged_amount
+    else:
+      primary_aged = 0
     # 63(f)(2): Primary taxpayer blind
-    primary_blind = is_blind ? blind_amount : 0
+    if is_blind:
+      primary_blind = blind_amount
+    else:
+      primary_blind = 0
     # Spouse additions (joint filers only)
-    spouse_aged = (filing_status == MARRIED_FILING_JOINTLY and spouse_age >= aged_threshold) ? aged_amount : 0
-    spouse_blind_add = (filing_status == MARRIED_FILING_JOINTLY and spouse_is_blind) ? blind_amount : 0
+    if filing_status == "MARRIED_FILING_JOINTLY" and spouse_age >= aged_threshold:
+      spouse_aged = aged_amount
+    else:
+      spouse_aged = 0
+    if filing_status == "MARRIED_FILING_JOINTLY" and spouse_is_blind:
+      spouse_blind_add = blind_amount
+    else:
+      spouse_blind_add = 0
     return primary_aged + primary_blind + spouse_aged + spouse_blind_add
   tests:
     - name: "Single under 65 not blind 2024"

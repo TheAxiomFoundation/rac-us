@@ -50,15 +50,15 @@ variable nol_modification_capital_losses:
     net_capital = capital_gains - capital_losses
     # If net capital gain or no loss, no modification needed
     if net_capital >= 0:
-    return 0
+        return 0
     # Disallow excess capital losses beyond what offset gains
     # Add back the excess loss that reduced taxable income
     excess_capital_loss = -net_capital
     # But only to extent losses exceeded gains
     if capital_losses > capital_gains:
-    return excess_capital_loss
+        return excess_capital_loss
     else:
-    return 0
+        return 0
   default: 0
 
 variable nol_modification_exemptions:

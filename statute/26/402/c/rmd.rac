@@ -89,14 +89,14 @@ variable is_rmd_required:
   formula: |
     # Must have reached RMD age
     if not has_reached_rmd_age:
-    return false
+        return False
     # Still-working exception for non-5% owners
     if is_still_working_for_plan_sponsor and not is_5_percent_owner:
-    return false
+        return False
     # Must have account balance
     if prior_year_401k_balance <= 0:
-    return false
-    return true
+        return False
+    return True
   default: false
 
 variable rmd_divisor:
@@ -119,7 +119,7 @@ variable required_minimum_distribution:
   description: "Minimum amount that must be withdrawn from retirement account"
   formula: |
     if not is_rmd_required:
-    return 0
+        return 0
     # RMD = Prior year balance / Life expectancy divisor
     return prior_year_401k_balance / rmd_divisor
   default: 0

@@ -28,11 +28,12 @@ variable has_excessive_investment_income:
   label: "Disqualified by Investment Income"
   description: "Whether investment income exceeds the limit per 26 USC §32(i)(1)"
   formula: |
-    return (
-    interest_income                # §32(i)(2)(A)
-    + dividend_income              # §32(i)(2)(A)
-    + tax_exempt_interest          # §32(i)(2)(B)
-    + net_rent_royalty_income      # §32(i)(2)(C)
-    + capital_gain_net_income      # §32(i)(2)(D)
-    + net_passive_income           # §32(i)(2)(E)
+    disqualified_income = (
+        interest_income                # §32(i)(2)(A)
+        + dividend_income              # §32(i)(2)(A)
+        + tax_exempt_interest          # §32(i)(2)(B)
+        + net_rent_royalty_income      # §32(i)(2)(C)
+        + capital_gain_net_income      # §32(i)(2)(D)
+        + net_passive_income           # §32(i)(2)(E)
     )
+    return disqualified_income > disqualified_income_limit

@@ -53,7 +53,7 @@ variable holding_period:
     # Calculate days between acquisition and disposition
     # Note: Day of acquisition is excluded, day of disposition is included
     return days_between(acquisition_date, disposition_date)
-  default: false
+  default: False
 
 
 # ---- Merged from netting.rac ----
@@ -81,7 +81,7 @@ variable netting:
     net = short_term_capital_gain - total_st_loss
     # Only a gain if positive
     return max(0, net)
-  default: false
+  default: False
 
 
 # ---- Merged from preferential_rates.rac ----

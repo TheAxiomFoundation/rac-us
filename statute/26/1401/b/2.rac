@@ -41,9 +41,12 @@ variable additional_medicare_tax_threshold:
     # (A) Joint return = $250k
     # (B) Married filing separately = $125k
     # (C) Any other case = $200k (Single, HOH, Surviving Spouse)
-    if filing_status == JOINT: return threshold_joint
-    if filing_status == SEPARATE: return threshold_separate
-    return threshold_single
+    if filing_status == "JOINT":
+        return threshold_joint
+    elif filing_status == "SEPARATE":
+        return threshold_separate
+    else:
+        return threshold_single
 
 variable se_income_subject_to_additional_medicare_tax:
   entity: TaxUnit

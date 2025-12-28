@@ -40,7 +40,7 @@ variable snap_earned_income_deduction:
   label: "SNAP Earned Income Deduction"
   description: "20% of gross earned income deducted before other calculations"
   formula: |
-    let rate = parameter(gov.usda.fns.snap.deductions.earned_income_rate)
+    rate = parameter("gov.usda.fns.snap.deductions.earned_income_rate")
     return earned_income * rate
   default: 0
 
@@ -53,11 +53,11 @@ variable snap_pre_shelter_deductions:
   description: "Sum of all deductions before excess shelter calculation"
   formula: |
     # Sum all deductions that apply before shelter
-    let earned_ded = snap_earned_income_deduction
-    let std_ded = snap_standard_deduction
-    let care_ded = snap_dependent_care_deduction
-    let support_ded = snap_child_support_deduction
-    let medical_ded = snap_medical_expense_deduction
+    earned_ded = snap_earned_income_deduction
+    std_ded = snap_standard_deduction
+    care_ded = snap_dependent_care_deduction
+    support_ded = snap_child_support_deduction
+    medical_ded = snap_medical_expense_deduction
     return earned_ded + std_ded + care_ded + support_ded + medical_ded
   default: 0
 
@@ -80,15 +80,15 @@ variable snap_shelter_deduction:
   description: "Deduction for shelter costs exceeding 50% of adjusted income"
   formula: |
     # Section 2014(e)(6)(A): Excess = shelter costs - 50% of adjusted income
-    let adjusted = snap_adjusted_income
-    let excess = shelter_costs - (adjusted * excess_shelter_rate)
+    adjusted = snap_adjusted_income
+    excess = shelter_costs - (adjusted * excess_shelter_rate)
     if excess <= 0:
-    return 0
+        return 0
     # Section 2014(e)(6)(C): No cap for elderly/disabled households
     if has_elderly_disabled:
-    return excess
+        return excess
     # Section 2014(e)(6)(B): Cap for non-elderly/disabled households
-    let cap = parameter(gov.usda.fns.snap.deductions.shelter.cap)
+    cap = parameter("gov.usda.fns.snap.deductions.shelter.cap")
     return min(excess, cap)
   default: 0
 
@@ -100,8 +100,8 @@ variable snap_net_income:
   label: "SNAP Net Income"
   description: "Monthly income after all SNAP deductions, used for benefit calculation"
   formula: |
-    let adjusted = snap_adjusted_income
-    let shelter_ded = snap_shelter_deduction
+    adjusted = snap_adjusted_income
+    shelter_ded = snap_shelter_deduction
     return max(0, adjusted - shelter_ded)
   default: 0
 

@@ -20,10 +20,10 @@ variable num_qualifying_children:
   formula: |
     # Count children who meet all EITC-specific requirements
     count = person.count(
-    is_qualifying_child
-    and not child_is_married_filing_joint
-    and child_meets_place_of_abode
-    and child_has_valid_tin
+        is_qualifying_child
+        and not child_is_married_filing_joint
+        and child_meets_place_of_abode
+        and child_has_valid_tin
     )
     # For EITC parameter lookup, 3+ children use the same rates
     return min(count, 3)

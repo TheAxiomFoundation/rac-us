@@ -71,8 +71,8 @@ variable benefit_calculation:
     # Energy burden = energy costs / income
     # Handle zero income case
     if annual_gross_income <= 0:
-    # If no income but has energy costs, burden is effectively infinite
-    # Cap at 1.0 (100%) for calculation purposes
-    return 1.0
+        # If no income but has energy costs, burden is effectively infinite
+        # Cap at 1.0 (100%) for calculation purposes
+        return 1.0
     return min(1.0, annual_energy_costs / annual_gross_income)
   default: 0

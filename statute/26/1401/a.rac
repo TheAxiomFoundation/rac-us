@@ -18,7 +18,8 @@ variable self_employment_tax:
   description: "Hospital Insurance tax on self-employment earnings per 1401(b)"
   formula: |
     # taxable_self_employment_income from PE is already gross * 0.9235
-    return max(0, taxable_self_employment_income)
+    result = max(0, taxable_self_employment_income)
+    return result
 
 variable base_self_employment_tax:
   entity: Person

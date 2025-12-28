@@ -31,8 +31,8 @@ variable earned_income_limit:
     spouse_income = members.earned_income * members.is_tax_unit_spouse
     head_earned = sum(members, head_income)
     spouse_earned = sum(members, spouse_income)
-    if filing_status == SINGLE or filing_status == HEAD_OF_HOUSEHOLD:
-    return head_earned
+    if filing_status == "SINGLE" or filing_status == "HEAD_OF_HOUSEHOLD":
+        return head_earned
     # For married filers: use lesser of two spouses' earned income
     # This incentivizes work for both spouses
     return min(head_earned, spouse_earned)

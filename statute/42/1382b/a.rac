@@ -34,14 +34,16 @@ variable resource_exclusions:
     # Exclude household goods and one automobile (2)
     after_goods = after_home - household_goods_value - automobile_value
     # Exclude qualifying burial funds up to limit (9)
-    burial_limit = has_eligible_spouse
-    ? burial_funds_limit_couple
-    : burial_funds_limit_individual
+    if has_eligible_spouse:
+        burial_limit = burial_funds_limit_couple
+    else:
+        burial_limit = burial_funds_limit_individual
     burial_exclusion = min(designated_burial_funds, burial_limit)
     after_burial = after_goods - burial_exclusion
     # Exclude life insurance if face value <= $1,500 (5)
-    life_exclusion = life_insurance_face_value <= life_insurance_limit
-    ? life_insurance_cash_value
-    : 0
+    if life_insurance_face_value <= life_insurance_limit:
+        life_exclusion = life_insurance_cash_value
+    else:
+        life_exclusion = 0
     after_life = after_burial - life_exclusion
     return max(0, after_life)

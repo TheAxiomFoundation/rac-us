@@ -30,6 +30,9 @@ variable credit_reduction_amount:
     rate = phaseout_percentage[num_qualifying_children]
     threshold = phaseout_amount[num_qualifying_children]
     # Joint filers get higher threshold per 32(b)(2)(B)
-    adjusted_threshold = filing_status == JOINT ? (threshold + joint_return_adjustment) : threshold
+    if filing_status == 'JOINT':
+        adjusted_threshold = threshold + joint_return_adjustment
+    else:
+        adjusted_threshold = threshold
     # Reduction = rate × (income - threshold), but not below zero
     return max(0, rate * (income - adjusted_threshold))

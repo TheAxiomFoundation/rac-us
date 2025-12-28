@@ -33,19 +33,19 @@ variable distributions:
   formula: |
     # Must satisfy 5-year holding period
     if not is_roth_ira_5_year_satisfied:
-    return false
+        return False
     # Must meet one of these conditions:
     # (i) Age 59.5+
     if age >= early_withdrawal_penalty_age:
-    return true
+        return True
     # (ii) Death
     if is_roth_death_distribution:
-    return true
+        return True
     # (iii) Disability
     if is_roth_owner_disabled:
-    return true
+        return True
     # (iv) First-time homebuyer (up to $10,000 lifetime)
     if roth_first_home_distribution > 0:
-    return true
-    return false
+        return True
+    return False
   default: 0

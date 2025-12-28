@@ -29,8 +29,10 @@ variable expansion:
   description: "Eligible for enhanced federal match under expansion"
   formula: |
     # Must be at least 19 (not under 19)
-    if age < age_child_max: return false
+    if age < age_child_max:
+        return False
     # Must be under 65 (not Medicare aged)
-    if age >= age_elderly_min: return false
-    return true
+    if age >= age_elderly_min:
+        return False
+    return True
   default: false

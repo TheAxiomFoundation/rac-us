@@ -20,7 +20,6 @@ variable interest_deduction:
     # 1. Qualified residence interest (mortgage interest within limits)
     # 2. Investment interest (limited to net investment income)
     # 3. Mortgage points (if meeting requirements)
-    return qualified_residence_interest +
-    deductible_investment_interest +
-    mortgage_points
+    total = qualified_residence_interest + deductible_investment_interest + mortgage_points
+    return total
   default: 0

@@ -19,10 +19,13 @@ variable work_requirements:
   dtype: Boolean
   formula: |
     # 607(c)(1)(A): Single parent or head of household with child under threshold age
-    let has_young_child = any(children, child.age < child_under_age_threshold)
-    if tanf_head_of_household and has_young_child: return work_activities_hours_reduced  # 20 hours/week
+    has_young_child = any(children, child.age < child_under_age_threshold)
+    if tanf_head_of_household and has_young_child:
+        return work_activities_hours_reduced  # 20 hours/week
     # 607(c)(1)(B): General requirement - single parent families
-    if tanf_head_of_household: return work_activities_hours_single_parent  # 30 hours/week
+    if tanf_head_of_household:
+        return work_activities_hours_single_parent  # 30 hours/week
     # 607(c)(2): Two-parent families
-    if tanf_two_parent_family: return work_activities_hours_two_parent  # 35 hours/week (55 if child care)
+    if tanf_two_parent_family:
+        return work_activities_hours_two_parent  # 35 hours/week (55 if child care)
     return 0

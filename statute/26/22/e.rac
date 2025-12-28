@@ -23,7 +23,7 @@ variable is_qualified_individual:
     # is_permanently_disabled is assumed to be an input indicating permanent/total disability
     is_disabled_and_under_65 = is_permanently_disabled and taxpayer_age < elderly_age_threshold
     return is_elderly or is_disabled_and_under_65
-  default: false
+  default: False
 
 variable num_qualified_individuals:
   imports: [26/22/e#is_sec22_qualified_individual]

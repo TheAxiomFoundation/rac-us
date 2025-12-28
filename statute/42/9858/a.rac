@@ -83,13 +83,13 @@ variable benefit:
     # Home-based care typically has different age group cutoffs
     # Infant: under infant_max_months (center) or (home)
     if (age_months < infant_max_months_center and not is_home_based) or (age_months < infant_max_months_home and is_home_based):
-    return CCDFAgeGroup.INFANT
+        return CCDFAgeGroup.INFANT
     # Toddler: under toddler_max_months
     if (age_months < toddler_max_months_center and not is_home_based) or (age_months < toddler_max_months_home and is_home_based):
-    return CCDFAgeGroup.TODDLER
+        return CCDFAgeGroup.TODDLER
     # Preschooler: under preschool_max_years
     if age < preschool_max_years:
-    return CCDFAgeGroup.PRESCHOOLER
+        return CCDFAgeGroup.PRESCHOOLER
     # School-age: preschool_max_years and above
     return CCDFAgeGroup.SCHOOL_AGE
   default: 0
@@ -172,7 +172,7 @@ variable copayment:
     # Families at or below poverty level should have copay waived
     # per 42 USC 9858c(c)(4)(A)(i)
     if family_income <= poverty_level:
-    return 0
+        return 0
     # Income in excess of poverty level
     income_above_fpl = max(family_income - poverty_level, 0)
     # Federal maximum copay guidance: 7% of family income
@@ -191,15 +191,15 @@ variable copayment:
     # Graduated copay rate based on income level
     # (States set their own rates; this is illustrative)
     if income_to_smi <= smi_threshold_1:
-    copay_rate = copay_rate_1   # First threshold or below
-    else if income_to_smi <= smi_threshold_2:
-    copay_rate = copay_rate_2   # Between first and second threshold
-    else if income_to_smi <= smi_threshold_3:
-    copay_rate = copay_rate_3   # Between second and third threshold
-    else if income_to_smi <= smi_threshold_4:
-    copay_rate = copay_rate_4   # Between third and fourth threshold
-    else if income_to_smi > smi_threshold_4:
-    copay_rate = copay_rate_5   # Above fourth threshold
+        copay_rate = copay_rate_1   # First threshold or below
+    elif income_to_smi <= smi_threshold_2:
+        copay_rate = copay_rate_2   # Between first and second threshold
+    elif income_to_smi <= smi_threshold_3:
+        copay_rate = copay_rate_3   # Between second and third threshold
+    elif income_to_smi <= smi_threshold_4:
+        copay_rate = copay_rate_4   # Between third and fourth threshold
+    elif income_to_smi > smi_threshold_4:
+        copay_rate = copay_rate_5   # Above fourth threshold
     # Annual copay based on income above FPL
     calculated_copay = income_above_fpl * copay_rate
     # Apply maximum copay cap (7% of total income per federal guidance)
@@ -237,9 +237,9 @@ variable eligibility:
     has_disability = this.is_disabled
     # Age eligible if under standard limit, or under disability limit with disability
     if has_disability:
-    age_limit = disability_limit
-    else if not has_disability:
-    age_limit = standard_limit
+        age_limit = disability_limit
+    elif not has_disability:
+        age_limit = standard_limit
     return age < age_limit
 
 

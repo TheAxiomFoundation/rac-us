@@ -28,10 +28,10 @@ variable basic_standard_deduction:
   description: "Basic standard deduction amount based on filing status per 26 USC 63(c)(2)"
   formula: |
     # 63(c)(2)(A): Joint return or surviving spouse
-    if (filing_status == MARRIED_FILING_JOINTLY) or (filing_status == QUALIFYING_WIDOW):
+    if filing_status == "MARRIED_FILING_JOINTLY" or filing_status == "QUALIFYING_WIDOW":
       return basic_joint
     # 63(c)(2)(B): Head of household
-    if filing_status == HEAD_OF_HOUSEHOLD:
+    if filing_status == "HEAD_OF_HOUSEHOLD":
       return basic_head_of_household
     # 63(c)(2)(C): Single or married filing separately
     return basic_single

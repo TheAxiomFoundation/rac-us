@@ -37,11 +37,13 @@ variable net_investment_income:
   formula: |
     # Section 1411(c)(1)(A)(i): Investment income from interest, dividends, annuities, royalties, rents
     # Note: Uses taxable interest only (excludes tax-exempt muni bond interest per Section 103)
-    investment_income = sum(members, taxable_interest_income) +
-    sum(members, dividend_income) +
-    sum(members, rental_income) +
-    sum(members, royalty_income) +
-    sum(members, annuity_income)
+    investment_income = (
+        sum(members, taxable_interest_income) +
+        sum(members, dividend_income) +
+        sum(members, rental_income) +
+        sum(members, royalty_income) +
+        sum(members, annuity_income)
+    )
     # Section 1411(c)(1)(A)(iii): Net capital gains (loss-limited)
     # loss_limited_net_capital_gains is already at TaxUnit level
     capital_gains_component = loss_limited_net_capital_gains

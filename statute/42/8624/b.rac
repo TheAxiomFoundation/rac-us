@@ -36,7 +36,7 @@ variable eligibility:
     extra_members = max(0, household_size - 1)
     fpl = base_fpl + (additional_per_person * extra_members)
     return fpl * fpl_percentage
-  default: false
+  default: False
 
 
 

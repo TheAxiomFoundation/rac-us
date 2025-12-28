@@ -15,5 +15,15 @@ variable ssi:
   unit: "USD"
   label: "Supplemental Security Income"
   description: "Monthly SSI payment per 42 USC 1382(b)"
-  formula: return ssi_countable_income <= federal_benefit_rate
+  formula: |
+    if not is_ssi_categorical_eligible:
+        return 0
+    if not is_ssi_resource_eligible:
+        return 0
+    if not is_ssi_citizenship_eligible:
+        return 0
+    if not is_ssi_residency_eligible:
+        return 0
+    benefit = applicable_fbr - ssi_countable_income
+    return max(0, benefit)
   default: 0

@@ -45,9 +45,9 @@ variable income_tax_before_credits:
   label: "Income Tax Before Credits"
   description: "Federal income tax on ordinary income before credits per 26 USC Section 1"
   formula: |
+    if taxable_income <= 0:
+        return 0
     return marginal_agg(taxable_income, brackets, threshold_by=filing_status)
-    defined_for:
-    taxable_income > 0
   default: 0
 
 variable income_tax_before_credits_vectorized:
@@ -57,7 +57,8 @@ variable income_tax_before_credits_vectorized:
   unit: "USD"
   label: "Income Tax Before Credits (Vectorized)"
   description: "Vectorized implementation for microsimulation"
-  formula: return marginal_agg(taxable_income, brackets, threshold_by=filing_status)
+  formula: |
+    return marginal_agg(taxable_income, brackets, threshold_by=filing_status)
   default: 0
 
 variable total_federal_income_tax:

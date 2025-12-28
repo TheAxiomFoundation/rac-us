@@ -49,7 +49,7 @@ variable nol_deduction_claimed:
   label: "NOL Deduction Claimed"
   description: "Whether taxpayer claims an NOL deduction in current year"
   formula: return nol_deduction > 0
-  default: false
+  default: False
 
 variable taxable_income_before_nol:
   entity: TaxUnit

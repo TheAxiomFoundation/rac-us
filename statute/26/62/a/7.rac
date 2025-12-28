@@ -17,7 +17,8 @@ variable ira_deduction:
     base_limit = contribution_limit
     # Add catch-up contribution if age 50 or older
     if age >= catch_up_age:
-    return base_limit + catch_up_amount
+      return base_limit + catch_up_amount
+    return base_limit
 
 
 # Base TCJA values (2018) - contribution limit indexed annually
@@ -101,96 +102,90 @@ parameter phaseout_mfs_end:
 
 
 input traditional_ira_contributions:
-  entity Person
-  period Year
-  dtype Money
-  unit "USD"
-  label "Traditional IRA Contributions"
-  description "Contributions made to traditional IRA during the tax year"
-  default 0
+  entity: Person
+  period: Year
+  dtype: Money
+  unit: "USD"
+  label: "Traditional IRA Contributions"
+  description: "Contributions made to traditional IRA during the tax year"
+  default: 0
 
 input has_retirement_plan_at_work:
-  entity Person
-  period Year
-  dtype Boolean
-  label "Covered by Employer Retirement Plan"
-  description "Whether the individual is an active participant in an employer retirement plan"
-  default false
+  entity: Person
+  period: Year
+  dtype: Boolean
+  label: "Covered by Employer Retirement Plan"
+  description: "Whether the individual is an active participant in an employer retirement plan"
+  default: False
 
 
 variable ira_contribution_limit:
-  entity Person
-  period Year
-  dtype Money
-  unit "USD"
-  label "IRA Contribution Limit"
-  description "Maximum allowable IRA contribution including catch-up"
-  formula:
+  entity: Person
+  period: Year
+  dtype: Money
+  unit: "USD"
+  label: "IRA Contribution Limit"
+  description: "Maximum allowable IRA contribution including catch-up"
+  formula: |
     base_limit = contribution_limit
-
     # Add catch-up contribution if age 50 or older
     if age >= catch_up_age:
       return base_limit + catch_up_amount
     return base_limit
 
 variable ira_deduction_before_phaseout:
-  entity Person
-  period Year
-  dtype Money
-  unit "USD"
-  label "IRA Deduction Before Phase-out"
-  description "IRA deduction amount before applying income phase-out"
-  formula:
+  entity: Person
+  period: Year
+  dtype: Money
+  unit: "USD"
+  label: "IRA Deduction Before Phase-out"
+  description: "IRA deduction amount before applying income phase-out"
+  formula: |
     # Cannot deduct more than contributed or the annual limit
     return min(traditional_ira_contributions, ira_contribution_limit)
 
 variable ira_phaseout_ratio:
-  entity Person
-  period Year
-  dtype Rate
-  label "IRA Deduction Phase-out Ratio"
-  description "Ratio of IRA deduction that is phased out based on income"
-  formula:
+  entity: Person
+  period: Year
+  dtype: Rate
+  label: "IRA Deduction Phase-out Ratio"
+  description: "Ratio of IRA deduction that is phased out based on income"
+  formula: |
     # If not covered by employer plan, no phase-out applies
     if not has_retirement_plan_at_work:
       return 0
-
     # Determine phase-out range based on filing status
     start = phaseout_single_start
     end = phaseout_single_end
-
     magi = adjusted_gross_income
-
     if magi <= start:
       return 0  # No phase-out
     if magi >= end:
       return 1  # Fully phased out
-
     # Proportional phase-out
     return (magi - start) / (end - start)
 
 variable ira_deduction:
-  entity Person
-  period Year
-  dtype Money
-  unit "USD"
-  label "IRA Deduction"
-  description "Above-the-line deduction for traditional IRA contributions"
-  formula:
+  entity: Person
+  period: Year
+  dtype: Money
+  unit: "USD"
+  label: "IRA Deduction"
+  description: "Above-the-line deduction for traditional IRA contributions"
+  formula: |
     base_deduction = ira_deduction_before_phaseout
     phaseout = ira_phaseout_ratio
-
     # Apply phase-out
     return base_deduction * (1 - phaseout)
 
 variable total_ira_deduction:
-  entity TaxUnit
-  period Year
-  dtype Money
-  unit "USD"
-  label "Total IRA Deduction"
-  description "Combined IRA deduction for tax unit"
-  formula:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: "USD"
+  label: "Total IRA Deduction"
+  description: "Combined IRA deduction for tax unit"
+  formula: |
     return sum(members.ira_deduction)
 
 

@@ -20,5 +20,6 @@ variable federal_benefit_rate:
   label: "SSI applicable FBR"
   description: "FBR after living arrangement reduction per 42 USC 1382(a)(2)(A)"
   formula: |
-    if has_eligible_spouse: return fbr_couple
+    if has_eligible_spouse:
+        return fbr_couple
     return fbr_individual

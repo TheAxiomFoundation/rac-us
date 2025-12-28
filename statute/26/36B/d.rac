@@ -92,7 +92,7 @@ variable ptc_federal_poverty_level:
   formula: |
     size = ptc_household_size
     if size <= 0:
-    return 0
+        return 0
     # FPL = First person amount + (additional persons * additional amount)
     # Uses 48 contiguous states + DC guidelines (Alaska/Hawaii have higher FPL)
     return fpl_first_person + max(0, size - 1) * fpl_additional_person
@@ -108,7 +108,7 @@ variable household_income_pct_fpl:
     income = household_income
     fpl = ptc_federal_poverty_level
     if fpl <= 0:
-    return 0
+        return 0
     return income / fpl
 
 variable slcsp_premium:

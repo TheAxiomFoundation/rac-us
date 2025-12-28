@@ -9,24 +9,16 @@ variable hcv_annual_income:
   description: "Total annual gross income from all counted sources per 24 CFR 5.609(b)"
   formula: |
     # Sum of all counted income sources for all family members
-    # Major categories per 24 CFR 5.609(b): return (
-    employment_income +
-    self_employment_income +
-    social_security_benefits +
-    ssi_benefits +
-    pension_income +
-    annuity_income +
-    alimony_received +
-    child_support_received +
-    regular_gifts_received +
-    unemployment_benefits +
-    disability_benefits +
-    workers_compensation +
-    welfare_assistance +
-    interest_income +
-    dividend_income +
-    net_rental_income
-    )
+    # Major categories per 24 CFR 5.609(b)
+    total = employment_income + self_employment_income
+    total = total + social_security_benefits + ssi_benefits
+    total = total + pension_income + annuity_income
+    total = total + alimony_received + child_support_received
+    total = total + regular_gifts_received + unemployment_benefits
+    total = total + disability_benefits + workers_compensation
+    total = total + welfare_assistance + interest_income
+    total = total + dividend_income + net_rental_income
+    return total
   default: 0
 
 variable hcv_dependent_deduction:
@@ -41,7 +33,7 @@ variable hcv_dependent_deduction:
     # - Under 18 years old, OR
     # - A person with a disability, OR
     # - A full-time student
-    let deduction_per_dependent = parameter(gov.hud.hcv.deductions.dependent)
+    deduction_per_dependent = parameter(gov.hud.hcv.deductions.dependent)
     return num_dependents * deduction_per_dependent
   default: 0
 
@@ -55,11 +47,11 @@ variable hcv_elderly_disabled_deduction:
   formula: |
     # Elderly family: head, spouse, or sole member is 62 years or older
     # Disabled family: head, spouse, or sole member has a disability
-    let deduction_amount = parameter(gov.hud.hcv.deductions.elderly_disabled)
+    deduction_amount = parameter(gov.hud.hcv.deductions.elderly_disabled)
     if has_elderly_disabled:
-    return deduction_amount
+        return deduction_amount
     else:
-    return 0
+        return 0
   default: 0
 
 variable hcv_childcare_deduction:
@@ -76,7 +68,7 @@ variable hcv_childcare_deduction:
     # For modeling, we take the lesser of:
     # - Actual childcare expenses
     # - Employment income of the person enabled to work
-    let max_deduction = employment_income  # Cannot exceed income earned
+    max_deduction = employment_income  # Cannot exceed income earned
     return min(childcare_expense, max_deduction)
   default: 0
 
@@ -90,12 +82,12 @@ variable hcv_medical_deduction:
   formula: |
     # Only available to elderly or disabled families
     if not has_elderly_disabled:
-    return 0
+        return 0
     # Threshold = 3% of annual gross income
-    let threshold_rate = parameter(gov.hud.hcv.deductions.medical.threshold_rate)
-    let threshold = hcv_annual_income * threshold_rate
+    threshold_rate = parameter(gov.hud.hcv.deductions.medical.threshold_rate)
+    threshold = hcv_annual_income * threshold_rate
     # Deduction = expenses over threshold
-    let excess = medical_expense - threshold
+    excess = medical_expense - threshold
     return max(0, excess)
   default: 0
 
@@ -112,7 +104,7 @@ variable hcv_disability_assistance_deduction:
     # (2) Expense enables a family member to work
     # (3) Cannot exceed income earned by person enabled to work
     if not has_disability_expense:
-    return 0
+        return 0
     # Deduction limited to income earned
     return min(disability_assistance_expense, employment_income)
   default: 0
@@ -125,13 +117,10 @@ variable hcv_total_deductions:
   label: "HCV Total Deductions"
   description: "Sum of all allowable deductions from annual income"
   formula: |
-    return (
-    hcv_dependent_deduction +
-    hcv_elderly_disabled_deduction +
-    hcv_childcare_deduction +
-    hcv_medical_deduction +
-    hcv_disability_assistance_deduction
-    )
+    total = hcv_dependent_deduction + hcv_elderly_disabled_deduction
+    total = total + hcv_childcare_deduction + hcv_medical_deduction
+    total = total + hcv_disability_assistance_deduction
+    return total
   default: 0
 
 variable hcv_annual_adjusted_income:
@@ -142,7 +131,7 @@ variable hcv_annual_adjusted_income:
   label: "HCV Annual Adjusted Income"
   description: "Annual income minus all allowable deductions"
   formula: |
-    let adjusted = hcv_annual_income - hcv_total_deductions
+    adjusted = hcv_annual_income - hcv_total_deductions
     return max(0, adjusted)
   default: 0
 

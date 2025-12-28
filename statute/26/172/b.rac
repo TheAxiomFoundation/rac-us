@@ -34,8 +34,8 @@ variable nol_carryforward_allowed:
   formula: |
     # Post-TCJA: NOLs can be carried forward indefinitely
     # No limitation period on carryforwards
-    return true
-  default: true
+    return True
+  default: True
 
 variable nol_carryback_allowed:
   entity: TaxUnit
@@ -46,8 +46,8 @@ variable nol_carryback_allowed:
   formula: |
     # Post-TCJA: General carryback eliminated
     # Exception for farming losses under 172(b)(1)(B)
-    return false
-  default: false
+    return False
+  default: False
 
 variable farming_loss_carryback_allowed:
   entity: TaxUnit
@@ -59,7 +59,7 @@ variable farming_loss_carryback_allowed:
     # Farming losses may be carried back per 172(b)(1)(B)
     # Taxpayer must have a farming business and farming loss
     return is_farming_business and current_year_farming_loss > 0
-  default: false
+  default: False
 
 variable farming_loss_carryback_years:
   entity: TaxUnit
@@ -69,9 +69,9 @@ variable farming_loss_carryback_years:
   description: "Number of years farming loss can be carried back"
   formula: |
     if farming_loss_carryback_allowed:
-    return farming_loss_carryback_years_param
+        return farming_loss_carryback_years_param
     else:
-    return 0
+        return 0
   default: 0
 
 variable total_nol_carryforward:

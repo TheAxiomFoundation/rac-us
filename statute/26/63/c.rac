@@ -10,9 +10,13 @@ variable standard_deduction:
   period: Year
   dtype: Money
   formula: |
-    # § 63(c)(6): Check for ineligibility
-    if is_ineligible_for_standard_deduction: return 0
-    # § 63(c)(5): Use dependent limitation if applicable
-    basic = is_dependent ? dependent_standard_deduction : basic_standard_deduction
-    # § 63(f): Add additional amounts for age/blindness
+    # Section 63(c)(6): Check for ineligibility
+    if is_ineligible_for_standard_deduction:
+      return 0
+    # Section 63(c)(5): Use dependent limitation if applicable
+    if is_dependent:
+      basic = dependent_standard_deduction
+    else:
+      basic = basic_standard_deduction
+    # Section 63(f): Add additional amounts for age/blindness
     return basic + additional_standard_deduction

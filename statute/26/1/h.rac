@@ -157,7 +157,8 @@ variable net_capital_gain:
   formula: |
     # Net capital gain = LTCG - STCL, but cannot be negative here
     # Short-term gains are taxed as ordinary income, not preferential
-    return max(0, long_term_capital_gains)
+    result = max(0, long_term_capital_gains)
+    return result
   default: 0
 
 variable adjusted_net_capital_gain:
@@ -169,7 +170,8 @@ variable adjusted_net_capital_gain:
   description: "Net capital gain plus qualified dividends per Section 1(h)(11)(A)"
   formula: |
     # Section 1(h)(11)(A): net capital gain increased by qualified dividend income
-    return net_capital_gain + qualified_dividends
+    result = net_capital_gain + qualified_dividends
+    return result
   default: 0
 
 variable ordinary_income:
@@ -183,7 +185,8 @@ variable ordinary_income:
   description: "Taxable income minus adjusted net capital gain, used to determine bracket starting position"
   formula: |
     # Ordinary income = taxable income - preferential income
-    return max(0, taxable_income - adjusted_net_capital_gain)
+    result = max(0, taxable_income - adjusted_net_capital_gain)
+    return result
   default: 0
 
 variable zero_rate_threshold:
@@ -196,15 +199,16 @@ variable zero_rate_threshold:
   label: "0% Rate Threshold"
   description: "Maximum taxable income for 0% capital gains rate based on filing status"
   formula: |
-    if filing_status == JOINT:
-      return zero_rate_threshold_joint
-    if filing_status == SURVIVING_SPOUSE:
-      return zero_rate_threshold_joint
-    if filing_status == SEPARATE:
-      return zero_rate_threshold_separate
-    if filing_status == HEAD_OF_HOUSEHOLD:
-      return zero_rate_threshold_hoh
-    return zero_rate_threshold_single
+    if filing_status == "JOINT":
+        return zero_rate_threshold_joint
+    elif filing_status == "SURVIVING_SPOUSE":
+        return zero_rate_threshold_joint
+    elif filing_status == "SEPARATE":
+        return zero_rate_threshold_separate
+    elif filing_status == "HEAD_OF_HOUSEHOLD":
+        return zero_rate_threshold_hoh
+    else:
+        return zero_rate_threshold_single
   default: 0
 
 variable fifteen_rate_threshold:
@@ -217,15 +221,16 @@ variable fifteen_rate_threshold:
   label: "15% Rate Threshold"
   description: "Maximum taxable income for 15% capital gains rate based on filing status"
   formula: |
-    if filing_status == JOINT:
-      return fifteen_rate_threshold_joint
-    if filing_status == SURVIVING_SPOUSE:
-      return fifteen_rate_threshold_joint
-    if filing_status == SEPARATE:
-      return fifteen_rate_threshold_separate
-    if filing_status == HEAD_OF_HOUSEHOLD:
-      return fifteen_rate_threshold_hoh
-    return fifteen_rate_threshold_single
+    if filing_status == "JOINT":
+        return fifteen_rate_threshold_joint
+    elif filing_status == "SURVIVING_SPOUSE":
+        return fifteen_rate_threshold_joint
+    elif filing_status == "SEPARATE":
+        return fifteen_rate_threshold_separate
+    elif filing_status == "HEAD_OF_HOUSEHOLD":
+        return fifteen_rate_threshold_hoh
+    else:
+        return fifteen_rate_threshold_single
   default: 0
 
 variable capital_gains_zero_rate_amount:
@@ -242,7 +247,8 @@ variable capital_gains_zero_rate_amount:
     # Room in 0% bracket = threshold minus ordinary income
     room_in_zero_bracket = max(0, zero_rate_threshold - ordinary_income)
     # Amount taxed at 0% is lesser of room in bracket or total ANCG
-    return min(room_in_zero_bracket, adjusted_net_capital_gain)
+    result = min(room_in_zero_bracket, adjusted_net_capital_gain)
+    return result
   default: 0
 
 variable capital_gains_fifteen_rate_amount:
@@ -258,13 +264,14 @@ variable capital_gains_fifteen_rate_amount:
     # Remaining ANCG after 0% bracket
     remaining_ancg = adjusted_net_capital_gain - capital_gains_zero_rate_amount
     if remaining_ancg <= 0:
-      return 0
+        return 0
     # Room in 15% bracket = (15% threshold - 0% threshold) adjusted for ordinary income position
     # Start point is max(ordinary_income, zero_rate_threshold)
     start_point = max(ordinary_income, zero_rate_threshold)
     room_in_fifteen_bracket = max(0, fifteen_rate_threshold - start_point)
     # Amount taxed at 15% is lesser of room in bracket or remaining ANCG
-    return min(room_in_fifteen_bracket, remaining_ancg)
+    result = min(room_in_fifteen_bracket, remaining_ancg)
+    return result
   default: 0
 
 variable capital_gains_twenty_rate_amount:
@@ -276,7 +283,8 @@ variable capital_gains_twenty_rate_amount:
   description: "Amount of adjusted net capital gain taxed at 20% per Section 1(h)(1)(D)"
   formula: |
     # Everything beyond the 15% bracket is taxed at 20%
-    return max(0, adjusted_net_capital_gain - capital_gains_zero_rate_amount - capital_gains_fifteen_rate_amount)
+    result = max(0, adjusted_net_capital_gain - capital_gains_zero_rate_amount - capital_gains_fifteen_rate_amount)
+    return result
   default: 0
 
 variable capital_gains_tax:

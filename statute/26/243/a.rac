@@ -30,8 +30,8 @@ variable dividends_received_deduction:
   description: "Final DRD after all limitations"
   formula: |
     if ownership_percentage >= ownership_threshold_affiliated:
-    return deduction_rate_affiliated
+        return deduction_rate_affiliated
     if ownership_percentage >= ownership_threshold_20_percent:
-    return deduction_rate_20_percent
+        return deduction_rate_20_percent
     return deduction_rate_portfolio
-  default: false
+  default: False

@@ -34,7 +34,7 @@ variable eligibility:
     effective_size = household_size + extra_for_pregnancy
     extra_members = max(0, effective_size - 1)
     return base + (additional * extra_members)
-  default: =>
+  default: 0
 
 
 
@@ -49,7 +49,7 @@ variable medicaid:
   label: "Medicaid Eligible"
   description: "Eligible for Medicaid coverage under any pathway"
   formula: return medicaid_eligible
-  default: false
+  default: False
 
 variable chip:
   entity: Person
@@ -58,7 +58,7 @@ variable chip:
   label: "CHIP Eligible"
   description: "Eligible for Children's Health Insurance Program"
   formula: return chip_eligible
-  default: false
+  default: False
 
 variable public_health_coverage_eligible:
   entity: Person
@@ -67,7 +67,7 @@ variable public_health_coverage_eligible:
   label: "Public Health Coverage Eligible"
   description: "Eligible for Medicaid or CHIP"
   formula: return medicaid_eligible or chip_eligible
-  default: false
+  default: False
 
 variable household_magi:
   entity: Household

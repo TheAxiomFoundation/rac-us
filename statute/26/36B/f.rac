@@ -72,23 +72,23 @@ variable excess_aptc_repayment_cap:
     is_joint = filing_status == "joint"
     # No cap for income at or above 400% FPL
     if income_pct >= bracket_400_pct:
-    return no_repayment_cap  # No limit
+        return no_repayment_cap  # No limit
     # Cap based on income bracket and filing status
     if income_pct < bracket_200_pct:
-    if is_joint:
-    return repay_cap_under_200_joint
-    else:
-    return repay_cap_under_200_single
+        if is_joint:
+            return repay_cap_under_200_joint
+        else:
+            return repay_cap_under_200_single
     if income_pct < bracket_300_pct:
-    if is_joint:
-    return repay_cap_200_300_joint
-    else:
-    return repay_cap_200_300_single
+        if is_joint:
+            return repay_cap_200_300_joint
+        else:
+            return repay_cap_200_300_single
     # 300-400% FPL
     if is_joint:
-    return repay_cap_300_400_joint
+        return repay_cap_300_400_joint
     else:
-    return repay_cap_300_400_single
+        return repay_cap_300_400_single
 
 variable excess_advance_ptc_repayment:
   entity: TaxUnit
@@ -101,7 +101,7 @@ variable excess_advance_ptc_repayment:
     adjustment = net_ptc_adjustment
     # If adjustment is positive or zero, no repayment needed
     if adjustment >= 0:
-    return 0
+        return 0
     # Excess advance (negative adjustment becomes positive repayment)
     excess = -adjustment
     # Apply repayment cap for those below 400% FPL

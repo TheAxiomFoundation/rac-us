@@ -24,11 +24,14 @@ variable alternative_tax:
   description: "Final corporate tax applying Section 1201 if beneficial"
   formula: |
     # Only C corporations can use Section 1201
-    if not is_subject_to_corporate_tax: return false
+    if not is_subject_to_corporate_tax:
+        return False
     # Must have net capital gain
-    if net_capital_gain <= 0: return false
+    if net_capital_gain <= 0:
+        return False
     # Post-TCJA: Regular rate (21%) is always lower than alternative (35%)
-    if tax_year >= tcja_effective_year: return false
+    if tax_year >= tcja_effective_year:
+        return False
     # Pre-TCJA: Compare regular tax vs Section 1201 tax
     regular_tax = compute_regular_tax()
     section_1201_tax = compute_section_1201_tax()

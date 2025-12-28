@@ -81,7 +81,7 @@ variable is_qualified_loan_beneficiary:
     #
     # Note: Dependent status is determined at time loan was incurred,
     # not at time interest is paid
-    return true  # Typically input-based determination
+    return True  # Typically input-based determination
 
 variable has_excluded_related_party_loan:
   entity: Person

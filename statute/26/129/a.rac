@@ -29,10 +29,10 @@ variable exclusion:
   formula: |
     # No qualifying individuals = no exclusion
     if num_cdcc_qualifying_individuals == 0:
-    return 0
+        return 0
     # MFS gets half the limit
-    if filing_status == MARRIED_FILING_SEPARATELY:
-    return exclusion_limit_mfs
+    if filing_status == "MARRIED_FILING_SEPARATELY":
+        return exclusion_limit_mfs
     # All other statuses get the full limit
     return exclusion_limit
   default: 0

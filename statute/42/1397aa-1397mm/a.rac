@@ -22,6 +22,6 @@ variable chip:
   formula: |
     # Not eligible: no benefit
     if not is_chip_eligible:
-    return 0
+        return 0
     # Eligible: return per-capita benefit value
     return per_capita_chip_benefit

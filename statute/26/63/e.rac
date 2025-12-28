@@ -46,12 +46,12 @@ variable uses_standard_deduction:
     # 2. Standard deduction >= itemized deductions
     # If ineligible (MFS spouse itemizes, NRA, etc.), must itemize
     if is_ineligible_for_standard_deduction:
-    return false
+      return False
     std = standard_deduction
     itemized = itemized_taxable_income_deductions
     # Optimal behavior: choose standard if >= itemized
     return std >= itemized
-  default: true
+  default: True
 
 variable taxable_income_deductions:
   entity: TaxUnit
@@ -65,7 +65,7 @@ variable taxable_income_deductions:
     itemized = itemized_taxable_income_deductions
     # If ineligible for standard deduction, must use itemized
     if is_ineligible_for_standard_deduction:
-    return itemized
+      return itemized
     # Optimal behavior: use larger of the two
     return max(std, itemized)
   default: 0

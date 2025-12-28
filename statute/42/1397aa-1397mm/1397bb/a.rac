@@ -31,7 +31,7 @@ variable benefits:
   formula: |
     # Only calculate for eligible individuals
     if not is_chip_eligible:
-    return 0
+        return 0
     # Get state-specific per-capita value if available
     # Otherwise use national average from calibration
     state = household.state_code

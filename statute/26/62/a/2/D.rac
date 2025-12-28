@@ -26,4 +26,5 @@ variable educator_expense_deduction:
   formula: |
     # Only eligible educators can claim this deduction
     if not is_eligible_educator:
-    return 0
+      return 0
+    return educator_expenses

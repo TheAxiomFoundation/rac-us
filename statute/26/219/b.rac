@@ -20,4 +20,5 @@ variable contribution_limits:
     base_limit = deductible_amount
     # 219(b)(5)(B): Add catch-up for age 50+
     if age >= catch_up_age:
-    return base_limit + catch_up_amount
+        return base_limit + catch_up_amount
+    return base_limit
