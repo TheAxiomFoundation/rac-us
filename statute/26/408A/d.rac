@@ -30,6 +30,7 @@ variable distributions:
   unit: "USD"
   label: "Total IRA Taxable Income"
   description: "Combined taxable income from all IRA distributions"
+  syntax: python
   formula: |
     # Must satisfy 5-year holding period
     if not is_roth_ira_5_year_satisfied:

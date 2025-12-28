@@ -22,6 +22,7 @@ variable is_qualifying_individual:
   dtype: Bool
   label: "Is CDCC Qualifying Individual"
   description: "Whether person qualifies for purposes of Child and Dependent Care Credit per 26 USC 21(b)"
+  syntax: python
   formula: |
     # Category 1: Dependent child under age 13
     is_qualifying_child = is_dependent and age < child_age_limit
@@ -38,5 +39,6 @@ variable num_qualifying_individuals:
   dtype: Count
   label: "Number of CDCC Qualifying Individuals"
   description: "Count of qualifying individuals for Child and Dependent Care Credit per 26 USC 21(b)"
+  syntax: python
   formula: |
     return tax_unit.members.count(is_cdcc_qualifying_individual)

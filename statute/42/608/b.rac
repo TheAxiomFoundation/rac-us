@@ -9,5 +9,6 @@ variable benefit_calculation:
   entity: TanfUnit
   period: Month
   dtype: Money
+  syntax: python
   formula: |
     return tanf_gross_earned_income + tanf_gross_unearned_income

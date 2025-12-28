@@ -26,6 +26,7 @@ variable snap_standard_deduction:
   unit: "USD"
   label: "SNAP Standard Deduction"
   description: "Monthly standard deduction based on household size"
+  syntax: python
   formula: |
     # Standard deduction varies by household size: 1-3 same, 4, 5, 6+ maximum
     # Use cut() to look up amount from schedule by household size
@@ -39,6 +40,7 @@ variable snap_earned_income_deduction:
   unit: "USD"
   label: "SNAP Earned Income Deduction"
   description: "20% of gross earned income deducted before other calculations"
+  syntax: python
   formula: |
     rate = parameter("gov.usda.fns.snap.deductions.earned_income_rate")
     return earned_income * rate
@@ -51,6 +53,7 @@ variable snap_pre_shelter_deductions:
   unit: "USD"
   label: "SNAP Pre-Shelter Deductions"
   description: "Sum of all deductions before excess shelter calculation"
+  syntax: python
   formula: |
     # Sum all deductions that apply before shelter
     earned_ded = snap_earned_income_deduction
@@ -78,6 +81,7 @@ variable snap_shelter_deduction:
   unit: "USD"
   label: "SNAP Shelter Deduction"
   description: "Deduction for shelter costs exceeding 50% of adjusted income"
+  syntax: python
   formula: |
     # Section 2014(e)(6)(A): Excess = shelter costs - 50% of adjusted income
     adjusted = snap_adjusted_income
@@ -99,6 +103,7 @@ variable snap_net_income:
   unit: "USD"
   label: "SNAP Net Income"
   description: "Monthly income after all SNAP deductions, used for benefit calculation"
+  syntax: python
   formula: |
     adjusted = snap_adjusted_income
     shelter_ded = snap_shelter_deduction

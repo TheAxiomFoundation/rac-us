@@ -24,6 +24,7 @@ variable earned_income_limit:
   unit: "USD"
   label: "CDCC Earned Income Limit"
   description: "Earned income limitation on creditable expenses per 26 USC 21(d)"
+  syntax: python
   formula: |
     # For single/HoH filers: use the head's earned income
     # Filter earned income by role, then sum
@@ -31,7 +32,7 @@ variable earned_income_limit:
     spouse_income = members.earned_income * members.is_tax_unit_spouse
     head_earned = sum(members, head_income)
     spouse_earned = sum(members, spouse_income)
-    if filing_status == "SINGLE" or filing_status == "HEAD_OF_HOUSEHOLD":
+    if filing_status == SINGLE or filing_status == HEAD_OF_HOUSEHOLD:
         return head_earned
     # For married filers: use lesser of two spouses' earned income
     # This incentivizes work for both spouses

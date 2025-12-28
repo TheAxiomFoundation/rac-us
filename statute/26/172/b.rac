@@ -31,6 +31,7 @@ variable nol_carryforward_allowed:
   dtype: Boolean
   label: "NOL Carryforward Allowed"
   description: "Whether NOL can be carried forward per 172(b)(1)(A)"
+  syntax: python
   formula: |
     # Post-TCJA: NOLs can be carried forward indefinitely
     # No limitation period on carryforwards
@@ -43,6 +44,7 @@ variable nol_carryback_allowed:
   dtype: Boolean
   label: "NOL Carryback Allowed"
   description: "Whether NOL can be carried back (generally no for post-TCJA)"
+  syntax: python
   formula: |
     # Post-TCJA: General carryback eliminated
     # Exception for farming losses under 172(b)(1)(B)
@@ -55,6 +57,7 @@ variable farming_loss_carryback_allowed:
   dtype: Boolean
   label: "Farming Loss Carryback Allowed"
   description: "Whether farming loss qualifies for carryback per 172(b)(1)(B)"
+  syntax: python
   formula: |
     # Farming losses may be carried back per 172(b)(1)(B)
     # Taxpayer must have a farming business and farming loss
@@ -67,6 +70,7 @@ variable farming_loss_carryback_years:
   dtype: Integer
   label: "Farming Loss Carryback Years"
   description: "Number of years farming loss can be carried back"
+  syntax: python
   formula: |
     if farming_loss_carryback_allowed:
         return farming_loss_carryback_years_param
@@ -81,6 +85,7 @@ variable total_nol_carryforward:
   unit: "USD"
   label: "Total NOL Carryforward Available"
   description: "Total NOL carryforward from all prior years available for deduction"
+  syntax: python
   formula: |
     # Sum of pre-TCJA and post-TCJA NOL carryforwards
     # These are tracked separately due to different limitation rules
@@ -94,6 +99,7 @@ variable nol_taxable_income_for_limitation:
   unit: "USD"
   label: "Taxable Income for NOL Limitation"
   description: "Taxable income computed without NOL deduction for 80% limitation"
+  syntax: python
   formula: |
     # Use taxable income before NOL deduction
     # This creates a circular dependency that must be resolved iteratively
@@ -108,6 +114,7 @@ variable nol_limitation_amount:
   unit: "USD"
   label: "NOL Limitation Amount"
   description: "Maximum NOL deduction based on 80% taxable income limitation"
+  syntax: python
   formula: |
     # Post-TCJA NOLs limited to 80% of taxable income
     # Pre-TCJA NOLs not subject to this limitation
@@ -122,6 +129,7 @@ variable nol_deduction_pre_tcja:
   unit: "USD"
   label: "Pre-TCJA NOL Deduction"
   description: "NOL deduction from pre-TCJA losses (not subject to 80% limit)"
+  syntax: python
   formula: |
     ti = nol_taxable_income_for_limitation
     available = nol_carryforward_pre_tcja
@@ -136,6 +144,7 @@ variable nol_deduction_post_tcja:
   unit: "USD"
   label: "Post-TCJA NOL Deduction"
   description: "NOL deduction from post-TCJA losses (subject to 80% limit)"
+  syntax: python
   formula: |
     ti = nol_taxable_income_for_limitation
     available = nol_carryforward_post_tcja

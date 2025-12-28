@@ -44,6 +44,7 @@ variable ptc_household_size:
   dtype: Integer
   label: "PTC Household Size"
   description: "Family size for FPL determination per 26 USC 36B(d)(1)"
+  syntax: python
   formula: |
     # Household includes:
     # - Taxpayer (and spouse if filing jointly)
@@ -57,6 +58,7 @@ variable ptc_magi:
   unit: "USD"
   label: "Modified AGI for PTC"
   description: "MAGI for PTC purposes per 26 USC 36B(d)(2)(B)"
+  syntax: python
   formula: |
     # MAGI = AGI + excluded items:
     # (i) Foreign earned income exclusion (Section 911)
@@ -77,6 +79,7 @@ variable household_income:
   unit: "USD"
   label: "Household Income for PTC"
   description: "Modified AGI of taxpayer plus dependents per 26 USC 36B(d)(2)(A)"
+  syntax: python
   formula: |
     # Household income = MAGI of taxpayer + MAGI of dependents required to file
     # For simplicity, using tax unit MAGI (which includes all members)
@@ -89,6 +92,7 @@ variable ptc_federal_poverty_level:
   unit: "USD"
   label: "Federal Poverty Level for PTC"
   description: "FPL for household size per 26 USC 36B(d)(3) and HHS Guidelines"
+  syntax: python
   formula: |
     size = ptc_household_size
     if size <= 0:
@@ -104,6 +108,7 @@ variable household_income_pct_fpl:
   unit: "/1"
   label: "Household Income as Percentage of FPL"
   description: "Household income relative to federal poverty level"
+  syntax: python
   formula: |
     income = household_income
     fpl = ptc_federal_poverty_level

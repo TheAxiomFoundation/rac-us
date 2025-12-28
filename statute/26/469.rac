@@ -8,6 +8,7 @@ variable base_rental_real_estate_allowance:
   unit: "USD"
   label: "Base Rental Real Estate Allowance"
   description: "Base $25,000 allowance amount before phaseout per 26 USC 469(i)(2)"
+  syntax: python
   formula: |
     # Per 469(i)(5)(A): MFS living together gets $0
     # Per 469(i)(5)(B): MFS living apart gets $12,500
@@ -34,6 +35,7 @@ variable disallowed_rental_real_estate_loss:
   unit: "USD"
   label: "Disallowed Rental Real Estate Loss"
   description: "Rental real estate loss that is suspended per 26 USC 469(a)"
+  syntax: python
   formula: |
     # Loss that cannot be deducted this year - carries forward
     return max(0, net_rental_real_estate_loss - rental_real_estate_loss_allowance)
@@ -94,6 +96,7 @@ variable passive_loss_limitation:
   unit: ""
   label: "Has Passive Activities"
   description: "Whether taxpayer has any passive activities per 26 USC 469(c)"
+  syntax: python
   formula: |
     # Per 469(d)(1): Passive activity loss = losses - income (if positive)
     # Net income is the reverse: income - losses (if positive)
@@ -108,6 +111,7 @@ variable real_estate_professional:
   unit: ""
   label: "Real Estate Professional"
   description: "Whether taxpayer qualifies as real estate professional per 26 USC 469(c)(7)"
+  syntax: python
   formula: |
     # Per 469(c)(7)(B)(ii): More than 750 hours in real property trades/businesses
     # where taxpayer materially participates
@@ -139,6 +143,7 @@ variable rental_real_estate_allowance_phaseout:
   unit: "USD"
   label: "Rental Real Estate Allowance Phaseout"
   description: "Reduction in allowance due to AGI phaseout per 26 USC 469(i)(3)"
+  syntax: python
   formula: |
     # Per 469(i)(3)(A): Reduce by 50% of AGI over threshold
     excess_agi = max(0, adjusted_gross_income - rental_real_estate_phaseout_threshold)
@@ -157,6 +162,7 @@ variable rental_real_estate_exception:
   unit: "USD"
   label: "Rental Real Estate Loss Allowance"
   description: "Amount of rental real estate loss allowed against non-passive income per 26 USC 469(i)"
+  syntax: python
   formula: |
     # Requirements per 469(i):
     # 1. Natural person (not corporation, trust, or estate - simplified here)
@@ -181,6 +187,7 @@ variable rental_real_estate_phaseout_threshold:
   unit: "USD"
   label: "Rental Real Estate Phaseout Threshold"
   description: "Modified AGI threshold where phaseout begins per 26 USC 469(i)(3)"
+  syntax: python
   formula: |
     # Per 469(i)(5)(B): MFS living apart uses $50,000 threshold
     # All others (including MFS living together, who get $0 anyway) use $100,000

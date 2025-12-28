@@ -54,6 +54,7 @@ variable actc_earned_income_formula:
   unit: "USD"
   label: "ACTC Earned Income Formula"
   description: "15% of earned income above threshold per 26 USC 24(d)(1)(B)(i)"
+  syntax: python
   formula: |
     excess = max(0, earned_income - earned_income_threshold)
     earned_formula = refundable_rate * excess
@@ -73,6 +74,7 @@ variable actc_ss_tax_formula:
   unit: "USD"
   label: "ACTC SS Tax Formula"
   description: "SS taxes minus EITC for families with 3+ children per 26 USC 24(d)(1)(B)(ii)"
+  syntax: python
   formula: |
     # Only applies with 3+ qualifying children
     if num_ctc_qualifying_children < qualifying_children_threshold:
@@ -90,6 +92,7 @@ variable additional_child_tax_credit:
   unit: "USD"
   label: "Additional Child Tax Credit"
   description: "Refundable portion of CTC per 26 USC 24(d)"
+  syntax: python
   formula: |
     # ACTC = lesser of:
     # (A) CTC before tax liability limit

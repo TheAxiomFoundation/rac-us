@@ -39,6 +39,7 @@ variable student_loan_interest:
   unit: "USD"
   label: "Student Loan Interest Deduction"
   description: "Above-the-line deduction for interest paid on qualified education loans"
+  syntax: python
   formula: |
     # 26 USC 221(d)(2) - MFS cannot claim this deduction
     not_mfs = filing_status != MARRIED_FILING_SEPARATELY

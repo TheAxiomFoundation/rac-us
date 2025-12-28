@@ -31,6 +31,7 @@ variable nol_modification_prior_nol:
   unit: "USD"
   label: "NOL Modification - Prior NOL"
   description: "Add back prior year NOL deductions per 172(d)(1)"
+  syntax: python
   formula: |
     # When computing current year NOL, add back any NOL deduction taken
     # This prevents circular references and stacking of NOL deductions
@@ -44,6 +45,7 @@ variable nol_modification_capital_losses:
   unit: "USD"
   label: "NOL Modification - Capital Losses"
   description: "Capital losses limited to capital gains per 172(d)(2)"
+  syntax: python
   formula: |
     # Capital losses can only offset capital gains for NOL computation
     # Excess capital losses are not part of NOL
@@ -68,6 +70,7 @@ variable nol_modification_exemptions:
   unit: "USD"
   label: "NOL Modification - Exemptions"
   description: "Add back personal exemptions per 172(d)(3)"
+  syntax: python
   formula: |
     # Personal exemptions are not allowed in computing NOL
     # Add them back (though suspended 2018-2025 by TCJA)
@@ -81,6 +84,7 @@ variable nol_modification_nonbusiness:
   unit: "USD"
   label: "NOL Modification - Nonbusiness Deductions"
   description: "Limit nonbusiness deductions to nonbusiness income per 172(d)(4)"
+  syntax: python
   formula: |
     # Simplified: For individuals, nonbusiness deductions (e.g., standard/itemized)
     # cannot create or increase an NOL beyond business losses
@@ -99,6 +103,7 @@ variable nol_modifications:
   unit: "USD"
   label: "Total NOL Modifications"
   description: "Total modifications to taxable income for NOL calculation per 172(d)"
+  syntax: python
   formula: |
     # Sum all modifications that adjust taxable income for NOL purposes
     # These are added to taxable income before determining if NOL exists

@@ -13,6 +13,7 @@ variable snap_medical_expense_deduction:
   unit: "USD"
   label: "SNAP Medical Expense Deduction"
   description: "Deduction for medical expenses over $35/month for elderly/disabled members"
+  syntax: python
   formula: |
     # Only available for elderly/disabled households
     if not has_elderly_disabled:

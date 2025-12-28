@@ -26,6 +26,7 @@ variable is_ctc_qualifying_child:
   dtype: Boolean
   label: "CTC Qualifying Child"
   description: "Whether this person is a qualifying child for CTC per 26 USC 24(c)(1)"
+  syntax: python
   formula: |
     # Must be a qualifying child under Section 152(c) AND under age 17
     return is_qualifying_child and age < qualifying_age_limit

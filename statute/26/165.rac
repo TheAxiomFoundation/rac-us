@@ -24,6 +24,7 @@ variable capital_loss_deduction:
   unit: "USD"
   label: "Capital Loss Deduction"
   description: "Deductible capital loss (limited to $3,000)"
+  syntax: python
   formula: |
     net_loss = capital_losses - capital_gains
     if net_loss <= 0:

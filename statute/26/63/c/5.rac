@@ -25,6 +25,7 @@ variable dependent_standard_deduction:
   unit: "USD"
   label: "Dependent Standard Deduction"
   description: "Limited standard deduction for individuals claimed as dependents per 26 USC 63(c)(5)"
+  syntax: python
   formula: |
     # 63(c)(5)(A): Greater of minimum or (earned income + addon)
     earned_plus = earned_income + dependent_earned_addon

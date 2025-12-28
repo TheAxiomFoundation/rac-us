@@ -13,6 +13,7 @@ variable snap_countable_resources:
   unit: "USD"
   label: "SNAP Countable Resources"
   description: "Total countable resources for SNAP after applying exclusions"
+  syntax: python
   formula: |
     # Start with liquid assets
     liquid = bank_accounts + cash_on_hand
@@ -30,6 +31,7 @@ variable snap_resource_eligible:
   dtype: Bool
   label: "SNAP Resource Eligible"
   description: "Whether household's countable resources are within SNAP limits"
+  syntax: python
   formula: |
     base_limit = parameter("gov.usda.fns.snap.resources.limit")
     elderly_disabled_limit = parameter("gov.usda.fns.snap.resources.elderly_disabled_limit")

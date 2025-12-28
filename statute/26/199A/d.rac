@@ -42,9 +42,10 @@ variable sstb:
   unit: "percent"
   label: "QBI Applicable Percentage"
   description: "Phase-in percentage for SSTB income per 26 USC § 199A(d)(3)"
+  syntax: python
   formula: |
     # Get threshold based on filing status
-    is_joint_or_surviving = filing_status == "JOINT" or filing_status == "SURVIVING_SPOUSE"
+    is_joint_or_surviving = filing_status == JOINT or filing_status == SURVIVING_SPOUSE
     threshold = threshold_joint if is_joint_or_surviving else threshold_single
     phaseout_range = phaseout_range_joint if is_joint_or_surviving else phaseout_range_single
     # If below threshold, 100% applies

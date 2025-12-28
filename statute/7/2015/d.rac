@@ -6,6 +6,7 @@ variable is_snap_abawd:
   dtype: Bool
   label: "Subject to SNAP ABAWD Requirements"
   description: "Whether individual is an Able-Bodied Adult Without Dependents subject to work requirements"
+  syntax: python
   formula: |
     # Section 2015(o)(2): Definition of ABAWD
     # - Aged 18-54 (as of 2025 phase-in per Fiscal Responsibility Act)
@@ -26,6 +27,7 @@ variable snap_abawd_work_requirement_met:
   dtype: Bool
   label: "SNAP ABAWD Work Requirement Met"
   description: "Whether ABAWD individual meets 80 hour/month work requirement"
+  syntax: python
   formula: |
     # Not subject to ABAWD rules = automatically meets requirement
     if not is_snap_abawd:

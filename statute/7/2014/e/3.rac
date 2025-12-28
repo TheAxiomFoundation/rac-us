@@ -14,6 +14,7 @@ variable snap_dependent_care_deduction:
   unit: "USD"
   label: "SNAP Dependent Care Deduction"
   description: "Deduction for dependent care expenses necessary for work or training"
+  syntax: python
   formula: |
     # Section 2014(e)(3): Actual dependent care costs necessary for work/training
     # Includes child care, care for elderly/disabled dependents

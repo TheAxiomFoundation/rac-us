@@ -21,6 +21,7 @@ variable distributions:
   unit: "USD"
   label: "Net Taxable Distribution"
   description: "Taxable distribution after excluding rollover amounts"
+  syntax: python
   formula: |
     # Traditional distributions are fully taxable
     traditional_taxable = traditional_401k_distribution

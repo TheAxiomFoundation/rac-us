@@ -10,6 +10,7 @@ variable child_tax_credit:
   unit: "USD"
   label: "Child Tax Credit (Nonrefundable)"
   description: "Nonrefundable portion of Child Tax Credit per 26 USC Section 24, limited by tax liability"
+  syntax: python
   formula: |
     # CTC is limited to tax liability per §26(a)
     return min(tentative_child_tax_credit, tax_liability_before_credits)
@@ -23,6 +24,7 @@ variable ctc_standalone:
   unit: "USD"
   label: "Total Child Tax Credit"
   description: "Sum of nonrefundable CTC and refundable ACTC per 26 USC Section 24"
+  syntax: python
   formula: |
     if filing_status == JOINT: return PHASEOUT_THRESHOLD_JOINT
     if filing_status == SURVIVING_SPOUSE: return PHASEOUT_THRESHOLD_JOINT
@@ -190,6 +192,7 @@ variable ctc_phaseout_threshold:
   unit: "USD"
   label: "CTC Phase-Out Threshold"
   description: "Income threshold where phase-out begins per Section 24(b)(1)"
+  syntax: python
   formula: |
     if filing_status == JOINT: return ctc_phaseout_threshold_joint
     if filing_status == SURVIVING_SPOUSE: return ctc_phaseout_threshold_joint
@@ -202,6 +205,7 @@ variable ctc_before_phaseout:
   unit: "USD"
   label: "CTC Before Phase-Out"
   description: "Total credit for all qualifying children and other dependents before phase-out"
+  syntax: python
   formula: |
     let child_credit = num_qualifying_children * ctc_credit_amount
     let other_credit = num_other_dependents * ctc_other_dependent_amount
@@ -214,6 +218,7 @@ variable ctc_phaseout_reduction:
   unit: "USD"
   label: "CTC Phase-Out Reduction"
   description: "Credit reduction based on income exceeding threshold per Section 24(b)(2)"
+  syntax: python
   formula: |
     let excess = adjusted_gross_income - ctc_phaseout_threshold
     if excess <= 0 : 0
@@ -235,6 +240,7 @@ variable ctc_phase_in_earnings:
   unit: "USD"
   label: "CTC Phase-In (Earned Income Formula)"
   description: "15% of earned income exceeding $2,500 per Section 24(d)(1)(B)(i)"
+  syntax: python
   formula: |
     let excess = max(0, earned_income - actc_earned_income_threshold)
     return actc_refundable_rate * excess
@@ -255,6 +261,7 @@ variable ctc_phase_in:
   unit: "USD"
   label: "CTC Phase-In Amount"
   description: "Amount used to determine refundable credit"
+  syntax: python
   formula: |
     if num_qualifying_children < qualifying_children_ss_threshold : ctc_phase_in_earnings
     else max(ctc_phase_in_earnings, ctc_social_security_excess)
@@ -275,6 +282,7 @@ variable refundable_ctc:
   unit: "USD"
   label: "Refundable CTC (ACTC)"
   description: "Refundable portion of CTC per Section 24(d)"
+  syntax: python
   formula: |
     let ctc = total_child_tax_credit
     let phase_in = ctc_phase_in

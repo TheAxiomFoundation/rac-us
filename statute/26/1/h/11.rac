@@ -52,6 +52,7 @@ variable qualified_dividend_income:
   unit: "USD"
   label: "Qualified Dividend Income"
   description: "Total qualified dividend income eligible for preferential capital gains rates per 26 USC 1(h)(11)"
+  syntax: python
   formula: |
     # In microsimulation, qualified dividends are provided as direct input
     # Full implementation would aggregate is_qualified_dividend for each dividend payment

@@ -23,6 +23,7 @@ variable educator_expense_deduction:
   unit: "USD"
   label: "Total Educator Expense Deduction"
   description: "Combined educator expense deduction for tax unit (both spouses if applicable)"
+  syntax: python
   formula: |
     # Only eligible educators can claim this deduction
     if not is_eligible_educator:

@@ -19,6 +19,7 @@ variable elderly_disabled_credit:
   unit: "USD"
   label: "Credit for the Elderly or Disabled"
   description: "Final credit for the elderly or disabled per 26 USC 22 (nonrefundable)"
+  syntax: python
   formula: |
     # No credit if no qualified individuals
     if num_sec22_qualified_individuals == 0: return 0

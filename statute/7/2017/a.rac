@@ -57,6 +57,7 @@ variable snap_max_allotment:
   unit: "USD"
   label: "SNAP Maximum Allotment"
   description: "Maximum monthly SNAP benefit based on Thrifty Food Plan for household size"
+  syntax: python
   formula: |
     # Maximum allotments by household size (48 states + DC)
     # Sizes 1-8 have specific amounts; beyond max_schedule_size, add per-person increment
@@ -77,6 +78,7 @@ variable snap_expected_contribution:
   unit: "USD"
   label: "SNAP Expected Contribution"
   description: "Expected household contribution toward food costs (30% of net income)"
+  syntax: python
   formula: |
     rate = parameter("gov.usda.fns.snap.allotment.contribution_rate")
     return round(snap_net_income * rate)
@@ -99,6 +101,7 @@ variable snap_minimum_benefit:
   unit: "USD"
   label: "SNAP Minimum Benefit"
   description: "Minimum monthly SNAP benefit for 1-2 person households"
+  syntax: python
   formula: |
     # Minimum benefit only applies to households at or below minimum_benefit_max_size
     if household_size <= minimum_benefit_max_size:
@@ -114,6 +117,7 @@ variable snap_allotment:
   unit: "USD"
   label: "SNAP Allotment"
   description: "Final monthly SNAP benefit amount"
+  syntax: python
   formula: |
     # Must be eligible to receive benefits
     if not snap_eligible:
@@ -173,6 +177,7 @@ variable snap_max_allotment:
   period: Month
   dtype: Money
   description: "Maximum monthly SNAP benefit based on Thrifty Food Plan"
+  syntax: python
   formula: |
     if household_size <= 8:
         return max_allotment_schedule[household_size - 1]
@@ -214,6 +219,7 @@ variable snap_minimum_benefit:
   period: Month
   dtype: Money
   description: "Minimum benefit for 1-2 person households"
+  syntax: python
   formula: |
     if household_size <= minimum_benefit_max_size:
         return minimum_benefit
@@ -232,6 +238,7 @@ variable snap_allotment:
   period: Month
   dtype: Money
   description: "Final monthly SNAP benefit per 7 USC 2017(a)"
+  syntax: python
   formula: |
     if not snap_eligible:
         return 0
@@ -289,6 +296,7 @@ variable snap_max_allotment:
   unit: "USD"
   label: "SNAP Maximum Allotment"
   description: "Maximum monthly SNAP benefit based on Thrifty Food Plan"
+  syntax: python
   formula: |
     size = household_size
     # Lookup from schedule (index = size - 1)
@@ -324,6 +332,7 @@ variable snap_minimum_benefit:
   unit: "USD"
   label: "SNAP Minimum Benefit"
   description: "Minimum benefit for 1-2 person households"
+  syntax: python
   formula: |
     if household_size <= minimum_benefit_max_size:
         return minimum_benefit
@@ -336,6 +345,7 @@ variable snap_allotment:
   unit: "USD"
   label: "SNAP Allotment"
   description: "Final monthly SNAP benefit per 7 USC 2017(a)"
+  syntax: python
   formula: |
     if not snap_eligible:
         return 0

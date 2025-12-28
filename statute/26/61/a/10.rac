@@ -19,6 +19,7 @@ variable pension_income:
   unit: USD
   label: Gross Pension Distributions
   description: Gross distributions before rollover exclusions
+  syntax: python
   formula: |
     # Employer plans (401k, 403b, pension) - net of rollovers
     employer_plan_income = net_taxable_distribution

@@ -21,6 +21,7 @@ variable applicable_percentage:
   dtype: Rate
   label: "CDCC Applicable Percentage"
   description: "Credit rate for Child and Dependent Care Credit per 26 USC 21(b)"
+  syntax: python
   formula: |
     agi = adjusted_gross_income
     # For ARPA 2021 complete phaseout above $400,000

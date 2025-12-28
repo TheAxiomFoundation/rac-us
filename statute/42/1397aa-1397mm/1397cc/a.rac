@@ -35,6 +35,7 @@ variable cost_sharing:
   unit: "USD"
   label: "CHIP Affordable"
   description: "CHIP cost-sharing is within 5% of household income"
+  syntax: python
   formula: |
     # Only applicable to CHIP-eligible persons
     if not is_chip_eligible:

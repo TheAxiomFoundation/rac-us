@@ -23,6 +23,7 @@ variable education_credits_validation:
   unit: "USD"
   label: "Education Credit"
   description: "Total education credit claimed per 26 USC § 25A"
+  syntax: python
   formula: |
     # 100% of first $2,000 + 25% of next $2,000 = max $2,500
     expenses = aoc_qualified_expenses

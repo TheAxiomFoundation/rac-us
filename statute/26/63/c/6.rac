@@ -22,9 +22,10 @@ variable is_ineligible_for_standard_deduction:
   dtype: Boolean
   label: "Ineligible for Standard Deduction"
   description: "Whether taxpayer is ineligible for standard deduction per 26 USC 63(c)(6)"
+  syntax: python
   formula: |
     # 63(c)(6)(A): MFS where spouse itemizes
-    if filing_status == "MARRIED_FILING_SEPARATELY" and spouse_itemizes:
+    if filing_status == MARRIED_FILING_SEPARATELY and spouse_itemizes:
       return True
     # 63(c)(6)(B): Nonresident alien
     if is_nonresident_alien:

@@ -34,6 +34,7 @@ variable net_investment_income:
   unit: "USD"
   label: "Net Investment Income"
   description: "Net investment income for NIIT purposes per Section 1411(c)"
+  syntax: python
   formula: |
     # Section 1411(c)(1)(A)(i): Investment income from interest, dividends, annuities, royalties, rents
     # Note: Uses taxable interest only (excludes tax-exempt muni bond interest per Section 103)

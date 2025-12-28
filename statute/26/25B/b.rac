@@ -22,6 +22,7 @@ variable applicable_percentage:
   dtype: Rate
   label: "Saver's Credit Applicable Percentage"
   description: "Credit rate for Saver's Credit based on AGI and filing status per 26 USC 25B(b)"
+  syntax: python
   formula: |
     agi = adjusted_gross_income
     # Get threshold adjustment factor based on filing status

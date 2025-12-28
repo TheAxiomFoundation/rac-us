@@ -73,6 +73,7 @@ variable is_qualified_loan_beneficiary:
   dtype: Bool
   label: "Has Excluded Related-Party Loan"
   description: "Whether the loan is from a related person and thus excluded from Section 221"
+  syntax: python
   formula: |
     # The loan must be for education of:
     # - The taxpayer themselves, OR

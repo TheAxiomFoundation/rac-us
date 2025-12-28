@@ -36,6 +36,7 @@ variable earned_income_limit:
   unit: "USD"
   label: "DCAP Earned Income Limit"
   description: "Earned income limitation on dependent care assistance exclusion per 26 USC 129(b)"
+  syntax: python
   formula: |
     # Calculate earned income for head and spouse
     # Filter earned income by role, then sum
@@ -44,7 +45,7 @@ variable earned_income_limit:
     head_earned = sum(members, head_income)
     spouse_actual_earned = sum(members, spouse_income)
     # For single/HoH filers: use the head's earned income
-    if filing_status == "SINGLE" or filing_status == "HEAD_OF_HOUSEHOLD":
+    if filing_status == SINGLE or filing_status == HEAD_OF_HOUSEHOLD:
         return head_earned
     # For married filers: use lesser of two spouses' earned income
     # But first apply the special rule for student/disabled spouse

@@ -16,6 +16,7 @@ variable contribution_limits:
   unit: "USD"
   label: "Maximum Deductible IRA Contribution"
   description: "Lesser of contribution limit or compensation"
+  syntax: python
   formula: |
     base_limit = deductible_amount
     # 219(b)(5)(B): Add catch-up for age 50+

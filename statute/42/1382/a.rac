@@ -36,6 +36,7 @@ variable resource_test:
   unit: "USD"
   label: "SSI resource eligibility"
   description: "Resources do not exceed limit per 42 USC 1382(a)(3)(B)"
+  syntax: python
   formula: |
     if has_eligible_spouse:
         return resource_limit_couple

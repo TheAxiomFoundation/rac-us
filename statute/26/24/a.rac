@@ -46,8 +46,9 @@ variable ctc_phaseout_threshold:
   unit: "USD"
   label: "CTC Phaseout Threshold"
   description: "Income threshold where CTC phaseout begins per 26 USC 24(b)(2) and 24(h)(3)"
+  syntax: python
   formula: |
-    if filing_status == 'JOINT':
+    if filing_status == JOINT:
       return phaseout_threshold_joint
     return phaseout_threshold_other
   tests:
@@ -71,6 +72,7 @@ variable ctc_phaseout_reduction:
   unit: "USD"
   label: "CTC Phaseout Reduction"
   description: "Credit reduction based on income above threshold per 26 USC 24(b)(1)"
+  syntax: python
   formula: |
     threshold = ctc_phaseout_threshold
     excess = max(0, adjusted_gross_income - threshold)
@@ -98,6 +100,7 @@ variable child_tax_credit_before_limit:
   unit: "USD"
   label: "CTC Before Tax Liability Limit"
   description: "Child Tax Credit after phaseout but before tax liability limit per 26 USC 24(a)-(b)"
+  syntax: python
   formula: |
     gross = ctc_gross_credit
     reduction = ctc_phaseout_reduction
@@ -134,6 +137,7 @@ variable child_tax_credit:
   unit: "USD"
   label: "Child Tax Credit (Non-refundable)"
   description: "Non-refundable portion of CTC limited to tax liability per 26 USC 24(a) and 26(a)"
+  syntax: python
   formula: |
     credit = child_tax_credit_before_limit
     return min(credit, tax_liability_limit)

@@ -16,6 +16,7 @@ variable coverage:
   unit: "USD"
   label: "FUTA tax liability"
   description: "Federal unemployment tax owed by employer per 26 USC 3301"
+  syntax: python
   formula: |
     # Most employment is covered; exceptions defined in 3306(c)
     # Exceptions include:

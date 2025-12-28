@@ -28,6 +28,7 @@ variable dividends_received_deduction:
   unit: "USD"
   label: "Dividends Received Deduction"
   description: "Final DRD after all limitations"
+  syntax: python
   formula: |
     if ownership_percentage >= ownership_threshold_affiliated:
         return deduction_rate_affiliated

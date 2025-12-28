@@ -20,6 +20,7 @@ variable expensing_election:
   unit: "USD"
   label: "Section 179 Carryforward"
   description: "Disallowed Section 179 amount to carry forward to next year"
+  syntax: python
   formula: |
     # Start with maximum
     max_available = maximum_deduction

@@ -11,6 +11,7 @@ variable snap_categorically_eligible:
   dtype: Bool
   label: "SNAP Categorically Eligible"
   description: "Whether household is categorically eligible through receipt of TANF, SSI, or GA"
+  syntax: python
   formula: |
     # Section 2014(a) + Section 2014(j): SSI and TANF recipients
     return receives_ssi or receives_tanf or receives_general_assistance
@@ -22,6 +23,7 @@ variable snap_eligible:
   dtype: Bool
   label: "SNAP Eligible"
   description: "Whether household meets all SNAP eligibility requirements"
+  syntax: python
   formula: |
     # Section 2014(a): Categorically eligible households bypass certain tests
     if snap_categorically_eligible:

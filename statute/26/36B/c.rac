@@ -36,6 +36,7 @@ variable ptc_filing_status_eligible:
   dtype: Boolean
   label: "PTC Filing Status Eligible"
   description: "Eligible filing status per 26 USC 36B(c)(1)(C)"
+  syntax: python
   formula: |
     # Married filing separately is generally ineligible
     # Exception: Victims of domestic abuse or spousal abandonment (not modeled)
@@ -48,6 +49,7 @@ variable ptc_income_eligible:
   dtype: Boolean
   label: "PTC Income Eligible"
   description: "Household income within eligible range per 26 USC 36B(c)(1)(A)"
+  syntax: python
   formula: |
     income_pct = household_income_pct_fpl
     # Must be at least 100% FPL
@@ -64,6 +66,7 @@ variable ptc_not_dependent:
   dtype: Boolean
   label: "PTC Not Claimed as Dependent"
   description: "Not claimed as dependent by another per 26 USC 36B(c)(1)(D)"
+  syntax: python
   formula: |
     # Taxpayer cannot be claimed as dependent by another
     result = not is_tax_unit_dependent
@@ -75,6 +78,7 @@ variable is_applicable_taxpayer:
   dtype: Boolean
   label: "Is Applicable Taxpayer for PTC"
   description: "Meets all applicable taxpayer requirements per 26 USC 36B(c)(1)"
+  syntax: python
   formula: |
     # All conditions must be met
     if not ptc_filing_status_eligible:

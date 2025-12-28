@@ -20,6 +20,7 @@ variable categorical:
   entity: Person
   period: Month
   dtype: Boolean
+  syntax: python
   formula: |
     # 42 USC 1786(b)(3): Breastfeeding women - up to 1 year postpartum
     # Takes priority over postpartum since it has longer eligibility period

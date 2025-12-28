@@ -23,6 +23,7 @@ variable phaseout:
   unit: "USD"
   label: "IRA Deduction After Phase-out"
   description: "IRA deduction after applying income-based phase-out"
+  syntax: python
   formula: |
     # MFS has its own very narrow range
     if filing_status == MARRIED_FILING_SEPARATELY:

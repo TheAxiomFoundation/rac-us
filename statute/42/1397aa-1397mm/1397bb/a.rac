@@ -28,6 +28,7 @@ variable benefits:
   unit: "USD"
   label: "Household Has CHIP Eligible"
   description: "Household contains at least one CHIP-eligible person"
+  syntax: python
   formula: |
     # Only calculate for eligible individuals
     if not is_chip_eligible:

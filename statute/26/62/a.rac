@@ -29,6 +29,7 @@ variable adjusted_gross_income:
   unit: "USD"
   label: "Adjusted Gross Income"
   description: "Gross income minus above-the-line deductions per 26 USC §62(a)"
+  syntax: python
   formula: |
     # Step 1: Calculate gross income (Section 61)
     employee_income = wages + salaries + tips

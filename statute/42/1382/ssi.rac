@@ -15,6 +15,7 @@ variable ssi:
   unit: "USD"
   label: "Supplemental Security Income"
   description: "Monthly SSI payment per 42 USC 1382(b)"
+  syntax: python
   formula: |
     if not is_ssi_categorical_eligible:
         return 0

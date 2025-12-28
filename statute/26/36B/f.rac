@@ -53,6 +53,7 @@ variable net_ptc_adjustment:
   unit: "USD"
   label: "Net PTC Adjustment"
   description: "Difference between actual PTC and advance payments per 26 USC 36B(f)"
+  syntax: python
   formula: |
     actual_credit = premium_tax_credit
     advance = advance_ptc
@@ -67,6 +68,7 @@ variable excess_aptc_repayment_cap:
   unit: "USD"
   label: "Excess APTC Repayment Cap"
   description: "Maximum repayment of excess advance per 26 USC 36B(f)(2)(B)"
+  syntax: python
   formula: |
     income_pct = household_income_pct_fpl
     is_joint = filing_status == "joint"
@@ -97,6 +99,7 @@ variable excess_advance_ptc_repayment:
   unit: "USD"
   label: "Excess Advance PTC Repayment"
   description: "Additional tax due for excess advance payments per 26 USC 36B(f)(2)"
+  syntax: python
   formula: |
     adjustment = net_ptc_adjustment
     # If adjustment is positive or zero, no repayment needed
@@ -115,6 +118,7 @@ variable additional_ptc_refund:
   unit: "USD"
   label: "Additional PTC Refund"
   description: "Additional refund if actual PTC exceeds advance payments"
+  syntax: python
   formula: |
     adjustment = net_ptc_adjustment
     # If positive, taxpayer is owed additional credit

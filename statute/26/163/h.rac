@@ -23,6 +23,7 @@ variable qualified_residence_interest:
   unit: "USD"
   label: "Qualified Residence Interest Deduction"
   description: "Deductible interest on qualified residence per 26 USC 163(h)"
+  syntax: python
   formula: |
     # Determine applicable acquisition debt limit
     is_mfs = filing_status == "married_separate"

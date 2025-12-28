@@ -13,6 +13,7 @@ variable ira_deduction:
   unit: "USD"
   label: "Total IRA Deduction"
   description: "Combined IRA deduction for tax unit"
+  syntax: python
   formula: |
     base_limit = contribution_limit
     # Add catch-up contribution if age 50 or older
@@ -126,6 +127,7 @@ variable ira_contribution_limit:
   unit: "USD"
   label: "IRA Contribution Limit"
   description: "Maximum allowable IRA contribution including catch-up"
+  syntax: python
   formula: |
     base_limit = contribution_limit
     # Add catch-up contribution if age 50 or older
@@ -140,6 +142,7 @@ variable ira_deduction_before_phaseout:
   unit: "USD"
   label: "IRA Deduction Before Phase-out"
   description: "IRA deduction amount before applying income phase-out"
+  syntax: python
   formula: |
     # Cannot deduct more than contributed or the annual limit
     return min(traditional_ira_contributions, ira_contribution_limit)
@@ -150,6 +153,7 @@ variable ira_phaseout_ratio:
   dtype: Rate
   label: "IRA Deduction Phase-out Ratio"
   description: "Ratio of IRA deduction that is phased out based on income"
+  syntax: python
   formula: |
     # If not covered by employer plan, no phase-out applies
     if not has_retirement_plan_at_work:
@@ -172,6 +176,7 @@ variable ira_deduction:
   unit: "USD"
   label: "IRA Deduction"
   description: "Above-the-line deduction for traditional IRA contributions"
+  syntax: python
   formula: |
     base_deduction = ira_deduction_before_phaseout
     phaseout = ira_phaseout_ratio
@@ -185,6 +190,7 @@ variable total_ira_deduction:
   unit: "USD"
   label: "Total IRA Deduction"
   description: "Combined IRA deduction for tax unit"
+  syntax: python
   formula: |
     return sum(members.ira_deduction)
 

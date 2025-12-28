@@ -30,6 +30,7 @@ variable eligibility:
   unit: "USD"
   label: "LIHEAP eligibility"
   description: "Overall LIHEAP eligibility per 42 USC 8624(b)(2)"
+  syntax: python
   formula: |
     base_fpl = fpl_by_household_size[1]
     additional_per_person = fpl_by_household_size["additional_per_person"]

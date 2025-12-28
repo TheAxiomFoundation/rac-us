@@ -14,6 +14,7 @@ variable se_tax_deduction:
   unit: "USD"
   label: "Self-Employment Tax Deduction"
   description: "Deduction for one-half of self-employment taxes per 164(f)"
+  syntax: python
   formula: |
     # Exactly one-half of the self-employment tax per statute
     return 0.5 * self_employment_tax

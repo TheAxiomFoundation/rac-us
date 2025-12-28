@@ -12,6 +12,7 @@ variable hsa_deduction:
   unit: "USD"
   label: "Total HSA Deduction"
   description: "Combined HSA deduction for tax unit"
+  syntax: python
   formula: |
     # Must have HDHP to contribute
     if not has_hdhp:

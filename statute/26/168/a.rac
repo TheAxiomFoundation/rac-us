@@ -22,6 +22,7 @@ variable depreciation:
   unit: "USD"
   label: "MACRS Depreciation"
   description: "Total depreciation deduction under Section 168"
+  syntax: python
   formula: |
     if current_year < year_placed_in_service: return 0  # Not yet placed in service
     return current_year - year_placed_in_service + 1

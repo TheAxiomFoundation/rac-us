@@ -25,6 +25,7 @@ variable eligibility:
   entity: Person
   period: Month
   dtype: Boolean
+  syntax: python
   formula: |
     # FPL = base for 1 person + additional per person beyond 1
     base = fpl_by_household_size[1]

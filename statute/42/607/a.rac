@@ -17,6 +17,7 @@ variable work_requirements:
   entity: Family
   period: Month
   dtype: Boolean
+  syntax: python
   formula: |
     # 607(c)(1)(A): Single parent or head of household with child under threshold age
     has_young_child = any(children, child.age < child_under_age_threshold)

@@ -22,6 +22,7 @@ variable early_withdrawal:
   unit: "USD"
   label: "Early Withdrawal Penalty"
   description: "10% additional tax on early distributions from retirement plans per 72(t)"
+  syntax: python
   formula: |
     # No penalty if no taxable distribution
     if taxable_401k_distribution <= 0:

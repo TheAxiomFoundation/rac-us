@@ -11,6 +11,7 @@ variable adjusted_section_22_amount:
   unit: "USD"
   label: "Adjusted Section 22 Amount"
   description: "Section 22 amount after all reductions per 26 USC 22(d)"
+  syntax: python
   formula: |
     # Start with initial amount
     initial = sec22_initial_amount
@@ -40,6 +41,7 @@ variable agi_reduction:
   unit: "USD"
   label: "Section 22 AGI Reduction"
   description: "Reduction to section 22 amount based on excess AGI per 26 USC 22(d)(2)"
+  syntax: python
   formula: |
     # Calculate excess AGI over threshold
     excess_agi = max(0, adjusted_gross_income - sec22_agi_threshold)
@@ -59,6 +61,7 @@ variable agi_threshold:
   unit: "USD"
   label: "Section 22 AGI Threshold"
   description: "AGI threshold for section 22 reduction based on filing status per 26 USC 22(d)(2)"
+  syntax: python
   formula: |
     if filing_status == JOINT: return agi_threshold_joint
     if filing_status == SEPARATE: return agi_threshold_separate
@@ -79,6 +82,7 @@ variable nontaxable_reduction:
   unit: "USD"
   label: "Section 22 Nontaxable Income Reduction"
   description: "Reduction to section 22 amount for nontaxable pensions, Social Security, and disability income per 26 USC 22(d)(1)"
+  syntax: python
   formula: |
     # Sum all amounts that reduce the section 22 amount
     # Per statute: Social Security (nontaxable) + pensions/annuities (taxable) + disability

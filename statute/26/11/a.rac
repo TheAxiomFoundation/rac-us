@@ -11,6 +11,7 @@ variable tax_imposed:
   dtype: Boolean
   label: "Subject to Corporate Income Tax"
   description: "Whether entity is subject to tax under 26 USC 11"
+  syntax: python
   formula: |
     # Only C corporations are subject to corporate income tax
     # S corporations: exempt per 26 USC 1363(a)

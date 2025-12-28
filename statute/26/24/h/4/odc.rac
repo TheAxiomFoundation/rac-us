@@ -22,6 +22,7 @@ variable is_other_dependent:
   dtype: Boolean
   label: "Is Other Dependent for ODC"
   description: "Whether this person qualifies as 'other dependent' for ODC per 26 USC 24(h)(4)"
+  syntax: python
   formula: |
     # An "other dependent" is someone who:
     # 1. Is a dependent under Section 152
@@ -53,6 +54,7 @@ variable other_dependent_credit_amount:
   unit: "USD"
   label: "Other Dependent Credit"
   description: "Credit for dependents who are not CTC qualifying children per 26 USC 24(h)(4)"
+  syntax: python
   formula: |
     gross = other_dependent_credit * num_other_dependents
     # ODC uses same phaseout as CTC

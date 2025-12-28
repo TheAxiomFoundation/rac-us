@@ -16,6 +16,7 @@ variable employer_medicare_tax:
   unit: "USD"
   label: "Total Medicare Tax"
   description: "Combined employer and employee Medicare tax (2.9% of wages)"
+  syntax: python
   formula: |
     # Medicare tax applies to ALL wages - no cap unlike Social Security
     # Employer rate matches employee rate

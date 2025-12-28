@@ -18,6 +18,7 @@ variable distributions:
   unit: "USD"
   label: "IRA Early Withdrawal Penalty"
   description: "10% additional tax on early IRA distributions per 72(t)"
+  syntax: python
   formula: |
     if traditional_ira_distribution <= 0:
         return 0

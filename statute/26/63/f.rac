@@ -37,9 +37,10 @@ variable additional_standard_deduction:
   unit: "USD"
   label: "Additional Standard Deduction"
   description: "Additional standard deduction amounts for aged and blind taxpayers per 26 USC 63(f)"
+  syntax: python
   formula: |
     # 63(f)(3): "married" includes surviving spouse per statute text
-    is_married = (filing_status == "MARRIED_FILING_JOINTLY") or (filing_status == "MARRIED_FILING_SEPARATELY") or (filing_status == "QUALIFYING_WIDOW")
+    is_married = (filing_status == MARRIED_FILING_JOINTLY) or (filing_status == MARRIED_FILING_SEPARATELY) or (filing_status == QUALIFYING_WIDOW)
     # Select amounts based on marital status
     if is_married:
       aged_amount = additional_aged_married
@@ -58,11 +59,11 @@ variable additional_standard_deduction:
     else:
       primary_blind = 0
     # Spouse additions (joint filers only)
-    if filing_status == "MARRIED_FILING_JOINTLY" and spouse_age >= aged_threshold:
+    if filing_status == MARRIED_FILING_JOINTLY and spouse_age >= aged_threshold:
       spouse_aged = aged_amount
     else:
       spouse_aged = 0
-    if filing_status == "MARRIED_FILING_JOINTLY" and spouse_is_blind:
+    if filing_status == MARRIED_FILING_JOINTLY and spouse_is_blind:
       spouse_blind_add = blind_amount
     else:
       spouse_blind_add = 0

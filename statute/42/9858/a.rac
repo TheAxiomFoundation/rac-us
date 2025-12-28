@@ -75,6 +75,7 @@ variable benefit:
   unit: "USD"
   label: "CCDF Benefit"
   description: "Total annual CCDF child care benefit per 42 USC 9858"
+  syntax: python
   formula: |
     age = this.age
     is_home_based = this.is_ccdf_home_based
@@ -165,6 +166,7 @@ variable copayment:
   unit: "USD"
   label: "CCDF Copay Exceeds 7% Affordability Standard"
   description: "Copayment exceeds 7% of income affordability guideline"
+  syntax: python
   formula: |
     # Get family income and poverty level
     family_income = this.ccdf_income
@@ -227,6 +229,7 @@ variable eligibility:
   unit: "USD"
   label: "Number of CCDF Eligible Children"
   description: "Count of children eligible for CCDF in the assistance unit"
+  syntax: python
   formula: |
     age = this.age
     # Standard age limit: under 13

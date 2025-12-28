@@ -13,6 +13,7 @@ variable eligibility:
   entity: TanfUnit
   period: Month
   dtype: Boolean
+  syntax: python
   formula: |
     # States set their own need standards
     # Typical components (state parameters override these):

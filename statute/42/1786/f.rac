@@ -14,6 +14,7 @@ variable food_package:
   entity: Household
   period: Month
   dtype: Integer
+  syntax: python
   formula: |
     # Must be WIC eligible to receive a food package
     if not is_wic_eligible:
@@ -70,6 +71,7 @@ variable wic_priority_level:
   entity: Person
   period: Month
   dtype: Integer
+  syntax: python
   formula: |
     if not is_wic_eligible:
         return 0
@@ -92,6 +94,7 @@ variable wic_priority_description:
   entity: Person
   period: Month
   dtype: String
+  syntax: python
   formula: |
     priority = wic_priority_level
     if priority == 1:
@@ -114,6 +117,7 @@ variable is_wic_high_priority:
   entity: Person
   period: Month
   dtype: Boolean
+  syntax: python
   formula: |
     priority = wic_priority_level
     return priority >= 1 and priority <= priority_ranges.high_max
@@ -122,6 +126,7 @@ variable is_wic_standard_priority:
   entity: Person
   period: Month
   dtype: Boolean
+  syntax: python
   formula: |
     priority = wic_priority_level
     return priority >= priority_ranges.standard_min and priority <= priority_ranges.standard_max
@@ -130,6 +135,7 @@ variable is_wic_lower_priority:
   entity: Person
   period: Month
   dtype: Boolean
+  syntax: python
   formula: |
     priority = wic_priority_level
     return priority >= priority_ranges.lower_min and priority <= priority_ranges.lower_max

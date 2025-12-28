@@ -34,6 +34,7 @@ variable income_eligibility:
   entity: Person
   period: Year
   dtype: Boolean
+  syntax: python
   formula: |
     # FPL = base for size 1-max, then additional per person for each beyond max
     size = min(household_size, fpl_max_size)
@@ -68,6 +69,7 @@ variable school_meal_snap_categorically_eligible:
   entity: Person
   period: Year
   dtype: Boolean
+  syntax: python
   formula: |
     # Household receives SNAP benefits
     return household.receives_snap
@@ -76,6 +78,7 @@ variable school_meal_tanf_categorically_eligible:
   entity: Person
   period: Year
   dtype: Boolean
+  syntax: python
   formula: |
     # Household receives TANF benefits
     return household.receives_tanf
@@ -84,6 +87,7 @@ variable school_meal_fdpir_categorically_eligible:
   entity: Person
   period: Year
   dtype: Boolean
+  syntax: python
   formula: |
     # Household receives FDPIR (Food Distribution Program on Indian Reservations)
     return household.receives_fdpir
@@ -122,6 +126,7 @@ variable school_meal_categorically_eligible:
   entity: Person
   period: Year
   dtype: Boolean
+  syntax: python
   formula: |
     # 42 USC 1758(b)(2)(C)(ii) - Program participation
     snap_eligible = school_meal_snap_categorically_eligible
@@ -144,6 +149,7 @@ variable school_meal_cep_eligible:
   entity: Person
   period: Year
   dtype: Boolean
+  syntax: python
   formula: |
     # Student attends a school participating in Community Eligibility Provision
     return attends_cep_school
@@ -152,6 +158,7 @@ variable school_meal_directly_certified:
   entity: Person
   period: Year
   dtype: Boolean
+  syntax: python
   formula: |
     # Direct certification includes categorical eligibility pathways
     # that can be verified through data matching (SNAP, TANF, FDPIR, foster, homeless, migrant)
@@ -182,6 +189,7 @@ variable free_eligibility:
   dtype: Rate
   label: "School Meal FPG Ratio"
   description: "Ratio of household income to Federal Poverty Guidelines"
+  syntax: python
   formula: |
     # Get household's gross annual income
     household_income = household.gross_income
@@ -212,6 +220,7 @@ variable reduced_eligibility:
   dtype: Boolean
   label: "School Meal Eligible Subsidized"
   description: "Whether eligible for any subsidized meals (free OR reduced-price)"
+  syntax: python
   formula: |
     # Get household's gross annual income
     household_income = household.gross_income
@@ -237,6 +246,7 @@ variable subsidy:
   dtype: Money
   label: "Reduced Price School Meals"
   description: "Annual value of REDUCED-PRICE school meals for household"
+  syntax: python
   formula: |
     # Get state group and tier for rate lookup
     state = household.state
@@ -277,6 +287,7 @@ variable tier:
   dtype: Boolean
   label: "School Meal Tier Is Subsidized"
   description: "Boolean helper: is this person in a subsidized tier (free or reduced)?"
+  syntax: python
   formula: |
     # Get household income ratio to FPL
     household_income = household.gross_income

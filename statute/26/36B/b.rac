@@ -34,6 +34,7 @@ variable applicable_percentage:
   unit: "USD"
   label: "Monthly Expected Premium Contribution"
   description: "Monthly portion of expected premium contribution"
+  syntax: python
   formula: |
     income_pct = household_income_pct_fpl
     # Under IRA (2021-2025): Income above 400% FPL still eligible at 8.5%

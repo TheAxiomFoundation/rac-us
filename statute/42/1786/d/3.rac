@@ -18,6 +18,7 @@ variable adjunctive:
   entity: Household
   period: Month
   dtype: Boolean
+  syntax: python
   formula: |
     # Person or household receives SNAP benefits
     if receives_snap:

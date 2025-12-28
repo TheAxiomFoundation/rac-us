@@ -67,6 +67,7 @@ variable benefit_calculation:
   unit: "USD"
   label: "LIHEAP cooling assistance"
   description: "Home cooling assistance per 42 USC 8624(b)(1)(B)"
+  syntax: python
   formula: |
     # Energy burden = energy costs / income
     # Handle zero income case

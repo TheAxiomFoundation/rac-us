@@ -10,6 +10,7 @@ variable acp_annual_benefit:
   unit: "USD"
   label: "ACP Annual Benefit"
   description: "Annualized ACP benefit for household"
+  syntax: python
   formula: |
     # Sum monthly benefits across the year
     # Note: ACP benefit ended April 2024
@@ -34,6 +35,7 @@ variable acp_benefit:
   unit: "USD"
   label: "ACP Monthly Benefit"
   description: "Monthly discount equal to amount charged, up to maximum per 47 USC 1752(a)(7)"
+  syntax: python
   formula: |
     # Must be eligible to receive benefit
     if not acp_eligible:
@@ -57,6 +59,7 @@ variable acp_max_benefit:
   unit: "USD"
   label: "ACP Maximum Monthly Benefit"
   description: "Maximum monthly benefit: $75 on Tribal land, $30 otherwise per 47 USC 1752(a)(7)"
+  syntax: python
   formula: |
     if acp_on_tribal_land:
     return tribal_benefit

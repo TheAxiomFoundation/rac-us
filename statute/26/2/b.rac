@@ -16,6 +16,7 @@ variable is_head_of_household:
     Determines if taxpayer qualifies for head of household filing status
     per 26 USC § 2(b). Requires being unmarried and maintaining a household
     for a qualifying person for more than half the taxable year.
+  syntax: python
   formula: |
     # Per § 2(b)(1): Must not be married at close of taxable year
     if is_married:
@@ -45,21 +46,22 @@ variable filing_status:
   description: |
     Taxpayer filing status per 26 USC § 1 and § 2.
     One of: SINGLE, JOINT, HEAD_OF_HOUSEHOLD, SEPARATE, WIDOW
+  syntax: python
   formula: |
     # Check statuses in order of precedence
     if is_married and files_jointly:
-      return "JOINT"
+      return JOINT
     if is_married and not files_jointly:
-      return "SEPARATE"
+      return SEPARATE
     # Per § 2(a): Surviving spouse status for 2 years after death
     if is_surviving_spouse:
-      return "WIDOW"
+      return WIDOW
     # Per § 2(b): Head of household
     if is_head_of_household:
-      return "HEAD_OF_HOUSEHOLD"
+      return HEAD_OF_HOUSEHOLD
     # Default: single
-    return "SINGLE"
-  default: "SINGLE"
+    return SINGLE
+  default: SINGLE
 
 # Tests per § 2(b) requirements
 tests:
@@ -69,7 +71,7 @@ tests:
       num_dependents: 1
     expect:
       is_head_of_household: True
-      filing_status: "HEAD_OF_HOUSEHOLD"
+      filing_status: HEAD_OF_HOUSEHOLD
 
   - name: "Single without dependents is SINGLE"
     inputs:
@@ -77,7 +79,7 @@ tests:
       num_dependents: 0
     expect:
       is_head_of_household: False
-      filing_status: "SINGLE"
+      filing_status: SINGLE
 
   - name: "Married with children is not HOH"
     inputs:
@@ -86,7 +88,7 @@ tests:
       num_dependents: 2
     expect:
       is_head_of_household: False
-      filing_status: "JOINT"
+      filing_status: JOINT
 
   - name: "Single with multiple dependents is HOH"
     inputs:
@@ -94,4 +96,4 @@ tests:
       num_dependents: 3
     expect:
       is_head_of_household: True
-      filing_status: "HEAD_OF_HOUSEHOLD"
+      filing_status: HEAD_OF_HOUSEHOLD

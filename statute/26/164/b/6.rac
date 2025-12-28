@@ -20,6 +20,7 @@ variable salt_deduction:
   unit: "USD"
   label: "SALT Cap Reduction"
   description: "Amount of SALT disallowed due to the $10,000 cap"
+  syntax: python
   formula: |
     # Choose income tax or sales tax per taxpayer election
     if elects_sales_tax:

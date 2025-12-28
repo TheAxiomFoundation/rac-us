@@ -6,6 +6,7 @@ variable hcv_voucher_size:
   dtype: Integer
   label: "HCV Voucher Size"
   description: "Number of bedrooms for voucher based on family composition"
+  syntax: python
   formula: |
     # PHA subsidy standards determine bedroom size
     # Typical standards:
@@ -28,6 +29,7 @@ variable hcv_payment_standard:
   unit: "USD"
   label: "HCV Payment Standard"
   description: "Payment standard amount based on voucher bedroom size"
+  syntax: python
   formula: |
     voucher_size = hcv_voucher_size
     # Look up payment standard by bedroom size from parameter table
@@ -48,6 +50,7 @@ variable hcv_gross_rent:
   unit: "USD"
   label: "HCV Gross Rent"
   description: "Contract rent plus utility allowance"
+  syntax: python
   formula: |
     # Contract rent = rent paid to owner
     # Utility allowance = PHA estimate of tenant-paid utilities
@@ -61,6 +64,7 @@ variable hcv_housing_assistance_payment:
   unit: "USD"
   label: "HCV Housing Assistance Payment"
   description: "Monthly subsidy paid by PHA to landlord"
+  syntax: python
   formula: |
     # First check eligibility
     if not hcv_eligible:
@@ -82,6 +86,7 @@ variable hcv_rent_reasonable:
   dtype: Boolean
   label: "HCV Rent Reasonable"
   description: "Whether rent is reasonable compared to market"
+  syntax: python
   formula: |
     # Rent reasonableness is determined by PHA comparison
     # to comparable market units. For modeling, we assume
@@ -98,6 +103,7 @@ variable hcv_initial_affordability_check:
   dtype: Boolean
   label: "HCV Initial Affordability Check"
   description: "Whether family share is affordable at initial lease-up (40% limit)"
+  syntax: python
   formula: |
     family_share = hcv_gross_rent - hcv_housing_assistance_payment
     max_share_rate = parameter(gov.hud.hcv.housing_assistance.maximum_family_share.at_initial_lease)
@@ -115,6 +121,7 @@ variable hcv_family_payment:
   unit: "USD"
   label: "HCV Family Payment"
   description: "Total amount tenant pays (gross rent minus HAP)"
+  syntax: python
   formula: |
     # Family pays: Gross rent - HAP
     # Or equivalently: TTP + any excess rent over payment standard
@@ -129,6 +136,7 @@ variable hcv_payment_to_owner:
   unit: "USD"
   label: "HCV Payment to Owner"
   description: "HAP amount paid directly to landlord"
+  syntax: python
   formula: |
     # HAP paid directly to owner
     # May be less than full HAP if utility allowance creates reimbursement

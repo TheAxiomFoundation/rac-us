@@ -17,6 +17,7 @@ variable tip_income_deduction:
   unit: "USD"
   label: "Tip Income Deduction Available"
   description: "Whether the tip income deduction is available in this tax year"
+  syntax: python
   formula: |
     # For employees, no limit from self-employment
     # For self-employed, cannot exceed net earnings from trade/business

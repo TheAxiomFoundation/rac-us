@@ -6,6 +6,7 @@ variable tanf_work_sanction_applicable:
   dtype: Bool
   label: "TANF Work Sanction Applicable"
   description: "Whether work requirement sanction applies to individual"
+  syntax: python
   formula: |
     # Sanction applies if:
     # - Required to participate in work activities
@@ -28,6 +29,7 @@ variable tanf_work_sanction_amount:
   unit: "USD"
   label: "TANF Work Sanction Reduction"
   description: "Monthly benefit reduction due to work requirement non-compliance"
+  syntax: python
   formula: |
     # States choose sanction approach:
     # 1. Pro-rata: Reduce by non-compliant adult's portion of benefit
@@ -50,6 +52,7 @@ variable tanf_full_family_sanction_applies:
   dtype: Bool
   label: "TANF Full-Family Sanction"
   description: "Whether full-family sanction terminates entire benefit"
+  syntax: python
   formula: |
     # State-specific: Some states terminate entire benefit
     # for work non-compliance
@@ -66,6 +69,7 @@ variable tanf_child_support_cooperation_met:
   dtype: Bool
   label: "TANF Child Support Cooperation Met"
   description: "Whether unit cooperates with child support enforcement"
+  syntax: python
   formula: |
     # Cooperation required unless good cause exemption
     # Good cause includes:
@@ -88,6 +92,7 @@ variable tanf_child_support_sanction_amount:
   unit: "USD"
   label: "TANF Child Support Sanction"
   description: "Benefit reduction for child support non-cooperation"
+  syntax: python
   formula: |
     if tanf_child_support_cooperation_met:
         return 0
@@ -103,6 +108,7 @@ variable tanf_irp_required:
   dtype: Bool
   label: "TANF Individual Responsibility Plan Required"
   description: "Whether Individual Responsibility Plan is required"
+  syntax: python
   formula: |
     # States may require IRP as condition of benefits
     # IRP outlines responsibilities and goals
@@ -118,6 +124,7 @@ variable tanf_irp_compliance:
   dtype: Bool
   label: "TANF IRP Compliance"
   description: "Whether individual complies with Individual Responsibility Plan"
+  syntax: python
   formula: |
     if not tanf_irp_required:
         return True
@@ -132,6 +139,7 @@ variable tanf_sanction_level:
   dtype: Integer
   label: "TANF Sanction Level"
   description: "Current sanction level for progressive sanctions (0-3 typical)"
+  syntax: python
   formula: |
     # Progressive sanctions typically:
     # Level 0: No sanction
@@ -150,6 +158,7 @@ variable tanf_total_sanction_amount:
   unit: "USD"
   label: "TANF Total Sanctions"
   description: "Combined benefit reduction from all applicable sanctions"
+  syntax: python
   formula: |
     work_sanction = tanf_work_sanction_amount
     child_support_sanction = tanf_child_support_sanction_amount
@@ -168,6 +177,7 @@ variable tanf_benefit_after_sanctions:
   unit: "USD"
   label: "TANF Benefit After Sanctions"
   description: "TANF benefit amount after applying all sanctions"
+  syntax: python
   formula: |
     benefit = tanf_benefit_amount_before_sanctions
     sanctions = tanf_total_sanction_amount
@@ -180,6 +190,7 @@ variable tanf_work_good_cause:
   dtype: Bool
   label: "TANF Work Good Cause"
   description: "Whether good cause exists for work requirement non-compliance"
+  syntax: python
   formula: |
     # Federal regulations recognize good cause including:
     # - Child care unavailable (child under 6)
@@ -204,6 +215,7 @@ variable tanf_child_support_good_cause_exemption:
   dtype: Bool
   label: "TANF Child Support Good Cause"
   description: "Whether good cause exemption applies for child support cooperation"
+  syntax: python
   formula: |
     # Good cause includes:
     # - Risk of domestic violence

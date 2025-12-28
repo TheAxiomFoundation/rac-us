@@ -25,6 +25,7 @@ variable eligibility:
   entity: Household
   period: Month
   dtype: Boolean
+  syntax: python
   formula: |
     # 42 USC 1786(d)(3) prohibits durational residency requirements
     # Person must only be physically present in the state where applying

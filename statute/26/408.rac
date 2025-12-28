@@ -44,6 +44,7 @@ variable ira_rmd_applicable_age:
   dtype: Integer
   label: "IRA RMD Applicable Age"
   description: "Age at which IRA required minimum distributions must begin"
+  syntax: python
   formula: |
     # Same rules as 401(k) - reuses rmd_applicable_age from 402/c/rmd
     return rmd_applicable_age
@@ -74,6 +75,7 @@ variable ira_required_minimum_distribution:
   unit: "USD"
   label: "IRA Required Minimum Distribution"
   description: "Minimum amount that must be withdrawn from IRA"
+  syntax: python
   formula: |
     # Must have reached RMD age
     if not is_ira_reached_rmd_age:

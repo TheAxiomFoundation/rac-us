@@ -19,6 +19,7 @@ variable amt:
   unit: "USD"
   label: "Total Income Tax with AMT"
   description: "Regular tax plus AMT"
+  syntax: python
   formula: |
     # Get base exemption based on filing status
     # Joint filers and surviving spouses: Section 55(d)(1)(A)

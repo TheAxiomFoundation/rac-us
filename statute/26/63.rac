@@ -93,14 +93,19 @@ variable standard_deduction:
   unit: "USD"
   label: "Standard Deduction"
   description: "Total standard deduction including basic and additional amounts per 26 USC 63"
+  syntax: python
   formula: |
+    # 63(c)(5): Use dependent limitation if applicable
+    if is_dependent:
+        basic = dependent_standard_deduction
+    else:
+        basic = basic_standard_deduction
     # 63(c)(6): Check for ineligibility (MFS spouse itemizes, NRA, etc.)
     if is_ineligible_for_standard_deduction:
-      return 0
-    # 63(c)(5): Use dependent limitation if applicable
-    basic = is_dependent ? dependent_standard_deduction : basic_standard_deduction
-    # 63(f): Add additional amounts for age/blindness
-    return basic + additional_standard_deduction
+        result = 0
+    else:
+        result = basic + additional_standard_deduction
+    return result
   tests:
     - name: "Single filer 2024"
       period: 2024-01

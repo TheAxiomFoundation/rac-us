@@ -26,6 +26,7 @@ variable initial_amount:
   unit: "USD"
   label: "Section 22 Initial Amount"
   description: "Initial section 22 amount before reductions per 26 USC 22(c)(1)"
+  syntax: python
   formula: |
     # No credit if no qualified individuals
     if num_sec22_qualified_individuals == 0: return 0

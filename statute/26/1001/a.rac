@@ -28,6 +28,7 @@ variable capital_gains:
   unit: "USD"
   label: "FMV at Gift Date"
   description: "Fair market value at date of gift"
+  syntax: python
   formula: |
     # Gain = amount realized - adjusted basis
     # If negative, it's a loss
@@ -49,6 +50,7 @@ variable holding_period:
   dtype: Bool
   label: "Held Substantially Identical Long-Term"
   description: "Held substantially identical property long-term when short sale initiated"
+  syntax: python
   formula: |
     # Calculate days between acquisition and disposition
     # Note: Day of acquisition is excluded, day of disposition is included
@@ -75,6 +77,7 @@ variable netting:
   unit: "USD"
   label: "Has Capital Loss Carryover"
   description: "Taxpayer has unused capital loss to carry forward"
+  syntax: python
   formula: |
     # Include carryover losses from prior years
     total_st_loss = short_term_capital_loss + short_term_capital_loss_carryover

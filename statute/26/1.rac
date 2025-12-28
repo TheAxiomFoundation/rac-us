@@ -44,6 +44,7 @@ variable income_tax_before_credits:
   unit: "USD"
   label: "Income Tax Before Credits"
   description: "Federal income tax on ordinary income before credits per 26 USC Section 1"
+  syntax: python
   formula: |
     if taxable_income <= 0:
         return 0
@@ -57,6 +58,7 @@ variable income_tax_before_credits_vectorized:
   unit: "USD"
   label: "Income Tax Before Credits (Vectorized)"
   description: "Vectorized implementation for microsimulation"
+  syntax: python
   formula: |
     return marginal_agg(taxable_income, brackets, threshold_by=filing_status)
   default: 0
@@ -77,6 +79,7 @@ variable total_federal_income_tax:
   unit: "USD"
   label: "Total Federal Income Tax"
   description: "Final federal income tax liability (negative = refund) per 26 USC Section 1"
+  syntax: python
   formula: |
     # Regular income tax (on ordinary income)
     regular_tax = income_tax_before_credits

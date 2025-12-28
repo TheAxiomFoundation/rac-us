@@ -17,6 +17,7 @@ variable combined_income:
   unit: "USD"
   label: "Combined Income for Social Security Taxability"
   description: "Modified AGI plus one-half of Social Security benefits per 26 USC Section 86(b)"
+  syntax: python
   formula: |
     # Per Section 86(b)(1), combined income = MAGI + 0.5 * SS benefits
     return modified_agi + (ss_fraction * tax_unit_social_security)
@@ -32,6 +33,7 @@ variable modified_agi:
   unit: "USD"
   label: "Modified Adjusted Gross Income for Social Security Taxability"
   description: "AGI plus tax-exempt interest for determining taxable portion of Social Security benefits per 26 USC Section 86(b)(1)"
+  syntax: python
   formula: |
     # Per Section 86(b)(1)(A) and IRS Publication 915:
     # MAGI = AGI + tax-exempt interest

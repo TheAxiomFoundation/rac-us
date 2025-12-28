@@ -21,6 +21,7 @@ variable income_methodology:
   unit: "USD"
   label: "Countable scholarship income"
   description: "Scholarship income counted under MAGI"
+  syntax: python
   formula: |
     # Start with AGI (26 USC 62)
     agi = adjusted_gross_income

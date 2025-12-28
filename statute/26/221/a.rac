@@ -65,6 +65,7 @@ variable student_loan_interest_deduction_eligible:
   unit: "USD"
   label: "Phase-out Start Threshold"
   description: "MAGI threshold where student loan interest deduction phase-out begins"
+  syntax: python
   formula: |
     # 221(d)(2): MFS cannot claim this deduction
     not_mfs = filing_status != MARRIED_FILING_SEPARATELY
@@ -80,6 +81,7 @@ variable student_loan_interest_phaseout_start:
   unit: "USD"
   label: "Phase-out End Threshold"
   description: "MAGI threshold where student loan interest deduction is fully phased out"
+  syntax: python
   formula: |
     if filing_status == MARRIED_FILING_JOINTLY:
         return phaseout_joint_start
@@ -92,6 +94,7 @@ variable student_loan_interest_phaseout_end:
   dtype: Rate
   label: "Student Loan Interest Phase-out Ratio"
   description: "Ratio of deduction reduced due to MAGI-based phase-out"
+  syntax: python
   formula: |
     if filing_status == MARRIED_FILING_JOINTLY:
         return phaseout_joint_end
@@ -104,6 +107,7 @@ variable student_loan_interest_phaseout_ratio:
   unit: "USD"
   label: "Student Loan Interest Deduction (Before Phase-out)"
   description: "Deduction amount before applying income-based phase-out"
+  syntax: python
   formula: |
     # For Section 221, MAGI equals AGI (no add-backs required per 221(b)(2)(C))
     # Unlike some other provisions, 221 uses AGI directly
@@ -128,6 +132,7 @@ variable student_loan_interest_deduction_before_phaseout:
   unit: "USD"
   label: "Student Loan Interest Deduction"
   description: "Above-the-line deduction for interest paid on qualified education loans per 26 USC 221"
+  syntax: python
   formula: |
     # Sum interest paid by all members of the tax unit
     total_interest = sum(members.student_loan_interest_paid)
@@ -135,6 +140,7 @@ variable student_loan_interest_deduction_before_phaseout:
     return min(total_interest, max_deduction)
 
 variable student_loan_interest_deduction:
+  syntax: python
   formula: |
     # Check eligibility per 221(d)
     if not student_loan_interest_deduction_eligible:

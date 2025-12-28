@@ -22,6 +22,7 @@ variable alternative_tax:
   unit: "USD"
   label: "Corporate Income Tax (with Section 1201 consideration)"
   description: "Final corporate tax applying Section 1201 if beneficial"
+  syntax: python
   formula: |
     # Only C corporations can use Section 1201
     if not is_subject_to_corporate_tax:
