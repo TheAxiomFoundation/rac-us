@@ -33,6 +33,25 @@ variable nol_modification_prior_nol:
     # This prevents circular references and stacking of NOL deductions
     return prior_nol_deduction_claimed
   default: 0
+  tests:
+    - name: "Add back NOL deduction from current year"
+      period: 2024
+      inputs:
+        taxable_income: -50000
+        capital_gains: 0
+        capital_losses: 0
+        personal_exemption: 0
+        prior_nol_deduction_claimed: 40000
+      expect: 40000
+    - name: "No modification when no NOL deduction claimed"
+      period: 2024
+      inputs:
+        taxable_income: -30000
+        capital_gains: 0
+        capital_losses: 0
+        personal_exemption: 0
+        prior_nol_deduction_claimed: 0
+      expect: 0
 
 variable nol_modification_capital_losses:
   entity: TaxUnit
@@ -58,6 +77,43 @@ variable nol_modification_capital_losses:
     else:
         return 0
   default: 0
+  tests:
+    - name: "Add back excess capital losses beyond gains"
+      period: 2024
+      inputs:
+        taxable_income: -50000
+        capital_gains: 10000
+        capital_losses: 30000
+        personal_exemption: 0
+        prior_nol_deduction_claimed: 0
+      expect: 20000
+    - name: "No modification when capital losses equal gains"
+      period: 2024
+      inputs:
+        taxable_income: -50000
+        capital_gains: 25000
+        capital_losses: 25000
+        personal_exemption: 0
+        prior_nol_deduction_claimed: 0
+      expect: 0
+    - name: "No modification when gains exceed losses"
+      period: 2024
+      inputs:
+        taxable_income: 50000
+        capital_gains: 50000
+        capital_losses: 15000
+        personal_exemption: 0
+        prior_nol_deduction_claimed: 0
+      expect: 0
+    - name: "Full capital loss modification with no gains"
+      period: 2024
+      inputs:
+        taxable_income: -50000
+        capital_gains: 0
+        capital_losses: 35000
+        personal_exemption: 0
+        prior_nol_deduction_claimed: 0
+      expect: 35000
 
 variable nol_modification_exemptions:
   entity: TaxUnit
@@ -72,6 +128,25 @@ variable nol_modification_exemptions:
     # Add them back (though suspended 2018-2025 by TCJA)
     return personal_exemption
   default: 0
+  tests:
+    - name: "Add back personal exemptions (pre-TCJA)"
+      period: 2016
+      inputs:
+        taxable_income: -30000
+        capital_gains: 0
+        capital_losses: 0
+        personal_exemption: 4050
+        prior_nol_deduction_claimed: 0
+      expect: 4050
+    - name: "Exemptions suspended during TCJA (2018-2025)"
+      period: 2024
+      inputs:
+        taxable_income: -30000
+        capital_gains: 0
+        capital_losses: 0
+        personal_exemption: 0
+        prior_nol_deduction_claimed: 0
+      expect: 0
 
 variable nol_modification_nonbusiness:
   entity: TaxUnit
@@ -91,6 +166,16 @@ variable nol_modification_nonbusiness:
     # Full implementation would track business vs. nonbusiness items
     return 0
   default: 0
+  tests:
+    - name: "Nonbusiness modification simplified to zero"
+      period: 2024
+      inputs:
+        taxable_income: -50000
+        capital_gains: 0
+        capital_losses: 0
+        personal_exemption: 0
+        prior_nol_deduction_claimed: 0
+      expect: 0
 
 variable nol_modifications:
   entity: TaxUnit
@@ -110,3 +195,31 @@ variable nol_modifications:
     nol_modification_nonbusiness
     )
   default: 0
+  tests:
+    - name: "Total NOL modifications from all categories"
+      period: 2024
+      inputs:
+        taxable_income: -50000
+        capital_gains: 0
+        capital_losses: 20000
+        personal_exemption: 2175
+        prior_nol_deduction_claimed: 15000
+      expect: 37175
+    - name: "Total NOL modifications with only capital loss adjustment"
+      period: 2024
+      inputs:
+        taxable_income: -30000
+        capital_gains: 5000
+        capital_losses: 35000
+        personal_exemption: 0
+        prior_nol_deduction_claimed: 0
+      expect: 30000
+    - name: "Total NOL modifications zero"
+      period: 2024
+      inputs:
+        taxable_income: 50000
+        capital_gains: 10000
+        capital_losses: 10000
+        personal_exemption: 0
+        prior_nol_deduction_claimed: 0
+      expect: 0

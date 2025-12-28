@@ -39,6 +39,39 @@ variable nol_deduction:
     # (Should already be handled by component calculations)
     return min(total, max(0, taxable_income))
   default: 0
+  tests:
+    - name: "NOL deduction with pre and post-TCJA carryforwards"
+      period: 2024
+      inputs:
+        taxable_income: 100000
+        nol_deduction_pre_2018: 30000
+        nol_deduction_post_2017: 50000
+        farming_loss_carryback: 0
+      expect: 80000
+    - name: "NOL deduction capped at taxable income"
+      period: 2024
+      inputs:
+        taxable_income: 50000
+        nol_deduction_pre_2018: 40000
+        nol_deduction_post_2017: 60000
+        farming_loss_carryback: 0
+      expect: 50000
+    - name: "NOL deduction with farming carryback"
+      period: 2024
+      inputs:
+        taxable_income: 100000
+        nol_deduction_pre_2018: 0
+        nol_deduction_post_2017: 60000
+        farming_loss_carryback: 10000
+      expect: 70000
+    - name: "No NOL deduction with zero carryforwards"
+      period: 2024
+      inputs:
+        taxable_income: 100000
+        nol_deduction_pre_2018: 0
+        nol_deduction_post_2017: 0
+        farming_loss_carryback: 0
+      expect: 0
 
 variable nol_deduction_claimed:
   entity: TaxUnit
@@ -48,6 +81,23 @@ variable nol_deduction_claimed:
   description: "Whether taxpayer claims an NOL deduction in current year"
   formula: return nol_deduction > 0
   default: False
+  tests:
+    - name: "NOL deduction is claimed when deduction is positive"
+      period: 2024
+      inputs:
+        taxable_income: 100000
+        nol_deduction_pre_2018: 25000
+        nol_deduction_post_2017: 0
+        farming_loss_carryback: 0
+      expect: true
+    - name: "NOL deduction not claimed when deduction is zero"
+      period: 2024
+      inputs:
+        taxable_income: 100000
+        nol_deduction_pre_2018: 0
+        nol_deduction_post_2017: 0
+        farming_loss_carryback: 0
+      expect: false
 
 variable taxable_income_before_nol:
   entity: TaxUnit
@@ -61,6 +111,23 @@ variable taxable_income_before_nol:
     # This is used for computing the 80% limitation
     return taxable_income + nol_deduction
   default: 0
+  tests:
+    - name: "Taxable income before NOL with deduction"
+      period: 2024
+      inputs:
+        taxable_income: 75000
+        nol_deduction_pre_2018: 25000
+        nol_deduction_post_2017: 0
+        farming_loss_carryback: 0
+      expect: 100000
+    - name: "Taxable income before NOL without deduction"
+      period: 2024
+      inputs:
+        taxable_income: 100000
+        nol_deduction_pre_2018: 0
+        nol_deduction_post_2017: 0
+        farming_loss_carryback: 0
+      expect: 100000
 
 variable amt_nol_deduction:
   entity: TaxUnit
@@ -78,3 +145,20 @@ variable amt_nol_deduction:
     # Full implementation would recompute with AMTI
     return nol_deduction
   default: 0
+  tests:
+    - name: "AMT NOL deduction equals regular NOL deduction"
+      period: 2024
+      inputs:
+        taxable_income: 100000
+        nol_deduction_pre_2018: 30000
+        nol_deduction_post_2017: 40000
+        farming_loss_carryback: 5000
+      expect: 75000
+    - name: "AMT NOL deduction zero when no carryforwards"
+      period: 2024
+      inputs:
+        taxable_income: 100000
+        nol_deduction_pre_2018: 0
+        nol_deduction_post_2017: 0
+        farming_loss_carryback: 0
+      expect: 0

@@ -185,16 +185,80 @@ variable acp_categorically_eligible:
   formula: |
     return acp_school_meal_eligible or acp_pell_grant_eligible or acp_wic_eligible or acp_lifeline_categorical_eligible or acp_tribal_program_eligible
   default: false
+  tests:
+    - name: "Categorically eligible through SNAP"
+      period: 2024-01
+      inputs:
+        household_size: 3
+        receives_snap: true
+        receives_medicaid: false
+        receives_ssi: false
+        receives_section_8: false
+        receives_veterans_pension: false
+        receives_free_school_meals: false
+        receives_reduced_price_school_meals: false
+        receives_pell_grant: false
+        receives_wic: false
+        receives_fdpir: false
+        receives_bia_general_assistance: false
+        receives_tribal_tanf: false
+        receives_head_start: false
+      expect: true
+    - name: "Categorically eligible through free school meals"
+      period: 2024-01
+      inputs:
+        household_size: 2
+        receives_snap: false
+        receives_medicaid: false
+        receives_ssi: false
+        receives_section_8: false
+        receives_veterans_pension: false
+        receives_free_school_meals: true
+        receives_reduced_price_school_meals: false
+        receives_pell_grant: false
+        receives_wic: false
+        receives_fdpir: false
+        receives_bia_general_assistance: false
+        receives_tribal_tanf: false
+        receives_head_start: false
+      expect: true
+    - name: "Categorically eligible through tribal program"
+      period: 2024-01
+      inputs:
+        household_size: 3
+        receives_snap: false
+        receives_medicaid: false
+        receives_ssi: false
+        receives_section_8: false
+        receives_veterans_pension: false
+        receives_free_school_meals: false
+        receives_reduced_price_school_meals: false
+        receives_pell_grant: false
+        receives_wic: false
+        receives_fdpir: true
+        receives_bia_general_assistance: false
+        receives_tribal_tanf: false
+        receives_head_start: false
+      expect: true
+    - name: "Not categorically eligible"
+      period: 2024-01
+      inputs:
+        household_size: 4
+        receives_snap: false
+        receives_medicaid: false
+        receives_ssi: false
+        receives_section_8: false
+        receives_veterans_pension: false
+        receives_free_school_meals: false
+        receives_reduced_price_school_meals: false
+        receives_pell_grant: false
+        receives_wic: false
+        receives_fdpir: false
+        receives_bia_general_assistance: false
+        receives_tribal_tanf: false
+        receives_head_start: false
+      expect: false
 
-# 47 USC 1752(a)(6) - Overall ACP Eligibility
-#
-
-text: """
-(6) ELIGIBLE HOUSEHOLD.—The term 'eligible household' means...
-a household in which—
-(A) at least 1 member of the household meets the qualifications in
-subsection (a) or (b) of section 54.409... [income or categorical]
-"""
 variable acp_eligible:
   imports:
     - 47/1752/a/6#acp_income_eligible
@@ -213,6 +277,102 @@ variable acp_eligible:
     # Eligible if income-based OR categorically eligible
     return acp_income_eligible or acp_categorically_eligible
   default: false
+  tests:
+    - name: "Income eligible when program active"
+      period: 2024-01
+      inputs:
+        household_size: 1
+        gross_income: 2000
+        receives_snap: false
+        receives_medicaid: false
+        receives_ssi: false
+        receives_section_8: false
+        receives_veterans_pension: false
+        receives_free_school_meals: false
+        receives_reduced_price_school_meals: false
+        receives_pell_grant: false
+        receives_wic: false
+        receives_fdpir: false
+        receives_bia_general_assistance: false
+        receives_tribal_tanf: false
+        receives_head_start: false
+      expect: true
+    - name: "Categorically eligible when program active"
+      period: 2024-01
+      inputs:
+        household_size: 3
+        gross_income: 5000
+        receives_snap: true
+        receives_medicaid: false
+        receives_ssi: false
+        receives_section_8: false
+        receives_veterans_pension: false
+        receives_free_school_meals: false
+        receives_reduced_price_school_meals: false
+        receives_pell_grant: false
+        receives_wic: false
+        receives_fdpir: false
+        receives_bia_general_assistance: false
+        receives_tribal_tanf: false
+        receives_head_start: false
+      expect: true
+    - name: "Ineligible (over income and no categorical)"
+      period: 2024-01
+      inputs:
+        household_size: 2
+        gross_income: 5000
+        receives_snap: false
+        receives_medicaid: false
+        receives_ssi: false
+        receives_section_8: false
+        receives_veterans_pension: false
+        receives_free_school_meals: false
+        receives_reduced_price_school_meals: false
+        receives_pell_grant: false
+        receives_wic: false
+        receives_fdpir: false
+        receives_bia_general_assistance: false
+        receives_tribal_tanf: false
+        receives_head_start: false
+      expect: false
+    - name: "Program inactive (benefit=$0)"
+      period: 2024-04
+      inputs:
+        household_size: 1
+        gross_income: 2000
+        receives_snap: false
+        receives_medicaid: false
+        receives_ssi: false
+        receives_section_8: false
+        receives_veterans_pension: false
+        receives_free_school_meals: false
+        receives_reduced_price_school_meals: false
+        receives_pell_grant: false
+        receives_wic: false
+        receives_fdpir: false
+        receives_bia_general_assistance: false
+        receives_tribal_tanf: false
+        receives_head_start: false
+      expect: false
+    - name: "Both income and categorical eligible"
+      period: 2024-01
+      inputs:
+        household_size: 2
+        gross_income: 3000
+        receives_snap: true
+        receives_medicaid: false
+        receives_ssi: false
+        receives_section_8: false
+        receives_veterans_pension: false
+        receives_free_school_meals: false
+        receives_reduced_price_school_meals: false
+        receives_pell_grant: false
+        receives_wic: false
+        receives_fdpir: false
+        receives_bia_general_assistance: false
+        receives_tribal_tanf: false
+        receives_head_start: false
+      expect: true
 
 variable acp_fpl_threshold:
   entity: Household
@@ -228,6 +388,32 @@ variable acp_fpl_threshold:
     # Return monthly threshold at 200% FPL
     return (annual_fpl * fpg_limit) / months_per_year
   default: 0
+  tests:
+    - name: "Single person household threshold"
+      period: 2024-01
+      inputs:
+        household_size: 1
+      expect: 2510
+    - name: "Two person household threshold"
+      period: 2024-01
+      inputs:
+        household_size: 2
+      expect: 3429.17
+    - name: "Three person household threshold"
+      period: 2024-01
+      inputs:
+        household_size: 3
+      expect: 4348.33
+    - name: "Four person household threshold"
+      period: 2024-01
+      inputs:
+        household_size: 4
+      expect: 5267.5
+    - name: "Large household (10 persons)"
+      period: 2024-01
+      inputs:
+        household_size: 10
+      expect: 10555
 
 
 variable acp_income_eligible:
@@ -242,6 +428,49 @@ variable acp_income_eligible:
     # Use gross income per 47 CFR 54.400(f)
     return gross_income <= acp_fpl_threshold
   default: false
+  tests:
+    - name: "Single person at threshold (eligible)"
+      period: 2024-01
+      inputs:
+        household_size: 1
+        gross_income: 2510
+      expect: true
+    - name: "Single person below threshold (eligible)"
+      period: 2024-01
+      inputs:
+        household_size: 1
+        gross_income: 2000
+      expect: true
+    - name: "Single person above threshold (ineligible)"
+      period: 2024-01
+      inputs:
+        household_size: 1
+        gross_income: 2511
+      expect: false
+    - name: "Four person family at threshold (eligible)"
+      period: 2024-01
+      inputs:
+        household_size: 4
+        gross_income: 5267.5
+      expect: true
+    - name: "Four person family well below threshold (eligible)"
+      period: 2024-01
+      inputs:
+        household_size: 4
+        gross_income: 3500
+      expect: true
+    - name: "Four person family above threshold (ineligible)"
+      period: 2024-01
+      inputs:
+        household_size: 4
+        gross_income: 5500
+      expect: false
+    - name: "Zero income (eligible)"
+      period: 2024-01
+      inputs:
+        household_size: 2
+        gross_income: 0
+      expect: true
 
 variable acp_lifeline_categorical_eligible:
   entity: Household
@@ -254,6 +483,77 @@ variable acp_lifeline_categorical_eligible:
     # Lifeline qualifying programs per 47 CFR 54.409(b)
     return receives_snap or receives_medicaid or receives_ssi or receives_section_8 or receives_veterans_pension
   default: false
+  tests:
+    - name: "SNAP recipient (eligible)"
+      period: 2024-01
+      inputs:
+        household_size: 3
+        receives_snap: true
+        receives_medicaid: false
+        receives_ssi: false
+        receives_section_8: false
+        receives_veterans_pension: false
+      expect: true
+    - name: "Medicaid recipient (eligible)"
+      period: 2024-01
+      inputs:
+        household_size: 2
+        receives_snap: false
+        receives_medicaid: true
+        receives_ssi: false
+        receives_section_8: false
+        receives_veterans_pension: false
+      expect: true
+    - name: "SSI recipient (eligible)"
+      period: 2024-01
+      inputs:
+        household_size: 1
+        receives_snap: false
+        receives_medicaid: false
+        receives_ssi: true
+        receives_section_8: false
+        receives_veterans_pension: false
+      expect: true
+    - name: "Section 8 recipient (eligible)"
+      period: 2024-01
+      inputs:
+        household_size: 4
+        receives_snap: false
+        receives_medicaid: false
+        receives_ssi: false
+        receives_section_8: true
+        receives_veterans_pension: false
+      expect: true
+    - name: "Veterans Pension recipient (eligible)"
+      period: 2024-01
+      inputs:
+        household_size: 2
+        receives_snap: false
+        receives_medicaid: false
+        receives_ssi: false
+        receives_section_8: false
+        receives_veterans_pension: true
+      expect: true
+    - name: "Multiple programs (eligible)"
+      period: 2024-01
+      inputs:
+        household_size: 3
+        receives_snap: true
+        receives_medicaid: true
+        receives_ssi: false
+        receives_section_8: false
+        receives_veterans_pension: false
+      expect: true
+    - name: "No qualifying programs (ineligible)"
+      period: 2024-01
+      inputs:
+        household_size: 2
+        receives_snap: false
+        receives_medicaid: false
+        receives_ssi: false
+        receives_section_8: false
+        receives_veterans_pension: false
+      expect: false
 
 variable acp_on_tribal_land:
   entity: Household
@@ -263,6 +563,17 @@ variable acp_on_tribal_land:
   description: "Household located on Tribal land for enhanced benefit per 47 USC 1752(a)(7)"
   formula: return is_on_tribal_land
   default: false
+  tests:
+    - name: "Household on tribal land"
+      period: 2024-01
+      inputs:
+        is_on_tribal_land: true
+      expect: true
+    - name: "Household not on tribal land"
+      period: 2024-01
+      inputs:
+        is_on_tribal_land: false
+      expect: false
 
 
 variable acp_pell_grant_eligible:
@@ -276,6 +587,19 @@ variable acp_pell_grant_eligible:
     # At least one member received Pell Grant in current award year
     return receives_pell_grant
   default: false
+  tests:
+    - name: "Household with Pell Grant recipient (eligible)"
+      period: 2024-01
+      inputs:
+        household_size: 2
+        receives_pell_grant: true
+      expect: true
+    - name: "Household without Pell Grant recipient (ineligible)"
+      period: 2024-01
+      inputs:
+        household_size: 2
+        receives_pell_grant: false
+      expect: false
 
 
 variable acp_school_meal_eligible:
@@ -289,6 +613,35 @@ variable acp_school_meal_eligible:
     # At least one member approved for free or reduced price meals
     return receives_free_school_meals or receives_reduced_price_school_meals
   default: false
+  tests:
+    - name: "Household with free school meal recipient (eligible)"
+      period: 2024-01
+      inputs:
+        household_size: 3
+        receives_free_school_meals: true
+        receives_reduced_price_school_meals: false
+      expect: true
+    - name: "Household with reduced price meal recipient (eligible)"
+      period: 2024-01
+      inputs:
+        household_size: 2
+        receives_free_school_meals: false
+        receives_reduced_price_school_meals: true
+      expect: true
+    - name: "Household with both free and reduced meals (eligible)"
+      period: 2024-01
+      inputs:
+        household_size: 4
+        receives_free_school_meals: true
+        receives_reduced_price_school_meals: true
+      expect: true
+    - name: "Household with no school meals (ineligible)"
+      period: 2024-01
+      inputs:
+        household_size: 2
+        receives_free_school_meals: false
+        receives_reduced_price_school_meals: false
+      expect: false
 
 
 variable acp_tribal_program_eligible:
@@ -301,6 +654,61 @@ variable acp_tribal_program_eligible:
   formula: |
     return receives_fdpir or receives_bia_general_assistance or receives_tribal_tanf or receives_head_start
   default: false
+  tests:
+    - name: "FDPIR recipient (eligible)"
+      period: 2024-01
+      inputs:
+        household_size: 3
+        receives_fdpir: true
+        receives_bia_general_assistance: false
+        receives_tribal_tanf: false
+        receives_head_start: false
+      expect: true
+    - name: "BIA general assistance recipient (eligible)"
+      period: 2024-01
+      inputs:
+        household_size: 2
+        receives_fdpir: false
+        receives_bia_general_assistance: true
+        receives_tribal_tanf: false
+        receives_head_start: false
+      expect: true
+    - name: "Tribal TANF recipient (eligible)"
+      period: 2024-01
+      inputs:
+        household_size: 4
+        receives_fdpir: false
+        receives_bia_general_assistance: false
+        receives_tribal_tanf: true
+        receives_head_start: false
+      expect: true
+    - name: "Head Start recipient (eligible)"
+      period: 2024-01
+      inputs:
+        household_size: 2
+        receives_fdpir: false
+        receives_bia_general_assistance: false
+        receives_tribal_tanf: false
+        receives_head_start: true
+      expect: true
+    - name: "Multiple tribal programs (eligible)"
+      period: 2024-01
+      inputs:
+        household_size: 3
+        receives_fdpir: true
+        receives_bia_general_assistance: true
+        receives_tribal_tanf: false
+        receives_head_start: false
+      expect: true
+    - name: "No tribal programs (ineligible)"
+      period: 2024-01
+      inputs:
+        household_size: 2
+        receives_fdpir: false
+        receives_bia_general_assistance: false
+        receives_tribal_tanf: false
+        receives_head_start: false
+      expect: false
 
 
 variable acp_wic_eligible:
@@ -314,3 +722,16 @@ variable acp_wic_eligible:
     # At least one member receives WIC
     return receives_wic
   default: false
+  tests:
+    - name: "WIC recipient (eligible)"
+      period: 2024-01
+      inputs:
+        household_size: 2
+        receives_wic: true
+      expect: true
+    - name: "Non-WIC recipient (ineligible)"
+      period: 2024-01
+      inputs:
+        household_size: 2
+        receives_wic: false
+      expect: false

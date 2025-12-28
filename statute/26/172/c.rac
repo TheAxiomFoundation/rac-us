@@ -29,6 +29,35 @@ variable net_operating_loss:
     # Return the absolute value of the loss
     return -modified_taxable_income
   default: 0
+  tests:
+    - name: "NOL generated from negative modified taxable income"
+      period: 2024
+      inputs:
+        taxable_income: -50000
+        adjusted_gross_income: 0
+        nol_modifications: 0
+      expect: 50000
+    - name: "NOL with modifications increasing loss"
+      period: 2024
+      inputs:
+        taxable_income: -30000
+        adjusted_gross_income: 0
+        nol_modifications: 10000
+      expect: 40000
+    - name: "No NOL with positive taxable income"
+      period: 2024
+      inputs:
+        taxable_income: 50000
+        adjusted_gross_income: 75000
+        nol_modifications: 0
+      expect: 0
+    - name: "No NOL with break-even position"
+      period: 2024
+      inputs:
+        taxable_income: -20000
+        adjusted_gross_income: 0
+        nol_modifications: 20000
+      expect: 0
 
 variable has_net_operating_loss:
   entity: TaxUnit
@@ -38,3 +67,18 @@ variable has_net_operating_loss:
   description: "Whether taxpayer has a net operating loss in the current year"
   formula: return net_operating_loss > 0
   default: False
+  tests:
+    - name: "Has NOL when net operating loss exists"
+      period: 2024
+      inputs:
+        taxable_income: -50000
+        adjusted_gross_income: 0
+        nol_modifications: 0
+      expect: true
+    - name: "No NOL when taxable income positive"
+      period: 2024
+      inputs:
+        taxable_income: 100000
+        adjusted_gross_income: 150000
+        nol_modifications: 0
+      expect: false

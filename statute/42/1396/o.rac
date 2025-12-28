@@ -240,3 +240,454 @@ variable medicaid_preventive_cost_share_exempt:
     # This includes immunizations, screenings, well-child visits
     return True
   default: True
+  tests:
+    - name: "Preventive services always exempt"
+      period: 2024-01
+      inputs: {}
+      expect: true
+
+variable medicaid_child_cost_share_exempt:
+  entity: Person
+  period: Month
+  dtype: Boolean
+  tests:
+    - name: "Child under age threshold is exempt"
+      period: 2024-01
+      inputs:
+        age: 10
+        child_age_threshold: 18
+      expect: true
+    - name: "Child at age threshold is not exempt"
+      period: 2024-01
+      inputs:
+        age: 18
+        child_age_threshold: 18
+      expect: false
+    - name: "Infant is exempt"
+      period: 2024-01
+      inputs:
+        age: 0
+        child_age_threshold: 18
+      expect: true
+    - name: "Teenager under threshold is exempt"
+      period: 2024-01
+      inputs:
+        age: 17
+        child_age_threshold: 18
+      expect: true
+    - name: "Adult not exempt"
+      period: 2024-01
+      inputs:
+        age: 25
+        child_age_threshold: 18
+      expect: false
+
+variable medicaid_pregnant_cost_share_exempt:
+  entity: Person
+  period: Month
+  dtype: Boolean
+  tests:
+    - name: "Pregnant woman is exempt"
+      period: 2024-01
+      inputs:
+        is_pregnant: true
+      expect: true
+    - name: "Non-pregnant woman not exempt"
+      period: 2024-01
+      inputs:
+        is_pregnant: false
+      expect: false
+    - name: "Pregnant individual exempt regardless of age"
+      period: 2024-01
+      inputs:
+        is_pregnant: true
+      expect: true
+
+variable medicaid_institutionalized_cost_share_exempt:
+  entity: Person
+  period: Month
+  dtype: Boolean
+  tests:
+    - name: "Institutionalized person is exempt"
+      period: 2024-01
+      inputs:
+        is_institutionalized: true
+      expect: true
+    - name: "Non-institutionalized person not exempt"
+      period: 2024-01
+      inputs:
+        is_institutionalized: false
+      expect: false
+
+variable medicaid_hospice_cost_share_exempt:
+  entity: Person
+  period: Month
+  dtype: Boolean
+  tests:
+    - name: "Hospice enrolled person is exempt"
+      period: 2024-01
+      inputs:
+        is_hospice_enrolled: true
+      expect: true
+    - name: "Non-hospice person not exempt"
+      period: 2024-01
+      inputs:
+        is_hospice_enrolled: false
+      expect: false
+
+variable medicaid_cost_share_exempt:
+  entity: Person
+  period: Month
+  dtype: Boolean
+  tests:
+    - name: "Child exempt means cost share exempt"
+      period: 2024-01
+      inputs:
+        medicaid_child_cost_share_exempt: true
+        medicaid_pregnant_cost_share_exempt: false
+        medicaid_institutionalized_cost_share_exempt: false
+        medicaid_hospice_cost_share_exempt: false
+      expect: true
+    - name: "Pregnant exempt means cost share exempt"
+      period: 2024-01
+      inputs:
+        medicaid_child_cost_share_exempt: false
+        medicaid_pregnant_cost_share_exempt: true
+        medicaid_institutionalized_cost_share_exempt: false
+        medicaid_hospice_cost_share_exempt: false
+      expect: true
+    - name: "Institutionalized exempt means cost share exempt"
+      period: 2024-01
+      inputs:
+        medicaid_child_cost_share_exempt: false
+        medicaid_pregnant_cost_share_exempt: false
+        medicaid_institutionalized_cost_share_exempt: true
+        medicaid_hospice_cost_share_exempt: false
+      expect: true
+    - name: "Hospice exempt means cost share exempt"
+      period: 2024-01
+      inputs:
+        medicaid_child_cost_share_exempt: false
+        medicaid_pregnant_cost_share_exempt: false
+        medicaid_institutionalized_cost_share_exempt: false
+        medicaid_hospice_cost_share_exempt: true
+      expect: true
+    - name: "No exemptions means not cost share exempt"
+      period: 2024-01
+      inputs:
+        medicaid_child_cost_share_exempt: false
+        medicaid_pregnant_cost_share_exempt: false
+        medicaid_institutionalized_cost_share_exempt: false
+        medicaid_hospice_cost_share_exempt: false
+      expect: false
+
+variable medicaid_nominal_cost_share_tier:
+  entity: Person
+  period: Month
+  dtype: Boolean
+  tests:
+    - name: "Income below 100% FPL qualifies for nominal tier"
+      period: 2024-01
+      inputs:
+        magi_income_pct_fpl: 0.75
+        nominal_tier_fpl_threshold: 1.00
+      expect: true
+    - name: "Income at 100% FPL does not qualify for nominal tier"
+      period: 2024-01
+      inputs:
+        magi_income_pct_fpl: 1.00
+        nominal_tier_fpl_threshold: 1.00
+      expect: false
+    - name: "Income above 100% FPL does not qualify"
+      period: 2024-01
+      inputs:
+        magi_income_pct_fpl: 1.25
+        nominal_tier_fpl_threshold: 1.00
+      expect: false
+    - name: "Zero income qualifies for nominal tier"
+      period: 2024-01
+      inputs:
+        magi_income_pct_fpl: 0.00
+        nominal_tier_fpl_threshold: 1.00
+      expect: true
+
+variable medicaid_moderate_cost_share_tier:
+  entity: Person
+  period: Month
+  dtype: Boolean
+  tests:
+    - name: "Income between 100-150% FPL qualifies for moderate tier"
+      period: 2024-01
+      inputs:
+        magi_income_pct_fpl: 1.10
+        nominal_tier_fpl_threshold: 1.00
+        moderate_tier_fpl_threshold: 1.50
+      expect: true
+    - name: "Income at 100% FPL threshold qualifies for moderate tier"
+      period: 2024-01
+      inputs:
+        magi_income_pct_fpl: 1.00
+        nominal_tier_fpl_threshold: 1.00
+        moderate_tier_fpl_threshold: 1.50
+      expect: true
+    - name: "Income at 150% FPL threshold does not qualify"
+      period: 2024-01
+      inputs:
+        magi_income_pct_fpl: 1.50
+        nominal_tier_fpl_threshold: 1.00
+        moderate_tier_fpl_threshold: 1.50
+      expect: false
+    - name: "Income below 100% FPL does not qualify for moderate tier"
+      period: 2024-01
+      inputs:
+        magi_income_pct_fpl: 0.95
+        nominal_tier_fpl_threshold: 1.00
+        moderate_tier_fpl_threshold: 1.50
+      expect: false
+
+variable medicaid_higher_cost_share_tier:
+  entity: Person
+  period: Month
+  dtype: Boolean
+  tests:
+    - name: "Income above 150% FPL qualifies for higher tier"
+      period: 2024-01
+      inputs:
+        magi_income_pct_fpl: 1.60
+        moderate_tier_fpl_threshold: 1.50
+      expect: true
+    - name: "Income at 150% FPL threshold qualifies for higher tier"
+      period: 2024-01
+      inputs:
+        magi_income_pct_fpl: 1.50
+        moderate_tier_fpl_threshold: 1.50
+      expect: true
+    - name: "Income below 150% FPL does not qualify"
+      period: 2024-01
+      inputs:
+        magi_income_pct_fpl: 1.49
+        moderate_tier_fpl_threshold: 1.50
+      expect: false
+
+variable medicaid_max_copayment_rate:
+  entity: Person
+  period: Month
+  dtype: Rate
+  tests:
+    - name: "Cost share exempt pays zero copayment"
+      period: 2024-01
+      inputs:
+        medicaid_cost_share_exempt: true
+        medicaid_nominal_cost_share_tier: false
+        medicaid_moderate_cost_share_tier: false
+        medicaid_higher_cost_share_tier: false
+      expect: 0
+    - name: "Nominal tier pays zero rate"
+      period: 2024-01
+      inputs:
+        medicaid_cost_share_exempt: false
+        medicaid_nominal_cost_share_tier: true
+        medicaid_moderate_cost_share_tier: false
+        medicaid_higher_cost_share_tier: false
+      expect: 0
+    - name: "Moderate tier pays 10% copayment rate"
+      period: 2024-01
+      inputs:
+        medicaid_cost_share_exempt: false
+        medicaid_nominal_cost_share_tier: false
+        medicaid_moderate_cost_share_tier: true
+        medicaid_higher_cost_share_tier: false
+        copayment_rate_100_150_fpl: 0.10
+      expect: 0.10
+    - name: "Higher tier pays 20% copayment rate"
+      period: 2024-01
+      inputs:
+        medicaid_cost_share_exempt: false
+        medicaid_nominal_cost_share_tier: false
+        medicaid_moderate_cost_share_tier: false
+        medicaid_higher_cost_share_tier: true
+        copayment_rate_150_plus_fpl: 0.20
+      expect: 0.20
+
+variable medicaid_nominal_copayment:
+  entity: Person
+  period: Month
+  dtype: Money
+  tests:
+    - name: "Cost share exempt pays zero nominal copayment"
+      period: 2024-01
+      inputs:
+        medicaid_cost_share_exempt: true
+        medicaid_nominal_cost_share_tier: true
+        nominal_copayment_max: 4
+      expect: 0
+    - name: "Nominal tier pays federal maximum ($4)"
+      period: 2024-01
+      inputs:
+        medicaid_cost_share_exempt: false
+        medicaid_nominal_cost_share_tier: true
+        nominal_copayment_max: 4
+      expect: 4
+    - name: "Moderate tier does not qualify for nominal copayment"
+      period: 2024-01
+      inputs:
+        medicaid_cost_share_exempt: false
+        medicaid_nominal_cost_share_tier: false
+        medicaid_moderate_cost_share_tier: true
+        nominal_copayment_max: 4
+      expect: 0
+
+variable medicaid_premium_applicable:
+  entity: Person
+  period: Month
+  dtype: Boolean
+  tests:
+    - name: "Cost share exempt cannot be charged premium"
+      period: 2024-01
+      inputs:
+        medicaid_cost_share_exempt: true
+        medicaid_category: "adult_expansion"
+        magi_income_pct_fpl: 1.60
+        premium_fpl_threshold: 1.50
+      expect: false
+    - name: "Infant cannot be charged premium"
+      period: 2024-01
+      inputs:
+        medicaid_cost_share_exempt: false
+        medicaid_category: "infant"
+        magi_income_pct_fpl: 1.60
+        premium_fpl_threshold: 1.50
+      expect: false
+    - name: "Child 1-5 cannot be charged premium"
+      period: 2024-01
+      inputs:
+        medicaid_cost_share_exempt: false
+        medicaid_category: "child_1_5"
+        magi_income_pct_fpl: 1.60
+        premium_fpl_threshold: 1.50
+      expect: false
+    - name: "Child 6-18 cannot be charged premium"
+      period: 2024-01
+      inputs:
+        medicaid_cost_share_exempt: false
+        medicaid_category: "child_6_18"
+        magi_income_pct_fpl: 1.60
+        premium_fpl_threshold: 1.50
+      expect: false
+    - name: "Pregnant woman cannot be charged premium"
+      period: 2024-01
+      inputs:
+        medicaid_cost_share_exempt: false
+        medicaid_category: "pregnant"
+        magi_income_pct_fpl: 1.60
+        premium_fpl_threshold: 1.50
+      expect: false
+    - name: "Expansion adult below 150% FPL cannot be charged premium"
+      period: 2024-01
+      inputs:
+        medicaid_cost_share_exempt: false
+        medicaid_category: "adult_expansion"
+        magi_income_pct_fpl: 1.40
+        premium_fpl_threshold: 1.50
+      expect: false
+    - name: "Expansion adult above 150% FPL can be charged premium"
+      period: 2024-01
+      inputs:
+        medicaid_cost_share_exempt: false
+        medicaid_category: "adult_expansion"
+        magi_income_pct_fpl: 1.60
+        premium_fpl_threshold: 1.50
+      expect: true
+    - name: "Expansion adult at 138% FPL (actual expansion threshold) cannot be charged"
+      period: 2024-01
+      inputs:
+        medicaid_cost_share_exempt: false
+        medicaid_category: "adult_expansion"
+        magi_income_pct_fpl: 1.38
+        premium_fpl_threshold: 1.50
+      expect: false
+
+variable medicaid_max_monthly_premium:
+  entity: Person
+  period: Month
+  dtype: Money
+  tests:
+    - name: "Premium not applicable means zero premium"
+      period: 2024-01
+      inputs:
+        medicaid_premium_applicable: false
+      expect: 0
+    - name: "Premium applicable with default implementation"
+      period: 2024-01
+      inputs:
+        medicaid_premium_applicable: true
+      expect: 0
+
+variable medicaid_monthly_cost_share_limit:
+  entity: Household
+  period: Month
+  dtype: Money
+  tests:
+    - name: "No income means no cost sharing limit"
+      period: 2024-01
+      inputs:
+        magi_income: 0
+        aggregate_cost_share_limit: 0.05
+      expect: 0
+    - name: "Low income household cost sharing limit"
+      period: 2024-01
+      inputs:
+        magi_income: 1000
+        aggregate_cost_share_limit: 0.05
+      expect: 50
+    - name: "Moderate income household cost sharing limit"
+      period: 2024-01
+      inputs:
+        magi_income: 2000
+        aggregate_cost_share_limit: 0.05
+      expect: 100
+    - name: "Higher income household cost sharing limit"
+      period: 2024-01
+      inputs:
+        magi_income: 4000
+        aggregate_cost_share_limit: 0.05
+      expect: 200
+
+variable medicaid_annual_cost_share_limit:
+  entity: Household
+  period: Year
+  dtype: Money
+  tests:
+    - name: "Annual limit is 12 times monthly limit"
+      period: 2024
+      inputs:
+        medicaid_monthly_cost_share_limit: 50
+        months_per_year: 12
+      expect: 600
+    - name: "Higher monthly limit results in higher annual"
+      period: 2024
+      inputs:
+        medicaid_monthly_cost_share_limit: 200
+        months_per_year: 12
+      expect: 2400
+    - name: "Zero monthly limit means zero annual"
+      period: 2024
+      inputs:
+        medicaid_monthly_cost_share_limit: 0
+        months_per_year: 12
+      expect: 0
+
+variable medicaid_emergency_cost_share_exempt:
+  entity: Person
+  period: Month
+  dtype: Boolean
+  tests:
+    - name: "Emergency services always exempt"
+      period: 2024-01
+      inputs: {}
+      expect: true
+    - name: "Emergency services exempt regardless of income"
+      period: 2024-01
+      inputs:
+        magi_income_pct_fpl: 2.00
+      expect: true
