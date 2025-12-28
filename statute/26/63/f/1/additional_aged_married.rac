@@ -1,0 +1,47 @@
+# 26 USC 63(f)(1) - Additional Amount for Aged (Married)
+#
+# Reference: IRC Section 63(f)(1), (f)(3), Rev. Proc. 2023-34
+
+text: """
+(f) Aged or blind additional amounts.--
+(1) Additional amounts for the aged.-- The taxpayer shall be entitled
+to an additional amount of $600--
+(A) for himself if he has attained age 65 before the close of his
+taxable year, and
+(B) for the spouse of the taxpayer if the spouse has attained age
+65 before the close of the taxable year and an additional exemption
+is allowable to the taxpayer for such spouse under section 151(b).
+(3) Higher amount for certain unmarried individuals.-- In the case of
+an individual who is not married and is not a surviving spouse,
+paragraphs (1) and (2) shall be applied by substituting "$750"
+for "$600".
+"""
+
+parameter additional_aged_married:
+  description: "Additional standard deduction for aged taxpayer who is married or surviving spouse"
+  unit: USD
+  reference: "26 USC 63(f)(1), Rev. Proc. 2023-34"
+  values:
+    2024-01-01: 1550
+    2023-01-01: 1500
+    2022-01-01: 1400
+    2021-01-01: 1350
+    2020-01-01: 1300
+    2019-01-01: 1300
+    2018-01-01: 1300
+    2017-01-01: 1250
+    2016-01-01: 1250
+    2015-01-01: 1250
+    2014-01-01: 1200
+    2013-01-01: 1200
+    2012-01-01: 1150
+    2011-01-01: 1150
+    2010-01-01: 1100
+    2009-01-01: 1100
+    2008-01-01: 1050
+    2007-01-01: 1050
+    2006-01-01: 1000
+    2005-01-01: 1000
+    2004-01-01: 950
+    2003-01-01: 950
+    1988-01-01: 600

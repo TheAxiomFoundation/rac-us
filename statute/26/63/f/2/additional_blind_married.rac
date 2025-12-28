@@ -1,0 +1,41 @@
+# 26 USC 63(f)(2) - Additional Amount for Blind (Married)
+#
+# Reference: IRC Section 63(f)(2), Rev. Proc. 2023-34
+
+text: """
+(f)(2) Additional amount for blind.-- The taxpayer shall be entitled
+to an additional amount of $600--
+(A) for himself if he is blind at the close of the taxable year, and
+(B) for the spouse of the taxpayer if the spouse is blind as of the
+close of the taxable year and an additional exemption is allowable
+to the taxpayer for such spouse under section 151(b).
+"""
+
+parameter additional_blind_married:
+  description: "Additional standard deduction for blind taxpayer who is married or surviving spouse"
+  unit: USD
+  reference: "26 USC 63(f)(2), Rev. Proc. 2023-34"
+  values:
+    2024-01-01: 1550
+    2023-01-01: 1500
+    2022-01-01: 1400
+    2021-01-01: 1350
+    2020-01-01: 1300
+    2019-01-01: 1300
+    2018-01-01: 1300
+    2017-01-01: 1250
+    2016-01-01: 1250
+    2015-01-01: 1250
+    2014-01-01: 1200
+    2013-01-01: 1200
+    2012-01-01: 1150
+    2011-01-01: 1150
+    2010-01-01: 1100
+    2009-01-01: 1100
+    2008-01-01: 1050
+    2007-01-01: 1050
+    2006-01-01: 1000
+    2005-01-01: 1000
+    2004-01-01: 950
+    2003-01-01: 950
+    1988-01-01: 600
