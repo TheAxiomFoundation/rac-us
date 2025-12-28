@@ -16,10 +16,8 @@ income' means adjusted gross income, minus—
 variable taxable_income:
   imports:
     - 26/62/a#adjusted_gross_income
-    - 26/63/e/taxable_income_deductions#taxable_income_deductions
+    - 26/63/e#taxable_income_deductions
     - 26/151#personal_exemption
-
-variable taxable_income:
   entity: TaxUnit
   period: Year
   dtype: Money
