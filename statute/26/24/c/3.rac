@@ -1,10 +1,20 @@
-# 26 USC § 24 - Number of Qualifying Children for CTC
+# 26 USC Section 24(c)(3) - Count of Qualifying Children
 #
-variable num_qualifying_children:
-  imports: [26/24/c/1#is_ctc_qualifying_child]
+# Helper variable to count qualifying children in tax unit
+
+variable num_ctc_qualifying_children:
+  imports:
+    - 26/24/c/1#is_ctc_qualifying_child
   entity: TaxUnit
   period: Year
-  dtype: Count
+  dtype: Integer
   label: "Number of CTC Qualifying Children"
-  description: "Count of qualifying children for Child Tax Credit per 26 USC § 24(c)"
+  description: "Count of qualifying children for Child Tax Credit per 26 USC 24(c)"
   formula: return person.count(is_ctc_qualifying_child)
+  tests:
+    - name: "No children"
+      inputs: {is_ctc_qualifying_child: [false, false]}
+      expect: 0
+    - name: "Two qualifying children"
+      inputs: {is_ctc_qualifying_child: [true, true, false]}
+      expect: 2
