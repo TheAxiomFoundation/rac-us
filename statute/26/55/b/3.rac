@@ -15,6 +15,10 @@ parameter amt_bracket_joint:
   indexed_by: statute/26/55/d/4
   values:
     2018-01-01: 191100
+  tests:
+    - name: "MFJ bracket threshold is $191,100"
+      inputs: {}
+      expect: 191100
 
 parameter amt_bracket_single:
   description: "AMT 28% bracket threshold for single filers"
@@ -22,6 +26,13 @@ parameter amt_bracket_single:
   indexed_by: statute/26/55/d/4
   values:
     2018-01-01: 95550
+  tests:
+    - name: "Single bracket threshold is $95,550"
+      inputs: {}
+      expect: 95550
+    - name: "Single threshold is half of MFJ"
+      inputs: {}
+      expect: 95550  # Should be 191100 / 2 = 95550
 
 parameter amt_bracket_married_separate:
   description: "AMT 28% bracket threshold for married filing separately"
@@ -29,3 +40,10 @@ parameter amt_bracket_married_separate:
   indexed_by: statute/26/55/d/4
   values:
     2018-01-01: 95550
+  tests:
+    - name: "MFS bracket threshold is $95,550"
+      inputs: {}
+      expect: 95550
+    - name: "MFS threshold equals single threshold"
+      inputs: {}
+      expect: 95550

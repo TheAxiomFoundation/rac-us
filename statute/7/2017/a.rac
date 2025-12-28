@@ -122,6 +122,239 @@ variable snap_minimum_benefit:
         return 0
   default: 0
 
+variable snap_max_allotment:
+  entity: Household
+  period: Month
+  dtype: Money
+  unit: "USD"
+  label: "SNAP Maximum Allotment"
+  description: "Maximum monthly SNAP benefit based on Thrifty Food Plan for household size"
+  syntax: python
+  formula: |
+    # Maximum allotments by household size (48 states + DC)
+    # Sizes 1-8 have specific amounts; beyond max_schedule_size, add per-person increment
+    if household_size <= max_schedule_size:
+        # Look up from schedule (index = size - 1)
+        return max_allotment_schedule[household_size - 1]
+    else:
+        # Beyond max schedule size: base amount + additional per extra member
+        base = max_allotment_schedule[max_schedule_size - 1]
+        extra_members = household_size - max_schedule_size
+        return base + (additional_per_person * extra_members)
+  default: 0
+  tests:
+    - name: "Single person"
+      period: 2024-10
+      inputs:
+        household_size: 1
+      expect: 292
+    - name: "Two person household"
+      period: 2024-10
+      inputs:
+        household_size: 2
+      expect: 536
+    - name: "Three person household"
+      period: 2024-10
+      inputs:
+        household_size: 3
+      expect: 768
+    - name: "Four person household"
+      period: 2024-10
+      inputs:
+        household_size: 4
+      expect: 975
+    - name: "Five person household"
+      period: 2024-10
+      inputs:
+        household_size: 5
+      expect: 1158
+    - name: "Six person household"
+      period: 2024-10
+      inputs:
+        household_size: 6
+      expect: 1390
+    - name: "Seven person household"
+      period: 2024-10
+      inputs:
+        household_size: 7
+      expect: 1536
+    - name: "Eight person household (max schedule)"
+      period: 2024-10
+      inputs:
+        household_size: 8
+      expect: 1756
+    - name: "Nine person household (base + 1 person)"
+      period: 2024-10
+      inputs:
+        household_size: 9
+      expect: 1976
+    - name: "Ten person household"
+      period: 2024-10
+      inputs:
+        household_size: 10
+      expect: 2196
+    - name: "Large household (15 persons)"
+      period: 2024-10
+      inputs:
+        household_size: 15
+      expect: 3316
+    - name: "Prior year 2023 single person"
+      period: 2023-10
+      inputs:
+        household_size: 1
+      expect: 291
+    - name: "Prior year 2023 family of 4"
+      period: 2023-10
+      inputs:
+        household_size: 4
+      expect: 973
+
+variable snap_expected_contribution:
+  entity: Household
+  period: Month
+  dtype: Money
+  unit: "USD"
+  label: "SNAP Expected Contribution"
+  description: "Expected household contribution toward food costs (30% of net income)"
+  formula: return round(snap_net_income * contribution_rate)
+  default: 0
+  tests:
+    - name: "No net income"
+      period: 2024-10
+      inputs:
+        household_size: 1
+        snap_net_income: 0
+      expect: 0
+    - name: "Small net income"
+      period: 2024-10
+      inputs:
+        household_size: 1
+        snap_net_income: 100
+      expect: 30
+    - name: "Moderate net income"
+      period: 2024-10
+      inputs:
+        household_size: 2
+        snap_net_income: 500
+      expect: 150
+    - name: "Large net income"
+      period: 2024-10
+      inputs:
+        household_size: 4
+        snap_net_income: 1000
+      expect: 300
+    - name: "Very large net income"
+      period: 2024-10
+      inputs:
+        household_size: 6
+        snap_net_income: 2500
+      expect: 750
+    - name: "Rounding test (0.4 cents rounds down)"
+      period: 2024-10
+      inputs:
+        household_size: 1
+        snap_net_income: 1
+      expect: 0
+    - name: "Rounding test (0.5 cents rounds to nearest)"
+      period: 2024-10
+      inputs:
+        household_size: 1
+        snap_net_income: 333.33
+      expect: 100
+
+variable snap_calculated_benefit:
+  entity: Household
+  period: Month
+  dtype: Money
+  unit: "USD"
+  label: "SNAP Calculated Benefit"
+  description: "SNAP benefit calculated as maximum allotment minus expected contribution"
+  formula: return snap_max_allotment - snap_expected_contribution
+  default: 0
+  tests:
+    - name: "Single person, no contribution"
+      period: 2024-10
+      inputs:
+        household_size: 1
+        snap_net_income: 0
+      expect: 292
+    - name: "Single person with contribution"
+      period: 2024-10
+      inputs:
+        household_size: 1
+        snap_net_income: 100
+      expect: 262
+    - name: "Family of 4, low contribution"
+      period: 2024-10
+      inputs:
+        household_size: 4
+        snap_net_income: 500
+      expect: 825
+    - name: "Family of 4, high contribution"
+      period: 2024-10
+      inputs:
+        household_size: 4
+        snap_net_income: 1500
+      expect: 525
+    - name: "Benefit reduced to zero by contribution"
+      period: 2024-10
+      inputs:
+        household_size: 1
+        snap_net_income: 1000
+      expect: -8
+
+variable snap_minimum_benefit:
+  entity: Household
+  period: Month
+  dtype: Money
+  unit: "USD"
+  label: "SNAP Minimum Benefit"
+  description: "Minimum monthly SNAP benefit for 1-2 person households"
+  syntax: python
+  formula: |
+    # Minimum benefit only applies to households at or below minimum_benefit_max_size
+    if household_size <= minimum_benefit_max_size:
+        return minimum_amount
+    else:
+        return 0
+  default: 0
+  tests:
+    - name: "Single person household"
+      period: 2024-10
+      inputs:
+        household_size: 1
+      expect: 23
+    - name: "Two person household"
+      period: 2024-10
+      inputs:
+        household_size: 2
+      expect: 23
+    - name: "Three person household (no minimum)"
+      period: 2024-10
+      inputs:
+        household_size: 3
+      expect: 0
+    - name: "Four person household (no minimum)"
+      period: 2024-10
+      inputs:
+        household_size: 4
+      expect: 0
+    - name: "Large household (no minimum)"
+      period: 2024-10
+      inputs:
+        household_size: 10
+      expect: 0
+    - name: "Prior year 2014"
+      period: 2014-10
+      inputs:
+        household_size: 1
+      expect: 16
+    - name: "Prior year 2014 two person"
+      period: 2014-10
+      inputs:
+        household_size: 2
+      expect: 16
+
 variable snap_allotment:
   entity: Household
   period: Month
@@ -139,3 +372,94 @@ variable snap_allotment:
     # Cannot exceed maximum allotment
     return max(0, min(benefit, snap_max_allotment))
   default: 0
+  tests:
+    - name: "Ineligible household"
+      period: 2024-10
+      inputs:
+        household_size: 1
+        snap_eligible: false
+        snap_calculated_benefit: 200
+        snap_minimum_benefit: 23
+        snap_max_allotment: 292
+      expect: 0
+    - name: "Single person, no income (minimum benefit applies)"
+      period: 2024-10
+      inputs:
+        household_size: 1
+        snap_eligible: true
+        snap_calculated_benefit: 269
+        snap_minimum_benefit: 23
+        snap_max_allotment: 292
+      expect: 269
+    - name: "Single person, high contribution (minimum benefit applies)"
+      period: 2024-10
+      inputs:
+        household_size: 1
+        snap_eligible: true
+        snap_calculated_benefit: 10
+        snap_minimum_benefit: 23
+        snap_max_allotment: 292
+      expect: 23
+    - name: "Two person household minimum applies"
+      period: 2024-10
+      inputs:
+        household_size: 2
+        snap_eligible: true
+        snap_calculated_benefit: 15
+        snap_minimum_benefit: 23
+        snap_max_allotment: 536
+      expect: 23
+    - name: "Family of 4, standard case"
+      period: 2024-10
+      inputs:
+        household_size: 4
+        snap_eligible: true
+        snap_calculated_benefit: 700
+        snap_minimum_benefit: 0
+        snap_max_allotment: 975
+      expect: 700
+    - name: "Family of 4, calculated benefit exceeds max"
+      period: 2024-10
+      inputs:
+        household_size: 4
+        snap_eligible: true
+        snap_calculated_benefit: 1200
+        snap_minimum_benefit: 0
+        snap_max_allotment: 975
+      expect: 975
+    - name: "Eligible with negative calculated benefit (minimum floor)"
+      period: 2024-10
+      inputs:
+        household_size: 2
+        snap_eligible: true
+        snap_calculated_benefit: -50
+        snap_minimum_benefit: 23
+        snap_max_allotment: 536
+      expect: 23
+    - name: "Three person household standard case"
+      period: 2024-10
+      inputs:
+        household_size: 3
+        snap_eligible: true
+        snap_calculated_benefit: 600
+        snap_minimum_benefit: 0
+        snap_max_allotment: 768
+      expect: 600
+    - name: "Large household (8 persons)"
+      period: 2024-10
+      inputs:
+        household_size: 8
+        snap_eligible: true
+        snap_calculated_benefit: 1500
+        snap_minimum_benefit: 0
+        snap_max_allotment: 1756
+      expect: 1500
+    - name: "Very large household (15 persons)"
+      period: 2024-10
+      inputs:
+        household_size: 15
+        snap_eligible: true
+        snap_calculated_benefit: 3000
+        snap_minimum_benefit: 0
+        snap_max_allotment: 3316
+      expect: 3000

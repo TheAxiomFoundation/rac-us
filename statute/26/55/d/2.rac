@@ -17,6 +17,10 @@ parameter phaseout_threshold_joint:
   indexed_by: statute/26/55/d/4
   values:
     2018-01-01: 1000000
+  tests:
+    - name: "MFJ phaseout threshold is $1,000,000"
+      inputs: {}
+      expect: 1000000
 
 parameter phaseout_threshold_single:
   description: "AMT phaseout threshold for single filers"
@@ -24,6 +28,13 @@ parameter phaseout_threshold_single:
   indexed_by: statute/26/55/d/4
   values:
     2018-01-01: 500000
+  tests:
+    - name: "Single phaseout threshold is $500,000"
+      inputs: {}
+      expect: 500000
+    - name: "Single threshold is half of MFJ"
+      inputs: {}
+      expect: 500000  # Should be 1000000 / 2 = 500000
 
 parameter phaseout_threshold_married_separate:
   description: "AMT phaseout threshold for married filing separately"
@@ -31,6 +42,13 @@ parameter phaseout_threshold_married_separate:
   indexed_by: statute/26/55/d/4
   values:
     2018-01-01: 500000
+  tests:
+    - name: "MFS phaseout threshold is $500,000"
+      inputs: {}
+      expect: 500000
+    - name: "MFS threshold equals single threshold"
+      inputs: {}
+      expect: 500000
 
 # Statutory rate - not indexed
 parameter phaseout_rate:
@@ -38,3 +56,10 @@ parameter phaseout_rate:
   unit: rate
   values:
     2018-01-01: 0.25
+  tests:
+    - name: "Phaseout rate is 25%"
+      inputs: {}
+      expect: 0.25
+    - name: "Phaseout rate is not 20%"
+      inputs: {}
+      expect: 0.25

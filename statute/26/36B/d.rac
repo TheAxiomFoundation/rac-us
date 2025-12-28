@@ -128,3 +128,99 @@ variable slcsp_premium_monthly:
   label: "Monthly SLCSP Premium"
   description: "Monthly portion of benchmark premium"
   formula: return slcsp_premium / months_per_year
+  tests:
+    # 2024 FPL Levels (48 contiguous states + DC)
+    # Individual: $15,060
+    # Family of 2: $20,440
+    # Family of 3: $25,820
+    # Family of 4: $31,200
+    # Family of 5: $36,580
+
+    # Test FPL Calculation - Single Individual
+    - name: "FPL calculation - single at 100% FPL (2024)"
+      period: 2024-01
+      inputs:
+        ptc_household_size: 1
+      expect: 15060
+
+    - name: "FPL calculation - single at 150% FPL (2024)"
+      period: 2024-01
+      inputs:
+        ptc_household_size: 1
+      expect: 15060
+
+    - name: "FPL calculation - single at 200% FPL (2024)"
+      period: 2024-01
+      inputs:
+        ptc_household_size: 1
+      expect: 15060
+
+    - name: "FPL calculation - single at 400% FPL (2024)"
+      period: 2024-01
+      inputs:
+        ptc_household_size: 1
+      expect: 15060
+
+    # Test FPL Calculation - Family of 2
+    - name: "FPL calculation - family of 2 at 100% FPL (2024)"
+      period: 2024-01
+      inputs:
+        ptc_household_size: 2
+      expect: 20440
+
+    - name: "FPL calculation - family of 2 at 150% FPL (2024)"
+      period: 2024-01
+      inputs:
+        ptc_household_size: 2
+      expect: 20440
+
+    - name: "FPL calculation - family of 2 at 200% FPL (2024)"
+      period: 2024-01
+      inputs:
+        ptc_household_size: 2
+      expect: 20440
+
+    # Test FPL Calculation - Family of 3
+    - name: "FPL calculation - family of 3 at 100% FPL (2024)"
+      period: 2024-01
+      inputs:
+        ptc_household_size: 3
+      expect: 25820
+
+    - name: "FPL calculation - family of 3 at 200% FPL (2024)"
+      period: 2024-01
+      inputs:
+        ptc_household_size: 3
+      expect: 25820
+
+    # Test FPL Calculation - Family of 4
+    - name: "FPL calculation - family of 4 at 100% FPL (2024)"
+      period: 2024-01
+      inputs:
+        ptc_household_size: 4
+      expect: 31200
+
+    - name: "FPL calculation - family of 4 at 150% FPL (2024)"
+      period: 2024-01
+      inputs:
+        ptc_household_size: 4
+      expect: 31200
+
+    - name: "FPL calculation - family of 4 at 300% FPL (2024)"
+      period: 2024-01
+      inputs:
+        ptc_household_size: 4
+      expect: 31200
+
+    # Test FPL Calculation - Family of 5
+    - name: "FPL calculation - family of 5 at 100% FPL (2024)"
+      period: 2024-01
+      inputs:
+        ptc_household_size: 5
+      expect: 36580
+
+    - name: "FPL calculation - family of 5 at 400% FPL (2024)"
+      period: 2024-01
+      inputs:
+        ptc_household_size: 5
+      expect: 36580

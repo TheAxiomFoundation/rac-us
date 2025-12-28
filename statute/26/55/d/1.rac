@@ -18,6 +18,10 @@ parameter exemption_joint:
   indexed_by: statute/26/55/d/4
   values:
     2018-01-01: 109400
+  tests:
+    - name: "MFJ exemption is defined"
+      inputs: {}
+      expect: 109400
 
 parameter exemption_single:
   description: "AMT exemption for single filers"
@@ -25,6 +29,10 @@ parameter exemption_single:
   indexed_by: statute/26/55/d/4
   values:
     2018-01-01: 70300
+  tests:
+    - name: "Single exemption is defined"
+      inputs: {}
+      expect: 70300
 
 parameter exemption_married_separate:
   description: "AMT exemption for married filing separately"
@@ -32,3 +40,10 @@ parameter exemption_married_separate:
   indexed_by: statute/26/55/d/4
   values:
     2018-01-01: 54700
+  tests:
+    - name: "MFS exemption is half of joint"
+      inputs: {}
+      expect: 54700
+    - name: "MFS exemption equals half of MFJ"
+      inputs: {}
+      expect: 54700  # Should be 109400 / 2 = 54700

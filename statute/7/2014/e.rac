@@ -176,3 +176,431 @@ variable snap_total_deductions:
   description: "Sum of all SNAP income deductions"
   formula: return snap_pre_shelter_deductions + snap_shelter_deduction
   default: 0
+  tests:
+    - name: "Single person, no deductions"
+      period: 2024-10
+      inputs:
+        household_size: 1
+        earned_income: 0
+        gross_income: 0
+        shelter_costs: 0
+        has_elderly_disabled: false
+        dependent_care_expenses: 0
+        child_support_paid: 0
+        medical_expenses: 0
+      expect: 200
+    - name: "Family of 4 with earned income only"
+      period: 2024-10
+      inputs:
+        household_size: 4
+        earned_income: 1000
+        gross_income: 1000
+        shelter_costs: 0
+        has_elderly_disabled: false
+        dependent_care_expenses: 0
+        child_support_paid: 0
+        medical_expenses: 0
+      expect: 483
+    - name: "Family of 4 with earned income and shelter no cap"
+      period: 2024-10
+      inputs:
+        household_size: 4
+        earned_income: 1000
+        gross_income: 1000
+        shelter_costs: 500
+        has_elderly_disabled: false
+        dependent_care_expenses: 0
+        child_support_paid: 0
+        medical_expenses: 0
+      expect: 633
+    - name: "Family of 4 with earned income and shelter at cap"
+      period: 2024-10
+      inputs:
+        household_size: 4
+        earned_income: 1000
+        gross_income: 1000
+        shelter_costs: 1500
+        has_elderly_disabled: false
+        dependent_care_expenses: 0
+        child_support_paid: 0
+        medical_expenses: 0
+      expect: 1155
+
+variable snap_standard_deduction:
+  imports: [26/1#cut]
+  entity: Household
+  period: Month
+  dtype: Money
+  unit: "USD"
+  label: "SNAP Standard Deduction"
+  description: "Monthly standard deduction based on household size"
+  syntax: python
+  formula: |
+    # Standard deduction varies by household size: 1-3 same, 4, 5, 6+ maximum
+    # Use cut() to look up amount from schedule by household size
+    return cut(household_size, standard_deduction_schedule)
+  default: 0
+  tests:
+    - name: "Single person standard deduction"
+      period: 2024-10
+      inputs:
+        household_size: 1
+      expect: 200
+    - name: "Two person household"
+      period: 2024-10
+      inputs:
+        household_size: 2
+      expect: 200
+    - name: "Three person household (same as 1-2)"
+      period: 2024-10
+      inputs:
+        household_size: 3
+      expect: 200
+    - name: "Four person household"
+      period: 2024-10
+      inputs:
+        household_size: 4
+      expect: 211
+    - name: "Five person household"
+      period: 2024-10
+      inputs:
+        household_size: 5
+      expect: 247
+    - name: "Large household (6+)"
+      period: 2024-10
+      inputs:
+        household_size: 6
+      expect: 283
+    - name: "Large household (8 persons)"
+      period: 2024-10
+      inputs:
+        household_size: 8
+      expect: 283
+    - name: "Prior year 2023"
+      period: 2023-10
+      inputs:
+        household_size: 4
+      expect: 208
+    - name: "Prior year 2022"
+      period: 2022-10
+      inputs:
+        household_size: 4
+      expect: 197
+
+variable snap_earned_income_deduction:
+  entity: Household
+  period: Month
+  dtype: Money
+  unit: "USD"
+  label: "SNAP Earned Income Deduction"
+  description: "20% of gross earned income deducted before other calculations"
+  syntax: python
+  formula: |
+    return earned_income * earned_income_deduction_rate
+  default: 0
+  tests:
+    - name: "No earned income"
+      period: 2024-10
+      inputs:
+        earned_income: 0
+      expect: 0
+    - name: "Small earned income"
+      period: 2024-10
+      inputs:
+        earned_income: 100
+      expect: 20
+    - name: "Average earned income"
+      period: 2024-10
+      inputs:
+        earned_income: 1000
+      expect: 200
+    - name: "High earned income"
+      period: 2024-10
+      inputs:
+        earned_income: 3000
+      expect: 600
+    - name: "Very high earned income"
+      period: 2024-10
+      inputs:
+        earned_income: 5000
+      expect: 1000
+
+variable snap_pre_shelter_deductions:
+  entity: Household
+  period: Month
+  dtype: Money
+  unit: "USD"
+  label: "SNAP Pre-Shelter Deductions"
+  description: "Sum of all deductions before excess shelter calculation"
+  syntax: python
+  formula: |
+    # Sum all deductions that apply before shelter
+    return snap_earned_income_deduction + snap_standard_deduction + snap_dependent_care_deduction + snap_child_support_deduction + snap_medical_expense_deduction
+  default: 0
+  tests:
+    - name: "Only standard deduction"
+      period: 2024-10
+      inputs:
+        household_size: 1
+        earned_income: 0
+        dependent_care_expenses: 0
+        child_support_paid: 0
+        medical_expenses: 0
+      expect: 200
+    - name: "Earned income and standard deduction"
+      period: 2024-10
+      inputs:
+        household_size: 1
+        earned_income: 500
+        dependent_care_expenses: 0
+        child_support_paid: 0
+        medical_expenses: 0
+      expect: 300
+    - name: "All deductions combined"
+      period: 2024-10
+      inputs:
+        household_size: 2
+        earned_income: 1000
+        dependent_care_expenses: 200
+        child_support_paid: 150
+        medical_expenses: 100
+      expect: 650
+    - name: "Large household with multiple deductions"
+      period: 2024-10
+      inputs:
+        household_size: 4
+        earned_income: 2000
+        dependent_care_expenses: 300
+        child_support_paid: 200
+        medical_expenses: 150
+      expect: 1261
+
+variable snap_adjusted_income:
+  entity: Household
+  period: Month
+  dtype: Money
+  unit: "USD"
+  label: "SNAP Adjusted Income"
+  description: "Gross income minus pre-shelter deductions, used for shelter calculation"
+  formula: return max(0, gross_income - snap_pre_shelter_deductions)
+  default: 0
+  tests:
+    - name: "No income, standard deduction only"
+      period: 2024-10
+      inputs:
+        household_size: 1
+        gross_income: 0
+        earned_income: 0
+        dependent_care_expenses: 0
+        child_support_paid: 0
+        medical_expenses: 0
+      expect: 0
+    - name: "Income exceeds deductions"
+      period: 2024-10
+      inputs:
+        household_size: 1
+        gross_income: 1000
+        earned_income: 500
+        dependent_care_expenses: 0
+        child_support_paid: 0
+        medical_expenses: 0
+      expect: 700
+    - name: "Deductions exceed income (capped at zero)"
+      period: 2024-10
+      inputs:
+        household_size: 4
+        gross_income: 500
+        earned_income: 500
+        dependent_care_expenses: 100
+        child_support_paid: 50
+        medical_expenses: 100
+      expect: 0
+    - name: "Family of 4, moderate income and deductions"
+      period: 2024-10
+      inputs:
+        household_size: 4
+        gross_income: 1500
+        earned_income: 1000
+        dependent_care_expenses: 0
+        child_support_paid: 0
+        medical_expenses: 0
+      expect: 1189
+
+variable snap_shelter_deduction:
+  entity: Household
+  period: Month
+  dtype: Money
+  unit: "USD"
+  label: "SNAP Shelter Deduction"
+  description: "Deduction for shelter costs exceeding 50% of adjusted income"
+  syntax: python
+  formula: |
+    # Section 2014(e)(6)(A): Excess = shelter costs - 50% of adjusted income
+    adjusted = snap_adjusted_income
+    excess = shelter_costs - (adjusted * excess_shelter_rate)
+    if excess <= 0:
+        return 0
+    # Section 2014(e)(6)(C): No cap for elderly/disabled households
+    if has_elderly_disabled:
+        return excess
+    # Section 2014(e)(6)(B): Cap for non-elderly/disabled households
+    return min(excess, shelter_deduction_cap)
+  default: 0
+  tests:
+    - name: "No shelter costs"
+      period: 2024-10
+      inputs:
+        household_size: 1
+        gross_income: 1000
+        earned_income: 500
+        shelter_costs: 0
+        has_elderly_disabled: false
+        dependent_care_expenses: 0
+        child_support_paid: 0
+        medical_expenses: 0
+      expect: 0
+    - name: "Shelter below 50% of adjusted income"
+      period: 2024-10
+      inputs:
+        household_size: 1
+        gross_income: 1000
+        earned_income: 500
+        shelter_costs: 200
+        has_elderly_disabled: false
+        dependent_care_expenses: 0
+        child_support_paid: 0
+        medical_expenses: 0
+      expect: 0
+    - name: "Shelter at 50% adjusted, no deduction"
+      period: 2024-10
+      inputs:
+        household_size: 1
+        gross_income: 1000
+        earned_income: 500
+        shelter_costs: 350
+        has_elderly_disabled: false
+        dependent_care_expenses: 0
+        child_support_paid: 0
+        medical_expenses: 0
+      expect: 0
+    - name: "Shelter exceeds 50%, below cap"
+      period: 2024-10
+      inputs:
+        household_size: 2
+        gross_income: 1200
+        earned_income: 1000
+        shelter_costs: 600
+        has_elderly_disabled: false
+        dependent_care_expenses: 0
+        child_support_paid: 0
+        medical_expenses: 0
+      expect: 110
+    - name: "Shelter excess exceeds cap"
+      period: 2024-10
+      inputs:
+        household_size: 4
+        gross_income: 2000
+        earned_income: 2000
+        shelter_costs: 1500
+        has_elderly_disabled: false
+        dependent_care_expenses: 0
+        child_support_paid: 0
+        medical_expenses: 0
+      expect: 672
+    - name: "Elderly/disabled, excess above cap still applies"
+      period: 2024-10
+      inputs:
+        household_size: 2
+        gross_income: 1500
+        earned_income: 1000
+        shelter_costs: 2000
+        has_elderly_disabled: true
+        dependent_care_expenses: 0
+        child_support_paid: 0
+        medical_expenses: 0
+      expect: 1000
+    - name: "Shelter deduction cap prior year 2023"
+      period: 2023-10
+      inputs:
+        household_size: 4
+        gross_income: 2000
+        earned_income: 2000
+        shelter_costs: 1500
+        has_elderly_disabled: false
+        dependent_care_expenses: 0
+        child_support_paid: 0
+        medical_expenses: 0
+      expect: 624
+
+variable snap_net_income:
+  entity: Household
+  period: Month
+  dtype: Money
+  unit: "USD"
+  label: "SNAP Net Income"
+  description: "Monthly income after all SNAP deductions, used for benefit calculation"
+  syntax: python
+  formula: |
+    return max(0, snap_adjusted_income - snap_shelter_deduction)
+  default: 0
+  tests:
+    - name: "No income at all"
+      period: 2024-10
+      inputs:
+        household_size: 1
+        gross_income: 0
+        earned_income: 0
+        shelter_costs: 0
+        has_elderly_disabled: false
+        dependent_care_expenses: 0
+        child_support_paid: 0
+        medical_expenses: 0
+      expect: 0
+    - name: "Single person with low income"
+      period: 2024-10
+      inputs:
+        household_size: 1
+        gross_income: 400
+        earned_income: 200
+        shelter_costs: 300
+        has_elderly_disabled: false
+        dependent_care_expenses: 0
+        child_support_paid: 0
+        medical_expenses: 0
+      expect: 0
+    - name: "Single person moderate income and housing"
+      period: 2024-10
+      inputs:
+        household_size: 1
+        gross_income: 1000
+        earned_income: 800
+        shelter_costs: 400
+        has_elderly_disabled: false
+        dependent_care_expenses: 0
+        child_support_paid: 0
+        medical_expenses: 0
+      expect: 360
+    - name: "Family of 4 standard case"
+      period: 2024-10
+      inputs:
+        household_size: 4
+        gross_income: 1500
+        earned_income: 1000
+        shelter_costs: 700
+        has_elderly_disabled: false
+        dependent_care_expenses: 0
+        child_support_paid: 0
+        medical_expenses: 0
+      expect: 288
+    - name: "Family of 4 with full deductions"
+      period: 2024-10
+      inputs:
+        household_size: 4
+        gross_income: 2000
+        earned_income: 1600
+        shelter_costs: 900
+        has_elderly_disabled: false
+        dependent_care_expenses: 150
+        child_support_paid: 100
+        medical_expenses: 50
+      expect: 0

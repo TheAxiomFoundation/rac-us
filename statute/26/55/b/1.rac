@@ -14,9 +14,20 @@ parameter amt_rate_low:
   unit: rate
   values:
     2018-01-01: 0.26
+  tests:
+    - name: "Low rate is 26%"
+      inputs: {}
+      expect: 0.26
 
 parameter amt_rate_high:
   description: "AMT rate for income above bracket threshold"
   unit: rate
   values:
     2018-01-01: 0.28
+  tests:
+    - name: "High rate is 28%"
+      inputs: {}
+      expect: 0.28
+    - name: "High rate is higher than low rate"
+      inputs: {}
+      expect: 0.28

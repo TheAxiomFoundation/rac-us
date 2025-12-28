@@ -2,3 +2,82 @@ variable index:
   imports:
     - 26/36B/a#premium_tax_credit
     - 26/36B/b#applicable_percentage
+  tests:
+    # Premium Assistance Amount Calculation Tests
+    # PTC = SLCSP Premium - (Applicable % of Income)
+    #
+    # Test scenarios using 2024 FPL and IRA applicable percentages
+    # Single at 200% FPL: Income = $30,120, Applicable % = 2%
+    # Expected contribution = 2% of $30,120 = $602.40/year = $50.20/month
+
+    - name: "Premium tax credit - single at 200% FPL with $500 monthly SLCSP"
+      period: 2024-01
+      inputs:
+        household_income_pct_fpl: 2.0
+        slcsp_premium_monthly: 500
+        applicable_percentage: 0.02
+      expect: 449.80
+
+    - name: "Premium tax credit - single at 100% FPL with $400 monthly SLCSP"
+      period: 2024-01
+      inputs:
+        household_income_pct_fpl: 1.0
+        slcsp_premium_monthly: 400
+        applicable_percentage: 0.0
+      expect: 400
+
+    - name: "Premium tax credit - single at 400% FPL with $600 monthly SLCSP"
+      period: 2024-01
+      inputs:
+        household_income_pct_fpl: 4.0
+        slcsp_premium_monthly: 600
+        applicable_percentage: 0.085
+      expect: 549
+
+    - name: "Premium tax credit - family of 4 at 200% FPL"
+      period: 2024-01
+      inputs:
+        household_income_pct_fpl: 2.0
+        slcsp_premium_monthly: 1200
+        applicable_percentage: 0.02
+      expect: 1176
+
+    - name: "Premium tax credit - family of 2 at 150% FPL"
+      period: 2024-01
+      inputs:
+        household_income_pct_fpl: 1.5
+        slcsp_premium_monthly: 750
+        applicable_percentage: 0.0
+      expect: 750
+
+    - name: "Premium tax credit - at 300% FPL (6% contribution)"
+      period: 2024-01
+      inputs:
+        household_income_pct_fpl: 3.0
+        slcsp_premium_monthly: 800
+        applicable_percentage: 0.06
+      expect: 752
+
+    - name: "Premium tax credit - above 400% FPL (8.5% capped)"
+      period: 2024-01
+      inputs:
+        household_income_pct_fpl: 5.0
+        slcsp_premium_monthly: 900
+        applicable_percentage: 0.085
+      expect: 823.5
+
+    - name: "Premium tax credit - zero when applicable % exceeds SLCSP"
+      period: 2024-01
+      inputs:
+        household_income_pct_fpl: 4.0
+        slcsp_premium_monthly: 500
+        applicable_percentage: 0.20
+      expect: 0
+
+    - name: "Premium tax credit - capped at SLCSP premium"
+      period: 2024-01
+      inputs:
+        household_income_pct_fpl: 1.0
+        slcsp_premium_monthly: 600
+        applicable_percentage: 0.0
+      expect: 600

@@ -10,21 +10,227 @@ variable amt:
     - 26/1#income_tax_before_credits as regular_tax
     - 26/1#filing_status
     - 26/59#amt_foreign_tax_credit
+    - 26/55/b/1#amt_rate_low
+    - 26/55/b/1#amt_rate_high
+    - 26/55/b/3#amt_bracket_joint
+    - 26/55/b/3#amt_bracket_single
+    - 26/55/b/3#amt_bracket_married_separate
+    - 26/55/d/1#exemption_joint
+    - 26/55/d/1#exemption_single
+    - 26/55/d/1#exemption_married_separate
+    - 26/55/d/2#phaseout_threshold_joint
+    - 26/55/d/2#phaseout_threshold_single
+    - 26/55/d/2#phaseout_threshold_married_separate
+    - 26/55/d/2#phaseout_rate
   entity: TaxUnit
   period: Year
   dtype: Money
   unit: "USD"
-  label: "Total Income Tax with AMT"
-  description: "Regular tax plus AMT"
+  label: "Alternative Minimum Tax"
+  description: "AMT liability under Section 55(a): excess of tentative minimum tax over regular tax"
   syntax: python
   formula: |
-    # Get base exemption based on filing status
-    # Joint filers and surviving spouses: Section 55(d)(1)(A)
-    # Single and HoH: Section 55(d)(1)(B)
-    # MFS: Section 55(d)(1)(C) - half of joint
-    if filing_status == MARRIED_FILING_JOINTLY: return exemption_joint
-    if filing_status == QUALIFYING_WIDOW: return exemption_joint
-    if filing_status == MARRIED_FILING_SEPARATELY: return exemption_mfs
-    if filing_status == SINGLE: return exemption_single
-    return exemption_single
+    # Section 55(a): AMT = max(0, tentative_minimum_tax - regular_tax)
+    # Where tentative_minimum_tax is computed in Section 55(b)
+
+    # Step 1: Get base exemption based on filing status per Section 55(d)(1)
+    if filing_status == MARRIED_FILING_JOINTLY:
+      base_exemption = exemption_joint
+      bracket_threshold = amt_bracket_joint
+      phaseout_threshold = phaseout_threshold_joint
+    elif filing_status == QUALIFYING_WIDOW:
+      base_exemption = exemption_joint
+      bracket_threshold = amt_bracket_joint
+      phaseout_threshold = phaseout_threshold_joint
+    elif filing_status == MARRIED_FILING_SEPARATELY:
+      base_exemption = exemption_married_separate
+      bracket_threshold = amt_bracket_married_separate
+      phaseout_threshold = phaseout_threshold_married_separate
+    else:  # SINGLE, HEAD_OF_HOUSEHOLD
+      base_exemption = exemption_single
+      bracket_threshold = amt_bracket_single
+      phaseout_threshold = phaseout_threshold_single
+
+    # Step 2: Apply exemption phaseout per Section 55(d)(2)
+    # Exemption reduced 25% for each dollar of AMTI above threshold
+    excess_income = max(0, amti - phaseout_threshold)
+    phaseout_reduction = excess_income * phaseout_rate
+    exemption = max(0, base_exemption - phaseout_reduction)
+
+    # Step 3: Compute taxable excess (AMTI - exemption)
+    taxable_excess = max(0, amti - exemption)
+
+    # Step 4: Compute tentative minimum tax with two-tier rate structure per Section 55(b)(1)
+    # 26% on amount up to bracket threshold, 28% on excess
+    amt_in_low_bracket = min(taxable_excess, bracket_threshold)
+    amt_in_high_bracket = max(0, taxable_excess - bracket_threshold)
+    tentative_minimum_tax = (amt_in_low_bracket * amt_rate_low) + (amt_in_high_bracket * amt_rate_high)
+
+    # Step 5: Apply foreign tax credit (if applicable) per Section 55(c)
+    tentative_minimum_tax_after_credits = max(0, tentative_minimum_tax - amt_foreign_tax_credit)
+
+    # Step 6: AMT is the excess of tentative minimum tax over regular tax (or zero)
+    amt_liability = max(0, tentative_minimum_tax_after_credits - regular_tax)
+
+    return amt_liability
   default: 0
+  tests:
+    # Test 1: No AMT - income below exemption threshold
+    - name: "No AMT - income below exemption"
+      period: 2024-01
+      inputs:
+        filing_status: MARRIED_FILING_JOINTLY
+        amti: 100000
+        exemption_joint: 133300
+        amt_bracket_joint: 232600
+        phaseout_threshold_joint: 1000000
+        phaseout_rate: 0.25
+        amt_rate_low: 0.26
+        amt_rate_high: 0.28
+        regular_tax: 12000
+        amt_foreign_tax_credit: 0
+      expect: 0
+
+    # Test 2: Single filer with AMT liability
+    - name: "Single filer with positive AMT"
+      period: 2024-01
+      inputs:
+        filing_status: SINGLE
+        amti: 300000
+        exemption_single: 85700
+        amt_bracket_single: 116300
+        phaseout_threshold_single: 500000
+        phaseout_rate: 0.25
+        amt_rate_low: 0.26
+        amt_rate_high: 0.28
+        regular_tax: 50000
+        amt_foreign_tax_credit: 0
+      expect: 7678
+
+    # Test 3: Married filing jointly with exemption phaseout
+    - name: "MFJ with exemption phaseout"
+      period: 2024-01
+      inputs:
+        filing_status: MARRIED_FILING_JOINTLY
+        amti: 1500000
+        exemption_joint: 133300
+        amt_bracket_joint: 232600
+        phaseout_threshold_joint: 1000000
+        phaseout_rate: 0.25
+        amt_rate_low: 0.26
+        amt_rate_high: 0.28
+        regular_tax: 350000
+        amt_foreign_tax_credit: 0
+      expect: 63024
+
+    # Test 4: Married filing separately with reduced AMT
+    - name: "MFS filing with reduced exemption"
+      period: 2024-01
+      inputs:
+        filing_status: MARRIED_FILING_SEPARATELY
+        amti: 400000
+        exemption_married_separate: 66650
+        amt_bracket_married_separate: 116300
+        phaseout_threshold_married_separate: 500000
+        phaseout_rate: 0.25
+        amt_rate_low: 0.26
+        amt_rate_high: 0.28
+        regular_tax: 75000
+        amt_foreign_tax_credit: 0
+      expect: 11012
+
+    # Test 5: Qualifying widow gets joint exemption
+    - name: "Qualifying widow with joint exemption"
+      period: 2024-01
+      inputs:
+        filing_status: QUALIFYING_WIDOW
+        amti: 500000
+        exemption_joint: 133300
+        amt_bracket_joint: 232600
+        phaseout_threshold_joint: 1000000
+        phaseout_rate: 0.25
+        amt_rate_low: 0.26
+        amt_rate_high: 0.28
+        regular_tax: 90000
+        amt_foreign_tax_credit: 0
+      expect: 26516
+
+    # Test 6: High income with significant AMT
+    - name: "High income single with significant AMT"
+      period: 2024-01
+      inputs:
+        filing_status: SINGLE
+        amti: 2000000
+        exemption_single: 85700
+        amt_bracket_single: 116300
+        phaseout_threshold_single: 500000
+        phaseout_rate: 0.25
+        amt_rate_low: 0.26
+        amt_rate_high: 0.28
+        regular_tax: 200000
+        amt_foreign_tax_credit: 0
+      expect: 157674
+
+    # Test 7: Regular tax exceeds tentative minimum tax (no AMT)
+    - name: "Regular tax exceeds TMT"
+      period: 2024-01
+      inputs:
+        filing_status: MARRIED_FILING_JOINTLY
+        amti: 250000
+        exemption_joint: 133300
+        amt_bracket_joint: 232600
+        phaseout_threshold_joint: 1000000
+        phaseout_rate: 0.25
+        amt_rate_low: 0.26
+        amt_rate_high: 0.28
+        regular_tax: 50000
+        amt_foreign_tax_credit: 0
+      expect: 0
+
+    # Test 8: High income single filer crossing bracket threshold
+    - name: "Single filer in high bracket"
+      period: 2024-01
+      inputs:
+        filing_status: SINGLE
+        amti: 600000
+        exemption_single: 85700
+        amt_bracket_single: 116300
+        phaseout_threshold_single: 500000
+        phaseout_rate: 0.25
+        amt_rate_low: 0.26
+        amt_rate_high: 0.28
+        regular_tax: 50000
+        amt_foreign_tax_credit: 0
+      expect: 48678
+
+    # Test 9: With foreign tax credit reducing AMT
+    - name: "AMT with foreign tax credit"
+      period: 2024-01
+      inputs:
+        filing_status: MARRIED_FILING_JOINTLY
+        amti: 800000
+        exemption_joint: 133300
+        amt_bracket_joint: 232600
+        phaseout_threshold_joint: 1000000
+        phaseout_rate: 0.25
+        amt_rate_low: 0.26
+        amt_rate_high: 0.28
+        regular_tax: 100000
+        amt_foreign_tax_credit: 5000
+      expect: 27024
+
+    # Test 10: Minimum AMTI with no AMT
+    - name: "Very low AMTI"
+      period: 2024-01
+      inputs:
+        filing_status: SINGLE
+        amti: 10000
+        exemption_single: 85700
+        amt_bracket_single: 116300
+        phaseout_threshold_single: 500000
+        phaseout_rate: 0.25
+        amt_rate_low: 0.26
+        amt_rate_high: 0.28
+        regular_tax: 1000
+        amt_foreign_tax_credit: 0
+      expect: 0

@@ -70,3 +70,152 @@ variable applicable_percentage:
     # Bracket 6: 400%+ FPL (8.5% flat under IRA - no cliff!)
     return bracket_6.initial_pct
   default: 0
+  tests:
+    # 2024 FPL Levels & Applicable Percentages (under IRA 2021-2025)
+    # Single: $15,060 FPL
+    # Bracket 1: 100-150% FPL (0% initial to 0% final)
+    # Bracket 2: 150-200% FPL (0% to 2%)
+    # Bracket 3: 200-250% FPL (2% to 4%)
+    # Bracket 4: 250-300% FPL (4% to 6%)
+    # Bracket 5: 300-400% FPL (6% to 8.5%)
+    # Bracket 6: 400%+ FPL (8.5% flat)
+
+    # Bracket 1 Tests (100-150% FPL, 0% contribution)
+    - name: "Applicable percentage - at 100% FPL (0%)"
+      period: 2024-01
+      inputs:
+        household_income_pct_fpl: 1.0
+      expect: 0
+
+    - name: "Applicable percentage - at 125% FPL (0%)"
+      period: 2024-01
+      inputs:
+        household_income_pct_fpl: 1.25
+      expect: 0
+
+    - name: "Applicable percentage - at 150% FPL boundary (0%)"
+      period: 2024-01
+      inputs:
+        household_income_pct_fpl: 1.5
+      expect: 0
+
+    # Bracket 2 Tests (150-200% FPL, 0% to 2%)
+    - name: "Applicable percentage - at 150% FPL start (0%)"
+      period: 2024-01
+      inputs:
+        household_income_pct_fpl: 1.5
+      expect: 0
+
+    - name: "Applicable percentage - at 175% FPL (1% interpolated)"
+      period: 2024-01
+      inputs:
+        household_income_pct_fpl: 1.75
+      expect: 0.01
+
+    - name: "Applicable percentage - at 200% FPL (2%)"
+      period: 2024-01
+      inputs:
+        household_income_pct_fpl: 2.0
+      expect: 0.02
+
+    # Bracket 3 Tests (200-250% FPL, 2% to 4%)
+    - name: "Applicable percentage - at 200% FPL start (2%)"
+      period: 2024-01
+      inputs:
+        household_income_pct_fpl: 2.0
+      expect: 0.02
+
+    - name: "Applicable percentage - at 225% FPL (3% interpolated)"
+      period: 2024-01
+      inputs:
+        household_income_pct_fpl: 2.25
+      expect: 0.03
+
+    - name: "Applicable percentage - at 250% FPL (4%)"
+      period: 2024-01
+      inputs:
+        household_income_pct_fpl: 2.5
+      expect: 0.04
+
+    # Bracket 4 Tests (250-300% FPL, 4% to 6%)
+    - name: "Applicable percentage - at 250% FPL start (4%)"
+      period: 2024-01
+      inputs:
+        household_income_pct_fpl: 2.5
+      expect: 0.04
+
+    - name: "Applicable percentage - at 275% FPL (5% interpolated)"
+      period: 2024-01
+      inputs:
+        household_income_pct_fpl: 2.75
+      expect: 0.05
+
+    - name: "Applicable percentage - at 300% FPL (6%)"
+      period: 2024-01
+      inputs:
+        household_income_pct_fpl: 3.0
+      expect: 0.06
+
+    # Bracket 5 Tests (300-400% FPL, 6% to 8.5%)
+    - name: "Applicable percentage - at 300% FPL start (6%)"
+      period: 2024-01
+      inputs:
+        household_income_pct_fpl: 3.0
+      expect: 0.06
+
+    - name: "Applicable percentage - at 350% FPL (7.25% interpolated)"
+      period: 2024-01
+      inputs:
+        household_income_pct_fpl: 3.5
+      expect: 0.0725
+
+    - name: "Applicable percentage - at 400% FPL (8.5%)"
+      period: 2024-01
+      inputs:
+        household_income_pct_fpl: 4.0
+      expect: 0.085
+
+    # Bracket 6 Tests (400%+ FPL, 8.5% flat under IRA)
+    - name: "Applicable percentage - above 400% FPL (8.5% flat)"
+      period: 2024-01
+      inputs:
+        household_income_pct_fpl: 4.5
+      expect: 0.085
+
+    - name: "Applicable percentage - well above 400% FPL (8.5% flat)"
+      period: 2024-01
+      inputs:
+        household_income_pct_fpl: 6.0
+      expect: 0.085
+
+    - name: "Applicable percentage - very high income (8.5% flat)"
+      period: 2024-01
+      inputs:
+        household_income_pct_fpl: 10.0
+      expect: 0.085
+
+    # Edge Cases - Below 100% FPL
+    - name: "Applicable percentage - below 100% FPL (0 credit)"
+      period: 2024-01
+      inputs:
+        household_income_pct_fpl: 0.75
+      expect: 0
+
+    - name: "Applicable percentage - at 50% FPL (0 credit)"
+      period: 2024-01
+      inputs:
+        household_income_pct_fpl: 0.5
+      expect: 0
+
+    # Interpolation accuracy tests
+    - name: "Applicable percentage - at 162.5% FPL (1% interpolated)"
+      period: 2024-01
+      inputs:
+        household_income_pct_fpl: 1.625
+      expect: 0.01
+
+    - name: "Applicable percentage - at 237.5% FPL (3% interpolated)"
+      period: 2024-01
+      inputs:
+        household_income_pct_fpl: 2.375
+      expect: 0.03

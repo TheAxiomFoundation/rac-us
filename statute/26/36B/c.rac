@@ -96,3 +96,195 @@ variable enrolled_in_qualified_health_plan:
   label: "Enrolled in Qualified Health Plan"
   description: "Enrolled in QHP through Marketplace per 26 USC 36B(c)(3)"
   default: false
+  tests:
+    # Income Eligibility Tests (100-400% FPL range)
+    # 2024 Single FPL: $15,060
+    # 100% = $15,060
+    # 150% = $22,590
+    # 200% = $30,120
+    # 250% = $37,650
+    # 300% = $45,180
+    # 400% = $60,240
+
+    - name: "Income eligible - at 100% FPL (2024)"
+      period: 2024-01
+      inputs:
+        household_income: 15060
+        ptc_federal_poverty_level: 15060
+        ptc_household_size: 1
+        filing_status: SINGLE
+        is_tax_unit_dependent: false
+      expect: true
+
+    - name: "Income eligible - at 150% FPL (2024)"
+      period: 2024-01
+      inputs:
+        household_income: 22590
+        ptc_federal_poverty_level: 15060
+        ptc_household_size: 1
+        filing_status: SINGLE
+        is_tax_unit_dependent: false
+      expect: true
+
+    - name: "Income eligible - at 200% FPL (2024)"
+      period: 2024-01
+      inputs:
+        household_income: 30120
+        ptc_federal_poverty_level: 15060
+        ptc_household_size: 1
+        filing_status: SINGLE
+        is_tax_unit_dependent: false
+      expect: true
+
+    - name: "Income eligible - at 300% FPL (2024)"
+      period: 2024-01
+      inputs:
+        household_income: 45180
+        ptc_federal_poverty_level: 15060
+        ptc_household_size: 1
+        filing_status: SINGLE
+        is_tax_unit_dependent: false
+      expect: true
+
+    - name: "Income eligible - at 400% FPL (2024)"
+      period: 2024-01
+      inputs:
+        household_income: 60240
+        ptc_federal_poverty_level: 15060
+        ptc_household_size: 1
+        filing_status: SINGLE
+        is_tax_unit_dependent: false
+      expect: true
+
+    - name: "Income eligible - above 400% FPL (IRA allows)"
+      period: 2024-01
+      inputs:
+        household_income: 90000
+        ptc_federal_poverty_level: 15060
+        ptc_household_size: 1
+        filing_status: SINGLE
+        is_tax_unit_dependent: false
+      expect: true
+
+    - name: "Income ineligible - below 100% FPL"
+      period: 2024-01
+      inputs:
+        household_income: 10000
+        ptc_federal_poverty_level: 15060
+        ptc_household_size: 1
+        filing_status: SINGLE
+        is_tax_unit_dependent: false
+      expect: false
+
+    - name: "Income ineligible - claimed as dependent"
+      period: 2024-01
+      inputs:
+        household_income: 30000
+        ptc_federal_poverty_level: 15060
+        ptc_household_size: 1
+        filing_status: SINGLE
+        is_tax_unit_dependent: true
+      expect: false
+
+    # Filing Status Tests
+    - name: "Filing status ineligible - married filing separately"
+      period: 2024-01
+      inputs:
+        household_income: 30000
+        ptc_federal_poverty_level: 15060
+        ptc_household_size: 1
+        filing_status: MARRIED_FILING_SEPARATELY
+        is_tax_unit_dependent: false
+      expect: false
+
+    - name: "Filing status eligible - single"
+      period: 2024-01
+      inputs:
+        household_income: 30000
+        ptc_federal_poverty_level: 15060
+        ptc_household_size: 1
+        filing_status: SINGLE
+        is_tax_unit_dependent: false
+      expect: true
+
+    - name: "Filing status eligible - married filing jointly"
+      period: 2024-01
+      inputs:
+        household_income: 40000
+        ptc_federal_poverty_level: 20440
+        ptc_household_size: 2
+        filing_status: JOINT
+        is_tax_unit_dependent: false
+      expect: true
+
+    - name: "Filing status eligible - head of household"
+      period: 2024-01
+      inputs:
+        household_income: 30000
+        ptc_federal_poverty_level: 15060
+        ptc_household_size: 1
+        filing_status: HEAD_OF_HOUSEHOLD
+        is_tax_unit_dependent: false
+      expect: true
+
+    # Family Size Tests
+    - name: "Income eligible - family of 4 at 200% FPL (2024)"
+      period: 2024-01
+      inputs:
+        household_income: 62400
+        ptc_federal_poverty_level: 31200
+        ptc_household_size: 4
+        filing_status: JOINT
+        is_tax_unit_dependent: false
+      expect: true
+
+    - name: "Income eligible - family of 4 below 100% FPL threshold"
+      period: 2024-01
+      inputs:
+        household_income: 20000
+        ptc_federal_poverty_level: 31200
+        ptc_household_size: 4
+        filing_status: JOINT
+        is_tax_unit_dependent: false
+      expect: false
+
+    # Edge Cases at FPL Boundaries
+    - name: "Edge case - exactly at 100% FPL (single)"
+      period: 2024-01
+      inputs:
+        household_income: 15060
+        ptc_federal_poverty_level: 15060
+        ptc_household_size: 1
+        filing_status: SINGLE
+        is_tax_unit_dependent: false
+      expect: true
+
+    - name: "Edge case - just below 100% FPL (single)"
+      period: 2024-01
+      inputs:
+        household_income: 15059
+        ptc_federal_poverty_level: 15060
+        ptc_household_size: 1
+        filing_status: SINGLE
+        is_tax_unit_dependent: false
+      expect: false
+
+    - name: "Edge case - exactly at 400% FPL (single)"
+      period: 2024-01
+      inputs:
+        household_income: 60240
+        ptc_federal_poverty_level: 15060
+        ptc_household_size: 1
+        filing_status: SINGLE
+        is_tax_unit_dependent: false
+      expect: true
+
+    - name: "Edge case - well above 400% FPL (IRA eligible)"
+      period: 2024-01
+      inputs:
+        household_income: 120000
+        ptc_federal_poverty_level: 15060
+        ptc_household_size: 1
+        filing_status: SINGLE
+        is_tax_unit_dependent: false
+      expect: true
