@@ -1,9 +1,21 @@
 #!/usr/bin/env python3
-"""Validate .rac files only use whitelisted attributes."""
+"""Validate .rac files only use whitelisted attributes and valid values."""
 
 import re
 import sys
 from pathlib import Path
+
+# Valid values for schema fields
+VALID_ENTITIES = {
+    # Core tax/benefit units
+    "Person", "TaxUnit", "Household", "Family",
+    # Benefit program units
+    "TanfUnit", "SnapUnit", "SPMUnit",
+    # Business/asset entities (for corporate/capital gains)
+    "Corporation", "Business", "Asset",
+}
+VALID_PERIODS = {"Year", "Month", "Week", "Day"}
+VALID_DTYPES = {"Money", "Rate", "Boolean", "Integer", "Count", "String", "Decimal"}  # Enum[...] handled specially
 
 # WHITELIST: Only these top-level attributes are allowed
 ALLOWED_ATTRIBUTES = {
@@ -28,10 +40,13 @@ ALLOWED_ATTRIBUTES = {
     "input",
     "enum",
     "values",
+    "parameter",
     # Helper functions (followed by identifier)
     "function",
     # Raw statute text
     "text",
+    # Test definitions
+    "tests",
 }
 
 # Keywords that can appear in formula/function bodies (not attributes)
@@ -39,6 +54,13 @@ CODE_KEYWORDS = {
     "if", "else", "return", "for", "break",
     "and", "or", "not", "in",
 }
+
+# Patterns for value extraction
+# Entity and dtype appear in variable/input declarations
+ENTITY_PATTERN = re.compile(r"^\s*entity:\s*(\w+)")
+# Period type declarations only - exclude date-like values (2024-01, etc.)
+PERIOD_PATTERN = re.compile(r"^\s*period:\s*(Year|Month|Week|Day|[A-Z][a-z]+)$")
+DTYPE_PATTERN = re.compile(r"^\s*dtype:\s*(\w+)")
 
 def validate_file(filepath: Path) -> list[str]:
     """Validate a single .rac file."""
@@ -68,6 +90,27 @@ def validate_file(filepath: Path) -> list[str]:
         stripped = line.strip()
         if stripped.startswith('#'):
             continue
+
+        # Validate entity values
+        entity_match = ENTITY_PATTERN.match(line)
+        if entity_match:
+            entity = entity_match.group(1)
+            if entity not in VALID_ENTITIES:
+                errors.append(f"{filepath}:{lineno}: invalid entity '{entity}' (must be one of: {sorted(VALID_ENTITIES)})")
+
+        # Validate period values
+        period_match = PERIOD_PATTERN.match(line)
+        if period_match:
+            period = period_match.group(1)
+            if period not in VALID_PERIODS:
+                errors.append(f"{filepath}:{lineno}: invalid period '{period}' (must be one of: {sorted(VALID_PERIODS)})")
+
+        # Validate dtype values
+        dtype_match = DTYPE_PATTERN.match(line)
+        if dtype_match:
+            dtype = dtype_match.group(1)
+            if dtype not in VALID_DTYPES and not dtype.startswith("Enum"):
+                errors.append(f"{filepath}:{lineno}: invalid dtype '{dtype}' (must be one of: {sorted(VALID_DTYPES)} or Enum[...])")
 
         # Calculate indentation
         indent = len(line) - len(line.lstrip())
