@@ -1,7 +1,7 @@
 # 26 USC 3304(a)(1)-(3) - Coverage Requirements
 #
 variable coverage:
-    entity: TaxUnit
+  entity: TaxUnit
   period: Year
   dtype: Money
   unit: "USD"

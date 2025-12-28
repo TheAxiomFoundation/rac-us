@@ -11,7 +11,7 @@ text: """
 of earned income... plus one-half of the remainder
 """
 variable income_exclusions:
-    entity: Person
+  entity: Person
   period: Month
   dtype: Money
   unit: "USD"

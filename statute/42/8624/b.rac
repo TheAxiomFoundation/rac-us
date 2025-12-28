@@ -17,7 +17,7 @@ the Social Security Act [SSI];
 (ii) 60 percent of the State median income
 """
 variable eligibility:
-    entity: Household
+  entity: Household
   period: Year
   dtype: Boolean
   unit: "USD"

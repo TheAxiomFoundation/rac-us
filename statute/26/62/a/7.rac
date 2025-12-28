@@ -197,7 +197,7 @@ variable total_ira_deduction:
 
 examples:
   - name: "Under 50, no employer plan, full contribution"
-    period: 2018-01
+  period: 2018-01
     inputs:
       person:
         age: 35
@@ -208,7 +208,7 @@ examples:
       ira_deduction: 5500
 
   - name: "Age 50+, catch-up eligible"
-    period: 2018-01
+  period: 2018-01
     inputs:
       person:
         age: 55
@@ -220,7 +220,7 @@ examples:
       ira_deduction: 6500
 
   - name: "With employer plan, mid-phaseout"
-    period: 2018-01
+  period: 2018-01
     inputs:
       person:
         age: 40

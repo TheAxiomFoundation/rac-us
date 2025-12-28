@@ -9,7 +9,7 @@ as a deduction only if verified under regulations prescribed by the
 Secretary.
 """
 variable charitable_deduction:
-    entity: TaxUnit
+  entity: TaxUnit
   period: Year
   dtype: Money
   unit: "USD"

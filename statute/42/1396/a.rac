@@ -8,7 +8,7 @@ text: """
 (ii) to all qualified pregnant women and children...
 """
 variable eligibility:
-    entity: Person
+  entity: Person
   period: Month
   dtype: Boolean
   syntax: python

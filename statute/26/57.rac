@@ -6,7 +6,7 @@ For purposes of this part, the items of tax preference determined under
 this section are—
 """
 variable preferences:
-    entity: TaxUnit
+  entity: TaxUnit
   period: Year
   dtype: Money
   unit: "USD"

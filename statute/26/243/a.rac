@@ -14,7 +14,7 @@ investment company;
 substituting "65 percent" for "50 percent".
 """
 variable dividends_received_deduction:
-    entity: Corporation
+  entity: Corporation
   period: Year
   dtype: Money
   unit: "USD"

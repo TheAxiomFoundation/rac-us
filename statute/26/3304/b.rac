@@ -1,7 +1,7 @@
 # 26 USC 3304(a)(4)-(7) - Unemployment Insurance Eligibility
 #
 variable eligibility:
-    entity: Person
+  entity: Person
   period: Year
   dtype: Integer
   unit: "USD"

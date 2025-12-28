@@ -41,7 +41,7 @@ benefits under title XVIII of the Social Security Act and for
 each month thereafter.
 """
 variable contribution_limits:
-    entity: Person
+  entity: Person
   period: Year
   dtype: Money
   unit: "USD"

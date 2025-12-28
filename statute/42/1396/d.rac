@@ -15,7 +15,7 @@ title XVIII (Medicare), and
 poverty line applicable to the size of the household.
 """
 variable expansion:
-    entity: Person
+  entity: Person
   period: Month
   dtype: Boolean
   label: "Qualifies for enhanced FMAP"

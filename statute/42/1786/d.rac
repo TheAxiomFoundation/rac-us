@@ -16,7 +16,7 @@ eligible applicant solely on the basis of the applicant's failure to meet
 a residency requirement...
 """
 variable eligibility:
-    entity: Household
+  entity: Household
   period: Month
   dtype: Boolean
   syntax: python

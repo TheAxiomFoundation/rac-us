@@ -8,7 +8,7 @@ applicable) exceeds 35 percent, then, in lieu of any such tax, there is hereby
 imposed a tax... computed as provided in paragraph (1), (2), or (3).
 """
 variable alternative_tax:
-    entity: Corporation
+  entity: Corporation
   period: Year
   dtype: Money
   unit: "USD"

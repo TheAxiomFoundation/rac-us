@@ -7,7 +7,7 @@ text: """
 Pre-TCJA (1993-2017): Graduated rates from 15% to 35% with "bubble" rates
 """
 variable tax_amount:
-    entity: Corporation
+  entity: Corporation
   period: Year
   dtype: Money
   unit: "USD"

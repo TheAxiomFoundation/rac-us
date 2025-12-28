@@ -11,7 +11,7 @@ of abode as the taxpayer for more than one-half of such taxable year, or
 incapable of caring for himself or herself...
 """
 variable is_qualifying_individual:
-    entity: Person
+  entity: Person
   period: Year
   dtype: Boolean
   label: "Is CDCC Qualifying Individual"

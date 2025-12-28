@@ -9,7 +9,7 @@ of the wages (as defined in section 3121(a)) received by him with respect to
 employment (as defined in section 3121(b)).
 """
 variable medicare_tax:
-    entity: Person
+  entity: Person
   period: Year
   dtype: Money
   unit: "USD"

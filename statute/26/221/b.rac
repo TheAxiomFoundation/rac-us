@@ -35,7 +35,7 @@ educational institution' for 'eligible educational institution (as
 defined in section 25A(f)(2))'.
 """
 variable qualified_loan:
-    entity: Person
+  entity: Person
   period: Year
   dtype: Boolean
   label: "Has Qualified Education Loan"

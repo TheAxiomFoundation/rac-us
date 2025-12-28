@@ -8,7 +8,7 @@ have an eligible spouse shall be payable at the rate of...
 eligible spouse shall be payable at the rate of...
 """
 variable federal_benefit_rate:
-    entity: Person
+  entity: Person
   period: Month
   dtype: Money
   unit: "USD"

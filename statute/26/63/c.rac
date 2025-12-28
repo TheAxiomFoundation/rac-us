@@ -40,7 +40,7 @@ variable standard_deduction_standalone:
   default: 0
 
 variable standard_deduction:
-    entity: TaxUnit
+  entity: TaxUnit
   period: Year
   dtype: Money
   syntax: python

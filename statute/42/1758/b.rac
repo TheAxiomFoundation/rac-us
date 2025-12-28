@@ -15,7 +15,7 @@ under a program funded by the McKinney-Vento Homeless Assistance Act...
 a runaway child... or a migratory child...
 """
 variable categorical_eligibility:
-    entity: Person
+  entity: Person
   period: Year
   dtype: Boolean
   formula: return receives_snap

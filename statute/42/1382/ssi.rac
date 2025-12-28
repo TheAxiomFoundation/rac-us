@@ -1,7 +1,7 @@
 # 42 USC 1382 - Supplemental Security Income (SSI)
 #
 variable ssi:
-    entity: Person
+  entity: Person
   period: Month
   dtype: Money
   unit: "USD"

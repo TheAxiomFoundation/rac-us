@@ -27,7 +27,7 @@ variable citizenship:
 
 
 variable resource_test:
-    entity: Person
+  entity: Person
   period: Month
   dtype: Boolean
   unit: "USD"

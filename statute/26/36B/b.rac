@@ -12,7 +12,7 @@ specified in such table for such income tier...
 This determines the "expected contribution" which is subtracted from
 """
 variable applicable_percentage:
-    entity: TaxUnit
+  entity: TaxUnit
   period: Month
   dtype: Money
   unit: "USD"

@@ -12,7 +12,7 @@ postpartum women, infants, and children who--
 (14) "postpartum women" - up to 6 months after pregnancy terminates
 """
 variable categorical:
-    entity: Person
+  entity: Person
   period: Month
   dtype: Boolean
   syntax: python

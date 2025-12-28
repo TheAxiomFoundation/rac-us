@@ -12,7 +12,7 @@ the Federal Government... for 60 months (whether or not consecutive)
 after the date the State program... becomes effective
 """
 variable time_limits:
-    entity: Person
+  entity: Person
   period: Month
   dtype: Boolean
   formula: return federal_time_limit_months  # 60 months

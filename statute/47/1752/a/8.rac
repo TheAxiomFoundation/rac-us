@@ -6,7 +6,7 @@ text: """
 but less than $50 for such connected device...
 """
 variable acp_device_copay_valid:
-    entity: Household
+  entity: Household
   period: Month
   dtype: Boolean
   label: "ACP Device Copay Valid"

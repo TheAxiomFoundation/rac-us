@@ -6,7 +6,7 @@ The Secretary shall prescribe by regulation... the supplemental foods to
 be made available in the program under this section.
 """
 variable food_package:
-    entity: Household
+  entity: Household
   period: Month
   dtype: Integer
   syntax: python

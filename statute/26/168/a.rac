@@ -10,7 +10,7 @@ shall be determined by using—
 (3) the applicable convention.
 """
 variable depreciation:
-    entity: Asset
+  entity: Asset
   period: Year
   dtype: Money
   unit: "USD"

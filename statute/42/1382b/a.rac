@@ -16,7 +16,7 @@ be excluded--
 (10) burial spaces for the individual and spouse
 """
 variable resource_exclusions:
-    entity: Person
+  entity: Person
   period: Month
   dtype: Money
   unit: "USD"
