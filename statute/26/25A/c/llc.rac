@@ -4,6 +4,37 @@ of the qualified tuition and related expenses paid by the taxpayer
 during the taxable year (for education furnished during any academic
 period beginning in such taxable year) as does not exceed $10,000.
 """
+
+parameter llc_expense_limit:
+  description: "Maximum qualified expenses eligible for LLC"
+  unit: USD
+  source: "26 USC 25A(c)(1)"
+  values:
+    2009-01-01: 10000
+
+parameter llc_credit_rate:
+  description: "Credit rate for lifetime learning credit"
+  unit: rate
+  source: "26 USC 25A(c)(1)"
+  values:
+    2009-01-01: 0.20
+
+parameter llc_max_credit:
+  description: "Maximum lifetime learning credit per taxpayer"
+  unit: USD
+  source: "26 USC 25A(c)(1)"
+  values:
+    2009-01-01: 2000
+
+input llc_qualified_expenses:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: "USD"
+  label: "LLC Qualified Expenses"
+  description: "Qualified tuition and related education expenses per 26 USC 25A(f)"
+  default: 0
+
 variable llc:
   imports:
     - 26/1#filing_status
@@ -16,9 +47,67 @@ variable llc:
   description: "Lifetime Learning Credit after phaseout per 26 USC § 25A(c)"
   syntax: python
   formula: |
-    # Sum all qualified expenses for students not claiming AOC
-    # Note: Cannot claim both AOC and LLC for same student
-    # Filter to non-AOC students, then sum their expenses
-    non_aoc_expenses = members.llc_qualified_expenses * (not members.is_aoc_eligible_student)
-    return sum(members, non_aoc_expenses)
+    # Calculate 20% of qualified expenses up to $10,000 = max $2,000
+    eligible_expenses = min(llc_qualified_expenses, llc_expense_limit)
+    return eligible_expenses * llc_credit_rate
   default: 0
+  tests:
+    - name: "No qualified expenses"
+      period: 2024
+      inputs:
+        llc_qualified_expenses: 0
+      expect: 0
+
+    - name: "Small qualified expenses ($1,000)"
+      period: 2024
+      inputs:
+        llc_qualified_expenses: 1000
+      expect: 200
+
+    - name: "Mid-range qualified expenses ($5,000)"
+      period: 2024
+      inputs:
+        llc_qualified_expenses: 5000
+      expect: 1000
+
+    - name: "At expense limit ($10,000)"
+      period: 2024
+      inputs:
+        llc_qualified_expenses: 10000
+      expect: 2000
+
+    - name: "Expenses exceed limit ($15,000)"
+      period: 2024
+      inputs:
+        llc_qualified_expenses: 15000
+      expect: 2000
+
+    - name: "Maximum credit achievable"
+      period: 2024
+      inputs:
+        llc_qualified_expenses: 10000
+      expect: 2000
+
+    - name: "Half of maximum credit ($5,000 expenses)"
+      period: 2024
+      inputs:
+        llc_qualified_expenses: 5000
+      expect: 1000
+
+    - name: "Minimal qualified expenses ($100)"
+      period: 2024
+      inputs:
+        llc_qualified_expenses: 100
+      expect: 20
+
+    - name: "Very large qualified expenses ($50,000)"
+      period: 2024
+      inputs:
+        llc_qualified_expenses: 50000
+      expect: 2000
+
+    - name: "Expenses just under limit ($9,999)"
+      period: 2024
+      inputs:
+        llc_qualified_expenses: 9999
+      expect: 1999

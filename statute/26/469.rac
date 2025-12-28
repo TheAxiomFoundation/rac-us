@@ -22,6 +22,22 @@ variable base_rental_real_estate_allowance:
     # All others get $25,000
     return allowance_amount
   default: 0
+  tests:
+    - name: "Single filer gets $25k base allowance"
+      inputs: {filing_status: "single", allowance_amount: 25000}
+      expect: 25000
+    - name: "Married joint filers get $25k base allowance"
+      inputs: {filing_status: "married_joint", allowance_amount: 25000}
+      expect: 25000
+    - name: "MFS living apart gets $12.5k base allowance"
+      inputs: {filing_status: "married_separate", lived_apart_from_spouse_all_year: true, allowance_amount_mfs: 12500}
+      expect: 12500
+    - name: "MFS living together gets $0 base allowance"
+      inputs: {filing_status: "married_separate", lived_apart_from_spouse_all_year: false, allowance_amount: 25000}
+      expect: 0
+    - name: "Head of household gets $25k base allowance"
+      inputs: {filing_status: "head_of_household", allowance_amount: 25000}
+      expect: 25000
 
 # Disallowed Rental Real Estate Loss
 # 26 USC Section 469(a)
@@ -40,6 +56,22 @@ variable disallowed_rental_real_estate_loss:
     # Loss that cannot be deducted this year - carries forward
     return max(0, net_rental_real_estate_loss - rental_real_estate_loss_allowance)
   default: 0
+  tests:
+    - name: "Loss exceeds allowance - full suspension"
+      inputs: {net_rental_real_estate_loss: 50000, rental_real_estate_loss_allowance: 25000}
+      expect: 25000
+    - name: "Loss equals allowance - no suspension"
+      inputs: {net_rental_real_estate_loss: 25000, rental_real_estate_loss_allowance: 25000}
+      expect: 0
+    - name: "Loss less than allowance - no suspension"
+      inputs: {net_rental_real_estate_loss: 15000, rental_real_estate_loss_allowance: 25000}
+      expect: 0
+    - name: "No loss - no suspension"
+      inputs: {net_rental_real_estate_loss: 0, rental_real_estate_loss_allowance: 25000}
+      expect: 0
+    - name: "Large loss with phased-out allowance"
+      inputs: {net_rental_real_estate_loss: 100000, rental_real_estate_loss_allowance: 0}
+      expect: 100000
 
 # Net Rental Real Estate Loss - For Exception Calculation
 # 26 USC Section 469(i)
@@ -52,6 +84,22 @@ variable net_rental_real_estate_loss:
   description: "Losses from rental real estate activities exceeding income per 26 USC 469(i)"
   formula: return max(0, rental_real_estate_loss - rental_real_estate_income)
   default: 0
+  tests:
+    - name: "Losses exceed income"
+      inputs: {rental_real_estate_loss: 50000, rental_real_estate_income: 20000}
+      expect: 30000
+    - name: "Income exceeds losses"
+      inputs: {rental_real_estate_loss: 20000, rental_real_estate_income: 50000}
+      expect: 0
+    - name: "Loss equals income"
+      inputs: {rental_real_estate_loss: 30000, rental_real_estate_income: 30000}
+      expect: 0
+    - name: "No activity"
+      inputs: {rental_real_estate_loss: 0, rental_real_estate_income: 0}
+      expect: 0
+    - name: "Large loss, small income"
+      inputs: {rental_real_estate_loss: 100000, rental_real_estate_income: 5000}
+      expect: 95000
 
 # 26 USC Section 469 - Passive Activity Losses and Credits
 #
@@ -102,6 +150,22 @@ variable passive_loss_limitation:
     # Net income is the reverse: income - losses (if positive)
     return max(0, passive_activity_income - passive_activity_losses)
   default: false
+  tests:
+    - name: "Income exceeds losses - net income"
+      inputs: {passive_activity_income: 50000, passive_activity_losses: 20000}
+      expect: 30000
+    - name: "Losses exceed income - net loss"
+      inputs: {passive_activity_income: 20000, passive_activity_losses: 50000}
+      expect: 0
+    - name: "Break even - no net income"
+      inputs: {passive_activity_income: 30000, passive_activity_losses: 30000}
+      expect: 0
+    - name: "No activity"
+      inputs: {passive_activity_income: 0, passive_activity_losses: 0}
+      expect: 0
+    - name: "Only income, no losses"
+      inputs: {passive_activity_income: 100000, passive_activity_losses: 0}
+      expect: 100000
 
 
 variable real_estate_professional:
@@ -119,6 +183,22 @@ variable real_estate_professional:
     materially_participates = materially_participates_in_real_property_business
     return materially_participates and (hours_in_real_property > hours_threshold)
   default: false
+  tests:
+    - name: "Qualifies - materially participates and over 750 hours"
+      inputs: {materially_participates_in_real_property_business: true, hours_in_real_property_trades_businesses: 800, hours_threshold: 750}
+      expect: true
+    - name: "Does not qualify - lacks material participation"
+      inputs: {materially_participates_in_real_property_business: false, hours_in_real_property_trades_businesses: 800, hours_threshold: 750}
+      expect: false
+    - name: "Does not qualify - insufficient hours despite material participation"
+      inputs: {materially_participates_in_real_property_business: true, hours_in_real_property_trades_businesses: 700, hours_threshold: 750}
+      expect: false
+    - name: "Does not qualify - no participation and insufficient hours"
+      inputs: {materially_participates_in_real_property_business: false, hours_in_real_property_trades_businesses: 500, hours_threshold: 750}
+      expect: false
+    - name: "Qualifies - exactly 751 hours (over threshold)"
+      inputs: {materially_participates_in_real_property_business: true, hours_in_real_property_trades_businesses: 751, hours_threshold: 750}
+      expect: true
 
 variable rental_real_estate_allowance_after_phaseout:
   imports:
@@ -132,6 +212,22 @@ variable rental_real_estate_allowance_after_phaseout:
   description: "Allowance remaining after AGI-based phaseout per 26 USC 469(i)"
   formula: return max(0, base_rental_real_estate_allowance - rental_real_estate_allowance_phaseout)
   default: 0
+  tests:
+    - name: "No phaseout - full allowance"
+      inputs: {base_rental_real_estate_allowance: 25000, rental_real_estate_allowance_phaseout: 0}
+      expect: 25000
+    - name: "Partial phaseout - $12.5k remains"
+      inputs: {base_rental_real_estate_allowance: 25000, rental_real_estate_allowance_phaseout: 12500}
+      expect: 12500
+    - name: "Full phaseout - no allowance"
+      inputs: {base_rental_real_estate_allowance: 25000, rental_real_estate_allowance_phaseout: 25000}
+      expect: 0
+    - name: "Over-phaseout - no negative allowance"
+      inputs: {base_rental_real_estate_allowance: 25000, rental_real_estate_allowance_phaseout: 30000}
+      expect: 0
+    - name: "MFS phaseout - $6.25k remains"
+      inputs: {base_rental_real_estate_allowance: 12500, rental_real_estate_allowance_phaseout: 6250}
+      expect: 6250
 
 variable rental_real_estate_allowance_phaseout:
   imports:
@@ -149,6 +245,22 @@ variable rental_real_estate_allowance_phaseout:
     excess_agi = max(0, adjusted_gross_income - rental_real_estate_phaseout_threshold)
     return excess_agi * phaseout_rate
   default: 0
+  tests:
+    - name: "AGI below threshold - no phaseout"
+      inputs: {adjusted_gross_income: 80000, rental_real_estate_phaseout_threshold: 100000, phaseout_rate: 0.5}
+      expect: 0
+    - name: "AGI at threshold - no phaseout"
+      inputs: {adjusted_gross_income: 100000, rental_real_estate_phaseout_threshold: 100000, phaseout_rate: 0.5}
+      expect: 0
+    - name: "AGI $20k above threshold - $10k phaseout"
+      inputs: {adjusted_gross_income: 120000, rental_real_estate_phaseout_threshold: 100000, phaseout_rate: 0.5}
+      expect: 10000
+    - name: "AGI $50k above threshold - $25k phaseout"
+      inputs: {adjusted_gross_income: 150000, rental_real_estate_phaseout_threshold: 100000, phaseout_rate: 0.5}
+      expect: 25000
+    - name: "MFS with $50k threshold - $5k phaseout"
+      inputs: {adjusted_gross_income: 60000, rental_real_estate_phaseout_threshold: 50000, phaseout_rate: 0.5}
+      expect: 5000
 
 
 variable rental_real_estate_exception:
@@ -178,6 +290,25 @@ variable rental_real_estate_exception:
     # No active participation - no exception, passive loss rules apply fully
     return 0
   default: 0
+  tests:
+    - name: "Real estate professional - unlimited deduction"
+      inputs: {is_real_estate_professional: true, net_rental_real_estate_loss: 100000, rental_real_estate_allowance_after_phaseout: 25000, actively_participates_in_rental: false}
+      expect: 100000
+    - name: "Active participant - $25k exception applies"
+      inputs: {is_real_estate_professional: false, net_rental_real_estate_loss: 50000, rental_real_estate_allowance_after_phaseout: 25000, actively_participates_in_rental: true}
+      expect: 25000
+    - name: "Active participant with small loss - loss limits deduction"
+      inputs: {is_real_estate_professional: false, net_rental_real_estate_loss: 10000, rental_real_estate_allowance_after_phaseout: 25000, actively_participates_in_rental: true}
+      expect: 10000
+    - name: "Passive activity - no exception allowed"
+      inputs: {is_real_estate_professional: false, net_rental_real_estate_loss: 50000, rental_real_estate_allowance_after_phaseout: 25000, actively_participates_in_rental: false}
+      expect: 0
+    - name: "Active participant after $100k AGI phaseout"
+      inputs: {is_real_estate_professional: false, net_rental_real_estate_loss: 50000, rental_real_estate_allowance_after_phaseout: 0, actively_participates_in_rental: true}
+      expect: 0
+    - name: "$25k rental real estate exception at-risk limit applied"
+      inputs: {is_real_estate_professional: false, net_rental_real_estate_loss: 35000, rental_real_estate_allowance_after_phaseout: 25000, actively_participates_in_rental: true}
+      expect: 25000
 
 variable rental_real_estate_phaseout_threshold:
   imports: [26/1#filing_status]
@@ -196,3 +327,19 @@ variable rental_real_estate_phaseout_threshold:
     if is_mfs and lived_apart: return phaseout_start_mfs
     return phaseout_start
   default: 100000
+  tests:
+    - name: "Single filer - $100k threshold"
+      inputs: {filing_status: "single", phaseout_start: 100000}
+      expect: 100000
+    - name: "Married joint - $100k threshold"
+      inputs: {filing_status: "married_joint", phaseout_start: 100000}
+      expect: 100000
+    - name: "MFS living apart - $50k threshold"
+      inputs: {filing_status: "married_separate", lived_apart_from_spouse_all_year: true, phaseout_start_mfs: 50000}
+      expect: 50000
+    - name: "MFS living together - $100k threshold"
+      inputs: {filing_status: "married_separate", lived_apart_from_spouse_all_year: false, phaseout_start: 100000}
+      expect: 100000
+    - name: "Head of household - $100k threshold"
+      inputs: {filing_status: "head_of_household", phaseout_start: 100000}
+      expect: 100000

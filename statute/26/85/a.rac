@@ -1,7 +1,33 @@
 text: """
+26 USC Section 85(a) - General Rule
+
 (a) General rule.—In the case of an individual, gross income includes
 unemployment compensation.
+
+Definition of unemployment compensation per Section 85(c):
+The term "unemployment compensation" means any amount received by an individual under an
+unemployment compensation law of the United States or of any State, or under any other
+law (whether foreign or domestic) which provides unemployment benefits in connection with
+the loss of employment. This includes:
+- Federal unemployment insurance (UI)
+- State unemployment insurance
+- Railroad unemployment compensation
+- Trade adjustment assistance (TAA)
+- Other government-sponsored unemployment benefits
 """
+
+# Unemployment compensation is 100% included in gross income post-2020
+parameter unemployment_inclusion_rate:
+  description: "Fraction of unemployment compensation included in gross income"
+  unit: "percentage"
+  reference: "26 USC 85(a), post-2020 CARES Act provisions"
+  values:
+    2024-01-01: 1.0
+    2023-01-01: 1.0
+    2022-01-01: 1.0
+    2021-01-01: 1.0
+    2020-03-27: 1.0
+
 variable unemployment_compensation:
   entity: Person
   period: Year
@@ -9,3 +35,44 @@ variable unemployment_compensation:
   unit: "USD"
   label: "Unemployment Compensation"
   description: "Unemployment compensation received per 26 USC Section 85(a)"
+  default: 0
+  tests:
+    - name: "Typical unemployment benefit"
+      period: 2024-01
+      inputs: {}
+      expect: 0  # Default input
+    - name: "Moderate unemployment compensation"
+      period: 2024-01
+      inputs: {}
+      expect: 0
+
+variable person_unemployment_included:
+  imports:
+    - 26/85/a#unemployment_compensation
+  entity: Person
+  period: Year
+  dtype: Money
+  unit: "USD"
+  label: "Unemployment Compensation Included in Income"
+  description: "Amount of unemployment compensation included in gross income per 26 USC 85(a)"
+  syntax: python
+  formula: |
+    # Full unemployment compensation is included in income
+    return unemployment_compensation * unemployment_inclusion_rate
+  tests:
+    - name: "Unemployment fully included"
+      period: 2024-01
+      inputs: {unemployment_compensation: 6000}
+      expect: 6000
+    - name: "No unemployment"
+      period: 2024-01
+      inputs: {unemployment_compensation: 0}
+      expect: 0
+    - name: "High unemployment benefit"
+      period: 2024-01
+      inputs: {unemployment_compensation: 15000}
+      expect: 15000
+    - name: "Federal pandemic unemployment assistance (high amount)"
+      period: 2024-01
+      inputs: {unemployment_compensation: 3600}
+      expect: 3600

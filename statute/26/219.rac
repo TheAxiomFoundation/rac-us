@@ -9,25 +9,161 @@ contributions of the individual for the taxable year.
 (c) Special rules for certain married individuals.
 (g) Limitation on deduction for active participants in certain pension plans.
 """
-variable ira_deduction:
-  imports:
-    - 26/219/b#ira_contribution_limit
-    - 26/219/b#ira_max_deductible_contribution
-    - 26/219/b#traditional_ira_contributions
-    - 26/219/g#ira_phaseout_ratio
-    - 26/219/g#ira_deduction_after_phaseout
-    - 26/219/g#is_active_retirement_plan_participant
-    - 26/32/c/2/A#earned_income
-    - 26/1#filing_status
-    - 26/62/a#adjusted_gross_income
+
+input earned_income:
+  entity: Person
+  period: Year
+  dtype: Money
+  unit: "USD"
+  label: "Earned Income"
+  description: "Wages and self-employment income"
+  default: 0
+
+input adjusted_gross_income:
+  entity: Person
+  period: Year
+  dtype: Money
+  unit: "USD"
+  label: "Adjusted Gross Income"
+  description: "AGI for phaseout calculation"
+  default: 0
+
+input filing_status:
+  entity: Person
+  period: Year
+  dtype: Integer
+  label: "Filing Status"
+  description: "Filing status code"
+  default: 1
+
+input is_active_retirement_plan_participant:
   entity: Person
   period: Year
   dtype: Boolean
+  label: "Active Participant in Retirement Plan"
+  description: "Covered by employer retirement plan"
+  default: false
+
+input age:
+  entity: Person
+  period: Year
+  dtype: Integer
+  label: "Age"
+  description: "Age at year-end"
+  default: 0
+
+variable ira_deduction:
+  imports:
+    - 26/219/b#ira_contribution_limit
+    - 26/219/g#ira_deduction_after_phaseout
+  entity: Person
+  period: Year
+  dtype: Money
   unit: "USD"
-  label: "Eligible for Spousal IRA"
-  description: "Whether individual can contribute to IRA using spouse's compensation"
+  label: "Traditional IRA Deduction"
+  description: "Maximum traditional IRA deduction after phaseout"
   syntax: python
   formula: |
-    # Must have earned income to contribute (post-SECURE, no age limit)
-    if earned_income <= 0:
-    return 0
+    # Final IRA deduction is the amount after applying all phaseout rules
+    return ira_deduction_after_phaseout
+  default: 0
+  tests:
+    - name: "Young adult, no coverage, no phaseout (2024)"
+      period: 2024
+      inputs:
+        earned_income: 50000
+        adjusted_gross_income: 50000
+        filing_status: 1
+        is_active_retirement_plan_participant: false
+        age: 30
+      expect: 7000
+    - name: "Age 50+, no coverage (2024)"
+      period: 2024
+      inputs:
+        earned_income: 50000
+        adjusted_gross_income: 50000
+        filing_status: 1
+        is_active_retirement_plan_participant: false
+        age: 55
+      expect: 8000
+    - name: "Single, active participant, below phaseout (2024)"
+      period: 2024
+      inputs:
+        earned_income: 100000
+        adjusted_gross_income: 140000
+        filing_status: 1
+        is_active_retirement_plan_participant: true
+        age: 35
+      expect: 7000
+    - name: "Single, active participant, fully phased out (2024)"
+      period: 2024
+      inputs:
+        earned_income: 200000
+        adjusted_gross_income: 200000
+        filing_status: 1
+        is_active_retirement_plan_participant: true
+        age: 35
+      expect: 0
+    - name: "Single, active participant, partially phased out at midpoint (2024)"
+      period: 2024
+      inputs:
+        earned_income: 100000
+        adjusted_gross_income: 153500
+        filing_status: 1
+        is_active_retirement_plan_participant: true
+        age: 35
+      expect: 3500
+    - name: "Married filing jointly, active participant, below phaseout (2024)"
+      period: 2024
+      inputs:
+        earned_income: 100000
+        adjusted_gross_income: 120000
+        filing_status: 2
+        is_active_retirement_plan_participant: true
+        age: 40
+      expect: 7000
+    - name: "Married filing jointly, active participant, fully phased out (2024)"
+      period: 2024
+      inputs:
+        earned_income: 200000
+        adjusted_gross_income: 200000
+        filing_status: 2
+        is_active_retirement_plan_participant: true
+        age: 40
+      expect: 0
+    - name: "Married filing separately, active participant (2024)"
+      period: 2024
+      inputs:
+        earned_income: 100000
+        adjusted_gross_income: 5000
+        filing_status: 3
+        is_active_retirement_plan_participant: true
+        age: 40
+      expect: 3500
+    - name: "Zero earned income, no deduction"
+      period: 2024
+      inputs:
+        earned_income: 0
+        adjusted_gross_income: 100000
+        filing_status: 1
+        is_active_retirement_plan_participant: false
+        age: 40
+      expect: 0
+    - name: "Prior year 2023, age 50+, active participant at threshold"
+      period: 2023
+      inputs:
+        earned_income: 100000
+        adjusted_gross_income: 116000
+        filing_status: 1
+        is_active_retirement_plan_participant: true
+        age: 55
+      expect: 7500
+    - name: "Age 50+ catch-up with phaseout"
+      period: 2024
+      inputs:
+        earned_income: 100000
+        adjusted_gross_income: 155000
+        filing_status: 1
+        is_active_retirement_plan_participant: true
+        age: 52
+      expect: 4000

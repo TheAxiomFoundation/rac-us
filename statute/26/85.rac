@@ -1,3 +1,20 @@
+text: """
+26 USC Section 85 - Unemployment Compensation
+
+(a) General rule.—In the case of an individual, gross income includes unemployment
+compensation.
+
+(b) Exceptions.—
+(1) Amounts excluded.—Gross income does not include any amount of unemployment
+compensation which, pursuant to section 104(a)(1), is not includible in gross income.
+
+(c) Unemployment compensation defined.—For purposes of this section, the term
+"unemployment compensation" means any amount received by an individual under an
+unemployment compensation law of the United States or of any State, or under any
+other law (whether foreign or domestic) which provides unemployment benefits in
+connection with the loss of employment.
+"""
+
 variable unemployment_in_agi:
   imports: [26/85/a#unemployment_compensation]
   entity: TaxUnit
@@ -12,3 +29,24 @@ variable unemployment_in_agi:
     # Post-2020: Full amount is included in gross income
     return sum(members.unemployment_compensation)
   default: 0
+  tests:
+    - name: "Single person with unemployment"
+      period: 2024-01
+      inputs:
+        members: [{unemployment_compensation: 2400}]
+      expect: 2400
+    - name: "Two earners with unemployment"
+      period: 2024-01
+      inputs:
+        members: [{unemployment_compensation: 3000}, {unemployment_compensation: 1500}]
+      expect: 4500
+    - name: "No unemployment"
+      period: 2024-01
+      inputs:
+        members: [{unemployment_compensation: 0}]
+      expect: 0
+    - name: "Multiple members, some without unemployment"
+      period: 2024-01
+      inputs:
+        members: [{unemployment_compensation: 2400}, {unemployment_compensation: 0}]
+      expect: 2400

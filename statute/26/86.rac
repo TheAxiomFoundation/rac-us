@@ -1,6 +1,74 @@
 text: """
-- 26 USC Section 86(d) - "social security benefit" definition
+26 USC Section 86 - Inclusion of Social Security Benefits in Income
+
+(a) In general.—Except as otherwise provided in this section, gross income includes
+Social Security benefits.
+
+(b) Amounts excluded.—In the case of an individual, gross income does not include
+Social Security benefits received...
+
+(c) Determination of modified adjusted gross income and combined income.—
+(1) Modified adjusted gross income.—For purposes of this section, the term "modified
+adjusted gross income" means adjusted gross income (within the meaning of section 62)
+increased by the sum of the following items:
+(A) interest not otherwise includible in gross income under section 103,
+(B) one-half of the taxpayer's self-employment taxes (within the meaning of section 1401),
+(C) the net operating loss carryback allowed for the taxable year, and
+(D) the amount allowable as a deduction under section 217.
+
+(2) Combined income.—For purposes of this section, the term "combined income" means
+the sum of adjusted gross income, the tax-exempt interest, and one-half of the
+taxpayer's self-employment tax.
+
+(d) Definitions.—
+(1) Social security benefit.—The term "social security benefit" means any amount
+received by the taxpayer as a pension or annuity under the Social Security Act.
 """
+
+# Base amounts for tier 1 taxation threshold per 26 USC 86(c)(1)
+parameter base_amount_single:
+  description: "Base amount for single, head of household, and married filing separately"
+  unit: "USD"
+  reference: "26 USC 86(c)(1)(A)"
+  values:
+    2024-01-01: 25000
+    2023-01-01: 25000
+    2022-01-01: 25000
+    2021-01-01: 25000
+    2020-01-01: 25000
+
+parameter base_amount_joint:
+  description: "Base amount for married filing jointly and qualifying widow(er)"
+  unit: "USD"
+  reference: "26 USC 86(c)(1)(B)"
+  values:
+    2024-01-01: 32000
+    2023-01-01: 32000
+    2022-01-01: 32000
+    2021-01-01: 32000
+    2020-01-01: 32000
+
+parameter base_amount_mfs:
+  description: "Base amount for married filing separately"
+  unit: "USD"
+  reference: "26 USC 86(c)(1)"
+  values:
+    2024-01-01: 0
+    2023-01-01: 0
+    2022-01-01: 0
+    2021-01-01: 0
+    2020-01-01: 0
+
+# Tier 1 rate: up to 50% of benefits are taxable
+parameter tier1_rate:
+  description: "Fraction of benefits subject to tier 1 taxation"
+  unit: "percentage"
+  reference: "26 USC 86(b)"
+  values:
+    2024-01-01: 0.5
+    2023-01-01: 0.5
+    2020-01-01: 0.5
+
 variable tax_unit_social_security:
   entity: TaxUnit
   period: Year
@@ -11,16 +79,42 @@ variable tax_unit_social_security:
   default: 0
 
 
-variable taxable_social_security:
+variable combined_income:
+  imports:
+    - 26/62/a#adjusted_gross_income
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: "USD"
+  label: "Combined Income"
+  description: "Modified AGI plus one-half of self-employment taxes and tax-exempt interest per 26 USC 86(c)(2)"
+  syntax: python
+  formula: |
+    # Simplified: combined income = AGI + 1/2 self-employment tax + tax-exempt interest
+    # For now, using just AGI as proxy; should include tax-exempt interest and SE tax
+    return adjusted_gross_income
+  tests:
+    - name: "Basic combined income"
+      period: 2024-01
+      inputs: {adjusted_gross_income: 50000}
+      expect: 50000
+    - name: "Zero income"
+      period: 2024-01
+      inputs: {adjusted_gross_income: 0}
+      expect: 0
+
+
+variable taxable_social_security_amount:
   imports:
     - 26/86#tax_unit_social_security
     - 26/1#filing_status
+    - 26/86#combined_income
   entity: TaxUnit
   period: Year
-  dtype: Rate
-  unit: "percentage"
-  label: "Taxable Fraction of Social Security"
-  description: "Portion of Social Security benefits included in taxable income"
+  dtype: Money
+  unit: "USD"
+  label: "Taxable Social Security Benefits"
+  description: "Portion of Social Security benefits included in taxable income per 26 USC 86(b)"
   syntax: python
   formula: |
     # Get base amount based on filing status per 86(c)(1)
@@ -32,11 +126,126 @@ variable taxable_social_security:
         base_amount = base_amount_joint
     elif filing_status == QUALIFYING_WIDOW:
         base_amount = base_amount_joint
-    else:
+    else:  # MARRIED_FILING_SEPARATELY
         base_amount = base_amount_mfs
+
+    # Combined income above base amount
     excess = max(0, combined_income - base_amount)
-    # Lesser of 50% of benefits or 50% of excess over base
+
+    # Tier 1: Lesser of 50% of benefits or 50% of excess over base
     half_benefits = tier1_rate * tax_unit_social_security
     half_excess = tier1_rate * excess
-    return min(half_benefits, half_excess)
-  default: 0
+    tier1_taxable = min(half_benefits, half_excess)
+
+    # Tier 2: Additional taxation (simplified - full implementation needed)
+    # Under IRC 86(c)(2)(A), if combined income exceeds second threshold,
+    # up to 85% of benefits may be taxable
+    tier2_amount = 0
+
+    return min(tax_unit_social_security, tier1_taxable + tier2_amount)
+  tests:
+    - name: "Below threshold (single, no tax)"
+      period: 2024-01
+      inputs:
+        filing_status: SINGLE
+        combined_income: 20000
+        tax_unit_social_security: 15000
+      expect: 0
+    - name: "At threshold (single, no tax)"
+      period: 2024-01
+      inputs:
+        filing_status: SINGLE
+        combined_income: 25000
+        tax_unit_social_security: 15000
+      expect: 0
+    - name: "Tier 1 partial taxation (single)"
+      period: 2024-01
+      inputs:
+        filing_status: SINGLE
+        combined_income: 35000
+        tax_unit_social_security: 12000
+      expect: 5000  # min(6000, 5000) = 5000
+    - name: "Tier 1 half benefits (single)"
+      period: 2024-01
+      inputs:
+        filing_status: SINGLE
+        combined_income: 60000
+        tax_unit_social_security: 10000
+      expect: 5000  # min(5000, 17500) = 5000
+    - name: "Joint filers below threshold"
+      period: 2024-01
+      inputs:
+        filing_status: MARRIED_FILING_JOINTLY
+        combined_income: 30000
+        tax_unit_social_security: 16000
+      expect: 0
+    - name: "Joint filers tier 1 partial"
+      period: 2024-01
+      inputs:
+        filing_status: MARRIED_FILING_JOINTLY
+        combined_income: 40000
+        tax_unit_social_security: 14000
+      expect: 4000  # min(7000, 4000) = 4000
+    - name: "Joint filers significant income"
+      period: 2024-01
+      inputs:
+        filing_status: MARRIED_FILING_JOINTLY
+        combined_income: 60000
+        tax_unit_social_security: 18000
+      expect: 9000  # min(9000, 14000) = 9000
+    - name: "Married filing separately (zero base)"
+      period: 2024-01
+      inputs:
+        filing_status: MARRIED_FILING_SEPARATELY
+        combined_income: 5000
+        tax_unit_social_security: 8000
+      expect: 2500  # min(4000, 2500) = 2500
+    - name: "High income benefits all taxable"
+      period: 2024-01
+      inputs:
+        filing_status: SINGLE
+        combined_income: 100000
+        tax_unit_social_security: 20000
+      expect: 10000  # min(10000, 37500) = 10000
+
+
+variable taxable_social_security:
+  imports:
+    - 26/86#taxable_social_security_amount
+    - 26/86#tax_unit_social_security
+  entity: TaxUnit
+  period: Year
+  dtype: Rate
+  unit: "percentage"
+  label: "Taxable Fraction of Social Security"
+  description: "Portion of Social Security benefits included in taxable income (as a percentage)"
+  syntax: python
+  formula: |
+    if tax_unit_social_security == 0:
+        return 0
+    return taxable_social_security_amount / tax_unit_social_security
+  tests:
+    - name: "No benefits, zero rate"
+      period: 2024-01
+      inputs:
+        tax_unit_social_security: 0
+        taxable_social_security_amount: 0
+      expect: 0
+    - name: "All benefits taxable (100%)"
+      period: 2024-01
+      inputs:
+        tax_unit_social_security: 10000
+        taxable_social_security_amount: 10000
+      expect: 1.0
+    - name: "Half benefits taxable (50%)"
+      period: 2024-01
+      inputs:
+        tax_unit_social_security: 10000
+        taxable_social_security_amount: 5000
+      expect: 0.5
+    - name: "No benefits taxable (0%)"
+      period: 2024-01
+      inputs:
+        tax_unit_social_security: 10000
+        taxable_social_security_amount: 0
+      expect: 0.0

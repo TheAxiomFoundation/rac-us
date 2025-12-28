@@ -1,9 +1,12 @@
 text: """
+IRC § 223(b) - Limitations on HSA Contributions
+
 (b) Limitations.—
 (1) In general.—The amount allowable as a deduction under subsection
 (a) to an individual for the taxable year shall not exceed the
 sum of the monthly limitations for months during such taxable
 year that the individual is an eligible individual.
+
 (2) Monthly limitation.—The monthly limitation for any month is
 1/12 of—
 (A) in the case of an eligible individual who has self-only
@@ -12,6 +15,7 @@ day of such month, $2,250 ($4,150 for 2024), and
 (B) in the case of an eligible individual who has family
 coverage under a high deductible health plan as of the first
 day of such month, $4,500 ($8,300 for 2024).
+
 (3) Additional contributions for individuals 55 or older.—
 (A) In general.—In the case of an individual who has attained
 age 55 before the close of the taxable year, the applicable
@@ -19,6 +23,7 @@ limitation under subparagraphs (A) and (B) of paragraph (2)
 shall be increased by the additional contribution amount.
 (B) Additional contribution amount.—For purposes of this section,
 the term 'additional contribution amount' means $1,000.
+
 (5) Special rule for married individuals.—In the case of individuals
 who are married to each other, if either spouse has family
 coverage—
@@ -26,54 +31,208 @@ coverage—
 and
 (B) the limitation under paragraph (1) shall be divided equally
 between them unless they agree on a different division.
+
 (6) Denial of deduction to dependents.—No deduction shall be
 allowed under this section to any individual with respect to
 whom a deduction under section 151 is allowable to another
 taxpayer for a taxable year beginning in the calendar year in
 which such individual's taxable year begins.
+
 (7) Medicare eligible individuals.—The limitation under this
 subsection for any month with respect to an individual shall
 be zero for the first month such individual is entitled to
 benefits under title XVIII of the Social Security Act and for
 each month thereafter.
 """
-variable contribution_limits:
+
+# Inputs
+input hsa_coverage_type:
+  entity: Person
+  period: Year
+  dtype: String
+  label: "HSA Coverage Type"
+  description: "Type of HDHP coverage (self_only or family)"
+  default: "self_only"
+
+input age:
+  entity: Person
+  period: Year
+  dtype: Integer
+  label: "Age"
+  description: "Individual's age during the taxable year"
+  default: 0
+
+input months_of_coverage:
+  entity: Person
+  period: Year
+  dtype: Integer
+  label: "Months of HDHP Coverage"
+  description: "Number of months during year with eligible HDHP coverage"
+  default: 12
+
+# Parameters
+parameter hsa_limit_self_only:
+  values:
+    2024-01-01: 4150
+  unit: "USD"
+  period: Year
+  label: "HSA Annual Limit - Self-Only Coverage"
+  description: "Maximum annual HSA contribution for self-only HDHP coverage (2024)"
+  reference: "26 USC § 223(b)(2)(A)"
+
+parameter hsa_limit_family:
+  values:
+    2024-01-01: 8300
+  unit: "USD"
+  period: Year
+  label: "HSA Annual Limit - Family Coverage"
+  description: "Maximum annual HSA contribution for family HDHP coverage (2024)"
+  reference: "26 USC § 223(b)(2)(B)"
+
+parameter hsa_catchup_contribution:
+  values:
+    2024-01-01: 1000
+  unit: "USD"
+  period: Year
+  label: "HSA Catch-up Contribution (Age 55+)"
+  description: "Additional annual HSA contribution allowed for individuals age 55+"
+  reference: "26 USC § 223(b)(3)(B)"
+
+parameter catchup_age_threshold:
+  values:
+    1977-01-01: 55
+  unit: "/1"
+  period: Year
+  label: "Age Threshold for Catch-up Contributions"
+  description: "Minimum age to qualify for HSA catch-up contributions"
+  reference: "26 USC § 223(b)(3)(A)"
+
+parameter months_per_year:
+  values:
+    1977-01-01: 12
+  unit: "/1"
+  period: Year
+  label: "Months Per Year"
+  description: "Number of months in a calendar year"
+  reference: "Standard calendar year"
+
+# Variables
+variable hsa_annual_contribution_limit:
   entity: Person
   period: Year
   dtype: Money
   unit: "USD"
-  label: "HSA Excess Contributions"
-  description: "Contributions exceeding the limit (subject to excise tax)"
-  formula: return hsa_contributions_self + hsa_contributions_employer
-  default: 12
+  label: "HSA Annual Contribution Limit"
+  description: "Maximum HSA contribution for the year based on coverage type, before catch-up"
+  syntax: python
+  formula: |
+    # Section 223(b)(2): Base limit depends on coverage type
+    if hsa_coverage_type == "self_only":
+      return hsa_limit_self_only
+    elif hsa_coverage_type == "family":
+      return hsa_limit_family
+    else:
+      return 0
+  tests:
+    - name: "Self-only coverage limit"
+      inputs:
+        hsa_coverage_type: "self_only"
+        age: 45
+        months_of_coverage: 12
+      expect: 4150
+    - name: "Family coverage limit"
+      inputs:
+        hsa_coverage_type: "family"
+        age: 45
+        months_of_coverage: 12
+      expect: 8300
+    - name: "Invalid coverage type"
+      inputs:
+        hsa_coverage_type: "invalid"
+        age: 45
+        months_of_coverage: 12
+      expect: 0
 
-
-variable hdhp_requirements:
+variable hsa_catchup_eligible:
   entity: Person
   period: Year
   dtype: Boolean
-  unit: "USD"
-  label: "Can Be Claimed as Dependent"
-  description: "Whether the individual can be claimed as a dependent on another person's return"
+  label: "HSA Catch-up Contribution Eligible"
+  description: "Whether individual qualifies for additional $1,000 catch-up contribution (age 55+)"
   syntax: python
   formula: |
-    if hdhp_coverage_type == self_only: return hdhp_min_deductible_self_only
-    if hdhp_coverage_type == family: return hdhp_min_deductible_family
-    return 0
-  default: false
+    # Section 223(b)(3)(A): Age 55 or older by end of taxable year
+    return age >= catchup_age_threshold
+  tests:
+    - name: "Age 55 eligible for catch-up"
+      inputs:
+        age: 55
+        hsa_coverage_type: "self_only"
+        months_of_coverage: 12
+      expect: true
+    - name: "Age 54 not eligible for catch-up"
+      inputs:
+        age: 54
+        hsa_coverage_type: "self_only"
+        months_of_coverage: 12
+      expect: false
+    - name: "Age 65 eligible for catch-up"
+      inputs:
+        age: 65
+        hsa_coverage_type: "family"
+        months_of_coverage: 12
+      expect: true
 
-
-variable hsa_deduction:
-  imports:
+variable hsa_total_contribution_limit:
   entity: Person
   period: Year
   dtype: Money
   unit: "USD"
-  label: "HSA Additional Tax"
-  description: "20% additional tax on non-qualified HSA distributions"
+  label: "HSA Total Contribution Limit"
+  description: "Maximum HSA contribution including catch-up contributions, pro-rated by months"
   syntax: python
   formula: |
-    # Must be an eligible individual
-    if not is_hsa_eligible:
-    return 0
-  default: false
+    # Section 223(b)(1)-(3): Total limit = base limit + catch-up (if eligible)
+    base_limit = hsa_annual_contribution_limit
+    catchup_amount = 0
+
+    if hsa_catchup_eligible:
+      catchup_amount = hsa_catchup_contribution
+
+    total_limit = base_limit + catchup_amount
+
+    # Pro-rate by months of coverage (monthly limit × months)
+    prorated_limit = (total_limit / months_per_year) * months_of_coverage
+
+    return prorated_limit
+  tests:
+    - name: "Self-only, age 45, full year"
+      inputs:
+        hsa_coverage_type: "self_only"
+        age: 45
+        months_of_coverage: 12
+      expect: 4150
+    - name: "Self-only, age 55, full year with catch-up"
+      inputs:
+        hsa_coverage_type: "self_only"
+        age: 55
+        months_of_coverage: 12
+      expect: 5150
+    - name: "Family, age 60, full year with catch-up"
+      inputs:
+        hsa_coverage_type: "family"
+        age: 60
+        months_of_coverage: 12
+      expect: 9300
+    - name: "Self-only, age 55, 6 months coverage with catch-up"
+      inputs:
+        hsa_coverage_type: "self_only"
+        age: 55
+        months_of_coverage: 6
+      expect: 2575
+    - name: "Family, age 45, 3 months coverage"
+      inputs:
+        hsa_coverage_type: "family"
+        age: 45
+        months_of_coverage: 3
+      expect: 2075

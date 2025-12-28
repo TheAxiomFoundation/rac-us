@@ -5,6 +5,89 @@ the sum of—
 (1) the American Opportunity Tax Credit, plus
 (2) the Lifetime Learning Credit.
 """
+
+parameter aotc_phaseout_start_mfj:
+  description: "Income threshold for AOTC phaseout (Married Filing Jointly)"
+  unit: USD
+  source: "26 USC 25A(d)(2)"
+  values:
+    2024-01-01: 160000
+    2023-01-01: 160000
+
+parameter aotc_phaseout_end_mfj:
+  description: "Income threshold for complete AOTC phaseout (Married Filing Jointly)"
+  unit: USD
+  source: "26 USC 25A(d)(2)"
+  values:
+    2024-01-01: 180000
+    2023-01-01: 180000
+
+parameter aotc_phaseout_start_single:
+  description: "Income threshold for AOTC phaseout (Single)"
+  unit: USD
+  source: "26 USC 25A(d)(2)"
+  values:
+    2024-01-01: 80000
+    2023-01-01: 80000
+
+parameter aotc_phaseout_end_single:
+  description: "Income threshold for complete AOTC phaseout (Single)"
+  unit: USD
+  source: "26 USC 25A(d)(2)"
+  values:
+    2024-01-01: 90000
+    2023-01-01: 90000
+
+parameter llc_phaseout_start_mfj:
+  description: "Income threshold for LLC phaseout (Married Filing Jointly)"
+  unit: USD
+  source: "26 USC 25A(d)(2)"
+  values:
+    2024-01-01: 160000
+    2023-01-01: 160000
+
+parameter llc_phaseout_end_mfj:
+  description: "Income threshold for complete LLC phaseout (Married Filing Jointly)"
+  unit: USD
+  source: "26 USC 25A(d)(2)"
+  values:
+    2024-01-01: 180000
+    2023-01-01: 180000
+
+parameter llc_phaseout_start_single:
+  description: "Income threshold for LLC phaseout (Single)"
+  unit: USD
+  source: "26 USC 25A(d)(2)"
+  values:
+    2024-01-01: 80000
+    2023-01-01: 80000
+
+parameter llc_phaseout_end_single:
+  description: "Income threshold for complete LLC phaseout (Single)"
+  unit: USD
+  source: "26 USC 25A(d)(2)"
+  values:
+    2024-01-01: 90000
+    2023-01-01: 90000
+
+input american_opportunity_credit:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: "USD"
+  label: "American Opportunity Tax Credit"
+  description: "Calculated AOTC before phaseout and refundable portion"
+  default: 0
+
+input lifetime_learning_credit:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: "USD"
+  label: "Lifetime Learning Credit"
+  description: "Calculated LLC before phaseout"
+  default: 0
+
 variable education_credits:
   imports:
     - 26/62/a#adjusted_gross_income
@@ -15,5 +98,63 @@ variable education_credits:
   unit: "USD"
   label: "Education Credit"
   description: "Total education credit claimed (nonrefundable + refundable) per 26 USC § 25A"
-  formula: return american_opportunity_credit + lifetime_learning_credit
+  syntax: python
+  formula: |
+    return american_opportunity_credit + lifetime_learning_credit
   default: 0
+  tests:
+    - name: "No education credits"
+      period: 2024
+      inputs:
+        american_opportunity_credit: 0
+        lifetime_learning_credit: 0
+      expect: 0
+
+    - name: "AOTC only at maximum"
+      period: 2024
+      inputs:
+        american_opportunity_credit: 2500
+        lifetime_learning_credit: 0
+      expect: 2500
+
+    - name: "LLC only at maximum"
+      period: 2024
+      inputs:
+        american_opportunity_credit: 0
+        lifetime_learning_credit: 2000
+      expect: 2000
+
+    - name: "Combined credits"
+      period: 2024
+      inputs:
+        american_opportunity_credit: 2500
+        lifetime_learning_credit: 2000
+      expect: 4500
+
+    - name: "Partial AOTC and partial LLC"
+      period: 2024
+      inputs:
+        american_opportunity_credit: 1500
+        lifetime_learning_credit: 1000
+      expect: 2500
+
+    - name: "Small AOTC only"
+      period: 2024
+      inputs:
+        american_opportunity_credit: 500
+        lifetime_learning_credit: 0
+      expect: 500
+
+    - name: "Small LLC only"
+      period: 2024
+      inputs:
+        american_opportunity_credit: 0
+        lifetime_learning_credit: 300
+      expect: 300
+
+    - name: "Equal AOTC and LLC"
+      period: 2024
+      inputs:
+        american_opportunity_credit: 2000
+        lifetime_learning_credit: 2000
+      expect: 4000

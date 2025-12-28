@@ -4,19 +4,155 @@ to any individual for any taxable year shall not exceed the lesser of--
 (A) the deductible amount, or
 (B) an amount equal to the compensation includible in the individual's
 gross income for such taxable year.
+(5) Catch-up contributions.--In the case of an individual who has
+attained age 50 before the close of the taxable year, the amount
+applicable under paragraph (1) shall be increased by an amount equal to
+the applicable catch-up contribution amount.
 """
-variable contribution_limits:
+
+input earned_income:
+  entity: Person
+  period: Year
+  dtype: Money
+  unit: "USD"
+  label: "Earned Income"
+  description: "Wages and self-employment income"
+  default: 0
+
+input age:
+  entity: Person
+  period: Year
+  dtype: Integer
+  label: "Age"
+  description: "Person's age at year-end"
+  default: 0
+
+parameter ira_base_limit:
+  description: "Standard IRA contribution limit per taxpayer"
+  unit: currency-USD
+  source: "26 USC 219(b)(1)(A)"
+  values:
+    2024-01-01: 7000
+    2023-01-01: 6500
+    2022-01-01: 6000
+
+parameter ira_catch_up_amount:
+  description: "Additional catch-up contribution for taxpayers age 50 or older"
+  unit: currency-USD
+  source: "26 USC 219(b)(5)(B)"
+  values:
+    2024-01-01: 1000
+    2023-01-01: 1000
+    2022-01-01: 1000
+
+parameter catch_up_age:
+  description: "Age at which taxpayer becomes eligible for catch-up contributions"
+  unit: years
+  source: "26 USC 219(b)(5)"
+  values:
+    1974-01-01: 50
+
+variable ira_contribution_limit:
   imports: [26/32/c/2/A#earned_income]
   entity: Person
   period: Year
   dtype: Money
   unit: "USD"
   label: "Maximum Deductible IRA Contribution"
-  description: "Lesser of contribution limit or compensation"
+  description: "IRA contribution limit before phaseout, lesser of earned income or statutory limit"
   syntax: python
   formula: |
-    base_limit = deductible_amount
+    base_limit = ira_base_limit
     # 219(b)(5)(B): Add catch-up for age 50+
     if age >= catch_up_age:
-        return base_limit + catch_up_amount
-    return base_limit
+        limit = base_limit + ira_catch_up_amount
+    else:
+        limit = base_limit
+    # 219(b)(1)(B): Cannot exceed earned income
+    return min(limit, max(0, earned_income))
+  default: 0
+  tests:
+    - name: "Under 50 with full earned income (2024)"
+      period: 2024
+      inputs:
+        earned_income: 50000
+        age: 45
+      expect: 7000
+    - name: "Age 50 with full earned income (2024)"
+      period: 2024
+      inputs:
+        earned_income: 50000
+        age: 50
+      expect: 8000
+    - name: "Age 51 with full earned income (2024)"
+      period: 2024
+      inputs:
+        earned_income: 50000
+        age: 51
+      expect: 8000
+    - name: "Age 49 (catch-up not yet available)"
+      period: 2024
+      inputs:
+        earned_income: 50000
+        age: 49
+      expect: 7000
+    - name: "Under 50 with low earned income (2024)"
+      period: 2024
+      inputs:
+        earned_income: 5000
+        age: 40
+      expect: 5000
+    - name: "Age 50+ with low earned income (2024)"
+      period: 2024
+      inputs:
+        earned_income: 7500
+        age: 55
+      expect: 7500
+    - name: "Zero earned income (2024)"
+      period: 2024
+      inputs:
+        earned_income: 0
+        age: 45
+      expect: 0
+    - name: "Prior year 2023 under 50"
+      period: 2023
+      inputs:
+        earned_income: 50000
+        age: 45
+      expect: 6500
+    - name: "Prior year 2023 age 50+"
+      period: 2023
+      inputs:
+        earned_income: 50000
+        age: 50
+      expect: 7500
+    - name: "Negative earned income floor"
+      period: 2024
+      inputs:
+        earned_income: -1000
+        age: 45
+      expect: 0
+
+variable ira_max_deductible_contribution:
+  entity: Person
+  period: Year
+  dtype: Money
+  unit: "USD"
+  label: "Maximum Deductible IRA Contribution (alias)"
+  description: "Alias for ira_contribution_limit for backward compatibility"
+  formula: return ira_contribution_limit
+  default: 0
+
+variable traditional_ira_contributions:
+  entity: Person
+  period: Year
+  dtype: Money
+  unit: "USD"
+  label: "Traditional IRA Contributions"
+  description: "Actual traditional IRA contributions made"
+  syntax: python
+  formula: |
+    # This would be an input in practice, but for testing
+    # returns the maximum allowed contribution
+    return ira_contribution_limit
+  default: 0
