@@ -111,6 +111,7 @@ variable standard_deduction:
         return 0
     return basic + additional_standard_deduction
   tests:
+    # FILING STATUS: Single
     - name: "Single filer 2024"
       period: 2024-01
       inputs:
@@ -120,7 +121,54 @@ variable standard_deduction:
         age: 30
         is_blind: false
       expect: 14600
-    - name: "Married filing jointly 2024"
+      description: "Basic single filer, no dependent, no aged/blind credits"
+
+    - name: "Single aged exactly 65 2024"
+      period: 2024-01
+      inputs:
+        filing_status: SINGLE
+        is_dependent: false
+        is_ineligible_for_standard_deduction: false
+        age: 65
+        is_blind: false
+      expect: 16550
+      description: "Single filer at minimum aged threshold (65)"
+
+    - name: "Single aged 67 2024"
+      period: 2024-01
+      inputs:
+        filing_status: SINGLE
+        is_dependent: false
+        is_ineligible_for_standard_deduction: false
+        age: 67
+        is_blind: false
+      expect: 16550
+      description: "Single aged 65+ gets additional $1,950"
+
+    - name: "Single blind 2024"
+      period: 2024-01
+      inputs:
+        filing_status: SINGLE
+        is_dependent: false
+        is_ineligible_for_standard_deduction: false
+        age: 40
+        is_blind: true
+      expect: 16550
+      description: "Single blind person gets additional $1,950"
+
+    - name: "Single aged and blind 2024"
+      period: 2024-01
+      inputs:
+        filing_status: SINGLE
+        is_dependent: false
+        is_ineligible_for_standard_deduction: false
+        age: 70
+        is_blind: true
+      expect: 18500
+      description: "Single filer qualifies for both aged and blind: $14,600 + $1,950 + $1,950"
+
+    # FILING STATUS: Married Filing Jointly
+    - name: "Married filing jointly under 65 2024"
       period: 2024-01
       inputs:
         filing_status: MARRIED_FILING_JOINTLY
@@ -131,34 +179,22 @@ variable standard_deduction:
         is_blind: false
         spouse_is_blind: false
       expect: 29200
-    - name: "Head of household 2024"
+      description: "Married couple, both under 65, no blind credits"
+
+    - name: "Married filing jointly one aged 2024"
       period: 2024-01
       inputs:
-        filing_status: HEAD_OF_HOUSEHOLD
-        is_dependent: false
-        is_ineligible_for_standard_deduction: false
-        age: 35
-        is_blind: false
-      expect: 21900
-    - name: "Single aged 65+ 2024"
-      period: 2024-01
-      inputs:
-        filing_status: SINGLE
+        filing_status: MARRIED_FILING_JOINTLY
         is_dependent: false
         is_ineligible_for_standard_deduction: false
         age: 67
+        spouse_age: 60
         is_blind: false
-      expect: 16550
-    - name: "Single aged and blind 2024"
-      period: 2024-01
-      inputs:
-        filing_status: SINGLE
-        is_dependent: false
-        is_ineligible_for_standard_deduction: false
-        age: 70
-        is_blind: true
-      expect: 18500
-    - name: "Married both aged 2024"
+        spouse_is_blind: false
+      expect: 30750
+      description: "One spouse 65+: $29,200 + $1,550"
+
+    - name: "Married filing jointly both aged 2024"
       period: 2024-01
       inputs:
         filing_status: MARRIED_FILING_JOINTLY
@@ -169,6 +205,126 @@ variable standard_deduction:
         is_blind: false
         spouse_is_blind: false
       expect: 32300
+      description: "Both aged 65+: $29,200 + $1,550 + $1,550"
+
+    - name: "Married filing jointly both blind 2024"
+      period: 2024-01
+      inputs:
+        filing_status: MARRIED_FILING_JOINTLY
+        is_dependent: false
+        is_ineligible_for_standard_deduction: false
+        age: 45
+        spouse_age: 43
+        is_blind: true
+        spouse_is_blind: true
+      expect: 32300
+      description: "Both blind: $29,200 + $1,550 + $1,550"
+
+    - name: "Married filing jointly both aged and both blind 2024"
+      period: 2024-01
+      inputs:
+        filing_status: MARRIED_FILING_JOINTLY
+        is_dependent: false
+        is_ineligible_for_standard_deduction: false
+        age: 72
+        spouse_age: 70
+        is_blind: true
+        spouse_is_blind: true
+      expect: 35400
+      description: "Both 65+ and both blind: $29,200 + (1,550 × 2) + (1,550 × 2)"
+
+    # FILING STATUS: Married Filing Separately
+    - name: "Married filing separately 2024"
+      period: 2024-01
+      inputs:
+        filing_status: MARRIED_FILING_SEPARATELY
+        is_dependent: false
+        is_ineligible_for_standard_deduction: false
+        age: 45
+        is_blind: false
+      expect: 14600
+      description: "MFS uses single amount when eligible"
+
+    - name: "Married filing separately aged 2024"
+      period: 2024-01
+      inputs:
+        filing_status: MARRIED_FILING_SEPARATELY
+        is_dependent: false
+        is_ineligible_for_standard_deduction: false
+        age: 66
+        is_blind: false
+      expect: 16150
+      description: "MFS aged 65+ uses married aged amount: $14,600 + $1,550"
+
+    - name: "Married filing separately spouse itemizes 2024"
+      period: 2024-01
+      inputs:
+        filing_status: MARRIED_FILING_SEPARATELY
+        is_dependent: false
+        is_ineligible_for_standard_deduction: true
+        age: 45
+        is_blind: false
+      expect: 0
+      description: "MFS ineligible when spouse itemizes per 63(c)(6)(A)"
+
+    # FILING STATUS: Head of Household
+    - name: "Head of household 2024"
+      period: 2024-01
+      inputs:
+        filing_status: HEAD_OF_HOUSEHOLD
+        is_dependent: false
+        is_ineligible_for_standard_deduction: false
+        age: 35
+        is_blind: false
+      expect: 21900
+      description: "Head of household basic amount"
+
+    - name: "Head of household aged 2024"
+      period: 2024-01
+      inputs:
+        filing_status: HEAD_OF_HOUSEHOLD
+        is_dependent: false
+        is_ineligible_for_standard_deduction: false
+        age: 66
+        is_blind: false
+      expect: 23850
+      description: "HOH aged 65+ uses single aged amount: $21,900 + $1,950"
+
+    - name: "Head of household blind 2024"
+      period: 2024-01
+      inputs:
+        filing_status: HEAD_OF_HOUSEHOLD
+        is_dependent: false
+        is_ineligible_for_standard_deduction: false
+        age: 40
+        is_blind: true
+      expect: 23850
+      description: "HOH blind uses single blind amount: $21,900 + $1,950"
+
+    # FILING STATUS: Qualifying Widow(er)
+    - name: "Qualifying widow 2024"
+      period: 2024-01
+      inputs:
+        filing_status: QUALIFYING_WIDOW
+        is_dependent: false
+        is_ineligible_for_standard_deduction: false
+        age: 50
+        is_blind: false
+      expect: 29200
+      description: "QW uses married (joint) amount"
+
+    - name: "Qualifying widow aged 2024"
+      period: 2024-01
+      inputs:
+        filing_status: QUALIFYING_WIDOW
+        is_dependent: false
+        is_ineligible_for_standard_deduction: false
+        age: 68
+        is_blind: false
+      expect: 30750
+      description: "QW aged uses married aged amount: $29,200 + $1,550"
+
+    # DEPENDENT STANDARD DEDUCTION
     - name: "Dependent with no earned income 2024"
       period: 2024-01
       inputs:
@@ -179,6 +335,32 @@ variable standard_deduction:
         age: 16
         is_blind: false
       expect: 1300
+      description: "Dependent minimum floor per 63(c)(5)(A)"
+
+    - name: "Dependent exactly at threshold $850 2024"
+      period: 2024-01
+      inputs:
+        filing_status: SINGLE
+        is_dependent: true
+        is_ineligible_for_standard_deduction: false
+        earned_income: 850
+        age: 17
+        is_blind: false
+      expect: 1300
+      description: "Dependent earned income at threshold: still gets minimum $1,300"
+
+    - name: "Dependent just above threshold $900 2024"
+      period: 2024-01
+      inputs:
+        filing_status: SINGLE
+        is_dependent: true
+        is_ineligible_for_standard_deduction: false
+        earned_income: 900
+        age: 17
+        is_blind: false
+      expect: 1350
+      description: "Dependent formula: $250 + $900 earned income = $1,150, capped at $14,600"
+
     - name: "Dependent with $5000 earned income 2024"
       period: 2024-01
       inputs:
@@ -189,6 +371,8 @@ variable standard_deduction:
         age: 17
         is_blind: false
       expect: 5450
+      description: "Dependent formula: $250 + $5,000 = $5,250, includes addon"
+
     - name: "Dependent earned income capped at basic 2024"
       period: 2024-01
       inputs:
@@ -199,7 +383,34 @@ variable standard_deduction:
         age: 19
         is_blind: false
       expect: 14600
-    - name: "Ineligible - MFS spouse itemizes"
+      description: "Dependent cannot exceed basic single deduction of $14,600"
+
+    - name: "Dependent aged also uses limit 2024"
+      period: 2024-01
+      inputs:
+        filing_status: SINGLE
+        is_dependent: true
+        is_ineligible_for_standard_deduction: false
+        earned_income: 8000
+        age: 67
+        is_blind: false
+      expect: 8450
+      description: "Dependent limit applies even if aged: $250 + $8,000, not eligible for aged credit"
+
+    - name: "Dependent MFJ married child 2024"
+      period: 2024-01
+      inputs:
+        filing_status: MARRIED_FILING_JOINTLY
+        is_dependent: true
+        is_ineligible_for_standard_deduction: false
+        earned_income: 0
+        age: 22
+        is_blind: false
+      expect: 1300
+      description: "Dependent MFJ child still limited per 63(c)(5)"
+
+    # INELIGIBILITY CASES
+    - name: "Ineligible - MFS spouse itemizes 2024"
       period: 2024-01
       inputs:
         filing_status: MARRIED_FILING_SEPARATELY
@@ -208,3 +419,75 @@ variable standard_deduction:
         age: 45
         is_blind: false
       expect: 0
+      description: "MFS spouse itemizing makes other ineligible per 63(c)(6)(A)"
+
+    - name: "Ineligible - nonresident alien 2024"
+      period: 2024-01
+      inputs:
+        filing_status: SINGLE
+        is_dependent: false
+        is_ineligible_for_standard_deduction: true
+        age: 35
+        is_blind: false
+      expect: 0
+      description: "Nonresident alien ineligible per 63(c)(6)(B)"
+
+    # HISTORICAL YEAR TESTS
+    - name: "Single filer 2023"
+      period: 2023-01
+      inputs:
+        filing_status: SINGLE
+        is_dependent: false
+        is_ineligible_for_standard_deduction: false
+        age: 30
+        is_blind: false
+      expect: 13850
+      description: "2023 single basic amount (indexed)"
+
+    - name: "Married filing jointly 2023"
+      period: 2023-01
+      inputs:
+        filing_status: MARRIED_FILING_JOINTLY
+        is_dependent: false
+        is_ineligible_for_standard_deduction: false
+        age: 40
+        spouse_age: 38
+        is_blind: false
+        spouse_is_blind: false
+      expect: 27700
+      description: "2023 married joint basic amount (indexed)"
+
+    - name: "Head of household 2023"
+      period: 2023-01
+      inputs:
+        filing_status: HEAD_OF_HOUSEHOLD
+        is_dependent: false
+        is_ineligible_for_standard_deduction: false
+        age: 35
+        is_blind: false
+      expect: 20800
+      description: "2023 HOH basic amount (indexed)"
+
+    # EDGE CASES
+    - name: "Single dependent aged and blind 2024"
+      period: 2024-01
+      inputs:
+        filing_status: SINGLE
+        is_dependent: true
+        is_ineligible_for_standard_deduction: false
+        earned_income: 0
+        age: 67
+        is_blind: true
+      expect: 1300
+      description: "Dependent limit applies first, no age/blind credits for dependents"
+
+    - name: "Married MFS both aged but ineligible 2024"
+      period: 2024-01
+      inputs:
+        filing_status: MARRIED_FILING_SEPARATELY
+        is_dependent: false
+        is_ineligible_for_standard_deduction: true
+        age: 70
+        is_blind: false
+      expect: 0
+      description: "Ineligibility overrides all age/blind calculations"
