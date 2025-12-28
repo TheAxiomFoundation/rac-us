@@ -1,5 +1,3 @@
-# 26 USC Section 24(c)(3) - Count of Qualifying Children
-#
 # Helper variable to count qualifying children in tax unit
 
 variable num_ctc_qualifying_children:

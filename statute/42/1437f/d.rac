@@ -1,5 +1,3 @@
-# 42 USC 1437f(o)(2) & 24 CFR 982.505 - Housing Assistance Payment
-#
 variable hcv_voucher_size:
   entity: Household
   period: Year

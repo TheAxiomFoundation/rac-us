@@ -1,5 +1,3 @@
-# 26 USC 36B - Premium Tax Credit
-#
 variable index:
   imports:
     - 26/36B/a#premium_tax_credit

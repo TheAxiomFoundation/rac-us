@@ -1,5 +1,3 @@
-# 42 USC 1396o - Cost Sharing (Premiums, Deductibles, Copayments)
-#
 variable medicaid_child_cost_share_exempt:
   entity: Person
   period: Month

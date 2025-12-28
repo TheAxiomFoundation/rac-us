@@ -1,5 +1,3 @@
-# 26 USC 63 - Taxable Income Defined / Standard Deduction
-#
 # This file provides the primary standard_deduction variable that aggregates:
 # - Basic standard deduction (63(c)(2))
 # - Dependent limitation (63(c)(5))

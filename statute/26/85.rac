@@ -1,5 +1,3 @@
-# 26 USC Section 85 - Unemployment Compensation in AGI
-#
 variable unemployment_in_agi:
   imports: [26/85/a#unemployment_compensation]
   entity: TaxUnit

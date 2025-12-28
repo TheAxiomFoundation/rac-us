@@ -1,5 +1,3 @@
-# 7 USC Section 2015(d) & (o) - Work Requirements
-#
 variable is_snap_abawd:
   entity: Person
   period: Month

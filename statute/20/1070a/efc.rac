@@ -1,5 +1,3 @@
-# 20 USC 1070a - Expected Family Contribution (EFC) Calculation
-#
 variable efc:
   imports:
     - 26/62/a#adjusted_gross_income

@@ -1,5 +1,3 @@
-# 26 USC § 25A - Education Credits (Validation Version)
-#
 variable education_credits_validation:
   entity: TaxUnit
   period: Year

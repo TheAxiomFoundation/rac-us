@@ -1,5 +1,3 @@
-# 26 USC Section 59 - Other Definitions and Special Rules
-#
 variable special_rules:
   imports:
     - 26/1#filing_status

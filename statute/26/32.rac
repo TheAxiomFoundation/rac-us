@@ -1,5 +1,3 @@
-# 26 USC 32 - Earned Income Credit (Standalone Validation Version)
-#
 variable eitc_standalone:
   entity: TaxUnit
   period: Year

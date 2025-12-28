@@ -1,5 +1,3 @@
-# 26 USC § 24 - Child Tax Credit (Nonrefundable Portion)
-#
 variable child_tax_credit:
   imports:
     - 26/26/a#tax_liability_before_credits

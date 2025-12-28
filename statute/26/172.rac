@@ -1,5 +1,3 @@
-# 26 USC Section 172 - Input Variables
-#
 variable nol_carryforward_pre_2018:
   entity: TaxUnit
   period: Year

@@ -1,4 +1,3 @@
-# 26 USC Section 408(o) - Designated Nondeductible Contributions
 # and Section 219(b) - Maximum Amount of Deduction (Contribution Limits)
 variable contribution_limits:
   imports:

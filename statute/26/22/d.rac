@@ -1,5 +1,3 @@
-# 26 USC 22(d) - Adjusted Section 22 Amount
-#
 variable adjusted_section_22_amount:
   imports:
     - 26/22/c#sec22_initial_amount

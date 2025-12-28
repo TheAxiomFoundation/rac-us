@@ -1,6 +1,3 @@
-# 26 USC § 63(c) - Standard Deduction
-#
-
 # Standalone validation version - all logic inline (no imports)
 # Simplified for vectorization - no nested if/else
 variable standard_deduction_standalone:

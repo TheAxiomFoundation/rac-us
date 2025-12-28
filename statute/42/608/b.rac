@@ -1,5 +1,3 @@
-# 42 USC 608 - TANF Benefit Calculation
-#
 variable benefit_calculation:
   entity: TanfUnit
   period: Month

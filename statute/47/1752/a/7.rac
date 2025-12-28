@@ -1,5 +1,3 @@
-# 47 USC 1752(a)(7) - ACP Annual Benefit Value
-#
 variable acp_annual_benefit:
   imports:
     - 47/1752/a/7#acp_benefit

@@ -1,5 +1,3 @@
-# 26 USC 1411 - Net Investment Income Tax (Standalone Validation Version)
-#
 variable niit_standalone:
   entity: TaxUnit
   period: Year
