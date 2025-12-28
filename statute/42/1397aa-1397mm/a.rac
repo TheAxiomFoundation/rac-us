@@ -10,6 +10,23 @@ to enable them to initiate and expand the provision of child health
 assistance to uninsured, low-income children in an effective and
 efficient manner...
 """
+input is_chip_eligible:
+  entity: Household
+  period: Year
+  dtype: Boolean
+  label: "CHIP Eligible"
+  description: "Whether household contains CHIP-eligible children (under 19, low-income, uninsured)"
+  default: false
+
+input per_capita_chip_benefit:
+  entity: Household
+  period: Year
+  dtype: Money
+  unit: "USD"
+  label: "Per-Capita CHIP Benefit"
+  description: "Annual per-capita CHIP benefit value (varies by state, typically $2,000-$5,000)"
+  default: 0
+
 variable chip:
   entity: Household
   period: Year
@@ -24,3 +41,40 @@ variable chip:
         return 0
     # Eligible: return per-capita benefit value
     return per_capita_chip_benefit
+  tests:
+    - name: "Ineligible household receives no benefit"
+      period: 2024-01
+      inputs:
+        is_chip_eligible: false
+        per_capita_chip_benefit: 3_500
+      expect: 0
+    - name: "Eligible household with low state benefit"
+      period: 2024-01
+      inputs:
+        is_chip_eligible: true
+        per_capita_chip_benefit: 2_000
+      expect: 2_000
+    - name: "Eligible household with average state benefit"
+      period: 2024-01
+      inputs:
+        is_chip_eligible: true
+        per_capita_chip_benefit: 3_500
+      expect: 3_500
+    - name: "Eligible household with high state benefit"
+      period: 2024-01
+      inputs:
+        is_chip_eligible: true
+        per_capita_chip_benefit: 5_000
+      expect: 5_000
+    - name: "Eligible household with zero benefit value"
+      period: 2024-01
+      inputs:
+        is_chip_eligible: true
+        per_capita_chip_benefit: 0
+      expect: 0
+    - name: "Ineligible household with high benefit value still receives nothing"
+      period: 2024-01
+      inputs:
+        is_chip_eligible: false
+        per_capita_chip_benefit: 5_000
+      expect: 0

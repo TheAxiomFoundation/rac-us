@@ -138,3 +138,81 @@ variable resource_exclusions:
         life_exclusion = 0
     after_life = after_burial - life_exclusion
     return max(0, after_life)
+  tests:
+    - name: "Home exclusion - primary residence fully excluded"
+      period: 2024-01
+      inputs:
+        total_resources: 350_000
+        primary_residence_value: 300_000
+        household_goods_value: 0
+        automobile_value: 0
+        designated_burial_funds: 0
+        has_eligible_spouse: false
+        life_insurance_face_value: 0
+        life_insurance_cash_value: 0
+      expect: 50_000
+
+    - name: "Household goods and automobile excluded"
+      period: 2024-01
+      inputs:
+        total_resources: 25_000
+        primary_residence_value: 0
+        household_goods_value: 5_000
+        automobile_value: 12_000
+        designated_burial_funds: 0
+        has_eligible_spouse: false
+        life_insurance_face_value: 0
+        life_insurance_cash_value: 0
+      expect: 8_000
+
+    - name: "Burial funds exclusion - individual at limit"
+      period: 2024-01
+      inputs:
+        total_resources: 10_000
+        primary_residence_value: 0
+        household_goods_value: 0
+        automobile_value: 0
+        designated_burial_funds: 1_500
+        has_eligible_spouse: false
+        life_insurance_face_value: 0
+        life_insurance_cash_value: 0
+      expect: 8_500
+
+    - name: "Burial funds exclusion - couple at limit"
+      period: 2024-01
+      inputs:
+        total_resources: 15_000
+        primary_residence_value: 0
+        household_goods_value: 0
+        automobile_value: 0
+        designated_burial_funds: 3_000
+        has_eligible_spouse: true
+        life_insurance_face_value: 0
+        life_insurance_cash_value: 0
+      expect: 12_000
+
+    - name: "Life insurance excluded when face value under limit"
+      period: 2024-01
+      inputs:
+        total_resources: 5_000
+        primary_residence_value: 0
+        household_goods_value: 0
+        automobile_value: 0
+        designated_burial_funds: 0
+        has_eligible_spouse: false
+        life_insurance_face_value: 1_000
+        life_insurance_cash_value: 500
+      expect: 4_500
+
+    - name: "Life insurance NOT excluded when face value exceeds limit"
+      period: 2024-01
+      inputs:
+        total_resources: 5_000
+        primary_residence_value: 0
+        household_goods_value: 0
+        automobile_value: 0
+        designated_burial_funds: 0
+        has_eligible_spouse: false
+        life_insurance_face_value: 2_000
+        life_insurance_cash_value: 500
+      expect: 5_000

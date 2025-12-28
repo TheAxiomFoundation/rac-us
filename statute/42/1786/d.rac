@@ -17,6 +17,8 @@ variable eligibility:
   period: Month
   dtype: Boolean
   syntax: python
+  label: "WIC Residency Eligibility"
+  description: "Whether applicant meets WIC residency requirement per 42 USC 1786(d)(3) - no durational residency requirements permitted"
   formula: |
     # 42 USC 1786(d)(3) prohibits durational residency requirements
     # Person must only be physically present in the state where applying
@@ -24,3 +26,29 @@ variable eligibility:
     if is_us_resident:
         return True
     return False
+  tests:
+    - name: "US resident meets residency requirement"
+      period: 2024-01
+      inputs:
+        is_us_resident: true
+      expect: true
+    - name: "Non-US resident does not meet residency requirement"
+      period: 2024-01
+      inputs:
+        is_us_resident: false
+      expect: false
+    - name: "Recent immigrant physically present meets requirement"
+      period: 2024-01
+      inputs:
+        is_us_resident: true
+      expect: true
+    - name: "Temporary visitor not meeting residency"
+      period: 2024-01
+      inputs:
+        is_us_resident: false
+      expect: false
+    - name: "Migrant worker physically present in state"
+      period: 2024-01
+      inputs:
+        is_us_resident: true
+      expect: true

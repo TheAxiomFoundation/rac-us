@@ -68,3 +68,69 @@ variable ssi:
     benefit = applicable_fbr - ssi_countable_income
     return max(0, benefit)
   default: 0
+  tests:
+    - name: "Eligible individual with no countable income receives full FBR"
+      period: 2024-01
+      inputs:
+        is_ssi_categorical_eligible: true
+        is_ssi_resource_eligible: true
+        is_ssi_citizenship_eligible: true
+        is_ssi_residency_eligible: true
+        applicable_fbr: 943
+        ssi_countable_income: 0
+      expect: 943
+
+    - name: "Eligible individual with partial countable income"
+      period: 2024-01
+      inputs:
+        is_ssi_categorical_eligible: true
+        is_ssi_resource_eligible: true
+        is_ssi_citizenship_eligible: true
+        is_ssi_residency_eligible: true
+        applicable_fbr: 943
+        ssi_countable_income: 400
+      expect: 543
+
+    - name: "Eligible couple with no countable income receives couple FBR"
+      period: 2024-01
+      inputs:
+        is_ssi_categorical_eligible: true
+        is_ssi_resource_eligible: true
+        is_ssi_citizenship_eligible: true
+        is_ssi_residency_eligible: true
+        applicable_fbr: 1_415
+        ssi_countable_income: 0
+      expect: 1_415
+
+    - name: "Countable income exceeds FBR results in zero benefit"
+      period: 2024-01
+      inputs:
+        is_ssi_categorical_eligible: true
+        is_ssi_resource_eligible: true
+        is_ssi_citizenship_eligible: true
+        is_ssi_residency_eligible: true
+        applicable_fbr: 943
+        ssi_countable_income: 1_200
+      expect: 0
+
+    - name: "Categorically ineligible receives zero benefit"
+      period: 2024-01
+      inputs:
+        is_ssi_categorical_eligible: false
+        is_ssi_resource_eligible: true
+        is_ssi_citizenship_eligible: true
+        is_ssi_residency_eligible: true
+        applicable_fbr: 943
+        ssi_countable_income: 0
+      expect: 0
+
+    - name: "Resource ineligible receives zero benefit"
+      period: 2024-01
+      inputs:
+        is_ssi_categorical_eligible: true
+        is_ssi_resource_eligible: false
+        is_ssi_citizenship_eligible: true
+        is_ssi_residency_eligible: true
+        applicable_fbr: 943
+        ssi_countable_income: 0
+      expect: 0

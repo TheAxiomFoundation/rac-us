@@ -26,3 +26,24 @@ variable income_exclusions:
   label: "SSI total countable income"
   description: "Sum of countable earned and unearned income per 42 USC 1382a"
   formula: return general_exclusion
+  tests:
+    - name: "Default general exclusion"
+      period: 2024-01
+      inputs: {}
+      expect: 20  # Default $20 exclusion per 42 USC 1382a(b)(2)
+    - name: "Custom exclusion amount"
+      period: 2024-01
+      inputs: {general_exclusion: 25}
+      expect: 25  # Uses provided exclusion value
+    - name: "Zero exclusion"
+      period: 2024-01
+      inputs: {general_exclusion: 0}
+      expect: 0  # No exclusion applied
+    - name: "Higher exclusion for special case"
+      period: 2024-01
+      inputs: {general_exclusion: 50}
+      expect: 50  # Custom higher exclusion
+    - name: "Fractional exclusion amount"
+      period: 2024-01
+      inputs: {general_exclusion: 20.50}
+      expect: 20.50  # Handles fractional dollars
