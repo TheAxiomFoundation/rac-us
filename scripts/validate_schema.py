@@ -68,15 +68,15 @@ FORMULA_LINE = re.compile(r"^\s{4,}")  # Indented lines in formula
 ALLOWED_INTEGERS = {-1, 0, 1, 2, 3}
 LITERAL_PATTERN = re.compile(
     r"""
-    (?<![a-zA-Z_])  # Not preceded by identifier char
+    (?<![a-zA-Z_\d])  # Not preceded by identifier char or digit
     (
-        \d+\.\d+    # Float like 0.075
+        \d+\.\d+      # Float like 0.075
         |
-        [4-9]\d*    # Integer 4+
+        [4-9]         # Single digit 4-9
         |
-        [1-9]\d{1,} # Integer 10+
+        [1-9]\d+      # Multi-digit starting with 1-9 (10+)
     )
-    (?![a-zA-Z_])   # Not followed by identifier char
+    (?![a-zA-Z_\d])   # Not followed by identifier char or digit
     """,
     re.VERBOSE,
 )

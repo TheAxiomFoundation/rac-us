@@ -13,6 +13,22 @@ Over $73,000 . . . . . . . . . . . . . . . . .  0 percent
 household (as defined in section 2(b)), the applicable percentage...
 (3) OTHER INDIVIDUALS.--In any other case, the applicable percentage...
 """
+
+parameter savers_credit_rate_tier1:
+  description: "Saver's credit rate for lowest AGI tier (50%)"
+  values:
+    2002-01-01: 0.50
+
+parameter savers_credit_rate_tier2:
+  description: "Saver's credit rate for second AGI tier (20%)"
+  values:
+    2002-01-01: 0.20
+
+parameter savers_credit_rate_tier3:
+  description: "Saver's credit rate for third AGI tier (10%)"
+  values:
+    2002-01-01: 0.10
+
 variable applicable_percentage:
   imports:
     - 26/1#filing_status
@@ -34,13 +50,13 @@ variable applicable_percentage:
     # Apply rate based on adjusted AGI against joint thresholds
     # 50% rate: AGI at or below first threshold
     if adjusted_agi <= joint_threshold_50:
-        return 0.50
+        return savers_credit_rate_tier1
     # 20% rate: AGI above first but at or below second threshold
     if adjusted_agi <= joint_threshold_20:
-        return 0.20
+        return savers_credit_rate_tier2
     # 10% rate: AGI above second but at or below third threshold
     if adjusted_agi <= joint_threshold_10:
-        return 0.10
+        return savers_credit_rate_tier3
     # 0% rate: AGI above third threshold - no credit
     return 0
   default: 0

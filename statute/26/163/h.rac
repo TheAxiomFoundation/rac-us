@@ -15,6 +15,19 @@ indebtedness for any period shall not exceed $1,000,000
 ($500,000 in the case of a married individual filing a
 separate return).
 """
+
+parameter pre_tcja_acquisition_limit:
+  description: "Pre-TCJA acquisition debt limit (pre-Dec 15, 2017)"
+  unit: "USD"
+  values:
+    1987-01-01: 1000000
+
+parameter pre_tcja_acquisition_limit_mfs:
+  description: "Pre-TCJA acquisition debt limit for married filing separately"
+  unit: "USD"
+  values:
+    1987-01-01: 500000
+
 variable qualified_residence_interest:
   imports: [26/1#filing_status]
   entity: TaxUnit
@@ -29,9 +42,9 @@ variable qualified_residence_interest:
     is_mfs = filing_status == "married_separate"
     # Use pre-TCJA limit ($1M) for grandfathered debt
     if is_mfs:
-        pre_tcja_limit = 500000
+        pre_tcja_limit = pre_tcja_acquisition_limit_mfs
     else:
-        pre_tcja_limit = 1000000
+        pre_tcja_limit = pre_tcja_acquisition_limit
     if is_mfs:
         tcja_limit = p.acquisition_debt_limit_mfs
     else:

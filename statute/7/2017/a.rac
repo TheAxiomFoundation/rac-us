@@ -179,10 +179,10 @@ variable snap_max_allotment:
   description: "Maximum monthly SNAP benefit based on Thrifty Food Plan"
   syntax: python
   formula: |
-    if household_size <= 8:
+    if household_size <= max_schedule_size:
         return max_allotment_schedule[household_size - 1]
-    base = max_allotment_schedule[7]
-    extra = household_size - 8
+    base = max_allotment_schedule[max_schedule_size - 1]
+    extra = household_size - max_schedule_size
     return base + additional_per_person * extra
   tests:
     - inputs: {household_size: 1}
