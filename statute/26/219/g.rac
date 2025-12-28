@@ -23,17 +23,18 @@ variable phaseout:
   unit: "USD"
   label: "IRA Deduction After Phase-out"
   description: "IRA deduction after applying income-based phase-out"
+  syntax: python
   formula: |
     # MFS has its own very narrow range
     if filing_status == MARRIED_FILING_SEPARATELY:
-    return phaseout_mfs_start
+        return phaseout_mfs_start
     elif filing_status == JOINT and not is_active_retirement_plan_participant and spouse_is_active_retirement_plan_participant:
-    # 219(g)(7): Contributor not covered but spouse is covered
-    return phaseout_spouse_covered_start
+        # 219(g)(7): Contributor not covered but spouse is covered
+        return phaseout_spouse_covered_start
     elif filing_status == JOINT:
-    # Contributor is covered (or neither covered - no phase-out in that case)
-    return phaseout_joint_start
+        # Contributor is covered (or neither covered - no phase-out in that case)
+        return phaseout_joint_start
     else:
-    # Single or Head of Household
-    return phaseout_single_start
+        # Single or Head of Household
+        return phaseout_single_start
   default: 0

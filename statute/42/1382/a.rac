@@ -13,7 +13,7 @@ variable age_requirement:
   label: "SSI categorical eligibility"
   description: "Individual is aged (65+), blind, or disabled per 42 USC 1382(a)(1)(A)"
   formula: return age >= age_threshold
-  default: false
+  default: False
 
 
 variable citizenship:
@@ -23,7 +23,7 @@ variable citizenship:
   label: "SSI residency eligibility"
   description: "Is resident of the United States per 42 USC 1382c(a)(1)(B)"
   formula: return is_us_citizen or is_qualified_alien
-  default: false
+  default: False
 
 
 variable resource_test:
@@ -36,7 +36,9 @@ variable resource_test:
   unit: "USD"
   label: "SSI resource eligibility"
   description: "Resources do not exceed limit per 42 USC 1382(a)(3)(B)"
+  syntax: python
   formula: |
-    if has_eligible_spouse: return resource_limit_couple
+    if has_eligible_spouse:
+        return resource_limit_couple
     return resource_limit_individual
-  default: false
+  default: False

@@ -12,7 +12,8 @@ variable deductible_taxes:
   unit: "USD"
   label: "Local Benefit Assessments"
   description: "Special assessments for streets, sidewalks, etc. - NOT deductible under § 164(a)(5)"
+  syntax: python
   formula: |
     # Total real property minus foreign portion
-    real_property_tax - foreign_real_property_tax
+    return real_property_tax - foreign_real_property_tax
   default: false

@@ -66,6 +66,7 @@ variable rmd_applicable_age:
   dtype: Integer
   label: "RMD Applicable Age"
   description: "Age at which required minimum distributions must begin"
+  syntax: python
   formula: |
     # Use cut() to look up applicable age from birth year thresholds
     return cut(birth_year, rmd_birth_year_thresholds)
@@ -86,17 +87,18 @@ variable is_rmd_required:
   dtype: Boolean
   label: "RMD Required"
   description: "Whether a required minimum distribution must be taken this year"
+  syntax: python
   formula: |
     # Must have reached RMD age
     if not has_reached_rmd_age:
-    return false
+        return False
     # Still-working exception for non-5% owners
     if is_still_working_for_plan_sponsor and not is_5_percent_owner:
-    return false
+        return False
     # Must have account balance
     if prior_year_401k_balance <= 0:
-    return false
-    return true
+        return False
+    return True
   default: false
 
 variable rmd_divisor:
@@ -105,6 +107,7 @@ variable rmd_divisor:
   dtype: Decimal
   label: "RMD Divisor"
   description: "Life expectancy divisor from IRS Uniform Lifetime Table"
+  syntax: python
   formula: |
     # Use cut() to look up divisor from Uniform Lifetime Table
     return cut(age, uniform_lifetime_table)
@@ -117,9 +120,10 @@ variable required_minimum_distribution:
   unit: "USD"
   label: "Required Minimum Distribution"
   description: "Minimum amount that must be withdrawn from retirement account"
+  syntax: python
   formula: |
     if not is_rmd_required:
-    return 0
+        return 0
     # RMD = Prior year balance / Life expectancy divisor
     return prior_year_401k_balance / rmd_divisor
   default: 0
@@ -131,6 +135,7 @@ variable rmd_shortfall_penalty:
   unit: "USD"
   label: "RMD Shortfall Penalty"
   description: "Excise tax on failure to take required minimum distribution"
+  syntax: python
   formula: |
     # Input: Actual distribution taken
     # For now, assume full compliance

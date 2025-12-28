@@ -28,6 +28,7 @@ variable capital_gains:
   unit: "USD"
   label: "FMV at Gift Date"
   description: "Fair market value at date of gift"
+  syntax: python
   formula: |
     # Gain = amount realized - adjusted basis
     # If negative, it's a loss
@@ -46,14 +47,15 @@ variable holding_period:
     - 26/1031/like_kind_exchange#is_like_kind_exchange
   entity: Asset
   period: Year
-  dtype: Bool
+  dtype: Boolean
   label: "Held Substantially Identical Long-Term"
   description: "Held substantially identical property long-term when short sale initiated"
+  syntax: python
   formula: |
     # Calculate days between acquisition and disposition
     # Note: Day of acquisition is excluded, day of disposition is included
     return days_between(acquisition_date, disposition_date)
-  default: false
+  default: False
 
 
 # ---- Merged from netting.rac ----
@@ -71,17 +73,18 @@ variable netting:
     - 26/1212/carryover#long_term_capital_loss_carryover
   entity: TaxUnit
   period: Year
-  dtype: Bool
+  dtype: Boolean
   unit: "USD"
   label: "Has Capital Loss Carryover"
   description: "Taxpayer has unused capital loss to carry forward"
+  syntax: python
   formula: |
     # Include carryover losses from prior years
     total_st_loss = short_term_capital_loss + short_term_capital_loss_carryover
     net = short_term_capital_gain - total_st_loss
     # Only a gain if positive
     return max(0, net)
-  default: false
+  default: False
 
 
 # ---- Merged from preferential_rates.rac ----

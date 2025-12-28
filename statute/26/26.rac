@@ -17,6 +17,7 @@ variable total_nonrefundable_credits:
   unit: "USD"
   label: "Total Nonrefundable Credits"
   description: "Sum of nonrefundable personal credits per 26 USC Section 26, limited by tax liability"
+  syntax: python
   formula: |
     # Sum all nonrefundable credits
     # Each credit is already individually limited by tax liability in its own formula

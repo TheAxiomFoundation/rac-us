@@ -20,17 +20,23 @@ variable categorical:
   entity: Person
   period: Month
   dtype: Boolean
+  syntax: python
   formula: |
     # 42 USC 1786(b)(3): Breastfeeding women - up to 1 year postpartum
     # Takes priority over postpartum since it has longer eligibility period
-    if is_breastfeeding and months_postpartum < postpartum_max_months_breastfeeding: return "breastfeeding_woman"
+    if is_breastfeeding and months_postpartum < postpartum_max_months_breastfeeding:
+        return "breastfeeding_woman"
     # 42 USC 1786(d)(1): Pregnant women
-    if is_pregnant: return "pregnant_woman"
+    if is_pregnant:
+        return "pregnant_woman"
     # 42 USC 1786(b)(14): Postpartum women - up to 6 months after pregnancy ends
-    if is_postpartum and months_postpartum < postpartum_max_months_non_breastfeeding: return "postpartum_woman"
+    if is_postpartum and months_postpartum < postpartum_max_months_non_breastfeeding:
+        return "postpartum_woman"
     # 42 USC 1786(b)(6): Infants - under 1 year of age
-    if age < infant_max_years: return "infant"
+    if age < infant_max_years:
+        return "infant"
     # 42 USC 1786(b)(4): Children - 1 through 4 years (up to 5th birthday)
-    if age >= infant_max_years and age < child_max_years: return "child"
+    if age >= infant_max_years and age < child_max_years:
+        return "child"
     # No WIC category applies
     return "none"

@@ -14,6 +14,7 @@ variable eligibility:
   unit: "USD"
   label: "Extended benefits weeks"
   description: "Additional weeks available under extended benefits"
+  syntax: python
   formula: |
     # Standard base period: first 4 of last 5 completed calendar quarters
     # States may also offer "alternate base period" using most recent 4 quarters

@@ -15,12 +15,12 @@ variable interest_deduction:
   unit: "USD"
   label: "Interest Deduction"
   description: "Total deductible interest for itemized deductions per 26 USC 163"
+  syntax: python
   formula: |
     # Deductible interest consists of:
     # 1. Qualified residence interest (mortgage interest within limits)
     # 2. Investment interest (limited to net investment income)
     # 3. Mortgage points (if meeting requirements)
-    return qualified_residence_interest +
-    deductible_investment_interest +
-    mortgage_points
+    total = qualified_residence_interest + deductible_investment_interest + mortgage_points
+    return total
   default: 0

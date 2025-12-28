@@ -30,6 +30,7 @@ variable aoc:
   unit: "USD"
   label: "Nonrefundable AOC"
   description: "60% nonrefundable portion of AOC"
+  syntax: python
   formula: |
     # Step 1: Calculate credit based on qualified expenses
     # 100% of first $2,000 + 25% of next $2,000

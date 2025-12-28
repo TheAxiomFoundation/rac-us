@@ -25,9 +25,19 @@ variable taxable_social_security:
   unit: "percentage"
   label: "Taxable Fraction of Social Security"
   description: "Portion of Social Security benefits included in taxable income"
+  syntax: python
   formula: |
     # Get base amount based on filing status per 86(c)(1)
-    base_amount = filing_status == SINGLE ? base_amount_single : filing_status == HEAD_OF_HOUSEHOLD ? base_amount_single : filing_status == MARRIED_FILING_JOINTLY ? base_amount_joint : filing_status == QUALIFYING_WIDOW ? base_amount_joint : base_amount_mfs
+    if filing_status == SINGLE:
+        base_amount = base_amount_single
+    elif filing_status == HEAD_OF_HOUSEHOLD:
+        base_amount = base_amount_single
+    elif filing_status == MARRIED_FILING_JOINTLY:
+        base_amount = base_amount_joint
+    elif filing_status == QUALIFYING_WIDOW:
+        base_amount = base_amount_joint
+    else:
+        base_amount = base_amount_mfs
     excess = max(0, combined_income - base_amount)
     # Lesser of 50% of benefits or 50% of excess over base
     half_benefits = tier1_rate * tax_unit_social_security

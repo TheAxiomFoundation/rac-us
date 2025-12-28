@@ -13,15 +13,19 @@ variable efc:
   unit: "USD"
   label: "Expected Family Contribution"
   description: "Family's expected contribution toward education costs per EFC formula"
+  syntax: python
   formula: |
     formula_type = pell_grant_formula
     # Check for automatic zero EFC
     qualifies_auto_zero = adjusted_gross_income <= efc_params.automatic_zero
     # Apply automatic zero if eligible (Formula B never gets auto-zero)
-    if qualifies_auto_zero and (formula_type != B): return 0
-    # Final EFC calculation: Formula A adds dependent contribution, B and C do not
-    if formula_type == A: return max(0, head_contribution + dependent_contribution)
-    return max(0, head_contribution)
+    if qualifies_auto_zero and (formula_type != B):
+        result = 0
+    elif formula_type == A:
+        result = max(0, head_contribution + dependent_contribution)
+    else:
+        result = max(0, head_contribution)
+    return result
   default: 0
 
 
@@ -62,6 +66,7 @@ variable award:
   unit: "months"
   label: "Months Enrolled in School Year"
   description: "Number of months student is enrolled during the academic year"
+  syntax: python
   formula: |
     coa = cost_of_attendance
     months = months_in_school
@@ -72,7 +77,10 @@ variable award:
     use_efc = uses_efc
     use_sai = uses_sai
     # Select applicable contribution
-    contribution = use_efc ? efc : sai
+    if use_efc:
+        contribution = efc
+    else:
+        contribution = sai
     # Calculate raw award (COA minus contribution)
     raw_award = coa - contribution
     # Apply minimum threshold: if below min, no award
@@ -82,12 +90,24 @@ variable award:
     # Award must be at least minimum to be disbursed
     above_minimum = raw_award >= min_award
     # EFC methodology: prorate by months and cap
-    efc_award = above_minimum ? (raw_award * (months / months_in_year)) : 0
+    if above_minimum:
+        efc_award = raw_award * (months / months_in_year)
+    else:
+        efc_award = 0
     # SAI methodology: Use eligibility type
-    # INELIGIBLE -> 0, MAXIMUM -> max_award, MINIMUM or CALCULATED -> raw_award (if above minimum)
-    sai_award = eligibility_type == INELIGIBLE ? 0 : (eligibility_type == MAXIMUM ? max_award : (above_minimum ? raw_award : 0))
+    if eligibility_type == INELIGIBLE:
+        sai_award = 0
+    elif eligibility_type == MAXIMUM:
+        sai_award = max_award
+    elif above_minimum:
+        sai_award = raw_award
+    else:
+        sai_award = 0
     # Select final award based on methodology
-    uncapped_award = use_efc ? efc_award : sai_award
+    if use_efc:
+        uncapped_award = efc_award
+    else:
+        uncapped_award = sai_award
     # Cap at maximum and COA
     final_cap = min(coa, max_award)
     return min(final_cap, max(0, uncapped_award))
@@ -113,6 +133,7 @@ variable dependent_contribution:
   unit: "USD"
   label: "Dependent Student Contribution"
   description: "Dependent student's contribution from income and assets for Formula A"
+  syntax: python
   formula: |
     formula_type = pell_grant_formula
     # Only applies to Formula A (dependent students)
@@ -166,6 +187,7 @@ variable eligibility:
   dtype: Boolean
   label: "Pell Grant Eligible"
   description: "Whether person meets all eligibility requirements for Federal Pell Grant per 20 USC 1070a and 1091"
+  syntax: python
   formula: |
     # Basic statutory requirements per 20 USC 1091
     meets_enrollment = is_enrolled_in_higher_education
@@ -208,6 +230,7 @@ variable eligibility_type:
   dtype: Enum["INELIGIBLE",
   label: "Pell Grant Eligibility Type"
   description: "Eligibility category under SAI methodology determining maximum, minimum, or calculated award"
+  syntax: python
   formula: |
     agi = adjusted_gross_income
     poverty_line = fpg
@@ -252,6 +275,7 @@ variable formula_type:
   dtype: Enum["A",
   label: "Pell Grant Formula Type"
   description: "EFC formula type based on dependency status per THE EFC FORMULA guide"
+  syntax: python
   formula: |
     # For Pell purposes:
     # A = Dependent student (uses parent financials)
@@ -286,6 +310,7 @@ variable head_contribution:
   unit: "USD"
   label: "Head Contribution to EFC"
   description: "Parent or independent student contribution based on income and assets"
+  syntax: python
   formula: |
     formula_type = pell_grant_formula
     income = adjusted_gross_income
@@ -332,6 +357,7 @@ variable simplified_applies:
   dtype: Boolean
   label: "Simplified EFC Formula Applies"
   description: "Whether family qualifies for simplified EFC formula (assets excluded)"
+  syntax: python
   formula: |
     # Income eligibility
     income_eligible = adjusted_gross_income < simplified_params.income_limit

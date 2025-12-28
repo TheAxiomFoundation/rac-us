@@ -12,10 +12,17 @@ variable hsa_deduction:
   unit: "USD"
   label: "Total HSA Deduction"
   description: "Combined HSA deduction for tax unit"
+  syntax: python
   formula: |
     # Must have HDHP to contribute
-    if not has_hdhp: return 0
+    if not has_hdhp:
+      return 0
     # Base limit depends on coverage type
-    base_limit = hsa_coverage_type == self_only ? self_only_limit : family_limit
+    if hsa_coverage_type == "self_only":
+      base_limit = self_only_limit
+    else:
+      base_limit = family_limit
     # Add catch-up contribution if age 55 or older
-    return age >= catch_up_age ? (base_limit + catch_up_amount) : base_limit
+    if age >= catch_up_age:
+      return base_limit + catch_up_amount
+    return base_limit

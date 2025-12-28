@@ -22,6 +22,7 @@ variable used_vehicle_credit:
   unit: "USD"
   label: "Used Clean Vehicle Credit"
   description: "Credit for previously-owned clean vehicles per 26 USC 25E"
+  syntax: python
   formula: |
     # Note: Law specifies lesser of current or prior year MAGI
     # For simplicity, using current year AGI

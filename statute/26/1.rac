@@ -15,9 +15,22 @@ There is hereby imposed on the taxable income of every individual...
 a tax determined in accordance with the following table
 """
 
+# Federal income tax brackets (base statutory values from TCJA 2017)
+# Thresholds indexed annually per IRC 1(f); base 2018 values here
+# Current indexed values in IRS Rev. Proc. guidance files
 parameter brackets:
+  description: "Federal income tax brackets"
+  indexed_by: statute/26/1/f
   values:
-    # TODO: add values
+    # TCJA base thresholds (2018)
+    thresholds:
+      single: [0, 9525, 38700, 82500, 157500, 200000, 500000]
+      married_filing_jointly: [0, 19050, 77400, 165000, 315000, 400000, 600000]
+      married_filing_separately: [0, 9525, 38700, 82500, 157500, 200000, 300000]
+      head_of_household: [0, 13600, 51800, 82500, 157500, 200000, 500000]
+      qualifying_widow: [0, 19050, 77400, 165000, 315000, 400000, 600000]
+    # Rates are statutory (TCJA)
+    rates: [0.10, 0.12, 0.22, 0.24, 0.32, 0.35, 0.37]
 
 variable income_tax:
   imports:
@@ -31,10 +44,11 @@ variable income_tax_before_credits:
   unit: "USD"
   label: "Income Tax Before Credits"
   description: "Federal income tax on ordinary income before credits per 26 USC Section 1"
+  syntax: python
   formula: |
+    if taxable_income <= 0:
+        return 0
     return marginal_agg(taxable_income, brackets, threshold_by=filing_status)
-    defined_for:
-    taxable_income > 0
   default: 0
 
 variable income_tax_before_credits_vectorized:
@@ -44,7 +58,9 @@ variable income_tax_before_credits_vectorized:
   unit: "USD"
   label: "Income Tax Before Credits (Vectorized)"
   description: "Vectorized implementation for microsimulation"
-  formula: return marginal_agg(taxable_income, brackets, threshold_by=filing_status)
+  syntax: python
+  formula: |
+    return marginal_agg(taxable_income, brackets, threshold_by=filing_status)
   default: 0
 
 variable total_federal_income_tax:
@@ -63,6 +79,7 @@ variable total_federal_income_tax:
   unit: "USD"
   label: "Total Federal Income Tax"
   description: "Final federal income tax liability (negative = refund) per 26 USC Section 1"
+  syntax: python
   formula: |
     # Regular income tax (on ordinary income)
     regular_tax = income_tax_before_credits

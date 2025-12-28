@@ -19,6 +19,7 @@ variable alimony_deduction:
   unit: "USD"
   label: "Alimony Deduction"
   description: "Above-the-line deduction for alimony payments per 26 USC 62(a)(10) and 215"
+  syntax: python
   formula: |
     # Per TCJA: Only pre-2019 divorce instruments allow alimony deduction
     if not is_pre_2019_divorce_agreement_payer:

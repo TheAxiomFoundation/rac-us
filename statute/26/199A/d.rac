@@ -42,15 +42,19 @@ variable sstb:
   unit: "percent"
   label: "QBI Applicable Percentage"
   description: "Phase-in percentage for SSTB income per 26 USC § 199A(d)(3)"
+  syntax: python
   formula: |
     # Get threshold based on filing status
-    threshold = (filing_status == JOINT or filing_status == SURVIVING_SPOUSE) ? threshold_joint : threshold_single
-    phaseout_range = (filing_status == JOINT or filing_status == SURVIVING_SPOUSE) ? phaseout_range_joint : phaseout_range_single
+    is_joint_or_surviving = filing_status == JOINT or filing_status == SURVIVING_SPOUSE
+    threshold = threshold_joint if is_joint_or_surviving else threshold_single
+    phaseout_range = phaseout_range_joint if is_joint_or_surviving else phaseout_range_single
     # If below threshold, 100% applies
-    if taxable_income <= threshold: return 1.0
+    if taxable_income <= threshold:
+        return 1.0
     # If above threshold + phaseout range, 0% applies (SSTB gets no deduction)
     phaseout_end = threshold + phaseout_range
-    if taxable_income >= phaseout_end: return 0.0
+    if taxable_income >= phaseout_end:
+        return 0.0
     # Within phaseout range: linear reduction
     # Applicable % = 1 - (taxable_income - threshold) / phaseout_range
     excess = taxable_income - threshold

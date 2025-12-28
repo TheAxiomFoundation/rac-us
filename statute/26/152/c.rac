@@ -18,6 +18,7 @@ variable is_qualifying_child:
   dtype: Boolean
   label: "Is Qualifying Child under §152(c)"
   description: "Meets all requirements of 26 USC §152(c)"
+  syntax: python
   formula: |
     # (A) has not attained the age of 19 as of the close of the calendar year
     under_19 = age < age_limit_general

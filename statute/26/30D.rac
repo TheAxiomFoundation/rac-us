@@ -19,6 +19,7 @@ variable new_vehicle_credit:
   unit: "USD"
   label: "New Clean Vehicle Credit"
   description: "Credit for new clean vehicles per 26 USC 30D"
+  syntax: python
   formula: |
     capacity = new_clean_vehicle_battery_capacity_kwh
     min_capacity = p.eligibility.min_battery_capacity_kwh

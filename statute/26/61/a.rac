@@ -45,5 +45,6 @@ variable gross_income:
   unit: USD
   label: Gross Income
   description: Total gross income from all sources per 26 USC Section 61
+  syntax: python
   formula: |
     return wages + salaries + tips + self_employment_income + gains_from_property + interest_income + dividend_income + pension_income + other_income + unemployment_compensation

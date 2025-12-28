@@ -17,6 +17,7 @@ variable tax_liability_before_credits:
   unit: "USD"
   label: "Tax Liability Before Credits"
   description: "Maximum amount of nonrefundable credits per Section 26(a)"
+  syntax: python
   formula: |
     # Regular tax is the income tax computed under Section 1
     # Self-employment tax is separate and not limited by Section 26

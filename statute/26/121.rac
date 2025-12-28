@@ -29,6 +29,7 @@ variable meets_use_test:
 variable meets_frequency_test:
   dtype: Boolean
   description: "Whether taxpayer meets once-every-2-years limitation"
+  syntax: python
   formula: |
     if not prior_exclusion_claimed:
     return true
@@ -42,6 +43,7 @@ variable meets_full_requirements:
 variable qualifies_for_joint_limit:
   dtype: Boolean
   description: "Whether married filing jointly qualifies for $500,000 limit"
+  syntax: python
   formula: |
     if filing_status != JOINT:
     return false
@@ -56,6 +58,7 @@ variable qualifies_for_joint_limit:
 variable reduced_exclusion_fraction:
   dtype: Rate
   description: "Fraction of full exclusion available under 121(c)"
+  syntax: python
   formula: |
     if meets_full_requirements:
     return 1.0
@@ -79,6 +82,7 @@ variable applicable_exclusion_limit:
   dtype: Money
   unit: "USD"
   description: "Maximum exclusion available based on filing status and requirements"
+  syntax: python
   formula: |
     # Determine base limit
     if qualifies_for_joint_limit:
@@ -92,6 +96,7 @@ variable excludable_gain:
   dtype: Money
   unit: "USD"
   description: "Gain eligible for exclusion (realized gain minus depreciation recapture)"
+  syntax: python
   formula: |
     # Depreciation taken after May 6, 1997 is not excludable
     # It is taxed as unrecaptured Section 1250 gain (25% rate)

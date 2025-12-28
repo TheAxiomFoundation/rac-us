@@ -18,6 +18,7 @@ variable special_rules:
   unit: "USD"
   label: "Regular Tax"
   description: "Regular income tax for Section 55(c) cross-reference"
+  syntax: python
   formula: |
     # For AMT purposes, foreign source income must be recomputed
     # using AMT adjustments (Section 56) and preferences (Section 57)

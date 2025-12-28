@@ -19,10 +19,13 @@ variable expense_limit:
   unit: "USD"
   label: "CDCC Maximum Expense Limit"
   description: "Dollar limit on creditable expenses based on number of qualifying individuals per 26 USC 21(c)"
+  syntax: python
   formula: |
     # No qualifying individuals = no credit
-    if num_cdcc_qualifying_individuals == 0: return 0
+    if num_cdcc_qualifying_individuals == 0:
+        return 0
     # 1 qualifying individual
-    if num_cdcc_qualifying_individuals == 1: return one_qualifying_limit
+    if num_cdcc_qualifying_individuals == 1:
+        return one_qualifying_limit
     # 2 or more qualifying individuals
     return two_or_more_limit

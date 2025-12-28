@@ -21,6 +21,7 @@ variable eligible_individual:
   dtype: Boolean
   label: "Eligible for Saver's Credit"
   description: "Whether individual is an eligible individual for the Saver's Credit per 26 USC 25B(c)"
+  syntax: python
   formula: |
     # 25B(c)(1): Must be at least 18 at end of tax year
     meets_age_requirement = age >= minimum_age

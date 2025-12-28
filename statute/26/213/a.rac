@@ -19,6 +19,7 @@ variable medical_expense_deduction:
   unit: "USD"
   label: "Medical Expense Deduction"
   description: "Itemized deduction for medical expenses exceeding 7.5% of AGI per 26 USC 213(a)"
+  syntax: python
   formula: |
     agi = adjusted_gross_income
     expenses = qualifying_medical_expenses

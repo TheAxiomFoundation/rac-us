@@ -44,6 +44,7 @@ variable qbi_deduction:
   unit: "USD"
   label: "Qualified Business Income Deduction"
   description: "Section 199A deduction for pass-through income per 26 USC § 199A(a)"
+  syntax: python
   formula: |
     # § 199A(a)(2): 20% of (taxable income - net capital gain - qualified coop dividends)
     ordinary_income = taxable_income - net_capital_gain - qualified_coop_dividends

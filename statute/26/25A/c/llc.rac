@@ -24,6 +24,7 @@ variable llc:
   unit: "USD"
   label: "Lifetime Learning Credit"
   description: "Lifetime Learning Credit after phaseout per 26 USC § 25A(c)"
+  syntax: python
   formula: |
     # Sum all qualified expenses for students not claiming AOC
     # Note: Cannot claim both AOC and LLC for same student

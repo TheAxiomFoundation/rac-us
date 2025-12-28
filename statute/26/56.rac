@@ -24,6 +24,7 @@ variable adjustments:
   unit: "USD"
   label: "Total AMT Adjustments"
   description: "Sum of all AMT adjustments under Sections 56 and 58"
+  syntax: python
   formula: |
     # State and local taxes (including property taxes) claimed as itemized
     # deduction must be added back for AMT purposes

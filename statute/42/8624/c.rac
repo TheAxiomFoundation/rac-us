@@ -35,11 +35,13 @@ parameter priority_multiplier:
   values:
     1981-01-01: 1.25
 
+# NOTE: LIHEAP benefits are set by states, not a federal indexed value
+# This is a placeholder for demonstration - actual amounts vary by state/year
 parameter base_benefit_placeholder:
   description: "Placeholder base benefit amount (actual varies by state/year)"
-  unit: USD
+  unit: "USD"
   values:
-    2024-01-01: 500
+    1981-01-01: 500
 
 parameter cooling_assistance_fraction:
   description: "Cooling assistance as fraction of total LIHEAP benefit"
@@ -65,12 +67,13 @@ variable benefit_calculation:
   unit: "USD"
   label: "LIHEAP cooling assistance"
   description: "Home cooling assistance per 42 USC 8624(b)(1)(B)"
+  syntax: python
   formula: |
     # Energy burden = energy costs / income
     # Handle zero income case
     if annual_gross_income <= 0:
-    # If no income but has energy costs, burden is effectively infinite
-    # Cap at 1.0 (100%) for calculation purposes
-    return 1.0
+        # If no income but has energy costs, burden is effectively infinite
+        # Cap at 1.0 (100%) for calculation purposes
+        return 1.0
     return min(1.0, annual_energy_costs / annual_gross_income)
   default: 0

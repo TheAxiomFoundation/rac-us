@@ -35,10 +35,11 @@ variable cost_sharing:
   unit: "USD"
   label: "CHIP Affordable"
   description: "CHIP cost-sharing is within 5% of household income"
+  syntax: python
   formula: |
     # Only applicable to CHIP-eligible persons
     if not is_chip_eligible:
-    return false
+        return False
     # Check income against cost-sharing exemption threshold
     income_pct_fpl = medicaid_income_level
     # Below 150% FPL: exempt from most cost-sharing

@@ -25,11 +25,16 @@ variable child_dependent_care_credit:
   unit: "USD"
   label: "Child and Dependent Care Credit"
   description: "Credit for employment-related expenses for care of qualifying individuals per 26 USC 21"
+  syntax: python
   formula: |
-    # No qualifying individuals = no credit
-    if num_cdcc_qualifying_individuals == 0: return 0
     # Apply all limitations: actual expenses, statutory limit, earned income limit
-    return min(cdcc_expenses_paid, cdcc_maximum_expense_limit, cdcc_earned_income_limit)
+    limited_expenses = min(cdcc_expenses_paid, cdcc_maximum_expense_limit, cdcc_earned_income_limit)
+    # No qualifying individuals = no credit
+    if num_cdcc_qualifying_individuals == 0:
+        result = 0
+    else:
+        result = limited_expenses
+    return result
   default: 0
 
 variable inputs:
@@ -39,4 +44,36 @@ variable inputs:
   unit: "USD"
   label: "CDCC Expenses Paid"
   description: "Employment-related child/dependent care expenses paid during the year"
+  default: 0
+
+# Standalone validation version - all logic inline (no imports)
+variable cdcc_standalone:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: "USD"
+  label: "Child and Dependent Care Credit"
+  description: "Credit for employment-related expenses for care of qualifying individuals per 26 USC 21"
+  syntax: python
+  formula: |
+    # 26 USC 21(c): Maximum expense limits per qualifying individual
+    if num_cdcc_qualifying_individuals == 0:
+        expense_limit = 0
+    elif num_cdcc_qualifying_individuals == 1:
+        expense_limit = one_qualifying_individual
+    else:
+        expense_limit = two_or_more_qualifying_individuals
+    # 26 USC 21(d)(1): Earned income limitation
+    # Credit limited to lesser of spouse's earned income for married couples
+    earned_income_limit = earned_income
+    # 26 USC 21(b)(2): Qualified expenses = actual expenses capped by limits
+    qualified_expenses = min(cdcc_expenses_paid, expense_limit, earned_income_limit)
+    # 26 USC 21(a)(2): Applicable percentage
+    # Starts at 35%, decreases by 1% per $2,000 of AGI above threshold, floor of 20%
+    agi_above_threshold = max(0, adjusted_gross_income - phase_down_threshold)
+    percentage_reduction = (agi_above_threshold // phase_down_increment) * phase_down_rate
+    applicable_rate = max(minimum_rate, maximum_rate - percentage_reduction)
+    # Final credit = applicable percentage * qualified expenses
+    # Note: non-refundable (limited to tax liability) under permanent law
+    return applicable_rate * qualified_expenses
   default: 0

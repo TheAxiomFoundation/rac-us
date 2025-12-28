@@ -19,9 +19,11 @@ variable income:
   entity: Person
   period: Month
   dtype: Boolean
+  syntax: python
   formula: |
     # FPL based on household size
-    if household_size <= max_table_size: return fpl_monthly.by_household_size[household_size]
+    if household_size <= max_table_size:
+        return fpl_monthly.by_household_size[household_size]
     # For sizes > max_table_size, add per-person amount
     base = fpl_monthly.by_household_size[max_table_size]
     additional = fpl_monthly.additional_per_person

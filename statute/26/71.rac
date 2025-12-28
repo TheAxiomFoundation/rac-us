@@ -37,6 +37,7 @@ variable alimony_income:
   unit: "USD"
   label: "Tax Unit Taxable Alimony Income"
   description: "Total alimony includible in gross income for the tax unit"
+  syntax: python
   formula: |
     # Per TCJA: Only pre-2019 divorce instruments result in includible alimony income
     if not is_pre_2019_divorce_agreement:

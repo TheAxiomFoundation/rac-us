@@ -15,6 +15,7 @@ variable income_methodology:
   entity: Person
   period: Month
   dtype: Money
+  syntax: python
   formula: |
     # Start with AGI (26 USC 62)
     agi = adjusted_gross_income

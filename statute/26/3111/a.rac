@@ -16,6 +16,7 @@ variable employer_social_security_tax:
   unit: "USD"
   label: "Employer Social Security Tax"
   description: "Employer share of Social Security (OASDI) tax at 6.2% of wages up to wage base per 26 USC 3111(a)"
+  syntax: python
   formula: |
     # Social Security tax applies only up to the wage base cap
     # Employer rate matches employee rate
@@ -38,6 +39,7 @@ variable employer_fica_tax:
   unit: "USD"
   label: "Employer FICA Tax"
   description: "Combined employer Social Security and Medicare tax per 26 USC 3111"
+  syntax: python
   formula: |
     # Total employer FICA = Social Security (capped) + Medicare (uncapped)
     return employer_social_security_tax + employer_medicare_tax

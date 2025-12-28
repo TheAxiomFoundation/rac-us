@@ -25,6 +25,7 @@ variable combined_medicare_income:
   unit: "USD"
   label: "Combined Medicare Income"
   description: "Combined wages and SE income for Additional Medicare Tax threshold"
+  syntax: python
   formula: |
     total_wages = sum(members, irs_employment_income)
     total_se = sum(members, net_self_employment_earnings)
@@ -37,13 +38,17 @@ variable additional_medicare_tax_threshold:
   unit: "USD"
   label: "Additional Medicare Tax Threshold"
   description: "Income threshold for Additional Medicare Tax based on filing status"
+  syntax: python
   formula: |
     # (A) Joint return = $250k
     # (B) Married filing separately = $125k
     # (C) Any other case = $200k (Single, HOH, Surviving Spouse)
-    if filing_status == JOINT: return threshold_joint
-    if filing_status == SEPARATE: return threshold_separate
-    return threshold_single
+    if filing_status == JOINT:
+        return threshold_joint
+    elif filing_status == SEPARATE:
+        return threshold_separate
+    else:
+        return threshold_single
 
 variable se_income_subject_to_additional_medicare_tax:
   entity: TaxUnit
@@ -52,6 +57,7 @@ variable se_income_subject_to_additional_medicare_tax:
   unit: "USD"
   label: "SE Income Subject to Additional Medicare Tax"
   description: "Self-employment income subject to 0.9% additional tax per 1401(b)(2)"
+  syntax: python
   formula: |
     total_se = sum(members, net_self_employment_earnings)
     total_wages = sum(members, irs_employment_income)

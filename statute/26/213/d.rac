@@ -25,6 +25,7 @@ variable qualified_medical_expenses:
   unit: "USD"
   label: "Qualifying Medical Expenses"
   description: "Medical expenses eligible for deduction per 26 USC 213(d), net of insurance reimbursement"
+  syntax: python
   formula: |
     # Step 1: Start with gross medical expenses paid during taxable year
     gross_medical = medical_expenses_paid

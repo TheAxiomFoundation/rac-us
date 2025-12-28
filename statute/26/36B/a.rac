@@ -23,6 +23,7 @@ variable premium_tax_credit:
   unit: "USD"
   label: "Additional PTC Refund"
   description: "Additional refund if actual PTC exceeds advance payments"
+  syntax: python
   formula: |
     # Household includes:
     # - Taxpayer

@@ -64,6 +64,7 @@ variable hdhp_requirements:
   unit: "USD"
   label: "Can Be Claimed as Dependent"
   description: "Whether the individual can be claimed as a dependent on another person's return"
+  syntax: python
   formula: |
     if hdhp_coverage_type == self_only: return hdhp_min_deductible_self_only
     if hdhp_coverage_type == family: return hdhp_min_deductible_family
@@ -90,6 +91,7 @@ variable hsa_deduction:
   unit: "USD"
   label: "HSA Additional Tax"
   description: "20% additional tax on non-qualified HSA distributions"
+  syntax: python
   formula: |
     # Must be an eligible individual
     if not is_hsa_eligible:

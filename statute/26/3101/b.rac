@@ -18,6 +18,7 @@ variable medicare_tax:
   unit: "USD"
   label: "Medicare Tax Withheld"
   description: "Total Medicare tax withheld from wages (employee share) per 26 USC 3101(b)"
+  syntax: python
   formula: |
     # Medicare tax applies to ALL wages - no cap unlike Social Security
     return irs_employment_income * employee_rate

@@ -36,6 +36,7 @@ variable earned_income_limit:
   unit: "USD"
   label: "DCAP Earned Income Limit"
   description: "Earned income limitation on dependent care assistance exclusion per 26 USC 129(b)"
+  syntax: python
   formula: |
     # Calculate earned income for head and spouse
     # Filter earned income by role, then sum
@@ -45,7 +46,7 @@ variable earned_income_limit:
     spouse_actual_earned = sum(members, spouse_income)
     # For single/HoH filers: use the head's earned income
     if filing_status == SINGLE or filing_status == HEAD_OF_HOUSEHOLD:
-    return head_earned
+        return head_earned
     # For married filers: use lesser of two spouses' earned income
     # But first apply the special rule for student/disabled spouse
     # Check if spouse is student or disabled
@@ -56,8 +57,8 @@ variable earned_income_limit:
     spouse_is_disabled = any(members, spouse_disabled_flag)
     # Determine imputed income for student/disabled spouse
     # Imputed for 12 months (annual amount)
-    imputed_monthly = num_cdcc_qualifying_individuals >= qualifying_individuals_higher_imputed_threshold ? imputed_monthly_two : imputed_monthly_one
+    imputed_monthly = imputed_monthly_two if num_cdcc_qualifying_individuals >= qualifying_individuals_higher_imputed_threshold else imputed_monthly_one
     imputed_annual = imputed_monthly * months_per_year
     # If spouse is student or disabled, use higher of actual or imputed income
-    spouse_earned = (spouse_is_student or spouse_is_disabled) ? max(spouse_actual_earned, imputed_annual) : spouse_actual_earned
+    spouse_earned = max(spouse_actual_earned, imputed_annual) if (spouse_is_student or spouse_is_disabled) else spouse_actual_earned
     return min(head_earned, spouse_earned)

@@ -18,6 +18,7 @@ variable tax_amount:
   unit: "USD"
   label: "Corporate Income Tax"
   description: "Federal corporate income tax under 26 USC 11"
+  syntax: python
   formula: |
     # Only C corporations pay corporate income tax
     if not is_subject_to_corporate_tax: return 0

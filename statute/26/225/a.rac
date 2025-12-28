@@ -28,25 +28,26 @@ variable qualified_overtime_deduction:
   unit: "USD"
   label: "Qualified Overtime Compensation Deduction"
   description: "Above-the-line deduction for qualified overtime compensation per 26 USC 225"
+  syntax: python
   formula: |
     # Section 225(g): No deduction after the termination year
     if tax_year > termination_final_year:
-    return 0
+        return 0
     # Section 225(e): Married individuals must file jointly
     if filing_status == MARRIED_FILING_SEPARATELY:
-    return 0
+        return 0
     # Section 225(d): SSN required (assumed valid if filing)
     # Section 225(c)(1): Only FLSA Section 7 premium qualifies
     # (the excess over regular rate, i.e., the "half" in time-and-a-half)
     # This is an input variable provided by the taxpayer/employer
     overtime_premium = qualified_overtime_compensation
     # Section 225(b)(1): Apply maximum deduction cap
-    max_deduction = filing_status == JOINT ? max_deduction_joint : max_deduction_single
+    max_deduction = max_deduction_joint if filing_status == JOINT else max_deduction_single
     capped_deduction = min(overtime_premium, max_deduction)
     # Section 225(b)(2): Calculate phase-out based on MAGI
     # Section 225(b)(2)(B): MAGI = AGI + Section 911/931/933 exclusions
     magi = adjusted_gross_income + foreign_earned_income_exclusion + guam_income_exclusion + american_samoa_income_exclusion
-    phaseout_threshold = filing_status == JOINT ? phaseout_threshold_joint : phaseout_threshold_single
+    phaseout_threshold = phaseout_threshold_joint if filing_status == JOINT else phaseout_threshold_single
     # Section 225(b)(2)(A): Reduction = $100 per $1,000 over threshold
     excess_income = max(0, magi - phaseout_threshold)
     reduction_increments = floor(excess_income / phaseout_income_increment)

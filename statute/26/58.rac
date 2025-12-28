@@ -20,6 +20,7 @@ variable denial_of_losses:
   unit: "USD"
   label: "Total Section 58 Loss Adjustments"
   description: "Sum of all loss disallowances under Section 58"
+  syntax: python
   formula: |
     # Material participation is determined under Section 469 passive activity rules
     # Taxpayer must work 500+ hours, be sole participant, or meet other tests

@@ -29,6 +29,7 @@ variable ira_deduction:
   unit: "USD"
   label: "Eligible for Spousal IRA"
   description: "Whether individual can contribute to IRA using spouse's compensation"
+  syntax: python
   formula: |
     # Must have earned income to contribute (post-SECURE, no age limit)
     if earned_income <= 0:

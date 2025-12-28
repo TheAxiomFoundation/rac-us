@@ -19,9 +19,10 @@ variable chip:
   unit: "USD"
   label: "CHIP Coverage Gap Count"
   description: "Number of CHIP-eligible persons facing cost-sharing burden"
+  syntax: python
   formula: |
     # Not eligible: no benefit
     if not is_chip_eligible:
-    return 0
+        return 0
     # Eligible: return per-capita benefit value
     return per_capita_chip_benefit

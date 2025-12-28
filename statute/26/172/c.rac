@@ -20,6 +20,7 @@ variable net_operating_loss:
   unit: "USD"
   label: "Net Operating Loss"
   description: "Excess of deductions over gross income per 26 USC 172(c)"
+  syntax: python
   formula: |
     # NOL = negative taxable income (before NOL deduction), with modifications
     # Per 172(c), we compute the excess of deductions over income
@@ -27,7 +28,7 @@ variable net_operating_loss:
     modified_taxable_income = taxable_income + nol_modifications
     # NOL only exists when modified taxable income is negative
     if modified_taxable_income >= 0:
-    return 0
+        return 0
     # Return the absolute value of the loss
     return -modified_taxable_income
   default: 0
@@ -39,4 +40,4 @@ variable has_net_operating_loss:
   label: "Has Net Operating Loss"
   description: "Whether taxpayer has a net operating loss in the current year"
   formula: return net_operating_loss > 0
-  default: false
+  default: False

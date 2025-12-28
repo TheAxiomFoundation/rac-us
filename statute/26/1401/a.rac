@@ -16,9 +16,11 @@ variable self_employment_tax:
   unit: "USD"
   label: "Self-Employment Medicare Tax"
   description: "Hospital Insurance tax on self-employment earnings per 1401(b)"
+  syntax: python
   formula: |
     # taxable_self_employment_income from PE is already gross * 0.9235
-    return max(0, taxable_self_employment_income)
+    result = max(0, taxable_self_employment_income)
+    return result
 
 variable base_self_employment_tax:
   entity: Person
@@ -36,6 +38,7 @@ variable self_employment_tax:
   unit: "USD"
   label: "Self-Employment Tax"
   description: "Combined OASDI, HI, and Additional Medicare taxes per 1401"
+  syntax: python
   formula: |
     # Base SE tax (OASDI + Medicare at 2.9%)
     # Note: Additional Medicare Tax (0.9% above threshold) is calculated

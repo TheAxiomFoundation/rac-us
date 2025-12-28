@@ -23,12 +23,13 @@ variable rollovers:
   unit: "USD"
   label: "Net IRA Distribution After Rollover"
   description: "IRA distribution amount remaining taxable after valid rollover"
+  syntax: python
   formula: |
     # Direct transfers always permitted
     if is_ira_direct_transfer:
-    return true
+        return True
     # 60-day rollover limited to once per 12 months
     if has_prior_12_month_rollover:
-    return false
-    return true
+        return False
+    return True
   default: 0

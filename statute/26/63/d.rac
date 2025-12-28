@@ -22,6 +22,7 @@ variable itemized_taxable_income_deductions:
   unit: "USD"
   label: "Total Itemized Deductions"
   description: "Sum of allowable itemized deductions per 26 USC 63(d)"
+  syntax: python
   formula: |
     # Sum all itemized deduction components
     # Note: casualty_loss_deduction omitted pending Section 165 implementation
@@ -39,5 +40,7 @@ variable total_itemized_deductions:
   unit: "USD"
   label: "Total Itemized Deductions"
   description: "Alias for itemized_taxable_income_deductions"
-  formula: return itemized_taxable_income_deductions
+  syntax: python
+  formula: |
+    return itemized_taxable_income_deductions
   default: 0

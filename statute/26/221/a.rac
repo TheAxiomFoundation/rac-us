@@ -47,14 +47,14 @@ variable student_loan_deduction:
 variable student_loan_interest_paid:
   entity: Person
   period: Year
-  dtype: Bool
+  dtype: Boolean
   label: "Claimed as Dependent"
   description: "Whether the individual can be claimed as a dependent by another taxpayer under Section 151"
 
 variable is_claimed_as_dependent:
   entity: TaxUnit
   period: Year
-  dtype: Bool
+  dtype: Boolean
   label: "Student Loan Interest Deduction Eligibility"
   description: "Whether the tax unit is eligible for the student loan interest deduction"
 
@@ -65,6 +65,7 @@ variable student_loan_interest_deduction_eligible:
   unit: "USD"
   label: "Phase-out Start Threshold"
   description: "MAGI threshold where student loan interest deduction phase-out begins"
+  syntax: python
   formula: |
     # 221(d)(2): MFS cannot claim this deduction
     not_mfs = filing_status != MARRIED_FILING_SEPARATELY
@@ -80,9 +81,10 @@ variable student_loan_interest_phaseout_start:
   unit: "USD"
   label: "Phase-out End Threshold"
   description: "MAGI threshold where student loan interest deduction is fully phased out"
+  syntax: python
   formula: |
     if filing_status == MARRIED_FILING_JOINTLY:
-    return phaseout_joint_start
+        return phaseout_joint_start
     # Single, HOH, and Qualifying Widow(er) use single thresholds
     return phaseout_single_start
 
@@ -92,9 +94,10 @@ variable student_loan_interest_phaseout_end:
   dtype: Rate
   label: "Student Loan Interest Phase-out Ratio"
   description: "Ratio of deduction reduced due to MAGI-based phase-out"
+  syntax: python
   formula: |
     if filing_status == MARRIED_FILING_JOINTLY:
-    return phaseout_joint_end
+        return phaseout_joint_end
     return phaseout_single_end
 
 variable student_loan_interest_phaseout_ratio:
@@ -104,6 +107,7 @@ variable student_loan_interest_phaseout_ratio:
   unit: "USD"
   label: "Student Loan Interest Deduction (Before Phase-out)"
   description: "Deduction amount before applying income-based phase-out"
+  syntax: python
   formula: |
     # For Section 221, MAGI equals AGI (no add-backs required per 221(b)(2)(C))
     # Unlike some other provisions, 221 uses AGI directly
@@ -113,10 +117,10 @@ variable student_loan_interest_phaseout_ratio:
     range = end - start
     # Below phase-out start: no reduction
     if magi <= start:
-    return 0
+        return 0
     # Above phase-out end: fully phased out
     if magi >= end:
-    return 1
+        return 1
     # Per 221(b)(2)(B): proportional reduction within phase-out range
     # Reduction ratio = (MAGI - threshold) / phase-out range
     return (magi - start) / range
@@ -128,6 +132,7 @@ variable student_loan_interest_deduction_before_phaseout:
   unit: "USD"
   label: "Student Loan Interest Deduction"
   description: "Above-the-line deduction for interest paid on qualified education loans per 26 USC 221"
+  syntax: python
   formula: |
     # Sum interest paid by all members of the tax unit
     total_interest = sum(members.student_loan_interest_paid)
@@ -135,10 +140,11 @@ variable student_loan_interest_deduction_before_phaseout:
     return min(total_interest, max_deduction)
 
 variable student_loan_interest_deduction:
+  syntax: python
   formula: |
     # Check eligibility per 221(d)
     if not student_loan_interest_deduction_eligible:
-    return 0
+        return 0
     # Get base deduction (capped at maximum per 221(b)(1))
     base = student_loan_interest_deduction_before_phaseout
     # Apply phase-out per 221(b)(2)
