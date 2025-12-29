@@ -1,4 +1,93 @@
+text: """
+26 USC § 32(c)(3)(C) - Place of Abode
+
+The term 'qualifying child' means, with respect to any individual,
+a child who meets the requirements of section 152(c)(1)(B), which requires
+that the child has the same principal place of abode as the taxpayer for
+more than one-half of such taxable year.
+
+Note: For EITC purposes, the principal place of abode must be in the
+United States. A child who is born or dies during the taxable year is
+treated as having the same principal place of abode as the taxpayer for
+the taxpayer's entire taxable year if the child lived with the taxpayer
+for more than one-half of the time the child was alive during the year.
+"""
+
+parameter days_in_year:
+  description: "Number of days in the tax year"
+  values:
+    2024-01-01: 366
+    2023-01-01: 365
+    2020-01-01: 366
+    2019-01-01: 365
+
+parameter minimum_residency_fraction:
+  description: "Minimum fraction of year child must reside with taxpayer"
+  values:
+    2024-01-01: 0.5
+
 variable child_meets_place_of_abode:
   entity: Person
   period: Year
   dtype: Boolean
+  label: "Child Meets Place of Abode Requirement"
+  description: "Whether child has same principal place of abode as taxpayer for more than half of the taxable year per 26 USC §32(c)(3)(C) and §152(c)(1)(B)"
+  syntax: python
+  formula: |
+    # Child must live with taxpayer for more than half the year
+    # For children born/deceased during year, we use fraction of days alive
+    if days_lived_in_year > 0:
+      residency_fraction = days_with_taxpayer / days_lived_in_year
+    else:
+      return False
+    # Must be MORE than half, not equal to half
+    return residency_fraction > minimum_residency_fraction
+  tests:
+    - name: "Child lives with taxpayer full year"
+      period: 2024
+      inputs:
+        days_with_taxpayer: 366
+        days_lived_in_year: 366
+        days_in_year: 366
+        minimum_residency_fraction: 0.5
+      expect: true
+    - name: "Child lives with taxpayer exactly half year - not qualifying"
+      period: 2024
+      inputs:
+        days_with_taxpayer: 183
+        days_lived_in_year: 366
+        days_in_year: 366
+        minimum_residency_fraction: 0.5
+      expect: false
+    - name: "Child lives with taxpayer more than half year - qualifying"
+      period: 2024
+      inputs:
+        days_with_taxpayer: 184
+        days_lived_in_year: 366
+        days_in_year: 366
+        minimum_residency_fraction: 0.5
+      expect: true
+    - name: "Child born mid-year, lives with taxpayer entire time alive"
+      period: 2024
+      inputs:
+        days_with_taxpayer: 200
+        days_lived_in_year: 200
+        days_in_year: 366
+        minimum_residency_fraction: 0.5
+      expect: true
+    - name: "Child died mid-year, lived with taxpayer more than half of days alive"
+      period: 2024
+      inputs:
+        days_with_taxpayer: 100
+        days_lived_in_year: 150
+        days_in_year: 366
+        minimum_residency_fraction: 0.5
+      expect: true
+    - name: "Child died mid-year, lived with taxpayer less than half of days alive"
+      period: 2024
+      inputs:
+        days_with_taxpayer: 70
+        days_lived_in_year: 150
+        days_in_year: 366
+        minimum_residency_fraction: 0.5
+      expect: false

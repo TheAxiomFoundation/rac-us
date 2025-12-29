@@ -9,3 +9,80 @@ variable missing_spouse_tin:
   dtype: Boolean
   label: "Missing Spouse SSN for EITC"
   description: "Whether taxpayer's spouse lacks a valid SSN for work when filing jointly, disqualifying from EITC per 26 USC §32(c)(1)(E)(ii) and §32(m)"
+  tests:
+    - name: "single_filer_not_applicable"
+      period: 2024
+      description: "Single filer has no spouse, so spouse TIN requirement does not apply"
+      inputs:
+        tax_unit:
+          filing_status: single
+          has_spouse: false
+          earned_income: 25_000
+      expect:
+        missing_spouse_tin: false
+
+    - name: "married_both_valid_ssn"
+      period: 2024
+      description: "Married filing jointly where both spouses have valid SSNs qualifies for EITC consideration"
+      inputs:
+        tax_unit:
+          filing_status: married_filing_jointly
+          has_spouse: true
+          taxpayer_has_valid_ssn: true
+          spouse_has_valid_ssn: true
+          earned_income: 42_000
+      expect:
+        missing_spouse_tin: false
+
+    - name: "married_spouse_has_itin"
+      period: 2024
+      description: "Married filing jointly where spouse has ITIN instead of SSN disqualifies from EITC per §32(m)"
+      inputs:
+        tax_unit:
+          filing_status: married_filing_jointly
+          has_spouse: true
+          taxpayer_has_valid_ssn: true
+          spouse_has_valid_ssn: false
+          spouse_has_itin: true
+          earned_income: 35_000
+      expect:
+        missing_spouse_tin: true
+
+    - name: "married_spouse_no_tin"
+      period: 2024
+      description: "Married filing jointly where spouse has no TIN at all disqualifies from EITC"
+      inputs:
+        tax_unit:
+          filing_status: married_filing_jointly
+          has_spouse: true
+          taxpayer_has_valid_ssn: true
+          spouse_has_valid_ssn: false
+          spouse_has_itin: false
+          earned_income: 28_000
+      expect:
+        missing_spouse_tin: true
+
+    - name: "married_filing_separately"
+      period: 2024
+      description: "Married filing separately does not require spouse TIN on return"
+      inputs:
+        tax_unit:
+          filing_status: married_filing_separately
+          has_spouse: true
+          taxpayer_has_valid_ssn: true
+          spouse_has_valid_ssn: false
+          earned_income: 18_000
+      expect:
+        missing_spouse_tin: false
+
+    - name: "head_of_household_no_spouse"
+      period: 2024
+      description: "Head of household filer with no current spouse has no spouse TIN requirement"
+      inputs:
+        tax_unit:
+          filing_status: head_of_household
+          has_spouse: false
+          taxpayer_has_valid_ssn: true
+          earned_income: 32_000
+      expect:
+        missing_spouse_tin: false

@@ -9,3 +9,68 @@ variable missing_taxpayer_tin:
   dtype: Boolean
   label: "Missing Taxpayer SSN for EITC"
   description: "Whether taxpayer lacks a valid SSN for work, disqualifying from EITC per 26 USC §32(c)(1)(E)(i) and §32(m)"
+  tests:
+    - name: "taxpayer_with_valid_ssn_qualifies"
+      period: 2024
+      description: "Taxpayer with valid SSN for work meets EITC identification requirement"
+      inputs:
+        tax_unit:
+          has_valid_ssn_for_work: true
+          earned_income: 25_000
+      expect:
+        missing_taxpayer_tin: false
+
+    - name: "taxpayer_with_itin_disqualified"
+      period: 2024
+      description: "Taxpayer with ITIN (Individual Taxpayer Identification Number) instead of SSN is disqualified from EITC"
+      inputs:
+        tax_unit:
+          has_valid_ssn_for_work: false
+          has_itin: true
+          earned_income: 30_000
+      expect:
+        missing_taxpayer_tin: true
+
+    - name: "taxpayer_no_ssn_no_itin_disqualified"
+      period: 2024
+      description: "Taxpayer without any valid identification number is disqualified from EITC"
+      inputs:
+        tax_unit:
+          has_valid_ssn_for_work: false
+          has_itin: false
+          earned_income: 15_000
+      expect:
+        missing_taxpayer_tin: true
+
+    - name: "taxpayer_with_ssn_not_valid_for_work"
+      period: 2024
+      description: "Taxpayer with SSN not valid for employment (e.g., issued with work restrictions) is disqualified per §32(m)"
+      inputs:
+        tax_unit:
+          has_valid_ssn_for_work: false
+          has_ssn_with_work_restriction: true
+          earned_income: 22_000
+      expect:
+        missing_taxpayer_tin: true
+
+    - name: "naturalized_citizen_with_valid_ssn"
+      period: 2024
+      description: "Naturalized citizen with valid SSN for work qualifies for EITC consideration"
+      inputs:
+        tax_unit:
+          has_valid_ssn_for_work: true
+          citizenship_status: "NATURALIZED_CITIZEN"
+          earned_income: 35_000
+      expect:
+        missing_taxpayer_tin: false
+
+    - name: "low_income_taxpayer_missing_ssn"
+      period: 2024
+      description: "Low-income taxpayer who would otherwise qualify but lacks valid SSN is disqualified"
+      inputs:
+        tax_unit:
+          has_valid_ssn_for_work: false
+          earned_income: 8_000
+          num_qualifying_children: 2
+      expect:
+        missing_taxpayer_tin: true
