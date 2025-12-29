@@ -28,7 +28,8 @@ variable child_dependent_care_credit:
     # No qualifying individuals = no credit
     if num_cdcc_qualifying_individuals == 0:
         return 0
-    return limited_expenses
+    # Per 26 USC 21(a)(1): credit = applicable percentage × employment-related expenses
+    return cdcc_applicable_percentage * limited_expenses
   default: 0
   tests:
     - name: "No qualifying individuals returns zero"
@@ -38,61 +39,74 @@ variable child_dependent_care_credit:
         cdcc_expenses_paid: 5_000
         cdcc_maximum_expense_limit: 3_000
         cdcc_earned_income_limit: 40_000
+        cdcc_applicable_percentage: 0.20
       expect: 0
 
-    - name: "One qualifying individual - expenses below limit"
+    - name: "One qualifying individual - expenses below limit - 20% rate"
       period: 2024
       inputs:
         num_cdcc_qualifying_individuals: 1
         cdcc_expenses_paid: 2_000
         cdcc_maximum_expense_limit: 3_000
         cdcc_earned_income_limit: 40_000
-      expect: 2_000
+        cdcc_applicable_percentage: 0.20
+      # 2,000 × 0.20 = 400
+      expect: 400
 
-    - name: "One qualifying individual - expenses at statutory limit"
+    - name: "One qualifying individual - expenses at statutory limit - 35% rate"
       period: 2024
       inputs:
         num_cdcc_qualifying_individuals: 1
         cdcc_expenses_paid: 5_000
         cdcc_maximum_expense_limit: 3_000
         cdcc_earned_income_limit: 40_000
-      expect: 3_000
+        cdcc_applicable_percentage: 0.35
+      # 3,000 × 0.35 = 1,050
+      expect: 1_050
 
-    - name: "Two qualifying individuals - expenses below limit"
+    - name: "Two qualifying individuals - expenses below limit - 25% rate"
       period: 2024
       inputs:
         num_cdcc_qualifying_individuals: 2
         cdcc_expenses_paid: 4_000
         cdcc_maximum_expense_limit: 6_000
         cdcc_earned_income_limit: 50_000
-      expect: 4_000
+        cdcc_applicable_percentage: 0.25
+      # 4,000 × 0.25 = 1,000
+      expect: 1_000
 
-    - name: "Two qualifying individuals - expenses exceed statutory limit"
+    - name: "Two qualifying individuals - expenses exceed statutory limit - 20% rate"
       period: 2024
       inputs:
         num_cdcc_qualifying_individuals: 2
         cdcc_expenses_paid: 10_000
         cdcc_maximum_expense_limit: 6_000
         cdcc_earned_income_limit: 50_000
-      expect: 6_000
+        cdcc_applicable_percentage: 0.20
+      # 6,000 × 0.20 = 1,200
+      expect: 1_200
 
-    - name: "Earned income limit binding - single low earner"
+    - name: "Earned income limit binding - single low earner - 35% rate"
       period: 2024
       inputs:
         num_cdcc_qualifying_individuals: 1
         cdcc_expenses_paid: 5_000
         cdcc_maximum_expense_limit: 3_000
         cdcc_earned_income_limit: 2_500
-      expect: 2_500
+        cdcc_applicable_percentage: 0.35
+      # 2,500 × 0.35 = 875
+      expect: 875
 
-    - name: "All limits apply - minimum of three constraints"
+    - name: "All limits apply - minimum of three constraints - 30% rate"
       period: 2024
       inputs:
         num_cdcc_qualifying_individuals: 2
         cdcc_expenses_paid: 8_000
         cdcc_maximum_expense_limit: 6_000
         cdcc_earned_income_limit: 5_000
-      expect: 5_000
+        cdcc_applicable_percentage: 0.30
+      # 5,000 × 0.30 = 1,500
+      expect: 1_500
 
 variable inputs:
   entity: TaxUnit

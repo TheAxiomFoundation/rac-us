@@ -7,28 +7,105 @@ variable filing_status:
 
 # 26 USC Section 1 - Tax Imposed (Ordinary Income Tax)
 #
-
 text: """
 There is hereby imposed on the taxable income of every individual...
 a tax determined in accordance with the following table
 """
 
-# Federal income tax brackets (base statutory values from TCJA 2017)
-# Thresholds indexed annually per IRC 1(f); base 2018 values here
-# Current indexed values in IRS Rev. Proc. guidance files
-parameter brackets:
-  description: "Federal income tax brackets"
+# Federal income tax bracket thresholds - 26 USC 1(a)-(d), indexed per 1(f)
+# Base values from TCJA (P.L. 115-97), indexed amounts from IRS Rev. Proc.
+
+parameter bracket_thresholds_single:
+  description: "Income tax bracket thresholds for single filers"
+  reference: "26 USC 1(c); Rev. Proc. 2017-58, Rev. Proc. 2018-57, Rev. Proc. 2019-44, Rev. Proc. 2020-45, Rev. Proc. 2021-45, Rev. Proc. 2022-38, Rev. Proc. 2023-34"
   indexed_by: statute/26/1/f
   values:
-    # TCJA base thresholds (2018)
-    thresholds:
-      single: [0, 9_525, 38_700, 82_500, 157_500, 200_000, 500_000]
-      married_filing_jointly: [0, 19_050, 77_400, 165_000, 315_000, 400_000, 600_000]
-      married_filing_separately: [0, 9_525, 38_700, 82_500, 157_500, 200_000, 300_000]
-      head_of_household: [0, 13_600, 51_800, 82_500, 157_500, 200_000, 500_000]
-      qualifying_widow: [0, 19_050, 77_400, 165_000, 315_000, 400_000, 600_000]
-    # Rates are statutory (TCJA)
-    rates: [0.10, 0.12, 0.22, 0.24, 0.32, 0.35, 0.37]
+    2018: [0, 9_525, 38_700, 82_500, 157_500, 200_000, 500_000]
+    2019: [0, 9_700, 39_475, 84_200, 160_725, 204_100, 510_300]
+    2020: [0, 9_875, 40_125, 85_525, 163_300, 207_350, 518_400]
+    2021: [0, 9_950, 40_525, 86_375, 164_925, 209_425, 523_600]
+    2022: [0, 10_275, 41_775, 89_075, 170_050, 215_950, 539_900]
+    2023: [0, 11_000, 44_725, 95_375, 182_100, 231_250, 578_125]
+    2024: [0, 11_600, 47_150, 100_525, 191_950, 243_725, 609_350]
+
+parameter bracket_thresholds_married_filing_jointly:
+  description: "Income tax bracket thresholds for married filing jointly"
+  reference: "26 USC 1(a); Rev. Proc. 2017-58, Rev. Proc. 2018-57, Rev. Proc. 2019-44, Rev. Proc. 2020-45, Rev. Proc. 2021-45, Rev. Proc. 2022-38, Rev. Proc. 2023-34"
+  indexed_by: statute/26/1/f
+  values:
+    2018: [0, 19_050, 77_400, 165_000, 315_000, 400_000, 600_000]
+    2019: [0, 19_400, 78_950, 168_400, 321_450, 408_200, 612_350]
+    2020: [0, 19_750, 80_250, 171_050, 326_600, 414_700, 622_050]
+    2021: [0, 19_900, 81_050, 172_750, 329_850, 418_850, 628_300]
+    2022: [0, 20_550, 83_550, 178_150, 340_100, 431_900, 647_850]
+    2023: [0, 22_000, 89_450, 190_750, 364_200, 462_500, 693_750]
+    2024: [0, 23_200, 94_300, 201_050, 383_900, 487_450, 731_200]
+
+parameter bracket_thresholds_married_filing_separately:
+  description: "Income tax bracket thresholds for married filing separately"
+  reference: "26 USC 1(d); Rev. Proc. 2017-58, Rev. Proc. 2018-57, Rev. Proc. 2019-44, Rev. Proc. 2020-45, Rev. Proc. 2021-45, Rev. Proc. 2022-38, Rev. Proc. 2023-34"
+  indexed_by: statute/26/1/f
+  values:
+    2018: [0, 9_525, 38_700, 82_500, 157_500, 200_000, 300_000]
+    2019: [0, 9_700, 39_475, 84_200, 160_725, 204_100, 306_175]
+    2020: [0, 9_875, 40_125, 85_525, 163_300, 207_350, 311_025]
+    2021: [0, 9_950, 40_525, 86_375, 164_925, 209_425, 314_150]
+    2022: [0, 10_275, 41_775, 89_075, 170_050, 215_950, 323_925]
+    2023: [0, 11_000, 44_725, 95_375, 182_100, 231_250, 346_875]
+    2024: [0, 11_600, 47_150, 100_525, 191_950, 243_725, 365_600]
+
+parameter bracket_thresholds_head_of_household:
+  description: "Income tax bracket thresholds for head of household filers"
+  reference: "26 USC 1(b); Rev. Proc. 2017-58, Rev. Proc. 2018-57, Rev. Proc. 2019-44, Rev. Proc. 2020-45, Rev. Proc. 2021-45, Rev. Proc. 2022-38, Rev. Proc. 2023-34"
+  indexed_by: statute/26/1/f
+  values:
+    2018: [0, 13_600, 51_800, 82_500, 157_500, 200_000, 500_000]
+    2019: [0, 13_850, 52_850, 84_200, 160_700, 204_100, 510_300]
+    2020: [0, 14_100, 53_700, 85_500, 163_300, 207_350, 518_400]
+    2021: [0, 14_200, 54_200, 86_350, 164_900, 209_400, 523_600]
+    2022: [0, 14_650, 55_900, 89_050, 170_050, 215_950, 539_900]
+    2023: [0, 15_700, 59_850, 95_350, 182_100, 231_250, 578_100]
+    2024: [0, 16_550, 63_100, 100_500, 191_950, 243_700, 609_350]
+
+parameter bracket_thresholds_qualifying_widow:
+  description: "Income tax bracket thresholds for qualifying surviving spouse"
+  reference: "26 USC 1(a); Rev. Proc. 2017-58, Rev. Proc. 2018-57, Rev. Proc. 2019-44, Rev. Proc. 2020-45, Rev. Proc. 2021-45, Rev. Proc. 2022-38, Rev. Proc. 2023-34"
+  indexed_by: statute/26/1/f
+  values:
+    # Same as married filing jointly per 26 USC 1(a)
+    2018: [0, 19_050, 77_400, 165_000, 315_000, 400_000, 600_000]
+    2019: [0, 19_400, 78_950, 168_400, 321_450, 408_200, 612_350]
+    2020: [0, 19_750, 80_250, 171_050, 326_600, 414_700, 622_050]
+    2021: [0, 19_900, 81_050, 172_750, 329_850, 418_850, 628_300]
+    2022: [0, 20_550, 83_550, 178_150, 340_100, 431_900, 647_850]
+    2023: [0, 22_000, 89_450, 190_750, 364_200, 462_500, 693_750]
+    2024: [0, 23_200, 94_300, 201_050, 383_900, 487_450, 731_200]
+
+parameter bracket_rates:
+  description: "Marginal tax rates for each income bracket"
+  reference: "26 USC 1(a)-(d), as amended by P.L. 115-97 (TCJA)"
+  values:
+    # Statutory rates from TCJA, effective 2018-2025
+    2018: [0.10, 0.12, 0.22, 0.24, 0.32, 0.35, 0.37]
+    2019: [0.10, 0.12, 0.22, 0.24, 0.32, 0.35, 0.37]
+    2020: [0.10, 0.12, 0.22, 0.24, 0.32, 0.35, 0.37]
+    2021: [0.10, 0.12, 0.22, 0.24, 0.32, 0.35, 0.37]
+    2022: [0.10, 0.12, 0.22, 0.24, 0.32, 0.35, 0.37]
+    2023: [0.10, 0.12, 0.22, 0.24, 0.32, 0.35, 0.37]
+    2024: [0.10, 0.12, 0.22, 0.24, 0.32, 0.35, 0.37]
+
+# Composite brackets parameter for use in formulas
+parameter brackets:
+  description: "Federal income tax brackets (composite)"
+  reference: "26 USC 1"
+  values:
+    thresholds_by_filing_status:
+      SINGLE: bracket_thresholds_single
+      JOINT: bracket_thresholds_married_filing_jointly
+      SEPARATE: bracket_thresholds_married_filing_separately
+      HEAD_OF_HOUSEHOLD: bracket_thresholds_head_of_household
+      QUALIFYING_WIDOW: bracket_thresholds_qualifying_widow
+    rates: bracket_rates
 
 variable income_tax:
   imports:
