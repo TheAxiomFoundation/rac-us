@@ -275,3 +275,18 @@ variable is_active_retirement_plan_participant_derived:
     # Pass through the input value - used when referencing via imports
     return is_active_retirement_plan_participant
   default: false
+  tests:
+    - name: "Active participant returns true"
+      period: 2024
+      inputs:
+        is_active_retirement_plan_participant: true
+      expect: true
+    - name: "Non-participant returns false"
+      period: 2024
+      inputs:
+        is_active_retirement_plan_participant: false
+      expect: false
+    - name: "Default value (no input) returns false"
+      period: 2024
+      inputs: {}
+      expect: false

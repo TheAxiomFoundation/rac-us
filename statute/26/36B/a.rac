@@ -75,32 +75,28 @@ variable monthly_benchmark_excess:
     return max(0, excess)
   default: 0
   tests:
-    # At 150% FPL, contribution is 0% under IRA
-    - name: "Benchmark excess at 150% FPL (0% contribution)"
+    # Unit test: directly test formula with immediate inputs
+    # Formula: max(0, slcsp_premium_monthly - monthly_expected_contribution)
+    - name: "Positive excess when benchmark exceeds contribution"
       period: 2024-01
       inputs:
-        adjusted_gross_income: 22_590  # 150% FPL
-        tax_unit_size: 1
-        slcsp_premium: 4_800  # $400/month * 12
-      expect: 400  # SLCSP - 0 contribution = $400
+        slcsp_premium_monthly: 400
+        monthly_expected_contribution: 100
+      expect: 300  # max(0, 400 - 100) = 300
 
-    # At 200% FPL, contribution is 2% of income
-    - name: "Benchmark excess at 200% FPL (2% contribution)"
+    - name: "Zero excess when contribution exceeds benchmark"
       period: 2024-01
       inputs:
-        adjusted_gross_income: 30_120  # 200% FPL
-        tax_unit_size: 1
-        slcsp_premium: 4_800  # $400/month
-      expect: 349.8  # 400 - (30120 * 0.02 / 12) = 400 - 50.2
+        slcsp_premium_monthly: 400
+        monthly_expected_contribution: 500
+      expect: 0  # max(0, 400 - 500) = max(0, -100) = 0
 
-    # High income: expected contribution exceeds benchmark
-    - name: "Benchmark excess is zero when contribution exceeds SLCSP"
+    - name: "Full benchmark when zero contribution"
       period: 2024-01
       inputs:
-        adjusted_gross_income: 120_000
-        tax_unit_size: 1
-        slcsp_premium: 4_800  # $400/month
-      expect: 0  # max(0, 400 - 850) = 0
+        slcsp_premium_monthly: 600
+        monthly_expected_contribution: 0
+      expect: 600  # max(0, 600 - 0) = 600
 
 variable monthly_premium_assistance:
   entity: TaxUnit

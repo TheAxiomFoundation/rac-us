@@ -323,6 +323,20 @@ variable tanf_required_work_hours_monthly:
         tanf_work_requirement_exempt: false
         receives_federal_childcare_assistance: true
       expect: 238
+    - name: "Two-parent family without childcare (35 weekly * 4.33 = 152 monthly)"
+      period: 2024-01
+      inputs:
+        is_tanf_single_parent: false
+        is_tanf_two_parent_family: true
+        tanf_work_requirement_exempt: false
+        receives_federal_childcare_assistance: false
+      expect: 152
+    - name: "Exempt person has zero required hours"
+      period: 2024-01
+      inputs:
+        is_tanf_single_parent: true
+        tanf_work_requirement_exempt: true
+      expect: 0
 
 variable tanf_hours_in_core_activities:
   entity: Person

@@ -55,6 +55,76 @@ variable carryback_carryover:
     pre_2018_allowed = min(nol_carryforward_pre_2018, max(0, taxable_income - post_2017_allowed))
     return min(total_nol, pre_2018_allowed + post_2017_allowed)
   default: 0
+  tests:
+    - name: "NOL deduction with only post-TCJA carryforward subject to 80% limit"
+      period: 2024
+      inputs:
+        taxable_income: 100_000
+        filing_status: "single"
+        nol_carryforward_pre_2018: 0
+        nol_carryforward_post_2017: 150_000
+        farming_loss_carryback: 0
+        is_farming_business: false
+        current_year_farming_loss: 0
+      # Post-TCJA NOL limited to 80% of taxable income: 100_000 * 0.80 = 80_000
+      expect: 80_000
+    - name: "NOL deduction with only pre-TCJA carryforward (no 80% limit)"
+      period: 2024
+      inputs:
+        taxable_income: 100_000
+        filing_status: "single"
+        nol_carryforward_pre_2018: 150_000
+        nol_carryforward_post_2017: 0
+        farming_loss_carryback: 0
+        is_farming_business: false
+        current_year_farming_loss: 0
+      # Pre-TCJA NOL can offset 100% of taxable income: min(150_000, 100_000) = 100_000
+      expect: 100_000
+    - name: "NOL deduction with both pre and post TCJA carryforwards"
+      period: 2024
+      inputs:
+        taxable_income: 100_000
+        filing_status: "married_filing_jointly"
+        nol_carryforward_pre_2018: 40_000
+        nol_carryforward_post_2017: 100_000
+        farming_loss_carryback: 0
+        is_farming_business: false
+        current_year_farming_loss: 0
+      # Pre-TCJA: 40_000 (full amount, no limit)
+      # Post-TCJA: 80% of 100_000 = 80_000, minus pre-2018 used = 80_000 - 40_000 = 40_000
+      # But formula calculates: limited_amount = 100_000 * 0.80 = 80_000
+      # post_2017_allowed = min(100_000, max(0, 80_000 - 40_000)) = min(100_000, 40_000) = 40_000
+      # pre_2018_allowed = min(40_000, max(0, 100_000 - 40_000)) = min(40_000, 60_000) = 40_000
+      # Total = min(140_000, 40_000 + 40_000) = 80_000
+      expect: 80_000
+    - name: "NOL deduction when carryforward exceeds taxable income"
+      period: 2024
+      inputs:
+        taxable_income: 50_000
+        filing_status: "single"
+        nol_carryforward_pre_2018: 30_000
+        nol_carryforward_post_2017: 40_000
+        farming_loss_carryback: 0
+        is_farming_business: false
+        current_year_farming_loss: 0
+      # Pre-TCJA: min(30_000, 50_000) = 30_000
+      # Post-TCJA limited: 50_000 * 0.80 = 40_000, minus pre-2018 = 40_000 - 30_000 = 10_000
+      # post_2017_allowed = min(40_000, 10_000) = 10_000
+      # pre_2018_allowed = min(30_000, max(0, 50_000 - 10_000)) = min(30_000, 40_000) = 30_000
+      # Total = min(70_000, 30_000 + 10_000) = 40_000
+      expect: 40_000
+    - name: "NOL deduction with zero taxable income"
+      period: 2024
+      inputs:
+        taxable_income: 0
+        filing_status: "single"
+        nol_carryforward_pre_2018: 50_000
+        nol_carryforward_post_2017: 75_000
+        farming_loss_carryback: 0
+        is_farming_business: false
+        current_year_farming_loss: 0
+      # No taxable income to offset, so deduction is 0
+      expect: 0
 
 variable nol_carryforward_allowed:
   entity: TaxUnit

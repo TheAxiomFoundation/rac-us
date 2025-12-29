@@ -81,6 +81,10 @@ variable acp_device_received:
       inputs:
         has_received_acp_device: false
       expect: false
+    - name: "Default value when no input provided"
+      period: 2024
+      inputs: {}
+      expect: false
 
 
 variable acp_device_eligible:

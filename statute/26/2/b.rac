@@ -73,6 +73,69 @@ variable filing_status:
     # Default: single
     return SINGLE
   default: SINGLE
+  tests:
+    - name: "Married filing jointly returns JOINT"
+      period: 2024
+      inputs:
+        is_married: True
+        files_jointly: True
+        is_surviving_spouse: False
+        is_head_of_household: False
+      expect: JOINT
+
+    - name: "Married filing separately returns SEPARATE"
+      period: 2024
+      inputs:
+        is_married: True
+        files_jointly: False
+        is_surviving_spouse: False
+        is_head_of_household: False
+      expect: SEPARATE
+
+    - name: "Surviving spouse returns WIDOW"
+      period: 2024
+      inputs:
+        is_married: False
+        files_jointly: False
+        is_surviving_spouse: True
+        is_head_of_household: False
+      expect: WIDOW
+
+    - name: "Unmarried with qualifying person returns HEAD_OF_HOUSEHOLD"
+      period: 2024
+      inputs:
+        is_married: False
+        files_jointly: False
+        is_surviving_spouse: False
+        is_head_of_household: True
+      expect: HEAD_OF_HOUSEHOLD
+
+    - name: "Unmarried without dependents returns SINGLE"
+      period: 2024
+      inputs:
+        is_married: False
+        files_jointly: False
+        is_surviving_spouse: False
+        is_head_of_household: False
+      expect: SINGLE
+
+    - name: "JOINT takes precedence over HOH when married"
+      period: 2024
+      inputs:
+        is_married: True
+        files_jointly: True
+        is_surviving_spouse: False
+        is_head_of_household: True
+      expect: JOINT
+
+    - name: "WIDOW takes precedence over HOH when surviving spouse"
+      period: 2024
+      inputs:
+        is_married: False
+        files_jointly: False
+        is_surviving_spouse: True
+        is_head_of_household: True
+      expect: WIDOW
 
 # Tests per § 2(b) requirements
 tests:

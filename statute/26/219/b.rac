@@ -142,6 +142,25 @@ variable ira_max_deductible_contribution:
   description: "Alias for ira_contribution_limit for backward compatibility"
   formula: return ira_contribution_limit
   default: 0
+  tests:
+    - name: "Alias returns base limit for under 50"
+      period: 2024
+      inputs:
+        earned_income: 50_000
+        age: 45
+      expect: 7_000
+    - name: "Alias returns catch-up limit for age 50+"
+      period: 2024
+      inputs:
+        earned_income: 50_000
+        age: 55
+      expect: 8_000
+    - name: "Alias respects earned income cap"
+      period: 2024
+      inputs:
+        earned_income: 3_000
+        age: 30
+      expect: 3_000
 
 variable traditional_ira_contributions:
   entity: Person
