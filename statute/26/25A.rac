@@ -13,3 +13,69 @@ variable education_credits_validation:
     second_tier_expenses = max(0, min(expenses, aoc_second_tier_limit) - aoc_first_tier_limit)
     second_tier = second_tier_expenses * aoc_second_tier_rate
     return first_tier + second_tier
+  default: 0
+  tests:
+    - name: "No qualified expenses results in zero credit"
+      period: 2024
+      inputs:
+        aoc_qualified_expenses: 0
+        aoc_first_tier_limit: 2_000
+        aoc_first_tier_rate: 1.0
+        aoc_second_tier_limit: 4_000
+        aoc_second_tier_rate: 0.25
+      expect: 0
+    - name: "Expenses below first tier limit - full 100% credit"
+      period: 2024
+      inputs:
+        aoc_qualified_expenses: 1_500
+        aoc_first_tier_limit: 2_000
+        aoc_first_tier_rate: 1.0
+        aoc_second_tier_limit: 4_000
+        aoc_second_tier_rate: 0.25
+      expect: 1_500
+    - name: "Expenses at first tier limit exactly"
+      period: 2024
+      inputs:
+        aoc_qualified_expenses: 2_000
+        aoc_first_tier_limit: 2_000
+        aoc_first_tier_rate: 1.0
+        aoc_second_tier_limit: 4_000
+        aoc_second_tier_rate: 0.25
+      expect: 2_000
+    - name: "Expenses in second tier - partial 25% credit"
+      period: 2024
+      inputs:
+        aoc_qualified_expenses: 3_000
+        aoc_first_tier_limit: 2_000
+        aoc_first_tier_rate: 1.0
+        aoc_second_tier_limit: 4_000
+        aoc_second_tier_rate: 0.25
+      # First tier: $2,000 * 100% = $2,000
+      # Second tier: ($3,000 - $2,000) * 25% = $250
+      # Total: $2,250
+      expect: 2_250
+    - name: "Maximum credit at second tier limit"
+      period: 2024
+      inputs:
+        aoc_qualified_expenses: 4_000
+        aoc_first_tier_limit: 2_000
+        aoc_first_tier_rate: 1.0
+        aoc_second_tier_limit: 4_000
+        aoc_second_tier_rate: 0.25
+      # First tier: $2,000 * 100% = $2,000
+      # Second tier: $2,000 * 25% = $500
+      # Total: $2,500 (maximum AOTC)
+      expect: 2_500
+    - name: "Expenses exceed limit - credit capped at maximum"
+      period: 2024
+      inputs:
+        aoc_qualified_expenses: 10_000
+        aoc_first_tier_limit: 2_000
+        aoc_first_tier_rate: 1.0
+        aoc_second_tier_limit: 4_000
+        aoc_second_tier_rate: 0.25
+      # Expenses capped at $4,000 for credit calculation
+      # First tier: $2,000 * 100% = $2,000
+      # Second tier: $2,000 * 25% = $500
+      # Total: $2,500 (maximum AOTC)
+      expect: 2_500

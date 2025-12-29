@@ -26,3 +26,57 @@ variable alternative_tax:
     regular_tax = compute_regular_tax()
     section_1201_tax = compute_section_1201_tax()
     return section_1201_tax < regular_tax
+  tests:
+    - name: "Post-TCJA C corporation - Section 1201 never applies"
+      period: 2024
+      inputs:
+        is_subject_to_corporate_tax: true
+        net_capital_gain: 500_000
+        tax_year: 2024
+        tcja_effective_year: 2018
+      expect: false
+
+    - name: "Non-corporate entity - Section 1201 does not apply"
+      period: 2024
+      inputs:
+        is_subject_to_corporate_tax: false
+        net_capital_gain: 100_000
+        tax_year: 2024
+        tcja_effective_year: 2018
+      expect: false
+
+    - name: "Corporation with no capital gain"
+      period: 2024
+      inputs:
+        is_subject_to_corporate_tax: true
+        net_capital_gain: 0
+        tax_year: 2024
+        tcja_effective_year: 2018
+      expect: false
+
+    - name: "Corporation with capital loss - Section 1201 does not apply"
+      period: 2024
+      inputs:
+        is_subject_to_corporate_tax: true
+        net_capital_gain: -50_000
+        tax_year: 2024
+        tcja_effective_year: 2018
+      expect: false
+
+    - name: "Pre-TCJA corporation with large capital gain"
+      period: 2024
+      inputs:
+        is_subject_to_corporate_tax: true
+        net_capital_gain: 1_000_000
+        tax_year: 2016
+        tcja_effective_year: 2018
+      expect: true
+
+    - name: "TCJA transition year - regular rate applies"
+      period: 2024
+      inputs:
+        is_subject_to_corporate_tax: true
+        net_capital_gain: 250_000
+        tax_year: 2018
+        tcja_effective_year: 2018
+      expect: false

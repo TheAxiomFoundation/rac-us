@@ -18,3 +18,40 @@ variable depreciation:
     if current_year < year_placed_in_service: return 0  # Not yet placed in service
     return current_year - year_placed_in_service + 1
   default: 0
+  tests:
+    - name: "First year of depreciation"
+      period: 2024
+      inputs:
+        year_placed_in_service: 2024
+        current_year: 2024
+      expect: 1  # First depreciation year
+    - name: "Second year of depreciation"
+      period: 2024
+      inputs:
+        year_placed_in_service: 2023
+        current_year: 2024
+      expect: 2  # Second depreciation year
+    - name: "Asset not yet placed in service"
+      period: 2024
+      inputs:
+        year_placed_in_service: 2025
+        current_year: 2024
+      expect: 0  # No depreciation before placed in service
+    - name: "Fifth year of 5-year property"
+      period: 2024
+      inputs:
+        year_placed_in_service: 2020
+        current_year: 2024
+      expect: 5  # Fifth depreciation year
+    - name: "Tenth year for 7-year property"
+      period: 2024
+      inputs:
+        year_placed_in_service: 2015
+        current_year: 2024
+      expect: 10  # Tenth year (may exceed recovery period)
+    - name: "Asset placed in service years ago"
+      period: 2024
+      inputs:
+        year_placed_in_service: 2010
+        current_year: 2024
+      expect: 15  # Fifteenth depreciation year

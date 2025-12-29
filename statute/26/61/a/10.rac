@@ -26,3 +26,47 @@ variable pension_income:
     # Roth IRA non-qualified earnings (contributions come out tax-free)
     roth_ira_income = taxable_roth_distribution
     return employer_plan_income + traditional_ira_income + roth_ira_income
+  default: 0
+  tests:
+    - name: "No distributions - zero pension income"
+      period: 2024
+      inputs:
+        net_taxable_distribution: 0
+        taxable_ira_distribution: 0
+        taxable_roth_distribution: 0
+      expect: 0
+    - name: "Employer plan only - 401k distribution"
+      period: 2024
+      inputs:
+        net_taxable_distribution: 25_000
+        taxable_ira_distribution: 0
+        taxable_roth_distribution: 0
+      expect: 25_000
+    - name: "Traditional IRA only - full distribution taxable"
+      period: 2024
+      inputs:
+        net_taxable_distribution: 0
+        taxable_ira_distribution: 15_000
+        taxable_roth_distribution: 0
+      expect: 15_000
+    - name: "Roth IRA non-qualified distribution - earnings taxable"
+      period: 2024
+      inputs:
+        net_taxable_distribution: 0
+        taxable_ira_distribution: 0
+        taxable_roth_distribution: 3_500
+      expect: 3_500
+    - name: "Combined distributions - all three sources"
+      period: 2024
+      inputs:
+        net_taxable_distribution: 50_000
+        taxable_ira_distribution: 20_000
+        taxable_roth_distribution: 5_000
+      expect: 75_000
+    - name: "Large retirement distributions - high income retiree"
+      period: 2024
+      inputs:
+        net_taxable_distribution: 150_000
+        taxable_ira_distribution: 75_000
+        taxable_roth_distribution: 0
+      expect: 225_000
