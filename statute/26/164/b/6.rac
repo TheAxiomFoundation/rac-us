@@ -22,3 +22,115 @@ parameter salt_cap_married_separate:
     2026-01-01: .inf
     2018-01-01: 5000
     1900-01-01: .inf
+
+variable salt_deduction_cap:
+  imports:
+    - 26/1#filing_status
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: "USD"
+  label: "SALT Deduction Cap"
+  description: "Maximum allowable SALT deduction per 26 USC 164(b)(6)(A)"
+  syntax: python
+  formula: |
+    # 164(b)(6)(A): $5,000 cap for married filing separately, $10,000 for others
+    if filing_status == MARRIED_FILING_SEPARATELY:
+      return salt_cap_married_separate
+    return salt_cap
+  tests:
+    - name: "Single filer during TCJA period"
+      period: 2024
+      inputs:
+        filing_status: SINGLE
+      expect: 10_000
+    - name: "Married filing jointly during TCJA period"
+      period: 2024
+      inputs:
+        filing_status: MARRIED_FILING_JOINTLY
+      expect: 10_000
+    - name: "Married filing separately - lower cap"
+      period: 2024
+      inputs:
+        filing_status: MARRIED_FILING_SEPARATELY
+      expect: 5_000
+    - name: "Head of household during TCJA period"
+      period: 2024
+      inputs:
+        filing_status: HEAD_OF_HOUSEHOLD
+      expect: 10_000
+    - name: "Pre-TCJA period - no cap"
+      period: 2017
+      inputs:
+        filing_status: SINGLE
+      expect: .inf
+    - name: "Post-sunset period - no cap"
+      period: 2026
+      inputs:
+        filing_status: MARRIED_FILING_JOINTLY
+      expect: .inf
+
+input state_local_taxes:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: "USD"
+  label: "State and Local Taxes Paid"
+  description: "Total state and local taxes paid (income + property + sales)"
+  default: 0
+
+variable salt_deduction:
+  imports:
+    - 26/1#filing_status
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: "USD"
+  label: "SALT Deduction"
+  description: "State and local tax deduction, capped per 26 USC 164(b)(6)(A)"
+  syntax: python
+  formula: |
+    # 164(b)(6)(A): Cap at $5,000 for MFS, $10,000 for all others
+    # Cap only applies during TCJA period (2018-2025)
+    if filing_status == MARRIED_FILING_SEPARATELY:
+      cap = salt_cap_married_separate
+    else:
+      cap = salt_cap
+    return min(state_local_taxes, cap)
+  tests:
+    - name: "Single filer, SALT below cap"
+      period: 2024
+      inputs:
+        filing_status: SINGLE
+        state_local_taxes: 8_000
+      expect: 8_000
+    - name: "Single filer, SALT at cap"
+      period: 2024
+      inputs:
+        filing_status: SINGLE
+        state_local_taxes: 10_000
+      expect: 10_000
+    - name: "Single filer, SALT exceeds cap"
+      period: 2024
+      inputs:
+        filing_status: SINGLE
+        state_local_taxes: 25_000
+      expect: 10_000
+    - name: "Married filing separately, SALT below cap"
+      period: 2024
+      inputs:
+        filing_status: MARRIED_FILING_SEPARATELY
+        state_local_taxes: 3_000
+      expect: 3_000
+    - name: "Married filing separately, SALT exceeds cap"
+      period: 2024
+      inputs:
+        filing_status: MARRIED_FILING_SEPARATELY
+        state_local_taxes: 15_000
+      expect: 5_000
+    - name: "Married filing jointly, high SALT capped"
+      period: 2024
+      inputs:
+        filing_status: MARRIED_FILING_JOINTLY
+        state_local_taxes: 50_000
+      expect: 10_000

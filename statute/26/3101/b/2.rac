@@ -44,3 +44,48 @@ variable additional_medicare_tax:
     total_wages = sum(members, irs_employment_income)
     total_se = sum(members, taxable_self_employment_income)
     return total_wages + total_se
+  tests:
+    - name: "Zero wages and zero self-employment income"
+      period: 2024
+      inputs:
+        members:
+          - irs_employment_income: 0
+            taxable_self_employment_income: 0
+      expect: 0
+    - name: "Only wages, no self-employment income"
+      period: 2024
+      inputs:
+        members:
+          - irs_employment_income: 150_000
+            taxable_self_employment_income: 0
+      expect: 150_000
+    - name: "Only self-employment income, no wages"
+      period: 2024
+      inputs:
+        members:
+          - irs_employment_income: 0
+            taxable_self_employment_income: 85_000
+      expect: 85_000
+    - name: "Combined wages and self-employment income"
+      period: 2024
+      inputs:
+        members:
+          - irs_employment_income: 200_000
+            taxable_self_employment_income: 50_000
+      expect: 250_000
+    - name: "High earner with both income types"
+      period: 2024
+      inputs:
+        members:
+          - irs_employment_income: 350_000
+            taxable_self_employment_income: 75_000
+      expect: 425_000
+    - name: "Two-person tax unit with combined income"
+      period: 2024
+      inputs:
+        members:
+          - irs_employment_income: 120_000
+            taxable_self_employment_income: 30_000
+          - irs_employment_income: 80_000
+            taxable_self_employment_income: 20_000
+      expect: 250_000

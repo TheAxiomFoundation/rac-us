@@ -20,3 +20,57 @@ variable interest_deduction:
     total = qualified_residence_interest + deductible_investment_interest + mortgage_points
     return total
   default: 0
+  tests:
+    - name: "Mortgage interest only - under limit"
+      period: 2024
+      inputs:
+        mortgage_interest_paid: 15_000
+        acquisition_debt: 400_000
+        deductible_investment_interest: 0
+        mortgage_points: 0
+      expect: 15_000
+
+    - name: "Mortgage interest with points"
+      period: 2024
+      inputs:
+        mortgage_interest_paid: 18_000
+        acquisition_debt: 600_000
+        deductible_investment_interest: 0
+        mortgage_points: 3_000
+      expect: 21_000
+
+    - name: "All interest types combined"
+      period: 2024
+      inputs:
+        mortgage_interest_paid: 20_000
+        acquisition_debt: 500_000
+        deductible_investment_interest: 2_500
+        mortgage_points: 1_500
+      expect: 24_000
+
+    - name: "Investment interest without mortgage"
+      period: 2024
+      inputs:
+        mortgage_interest_paid: 0
+        acquisition_debt: 0
+        deductible_investment_interest: 5_000
+        mortgage_points: 0
+      expect: 5_000
+
+    - name: "Mortgage at TCJA limit - 750k debt"
+      period: 2024
+      inputs:
+        mortgage_interest_paid: 30_000
+        acquisition_debt: 750_000
+        deductible_investment_interest: 1_000
+        mortgage_points: 2_000
+      expect: 33_000
+
+    - name: "Zero interest deduction"
+      period: 2024
+      inputs:
+        mortgage_interest_paid: 0
+        acquisition_debt: 0
+        deductible_investment_interest: 0
+        mortgage_points: 0
+      expect: 0

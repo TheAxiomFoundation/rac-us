@@ -33,3 +33,39 @@ variable medicare_tax:
   formula: |
     # Medicare tax applies to ALL wages - no cap unlike Social Security
     return irs_employment_income * employee_rate
+  tests:
+    - name: "Zero income"
+      period: 2024
+      inputs:
+        irs_employment_income: 0
+      expect: 0
+
+    - name: "Median wage earner"
+      period: 2024
+      inputs:
+        irs_employment_income: 60_000
+      expect: 870  # 60_000 * 0.0145 = 870
+
+    - name: "Six figure income"
+      period: 2024
+      inputs:
+        irs_employment_income: 150_000
+      expect: 2_175  # 150_000 * 0.0145 = 2_175
+
+    - name: "High earner below additional Medicare threshold"
+      period: 2024
+      inputs:
+        irs_employment_income: 200_000
+      expect: 2_900  # 200_000 * 0.0145 = 2_900
+
+    - name: "Very high earner - no cap applies"
+      period: 2024
+      inputs:
+        irs_employment_income: 500_000
+      expect: 7_250  # 500_000 * 0.0145 = 7_250
+
+    - name: "Millionaire - demonstrates no wage cap"
+      period: 2024
+      inputs:
+        irs_employment_income: 1_000_000
+      expect: 14_500  # 1_000_000 * 0.0145 = 14_500
