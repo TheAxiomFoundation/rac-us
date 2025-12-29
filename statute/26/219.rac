@@ -55,7 +55,7 @@ input age:
 variable ira_deduction:
   imports:
     - 26/219/b#ira_contribution_limit
-    - 26/219/g#ira_deduction_after_phaseout
+    - 26/219/g#ira_phaseout_ratio
   entity: Person
   period: Year
   dtype: Money
@@ -64,8 +64,11 @@ variable ira_deduction:
   description: "Maximum traditional IRA deduction after phaseout"
   syntax: python
   formula: |
-    # Final IRA deduction is the amount after applying all phaseout rules
-    return ira_deduction_after_phaseout
+    # 26 USC 219(a), (g): IRA deduction is contribution limit less phaseout reduction
+    reduction = ira_contribution_limit * ira_phaseout_ratio
+    deduction = ira_contribution_limit - reduction
+    # Round down to nearest dollar per 219(g)
+    return max(0, int(deduction))
   default: 0
   tests:
     - name: "Young adult, no coverage, no phaseout (2024)"

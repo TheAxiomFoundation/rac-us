@@ -132,7 +132,6 @@ parameter phaseout_range_joint:
 
 variable ira_phaseout_ratio:
   imports:
-    - 26/62/a#adjusted_gross_income
     - 26/219/b#ira_contribution_limit
   entity: Person
   period: Year
@@ -275,60 +274,14 @@ variable ira_phaseout_ratio:
         spouse_is_active_retirement_plan_participant: true
       expect: 1
 
-variable ira_deduction_after_phaseout:
-  imports:
-    - 26/219/b#ira_contribution_limit
-    - 26/219/g#ira_phaseout_ratio
-  entity: Person
-  period: Year
-  dtype: Money
-  unit: USD
-  label: "IRA Deduction After Phase-out"
-  description: "IRA deduction after applying income-based phase-out"
-  syntax: python
-  formula: |
-    reduction = ira_contribution_limit * ira_phaseout_ratio
-    deduction = ira_contribution_limit - reduction
-    # Round down to nearest dollar
-    return max(0, int(deduction))
-  default: 0
-  tests:
-    - name: "Single, full deduction, no phaseout"
-      period: 2024
-      inputs:
-        ira_contribution_limit: 7_000
-        ira_phaseout_ratio: 0
-      expect: 7000
-    - name: "Single, 50% phased out"
-      period: 2024
-      inputs:
-        ira_contribution_limit: 7_000
-        ira_phaseout_ratio: 0.5
-      expect: 3500
-    - name: "Single, fully phased out"
-      period: 2024
-      inputs:
-        ira_contribution_limit: 7_000
-        ira_phaseout_ratio: 1
-      expect: 0
-    - name: "Age 50+, catch-up, partial phaseout"
-      period: 2024
-      inputs:
-        ira_contribution_limit: 8_000
-        ira_phaseout_ratio: 0.25
-      expect: 6000
-    - name: "Rounding test: partial dollar amount"
-      period: 2024
-      inputs:
-        ira_contribution_limit: 7_000
-        ira_phaseout_ratio: 0.33
-      expect: 4690
-
-variable is_active_retirement_plan_participant:
+variable is_active_retirement_plan_participant_derived:
   entity: Person
   period: Year
   dtype: Boolean
-  label: "Active Participant Status"
-  description: "Alias for input"
-  formula: return is_active_retirement_plan_participant
+  label: "Active Participant Status (derived)"
+  description: "Returns active participant status from input"
+  syntax: python
+  formula: |
+    # Pass through the input value - used when referencing via imports
+    return is_active_retirement_plan_participant
   default: false

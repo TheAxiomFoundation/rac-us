@@ -1,0 +1,12 @@
+text: |
+  In general, a qualified individual may elect to exclude from gross income
+  the foreign earned income of such individual.
+
+input foreign_earned_income_exclusion:
+  entity: Person
+  period: Year
+  dtype: Money
+  unit: USD
+  label: Foreign Earned Income Exclusion
+  description: Amount of foreign earned income excluded from gross income per 26 USC 911(a)
+  default: 0

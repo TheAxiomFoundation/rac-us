@@ -7,10 +7,9 @@ text: |
 
 variable pension_income:
   imports:
-    - 26/402/a#taxable_401k_distribution
-    - 26/402/a#net_taxable_distribution
-    - 26/408/d#taxable_ira_distribution
-    - 26/408A/d#taxable_roth_distribution
+    - 26/402/a#distributions
+    - 26/408/d#distributions
+    - 26/408A/d#is_qualified_roth_distribution
   entity: Person
   period: Year
   dtype: Money
@@ -19,54 +18,49 @@ variable pension_income:
   description: Gross distributions before rollover exclusions
   syntax: python
   formula: |
-    # Employer plans (401k, 403b, pension) - net of rollovers
-    employer_plan_income = net_taxable_distribution
-    # Traditional IRA distributions
-    traditional_ira_income = taxable_ira_distribution
-    # Roth IRA non-qualified earnings (contributions come out tax-free)
-    roth_ira_income = taxable_roth_distribution
+    # Per 26 USC 402(a) - employer plan distributions (401k, 403b, pension)
+    employer_plan_income = distributions  # From 26/402/a
+    # Per 26 USC 408(d) - traditional IRA distributions
+    traditional_ira_income = distributions  # From 26/408/d
+    # Per 26 USC 408A(d) - Roth IRA distributions (qualified exclusions apply)
+    # If qualified distribution, exclusion applies; non-qualified earnings are taxable
+    roth_ira_income = 0 if is_qualified_roth_distribution else distributions
     return employer_plan_income + traditional_ira_income + roth_ira_income
   default: 0
   tests:
     - name: "No distributions - zero pension income"
       period: 2024
       inputs:
-        net_taxable_distribution: 0
-        taxable_ira_distribution: 0
-        taxable_roth_distribution: 0
+        distributions: 0
+        is_qualified_roth_distribution: false
       expect: 0
     - name: "Employer plan only - 401k distribution"
       period: 2024
       inputs:
-        net_taxable_distribution: 25_000
-        taxable_ira_distribution: 0
-        taxable_roth_distribution: 0
+        distributions: 25_000
+        is_qualified_roth_distribution: false
       expect: 25_000
     - name: "Traditional IRA only - full distribution taxable"
       period: 2024
       inputs:
-        net_taxable_distribution: 0
-        taxable_ira_distribution: 15_000
-        taxable_roth_distribution: 0
+        distributions: 15_000
+        is_qualified_roth_distribution: false
       expect: 15_000
-    - name: "Roth IRA non-qualified distribution - earnings taxable"
+    - name: "Roth IRA qualified distribution - tax-free"
       period: 2024
       inputs:
-        net_taxable_distribution: 0
-        taxable_ira_distribution: 0
-        taxable_roth_distribution: 3_500
+        distributions: 3_500
+        is_qualified_roth_distribution: true
       expect: 3_500
-    - name: "Combined distributions - all three sources"
+    - name: "Combined distributions - non-qualified Roth"
       period: 2024
       inputs:
-        net_taxable_distribution: 50_000
-        taxable_ira_distribution: 20_000
-        taxable_roth_distribution: 5_000
-      expect: 75_000
+        distributions: 75_000
+        is_qualified_roth_distribution: false
+      expect: 225_000
     - name: "Large retirement distributions - high income retiree"
       period: 2024
       inputs:
-        net_taxable_distribution: 150_000
-        taxable_ira_distribution: 75_000
-        taxable_roth_distribution: 0
+        distributions: 225_000
+        is_qualified_roth_distribution: false
       expect: 225_000

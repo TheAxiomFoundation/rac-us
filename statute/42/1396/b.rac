@@ -8,12 +8,12 @@ variable income_methodology:
     - 26/62/a#adjusted_gross_income
     - 26/103#tax_exempt_interest
     - 26/86#taxable_social_security
-  entity: Person
-  period: Month
+  entity: TaxUnit
+  period: Year
   dtype: Money
   unit: USD
-  label: "Countable scholarship income"
-  description: "Scholarship income counted under MAGI"
+  label: "Modified Adjusted Gross Income (MAGI) for Medicaid"
+  description: "MAGI as determined under 42 USC § 1396d(b) for Medicaid eligibility, calculated as AGI plus tax-exempt interest, non-taxable Social Security benefits, and foreign earned income exclusions"
   syntax: python
   formula: |
     # Start with AGI (26 USC 62)

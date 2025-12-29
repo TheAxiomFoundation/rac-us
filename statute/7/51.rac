@@ -72,6 +72,51 @@ input bank_accounts:
   description: "Total balance in checking and savings accounts"
   default: 0
 
+input cash_on_hand:
+  entity: Household
+  period: Month
+  dtype: Money
+  unit: USD
+  label: "Cash on Hand"
+  description: "Physical cash not deposited in bank accounts"
+  default: 0
+
+input stocks:
+  entity: Household
+  period: Month
+  dtype: Money
+  unit: USD
+  label: "Stocks Value"
+  description: "Fair market value of stocks"
+  default: 0
+
+input bonds:
+  entity: Household
+  period: Month
+  dtype: Money
+  unit: USD
+  label: "Bonds Value"
+  description: "Fair market value of bonds"
+  default: 0
+
+input other_financial_assets:
+  entity: Household
+  period: Month
+  dtype: Money
+  unit: USD
+  label: "Other Financial Assets"
+  description: "Value of other non-exempt financial assets"
+  default: 0
+
+input vehicle_fair_market_value:
+  entity: Household
+  period: Month
+  dtype: Money
+  unit: USD
+  label: "Vehicle Fair Market Value"
+  description: "Fair market value of countable vehicle(s)"
+  default: 0
+
 input receives_ssi:
   entity: Household
   period: Month
@@ -88,13 +133,48 @@ input receives_tanf:
   description: "Whether household receives TANF cash assistance"
   default: false
 
+input receives_general_assistance:
+  entity: Household
+  period: Month
+  dtype: Boolean
+  label: "Receives General Assistance"
+  description: "Whether household receives state or local General Assistance"
+  default: false
+
+input dependent_care_expenses:
+  entity: Household
+  period: Month
+  dtype: Money
+  unit: USD
+  label: "Dependent Care Expenses"
+  description: "Monthly child care expenses for dependents while household members work or attend education"
+  default: 0
+
+input child_support_paid:
+  entity: Household
+  period: Month
+  dtype: Money
+  unit: USD
+  label: "Child Support Paid"
+  description: "Monthly child support payments made by household members"
+  default: 0
+
+input medical_expenses:
+  entity: Household
+  period: Month
+  dtype: Money
+  unit: USD
+  label: "Medical Expenses"
+  description: "Monthly out-of-pocket medical expenses for elderly/disabled household members"
+  default: 0
+
 variable snap:
   entity: Household
   period: Month
   dtype: Money
   unit: USD
   label: "SNAP Benefits"
-  description: "Monthly SNAP (food stamps) benefit amount"
+  description: "Monthly SNAP (food stamps) benefit amount per 7 USC 2011-2036"
   formula: return snap_allotment
   default: 0
   tests:
@@ -110,8 +190,17 @@ variable snap:
         shelter_costs: 0
         has_elderly_disabled: false
         bank_accounts: 0
+        cash_on_hand: 0
+        stocks: 0
+        bonds: 0
+        other_financial_assets: 0
+        vehicle_fair_market_value: 0
         receives_ssi: false
         receives_tanf: false
+        receives_general_assistance: false
+        dependent_care_expenses: 0
+        child_support_paid: 0
+        medical_expenses: 0
       expect: 0
 
     - name: "Ineligible - resources too high"
@@ -123,8 +212,17 @@ variable snap:
         shelter_costs: 500
         has_elderly_disabled: false
         bank_accounts: 5_000
+        cash_on_hand: 0
+        stocks: 0
+        bonds: 0
+        other_financial_assets: 0
+        vehicle_fair_market_value: 0
         receives_ssi: false
         receives_tanf: false
+        receives_general_assistance: false
+        dependent_care_expenses: 0
+        child_support_paid: 0
+        medical_expenses: 0
       expect: 0
 
     - name: "Categorical eligibility via SSI bypasses gross income test"
@@ -136,8 +234,17 @@ variable snap:
         shelter_costs: 800
         has_elderly_disabled: false
         bank_accounts: 0
+        cash_on_hand: 0
+        stocks: 0
+        bonds: 0
+        other_financial_assets: 0
+        vehicle_fair_market_value: 0
         receives_ssi: true
         receives_tanf: false
+        receives_general_assistance: false
+        dependent_care_expenses: 0
+        child_support_paid: 0
+        medical_expenses: 0
       expect: 292
 
     - name: "Categorical eligibility via TANF bypasses resource test"
@@ -149,8 +256,17 @@ variable snap:
         shelter_costs: 600
         has_elderly_disabled: false
         bank_accounts: 4_000
+        cash_on_hand: 0
+        stocks: 0
+        bonds: 0
+        other_financial_assets: 0
+        vehicle_fair_market_value: 0
         receives_ssi: false
         receives_tanf: true
+        receives_general_assistance: false
+        dependent_care_expenses: 0
+        child_support_paid: 0
+        medical_expenses: 0
       expect: 536
 
     - name: "Elderly/disabled exempt from gross income test"
@@ -162,8 +278,17 @@ variable snap:
         shelter_costs: 1_200
         has_elderly_disabled: true
         bank_accounts: 1_000
+        cash_on_hand: 0
+        stocks: 0
+        bonds: 0
+        other_financial_assets: 0
+        vehicle_fair_market_value: 0
         receives_ssi: false
         receives_tanf: false
+        receives_general_assistance: false
+        dependent_care_expenses: 0
+        child_support_paid: 0
+        medical_expenses: 0
       expect: 292
 
     # ============================================================
@@ -178,8 +303,17 @@ variable snap:
         shelter_costs: 0
         has_elderly_disabled: false
         bank_accounts: 0
+        cash_on_hand: 0
+        stocks: 0
+        bonds: 0
+        other_financial_assets: 0
+        vehicle_fair_market_value: 0
         receives_ssi: false
         receives_tanf: false
+        receives_general_assistance: false
+        dependent_care_expenses: 0
+        child_support_paid: 0
+        medical_expenses: 0
       expect: 292
 
     - name: "Single person - low income"
@@ -191,8 +325,17 @@ variable snap:
         shelter_costs: 400
         has_elderly_disabled: false
         bank_accounts: 0
+        cash_on_hand: 0
+        stocks: 0
+        bonds: 0
+        other_financial_assets: 0
+        vehicle_fair_market_value: 0
         receives_ssi: false
         receives_tanf: false
+        receives_general_assistance: false
+        dependent_care_expenses: 0
+        child_support_paid: 0
+        medical_expenses: 0
       expect: 262
 
     - name: "Single person - moderate income - minimum benefit applies"
@@ -204,8 +347,17 @@ variable snap:
         shelter_costs: 500
         has_elderly_disabled: false
         bank_accounts: 0
+        cash_on_hand: 0
+        stocks: 0
+        bonds: 0
+        other_financial_assets: 0
+        vehicle_fair_market_value: 0
         receives_ssi: false
         receives_tanf: false
+        receives_general_assistance: false
+        dependent_care_expenses: 0
+        child_support_paid: 0
+        medical_expenses: 0
       expect: 23
 
     - name: "Single person - at income threshold"
@@ -217,8 +369,17 @@ variable snap:
         shelter_costs: 700
         has_elderly_disabled: false
         bank_accounts: 500
+        cash_on_hand: 0
+        stocks: 0
+        bonds: 0
+        other_financial_assets: 0
+        vehicle_fair_market_value: 0
         receives_ssi: false
         receives_tanf: false
+        receives_general_assistance: false
+        dependent_care_expenses: 0
+        child_support_paid: 0
+        medical_expenses: 0
       expect: 23
 
     # ============================================================
@@ -233,8 +394,17 @@ variable snap:
         shelter_costs: 0
         has_elderly_disabled: false
         bank_accounts: 0
+        cash_on_hand: 0
+        stocks: 0
+        bonds: 0
+        other_financial_assets: 0
+        vehicle_fair_market_value: 0
         receives_ssi: false
         receives_tanf: false
+        receives_general_assistance: false
+        dependent_care_expenses: 0
+        child_support_paid: 0
+        medical_expenses: 0
       expect: 536
 
     - name: "Two person - low income with shelter costs"
@@ -246,8 +416,17 @@ variable snap:
         shelter_costs: 600
         has_elderly_disabled: false
         bank_accounts: 0
+        cash_on_hand: 0
+        stocks: 0
+        bonds: 0
+        other_financial_assets: 0
+        vehicle_fair_market_value: 0
         receives_ssi: false
         receives_tanf: false
+        receives_general_assistance: false
+        dependent_care_expenses: 0
+        child_support_paid: 0
+        medical_expenses: 0
       expect: 486
 
     - name: "Two person - minimum benefit applies"
@@ -259,8 +438,17 @@ variable snap:
         shelter_costs: 700
         has_elderly_disabled: false
         bank_accounts: 0
+        cash_on_hand: 0
+        stocks: 0
+        bonds: 0
+        other_financial_assets: 0
+        vehicle_fair_market_value: 0
         receives_ssi: false
         receives_tanf: false
+        receives_general_assistance: false
+        dependent_care_expenses: 0
+        child_support_paid: 0
+        medical_expenses: 0
       expect: 23
 
     # ============================================================
@@ -275,8 +463,17 @@ variable snap:
         shelter_costs: 0
         has_elderly_disabled: false
         bank_accounts: 0
+        cash_on_hand: 0
+        stocks: 0
+        bonds: 0
+        other_financial_assets: 0
+        vehicle_fair_market_value: 0
         receives_ssi: false
         receives_tanf: false
+        receives_general_assistance: false
+        dependent_care_expenses: 0
+        child_support_paid: 0
+        medical_expenses: 0
       expect: 975
 
     - name: "Family of 4 - working poor"
@@ -288,8 +485,17 @@ variable snap:
         shelter_costs: 900
         has_elderly_disabled: false
         bank_accounts: 0
+        cash_on_hand: 0
+        stocks: 0
+        bonds: 0
+        other_financial_assets: 0
+        vehicle_fair_market_value: 0
         receives_ssi: false
         receives_tanf: false
+        receives_general_assistance: false
+        dependent_care_expenses: 0
+        child_support_paid: 0
+        medical_expenses: 0
       expect: 775
 
     - name: "Family of 4 - moderate income"
@@ -301,8 +507,17 @@ variable snap:
         shelter_costs: 1_100
         has_elderly_disabled: false
         bank_accounts: 500
+        cash_on_hand: 0
+        stocks: 0
+        bonds: 0
+        other_financial_assets: 0
+        vehicle_fair_market_value: 0
         receives_ssi: false
         receives_tanf: false
+        receives_general_assistance: false
+        dependent_care_expenses: 0
+        child_support_paid: 0
+        medical_expenses: 0
       expect: 545
 
     - name: "Family of 4 - at 130% FPL threshold"
@@ -314,8 +529,17 @@ variable snap:
         shelter_costs: 1_200
         has_elderly_disabled: false
         bank_accounts: 0
+        cash_on_hand: 0
+        stocks: 0
+        bonds: 0
+        other_financial_assets: 0
+        vehicle_fair_market_value: 0
         receives_ssi: false
         receives_tanf: false
+        receives_general_assistance: false
+        dependent_care_expenses: 0
+        child_support_paid: 0
+        medical_expenses: 0
       expect: 0
 
     # ============================================================
@@ -330,8 +554,17 @@ variable snap:
         shelter_costs: 0
         has_elderly_disabled: false
         bank_accounts: 0
+        cash_on_hand: 0
+        stocks: 0
+        bonds: 0
+        other_financial_assets: 0
+        vehicle_fair_market_value: 0
         receives_ssi: false
         receives_tanf: false
+        receives_general_assistance: false
+        dependent_care_expenses: 0
+        child_support_paid: 0
+        medical_expenses: 0
       expect: 1_390
 
     - name: "Eight person - zero income - maximum benefit"
@@ -343,8 +576,17 @@ variable snap:
         shelter_costs: 0
         has_elderly_disabled: false
         bank_accounts: 0
+        cash_on_hand: 0
+        stocks: 0
+        bonds: 0
+        other_financial_assets: 0
+        vehicle_fair_market_value: 0
         receives_ssi: false
         receives_tanf: false
+        receives_general_assistance: false
+        dependent_care_expenses: 0
+        child_support_paid: 0
+        medical_expenses: 0
       expect: 1_756
 
     - name: "Ten person - zero income (beyond schedule)"
@@ -356,8 +598,17 @@ variable snap:
         shelter_costs: 0
         has_elderly_disabled: false
         bank_accounts: 0
+        cash_on_hand: 0
+        stocks: 0
+        bonds: 0
+        other_financial_assets: 0
+        vehicle_fair_market_value: 0
         receives_ssi: false
         receives_tanf: false
+        receives_general_assistance: false
+        dependent_care_expenses: 0
+        child_support_paid: 0
+        medical_expenses: 0
       expect: 2_196
 
     - name: "Large household with moderate income"
@@ -369,8 +620,17 @@ variable snap:
         shelter_costs: 1_400
         has_elderly_disabled: false
         bank_accounts: 0
+        cash_on_hand: 0
+        stocks: 0
+        bonds: 0
+        other_financial_assets: 0
+        vehicle_fair_market_value: 0
         receives_ssi: false
         receives_tanf: false
+        receives_general_assistance: false
+        dependent_care_expenses: 0
+        child_support_paid: 0
+        medical_expenses: 0
       expect: 1_256
 
     # ============================================================
@@ -385,8 +645,17 @@ variable snap:
         shelter_costs: 600
         has_elderly_disabled: false
         bank_accounts: 2_750
+        cash_on_hand: 0
+        stocks: 0
+        bonds: 0
+        other_financial_assets: 0
+        vehicle_fair_market_value: 0
         receives_ssi: false
         receives_tanf: false
+        receives_general_assistance: false
+        dependent_care_expenses: 0
+        child_support_paid: 0
+        medical_expenses: 0
       expect: 486
 
     - name: "Exceeds resource limit - regular household"
@@ -398,8 +667,17 @@ variable snap:
         shelter_costs: 600
         has_elderly_disabled: false
         bank_accounts: 2_751
+        cash_on_hand: 0
+        stocks: 0
+        bonds: 0
+        other_financial_assets: 0
+        vehicle_fair_market_value: 0
         receives_ssi: false
         receives_tanf: false
+        receives_general_assistance: false
+        dependent_care_expenses: 0
+        child_support_paid: 0
+        medical_expenses: 0
       expect: 0
 
     - name: "At higher resource limit - elderly/disabled"
@@ -411,8 +689,17 @@ variable snap:
         shelter_costs: 1_000
         has_elderly_disabled: true
         bank_accounts: 4_250
+        cash_on_hand: 0
+        stocks: 0
+        bonds: 0
+        other_financial_assets: 0
+        vehicle_fair_market_value: 0
         receives_ssi: false
         receives_tanf: false
+        receives_general_assistance: false
+        dependent_care_expenses: 0
+        child_support_paid: 0
+        medical_expenses: 0
       expect: 536
 
     - name: "Exceeds higher resource limit - elderly/disabled"
@@ -424,8 +711,17 @@ variable snap:
         shelter_costs: 1_000
         has_elderly_disabled: true
         bank_accounts: 4_251
+        cash_on_hand: 0
+        stocks: 0
+        bonds: 0
+        other_financial_assets: 0
+        vehicle_fair_market_value: 0
         receives_ssi: false
         receives_tanf: false
+        receives_general_assistance: false
+        dependent_care_expenses: 0
+        child_support_paid: 0
+        medical_expenses: 0
       expect: 0
 
     # ============================================================
@@ -440,8 +736,17 @@ variable snap:
         shelter_costs: 800
         has_elderly_disabled: false
         bank_accounts: 0
+        cash_on_hand: 0
+        stocks: 0
+        bonds: 0
+        other_financial_assets: 0
+        vehicle_fair_market_value: 0
         receives_ssi: false
         receives_tanf: false
+        receives_general_assistance: false
+        dependent_care_expenses: 0
+        child_support_paid: 0
+        medical_expenses: 0
       expect: 0
 
     - name: "Single person just below 130% FPL"
@@ -453,8 +758,17 @@ variable snap:
         shelter_costs: 800
         has_elderly_disabled: false
         bank_accounts: 0
+        cash_on_hand: 0
+        stocks: 0
+        bonds: 0
+        other_financial_assets: 0
+        vehicle_fair_market_value: 0
         receives_ssi: false
         receives_tanf: false
+        receives_general_assistance: false
+        dependent_care_expenses: 0
+        child_support_paid: 0
+        medical_expenses: 0
       expect: 23
 
     # ============================================================
@@ -469,8 +783,17 @@ variable snap:
         shelter_costs: 0
         has_elderly_disabled: false
         bank_accounts: 0
+        cash_on_hand: 0
+        stocks: 0
+        bonds: 0
+        other_financial_assets: 0
+        vehicle_fair_market_value: 0
         receives_ssi: false
         receives_tanf: false
+        receives_general_assistance: false
+        dependent_care_expenses: 0
+        child_support_paid: 0
+        medical_expenses: 0
       expect: 0
 
     - name: "Net income at FPL threshold"
@@ -482,8 +805,17 @@ variable snap:
         shelter_costs: 800
         has_elderly_disabled: false
         bank_accounts: 0
+        cash_on_hand: 0
+        stocks: 0
+        bonds: 0
+        other_financial_assets: 0
+        vehicle_fair_market_value: 0
         receives_ssi: false
         receives_tanf: false
+        receives_general_assistance: false
+        dependent_care_expenses: 0
+        child_support_paid: 0
+        medical_expenses: 0
       expect: 0
 
     # ============================================================
@@ -498,8 +830,17 @@ variable snap:
         shelter_costs: 1_200
         has_elderly_disabled: false
         bank_accounts: 0
+        cash_on_hand: 0
+        stocks: 0
+        bonds: 0
+        other_financial_assets: 0
+        vehicle_fair_market_value: 0
         receives_ssi: false
         receives_tanf: false
+        receives_general_assistance: false
+        dependent_care_expenses: 0
+        child_support_paid: 0
+        medical_expenses: 0
       expect: 568
 
     - name: "Elderly/disabled uncapped shelter deduction"
@@ -511,8 +852,17 @@ variable snap:
         shelter_costs: 2_000
         has_elderly_disabled: true
         bank_accounts: 0
+        cash_on_hand: 0
+        stocks: 0
+        bonds: 0
+        other_financial_assets: 0
+        vehicle_fair_market_value: 0
         receives_ssi: false
         receives_tanf: false
+        receives_general_assistance: false
+        dependent_care_expenses: 0
+        child_support_paid: 0
+        medical_expenses: 0
       expect: 536
 
     - name: "Non-elderly/disabled capped shelter deduction"
@@ -524,8 +874,17 @@ variable snap:
         shelter_costs: 2_000
         has_elderly_disabled: false
         bank_accounts: 0
+        cash_on_hand: 0
+        stocks: 0
+        bonds: 0
+        other_financial_assets: 0
+        vehicle_fair_market_value: 0
         receives_ssi: false
         receives_tanf: false
+        receives_general_assistance: false
+        dependent_care_expenses: 0
+        child_support_paid: 0
+        medical_expenses: 0
       expect: 336
 
     # ============================================================
@@ -540,8 +899,17 @@ variable snap:
         shelter_costs: 600
         has_elderly_disabled: false
         bank_accounts: 0
+        cash_on_hand: 0
+        stocks: 0
+        bonds: 0
+        other_financial_assets: 0
+        vehicle_fair_market_value: 0
         receives_ssi: false
         receives_tanf: false
+        receives_general_assistance: false
+        dependent_care_expenses: 0
+        child_support_paid: 0
+        medical_expenses: 0
       expect: 23
 
     - name: "Two person household receives minimum benefit"
@@ -553,8 +921,17 @@ variable snap:
         shelter_costs: 700
         has_elderly_disabled: false
         bank_accounts: 0
+        cash_on_hand: 0
+        stocks: 0
+        bonds: 0
+        other_financial_assets: 0
+        vehicle_fair_market_value: 0
         receives_ssi: false
         receives_tanf: false
+        receives_general_assistance: false
+        dependent_care_expenses: 0
+        child_support_paid: 0
+        medical_expenses: 0
       expect: 23
 
     - name: "Three person household - no minimum benefit"
@@ -566,6 +943,15 @@ variable snap:
         shelter_costs: 800
         has_elderly_disabled: false
         bank_accounts: 0
+        cash_on_hand: 0
+        stocks: 0
+        bonds: 0
+        other_financial_assets: 0
+        vehicle_fair_market_value: 0
         receives_ssi: false
         receives_tanf: false
+        receives_general_assistance: false
+        dependent_care_expenses: 0
+        child_support_paid: 0
+        medical_expenses: 0
       expect: 0

@@ -8,13 +8,183 @@ from the initial premium percentage to the final premium percentage
 specified in such table for such income tier...
 This determines the "expected contribution" which is subtracted from
 """
+
+# Income thresholds for sliding scale brackets (as percent of FPL)
+parameter min_eligibility_pct_fpl:
+  description: "Minimum income threshold (100% FPL) for PTC eligibility per 26 USC 36B(c)(1)(A)"
+  reference: "26 USC 36B(c)(1)(A)"
+  unit: /1
+  values:
+    2024-01-01: 1.0
+    2023-01-01: 1.0
+
+parameter bracket_100_pct:
+  description: "100% of federal poverty line threshold per 26 USC 36B(b)(3)(A)"
+  reference: "26 USC 36B(b)(3)(A)"
+  unit: /1
+  values:
+    2024-01-01: 1.0
+    2023-01-01: 1.0
+
+parameter bracket_150_pct:
+  description: "150% of federal poverty line threshold per 26 USC 36B(b)(3)(A)"
+  reference: "26 USC 36B(b)(3)(A)"
+  unit: /1
+  values:
+    2024-01-01: 1.5
+    2023-01-01: 1.5
+
+parameter bracket_200_pct:
+  description: "200% of federal poverty line threshold per 26 USC 36B(b)(3)(A)"
+  reference: "26 USC 36B(b)(3)(A)"
+  unit: /1
+  values:
+    2024-01-01: 2.0
+    2023-01-01: 2.0
+
+parameter bracket_250_pct:
+  description: "250% of federal poverty line threshold per 26 USC 36B(b)(3)(A)"
+  reference: "26 USC 36B(b)(3)(A)"
+  unit: /1
+  values:
+    2024-01-01: 2.5
+    2023-01-01: 2.5
+
+parameter bracket_300_pct:
+  description: "300% of federal poverty line threshold per 26 USC 36B(b)(3)(A)"
+  reference: "26 USC 36B(b)(3)(A)"
+  unit: /1
+  values:
+    2024-01-01: 3.0
+    2023-01-01: 3.0
+
+parameter bracket_400_pct:
+  description: "400% of federal poverty line threshold per 26 USC 36B(b)(3)(A)"
+  reference: "26 USC 36B(b)(3)(A)"
+  unit: /1
+  values:
+    2024-01-01: 4.0
+    2023-01-01: 4.0
+
+# Bracket 1: 100-150% FPL
+parameter bracket_1_initial_pct:
+  description: "Initial contribution percentage (100% FPL) for Bracket 1 per 26 USC 36B(b)(3)(A), as amended by IRA"
+  reference: "26 USC 36B(b)(3)(A), IRA 2021"
+  unit: /1
+  values:
+    2024-01-01: 0.0
+    2023-01-01: 0.0
+
+parameter bracket_1_final_pct:
+  description: "Final contribution percentage (150% FPL) for Bracket 1 per 26 USC 36B(b)(3)(A), as amended by IRA"
+  reference: "26 USC 36B(b)(3)(A), IRA 2021"
+  unit: /1
+  values:
+    2024-01-01: 0.0
+    2023-01-01: 0.0
+
+# Bracket 2: 150-200% FPL
+parameter bracket_2_initial_pct:
+  description: "Initial contribution percentage (150% FPL) for Bracket 2 per 26 USC 36B(b)(3)(A), as amended by IRA"
+  reference: "26 USC 36B(b)(3)(A), IRA 2021"
+  unit: /1
+  values:
+    2024-01-01: 0.0
+    2023-01-01: 0.0
+
+parameter bracket_2_final_pct:
+  description: "Final contribution percentage (200% FPL) for Bracket 2 per 26 USC 36B(b)(3)(A), as amended by IRA"
+  reference: "26 USC 36B(b)(3)(A), IRA 2021"
+  unit: /1
+  values:
+    2024-01-01: 0.02
+    2023-01-01: 0.02
+
+# Bracket 3: 200-250% FPL
+parameter bracket_3_initial_pct:
+  description: "Initial contribution percentage (200% FPL) for Bracket 3 per 26 USC 36B(b)(3)(A), as amended by IRA"
+  reference: "26 USC 36B(b)(3)(A), IRA 2021"
+  unit: /1
+  values:
+    2024-01-01: 0.02
+    2023-01-01: 0.02
+
+parameter bracket_3_final_pct:
+  description: "Final contribution percentage (250% FPL) for Bracket 3 per 26 USC 36B(b)(3)(A), as amended by IRA"
+  reference: "26 USC 36B(b)(3)(A), IRA 2021"
+  unit: /1
+  values:
+    2024-01-01: 0.04
+    2023-01-01: 0.04
+
+# Bracket 4: 250-300% FPL
+parameter bracket_4_initial_pct:
+  description: "Initial contribution percentage (250% FPL) for Bracket 4 per 26 USC 36B(b)(3)(A), as amended by IRA"
+  reference: "26 USC 36B(b)(3)(A), IRA 2021"
+  unit: /1
+  values:
+    2024-01-01: 0.04
+    2023-01-01: 0.04
+
+parameter bracket_4_final_pct:
+  description: "Final contribution percentage (300% FPL) for Bracket 4 per 26 USC 36B(b)(3)(A), as amended by IRA"
+  reference: "26 USC 36B(b)(3)(A), IRA 2021"
+  unit: /1
+  values:
+    2024-01-01: 0.06
+    2023-01-01: 0.06
+
+# Bracket 5: 300-400% FPL
+parameter bracket_5_initial_pct:
+  description: "Initial contribution percentage (300% FPL) for Bracket 5 per 26 USC 36B(b)(3)(A), as amended by IRA"
+  reference: "26 USC 36B(b)(3)(A), IRA 2021"
+  unit: /1
+  values:
+    2024-01-01: 0.06
+    2023-01-01: 0.06
+
+parameter bracket_5_final_pct:
+  description: "Final contribution percentage (400% FPL) for Bracket 5 per 26 USC 36B(b)(3)(A), as amended by IRA"
+  reference: "26 USC 36B(b)(3)(A), IRA 2021"
+  unit: /1
+  values:
+    2024-01-01: 0.085
+    2023-01-01: 0.085
+
+# Bracket 6: 400%+ FPL
+parameter bracket_6_initial_pct:
+  description: "Flat contribution percentage above 400% FPL per 26 USC 36B(b)(3)(A), as amended by IRA"
+  reference: "26 USC 36B(b)(3)(A), IRA 2021"
+  unit: /1
+  values:
+    2024-01-01: 0.085
+    2023-01-01: 0.085
+
+parameter income_lower_limit:
+  description: "Minimum income as percent of FPL for PTC eligibility per 26 USC 36B(c)(1)(A)"
+  reference: "26 USC 36B(c)(1)(A)"
+  unit: /1
+  values:
+    2024-01-01: 1.0
+    2023-01-01: 1.0
+
+parameter income_upper_limit_ira:
+  description: "Maximum income as percent of FPL for PTC eligibility under IRA (2021-2025) per 26 USC 36B(c)(1)(A)"
+  reference: "26 USC 36B(c)(1)(A), IRA 2021"
+  unit: /1
+  values:
+    2024-01-01: 10.0  # Effectively no upper limit under IRA
+    2023-01-01: 10.0
+
 variable applicable_percentage:
+  imports:
+    - 26/36B/d#household_income_pct_fpl
   entity: TaxUnit
   period: Month
-  dtype: Money
-  unit: USD
-  label: "Monthly Expected Premium Contribution"
-  description: "Monthly portion of expected premium contribution"
+  dtype: Rate
+  unit: /1
+  label: "Applicable Percentage"
+  description: "Applicable percentage for expected contribution per 26 USC 36B(b)(3)(A), as amended by IRA"
   syntax: python
   formula: |
     income_pct = household_income_pct_fpl
@@ -24,51 +194,32 @@ variable applicable_percentage:
         return 0
     # Bracket 1: 100-150% FPL (0% contribution under IRA)
     if income_pct < bracket_150_pct:
-        return interpolate_bracket(
-            income_pct,
-            bracket_1.lower_fpl,
-            bracket_1.upper_fpl,
-            bracket_1.initial_pct,
-            bracket_1.final_pct
-        )
+        # Linear interpolation from initial to final percentage
+        range_pct = bracket_150_pct - bracket_100_pct
+        range_amt = bracket_1_final_pct - bracket_1_initial_pct
+        return bracket_1_initial_pct + (income_pct - bracket_100_pct) / range_pct * range_amt
     # Bracket 2: 150-200% FPL (0% to 2% under IRA)
     if income_pct < bracket_200_pct:
-        return interpolate_bracket(
-            income_pct,
-            bracket_2.lower_fpl,
-            bracket_2.upper_fpl,
-            bracket_2.initial_pct,
-            bracket_2.final_pct
-        )
+        range_pct = bracket_200_pct - bracket_150_pct
+        range_amt = bracket_2_final_pct - bracket_2_initial_pct
+        return bracket_2_initial_pct + (income_pct - bracket_150_pct) / range_pct * range_amt
     # Bracket 3: 200-250% FPL (2% to 4% under IRA)
     if income_pct < bracket_250_pct:
-        return interpolate_bracket(
-            income_pct,
-            bracket_3.lower_fpl,
-            bracket_3.upper_fpl,
-            bracket_3.initial_pct,
-            bracket_3.final_pct
-        )
+        range_pct = bracket_250_pct - bracket_200_pct
+        range_amt = bracket_3_final_pct - bracket_3_initial_pct
+        return bracket_3_initial_pct + (income_pct - bracket_200_pct) / range_pct * range_amt
     # Bracket 4: 250-300% FPL (4% to 6% under IRA)
     if income_pct < bracket_300_pct:
-        return interpolate_bracket(
-            income_pct,
-            bracket_4.lower_fpl,
-            bracket_4.upper_fpl,
-            bracket_4.initial_pct,
-            bracket_4.final_pct
-        )
+        range_pct = bracket_300_pct - bracket_250_pct
+        range_amt = bracket_4_final_pct - bracket_4_initial_pct
+        return bracket_4_initial_pct + (income_pct - bracket_250_pct) / range_pct * range_amt
     # Bracket 5: 300-400% FPL (6% to 8.5% under IRA)
     if income_pct < bracket_400_pct:
-        return interpolate_bracket(
-            income_pct,
-            bracket_5.lower_fpl,
-            bracket_5.upper_fpl,
-            bracket_5.initial_pct,
-            bracket_5.final_pct
-        )
+        range_pct = bracket_400_pct - bracket_300_pct
+        range_amt = bracket_5_final_pct - bracket_5_initial_pct
+        return bracket_5_initial_pct + (income_pct - bracket_300_pct) / range_pct * range_amt
     # Bracket 6: 400%+ FPL (8.5% flat under IRA - no cliff!)
-    return bracket_6.initial_pct
+    return bracket_6_initial_pct
   default: 0
   tests:
     # 2024 FPL Levels & Applicable Percentages (under IRA 2021-2025)
