@@ -220,49 +220,42 @@ parameter young_child_age_threshold:
   values:
     1996-01-01: 6
   label: "Young Child Age Threshold"
-  reference: "https://www.acf.hhs.gov/ofa/policy-guidance/tanf-acf-im-2006-02"
 
 parameter hours_single_parent_young_child:
   description: "Weekly work hours for single parent with young child"
   values:
     1996-01-01: 20
   label: "Single Parent Young Child Work Hours"
-  reference: "https://www.acf.hhs.gov/ofa/policy-guidance/tanf-acf-im-2006-02"
 
 parameter hours_single_parent:
   description: "Weekly work hours for single parent"
   values:
     1996-01-01: 30
   label: "Single Parent Work Hours"
-  reference: "https://www.acf.hhs.gov/ofa/policy-guidance/tanf-acf-im-2006-02"
 
 parameter hours_two_parent:
   description: "Weekly work hours for two-parent families"
   values:
     1996-01-01: 35
   label: "Two-Parent Work Hours"
-  reference: "https://www.acf.hhs.gov/ofa/policy-guidance/tanf-acf-im-2006-02"
 
 parameter hours_two_parent_with_childcare:
   description: "Weekly work hours for two-parent families with federal childcare"
   values:
     1996-01-01: 55
   label: "Two-Parent Work Hours (With Childcare)"
-  reference: "https://www.acf.hhs.gov/ofa/policy-guidance/tanf-acf-im-2006-02"
 
 parameter weeks_per_month:
   description: "Average weeks per month for hour conversion"
   values:
     1996-01-01: 4.33
   label: "Weeks Per Month"
-  reference: "https://www.acf.hhs.gov/ofa/policy-guidance/tanf-acf-im-2006-02"
 
 parameter teen_parent_max_age:
   description: "Maximum age for teen parent requirements"
   values:
     1996-01-01: 20
   label: "Teen Parent Maximum Age"
-  reference: "https://www.acf.hhs.gov/ofa/policy-guidance/tanf-acf-im-2006-02"
 
 variable tanf_required_work_hours_weekly:
   entity: Person

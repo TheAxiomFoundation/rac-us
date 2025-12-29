@@ -29,7 +29,6 @@ received by the taxpayer as a pension or annuity under the Social Security Act.
 parameter base_amount_single:
   description: "Base amount for single, head of household, and married filing separately"
   unit: "USD"
-  reference: "26 USC 86(c)(1)(A)"
   values:
     2024-01-01: 25000
     2023-01-01: 25000
@@ -40,7 +39,6 @@ parameter base_amount_single:
 parameter base_amount_joint:
   description: "Base amount for married filing jointly and qualifying widow(er)"
   unit: "USD"
-  reference: "26 USC 86(c)(1)(B)"
   values:
     2024-01-01: 32000
     2023-01-01: 32000
@@ -51,7 +49,6 @@ parameter base_amount_joint:
 parameter base_amount_mfs:
   description: "Base amount for married filing separately"
   unit: "USD"
-  reference: "26 USC 86(c)(1)"
   values:
     2024-01-01: 0
     2023-01-01: 0
@@ -63,7 +60,6 @@ parameter base_amount_mfs:
 parameter tier1_rate:
   description: "Fraction of benefits subject to tier 1 taxation"
   unit: "percentage"
-  reference: "26 USC 86(b)"
   values:
     2024-01-01: 0.5
     2023-01-01: 0.5

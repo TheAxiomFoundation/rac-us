@@ -9,14 +9,12 @@ the wages (as defined in section 3121(a)) paid by him with respect to employment
 parameter employer_rate:
   description: "Employer Social Security tax rate"
   unit: rate
-  reference: "26 USC 3111(a)"
   values:
     1990-01-01: 0.062
 
 parameter wage_base:
   description: "Social Security wage base (maximum taxable earnings)"
   unit: "USD"
-  reference: "26 USC 3121(a)(1)"
   values:
     2024-01-01: 168600
     2023-01-01: 160200

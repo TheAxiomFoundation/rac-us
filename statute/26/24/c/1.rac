@@ -10,7 +10,6 @@ The term 'qualifying child' means a qualifying child of the taxpayer
 parameter qualifying_age_limit:
   description: "Maximum age (exclusive) for CTC qualifying child"
   unit: years
-  reference: "26 USC 24(c)(1)"
   values:
     2021-01-01: 18  # ARP temporarily raised to 18
     2022-01-01: 17  # Reverted

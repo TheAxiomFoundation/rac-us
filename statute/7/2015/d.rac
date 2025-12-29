@@ -51,7 +51,6 @@ parameter abawd_min_age:
   values:
     1977-01-01: 18
   label: "ABAWD Minimum Age"
-  reference: "https://www.fns.usda.gov/snap/work-requirements"
 
 parameter abawd_max_age:
   description: "Maximum age for ABAWD work requirements"
@@ -60,14 +59,12 @@ parameter abawd_max_age:
     2024-10-01: 52
     2023-10-01: 50
   label: "ABAWD Maximum Age"
-  reference: "https://www.fns.usda.gov/snap/work-requirements"
 
 parameter abawd_work_hours:
   description: "Required monthly work hours for ABAWD compliance"
   values:
     1977-01-01: 80
   label: "ABAWD Monthly Work Hours"
-  reference: "https://www.fns.usda.gov/snap/work-requirements"
 
 variable is_snap_abawd:
   entity: Person

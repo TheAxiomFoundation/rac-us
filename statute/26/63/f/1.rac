@@ -17,7 +17,6 @@ for "$600".
 parameter aged_threshold:
   description: "Age threshold for additional aged standard deduction"
   unit: years
-  reference: "26 USC 63(f)(1)"
   values:
     1988-01-01: 65
   tests:

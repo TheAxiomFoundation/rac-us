@@ -18,8 +18,6 @@ In the case of an eligible individual with:
 parameter earned_income_amount_by_children:
   description: "Earned income cap for EITC phase-in calculation, indexed by number of qualifying children"
   unit: USD
-  source: "Rev. Proc. 2023-34"
-  reference: "26 USC 32(b)(2)(A)"
   values:
     2024-01-01:
       0: 8_260
@@ -32,8 +30,6 @@ parameter earned_income_amount_by_children:
 parameter phaseout_amount_by_children:
   description: "Phaseout threshold for EITC reduction, indexed by number of qualifying children"
   unit: USD
-  source: "Rev. Proc. 2023-34"
-  reference: "26 USC 32(b)(2)(A)"
   values:
     2024-01-01:
       0: 10_330

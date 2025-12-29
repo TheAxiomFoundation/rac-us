@@ -10,7 +10,6 @@ shall be $2,000.
 parameter credit_amount:
   description: "CTC credit amount per qualifying child under TCJA"
   unit: USD
-  reference: "26 USC 24(h)(2)"
   values:
     2026-01-01: 1000  # TCJA sunset
     2018-01-01: 2000  # TCJA

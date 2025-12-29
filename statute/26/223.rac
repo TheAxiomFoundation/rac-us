@@ -78,7 +78,6 @@ parameter hsa_limit_self_only:
   period: Year
   label: "HSA Annual Limit - Self-Only Coverage"
   description: "Maximum annual HSA contribution for self-only HDHP coverage (2024)"
-  reference: "26 USC § 223(b)(2)(A)"
 
 parameter hsa_limit_family:
   values:
@@ -87,7 +86,6 @@ parameter hsa_limit_family:
   period: Year
   label: "HSA Annual Limit - Family Coverage"
   description: "Maximum annual HSA contribution for family HDHP coverage (2024)"
-  reference: "26 USC § 223(b)(2)(B)"
 
 parameter hsa_catchup_contribution:
   values:
@@ -96,7 +94,6 @@ parameter hsa_catchup_contribution:
   period: Year
   label: "HSA Catch-up Contribution (Age 55+)"
   description: "Additional annual HSA contribution allowed for individuals age 55+"
-  reference: "26 USC § 223(b)(3)(B)"
 
 parameter catchup_age_threshold:
   values:
@@ -105,7 +102,6 @@ parameter catchup_age_threshold:
   period: Year
   label: "Age Threshold for Catch-up Contributions"
   description: "Minimum age to qualify for HSA catch-up contributions"
-  reference: "26 USC § 223(b)(3)(A)"
 
 parameter months_per_year:
   values:
@@ -114,7 +110,6 @@ parameter months_per_year:
   period: Year
   label: "Months Per Year"
   description: "Number of months in a calendar year"
-  reference: "Standard calendar year"
 
 # Variables
 variable hsa_annual_contribution_limit:

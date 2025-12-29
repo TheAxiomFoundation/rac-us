@@ -13,8 +13,6 @@ adjusted for inflation per 32(j) to $6,920 for 2024)
 parameter joint_return_adjustment_amount:
   description: "Additional phaseout threshold for married filing jointly taxpayers"
   unit: USD
-  source: "Rev. Proc. 2023-34"
-  reference: "26 USC 32(b)(2)(B)"
   values:
     2024-01-01: 6_920
     2023-01-01: 6_570

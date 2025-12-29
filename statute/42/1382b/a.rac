@@ -91,7 +91,6 @@ parameter burial_funds_limit_individual:
   values:
     1974-01-01: 1500
   label: "SSI Burial Funds Limit (Individual)"
-  reference: "https://www.ssa.gov/ssi/eligibility"
 
 parameter burial_funds_limit_couple:
   description: "Maximum burial funds exclusion for couple"
@@ -99,7 +98,6 @@ parameter burial_funds_limit_couple:
   values:
     1974-01-01: 3000
   label: "SSI Burial Funds Limit (Couple)"
-  reference: "https://www.ssa.gov/ssi/eligibility"
 
 parameter life_insurance_limit:
   description: "Maximum face value of life insurance to qualify for exclusion"
@@ -107,7 +105,6 @@ parameter life_insurance_limit:
   values:
     1974-01-01: 1500
   label: "SSI Life Insurance Face Value Limit"
-  reference: "https://www.ssa.gov/ssi/eligibility"
 
 variable resource_exclusions:
   entity: Person

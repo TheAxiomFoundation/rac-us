@@ -9,8 +9,6 @@ the case may be, in the manner provided under section 72.
 parameter early_withdrawal_penalty_threshold_age:
   description: "Age at which early withdrawal penalty no longer applies"
   unit: years
-  source: "26 USC 72(t)"
-  reference: "IRC Section 72(t) - Early distributions from IRAs"
   values:
     1977-01-01: 59.5
 

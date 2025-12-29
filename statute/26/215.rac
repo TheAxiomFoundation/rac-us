@@ -22,7 +22,6 @@ rules apply.
 parameter alimony_deduction_rate:
   description: "Rate at which alimony paid is deductible (1.0 for pre-2019 agreements)"
   unit: "Rate"
-  reference: "26 USC 215(a), TCJA P.L. 115-97"
   values:
     2024-01-01: 1.0
     2019-01-01: 1.0

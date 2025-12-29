@@ -65,7 +65,6 @@ parameter federal_time_limit_months:
   values:
     1996-08-22: 60
   label: "Federal Time Limit"
-  reference: "42 USC 607(a)(7)(A)"
 
 parameter hardship_exemption_cap:
   description: "Maximum percentage of caseload that can receive hardship exemption"
@@ -73,7 +72,6 @@ parameter hardship_exemption_cap:
   values:
     1996-08-22: 0.20
   label: "Hardship Exemption Cap"
-  reference: "42 USC 607(a)(7)(C)"
 
 variable tanf_time_limit_reached:
   entity: Person

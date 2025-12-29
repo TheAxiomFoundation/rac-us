@@ -21,7 +21,6 @@ parameter fbr_individual:
     2024-01-01: 943
     2023-01-01: 914
   label: "SSI FBR (Individual)"
-  reference: "https://www.ssa.gov/oact/cola/SSI.html"
 
 parameter fbr_couple:
   description: "Federal Benefit Rate for couple"
@@ -31,7 +30,6 @@ parameter fbr_couple:
     2024-01-01: 1415
     2023-01-01: 1371
   label: "SSI FBR (Couple)"
-  reference: "https://www.ssa.gov/oact/cola/SSI.html"
 
 variable federal_benefit_rate:
   entity: Person

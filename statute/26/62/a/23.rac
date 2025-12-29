@@ -15,14 +15,12 @@ input qualified_tip_income:
 parameter max_deduction:
   description: "Maximum annual tip income deduction"
   unit: USD
-  source: "26 USC 74A (OBBBA)"
   values:
     2025-01-01: 25_000
 
 parameter termination_year:
   description: "Final year the tip income deduction is available"
   unit: years
-  source: "26 USC 74A(g) (OBBBA sunset)"
   values:
     2025-01-01: 2028
 

@@ -16,7 +16,6 @@ separate return).
 parameter acquisition_debt_limit:
   description: "Maximum acquisition indebtedness for mortgage interest deduction"
   unit: "USD"
-  reference: "26 USC 163(h)(3)(B)(ii)"
   values:
     1987-01-01: 1000000
     2017-12-15: 750000  # TCJA reduced limit for debt incurred after this date
@@ -24,7 +23,6 @@ parameter acquisition_debt_limit:
 parameter acquisition_debt_limit_mfs:
   description: "Maximum acquisition indebtedness for married filing separately"
   unit: "USD"
-  reference: "26 USC 163(h)(3)(B)(ii)"
   values:
     1987-01-01: 500000
     2017-12-15: 375000  # TCJA reduced limit for debt incurred after this date

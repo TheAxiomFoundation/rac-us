@@ -8,8 +8,6 @@ beneficiaries...
 parameter traditional_ira_contribution_limit:
   description: "Annual contribution limit for traditional IRA accounts"
   unit: "USD"
-  source: "26 USC 219(b) and IRC Notice 2023-91"
-  reference: "IRC Section 219(b) - Maximum Amount of Deduction"
   values:
     2024-01-01: 7000
     2023-01-01: 6500
@@ -18,8 +16,6 @@ parameter traditional_ira_contribution_limit:
 parameter traditional_ira_contribution_limit_age50plus:
   description: "Annual contribution limit for traditional IRA accounts for individuals age 50+"
   unit: "USD"
-  source: "26 USC 219(b) and IRC Notice 2023-91"
-  reference: "IRC Section 219(b) - Catch-up contributions"
   values:
     2024-01-01: 8000
     2023-01-01: 7500
@@ -28,8 +24,6 @@ parameter traditional_ira_contribution_limit_age50plus:
 parameter simple_ira_contribution_limit:
   description: "Annual contribution limit for SIMPLE IRA accounts (employee deferral)"
   unit: "USD"
-  source: "26 USC 408(p)"
-  reference: "IRC Section 408(p)(2)(A)(i)"
   values:
     2024-01-01: 16000
     2023-01-01: 15500
@@ -38,8 +32,6 @@ parameter simple_ira_contribution_limit:
 parameter simple_ira_contribution_limit_age50plus:
   description: "Annual contribution limit for SIMPLE IRA accounts for individuals age 50+ (catch-up)"
   unit: "USD"
-  source: "26 USC 408(p)"
-  reference: "IRC Section 408(p)(2)(C)"
   values:
     2024-01-01: 19500
     2023-01-01: 19000
@@ -48,16 +40,12 @@ parameter simple_ira_contribution_limit_age50plus:
 parameter sep_ira_contribution_rate:
   description: "Maximum annual SEP IRA contribution as percentage of net self-employment income"
   unit: rate
-  source: "26 USC 408(k)"
-  reference: "IRC Section 408(k)"
   values:
     1977-01-01: 0.20
 
 parameter roth_ira_contribution_phase_out_mfj_low:
   description: "Lower MAGI threshold for Roth IRA deduction phaseout (Married Filing Jointly)"
   unit: "USD"
-  source: "26 USC 408A(c)(3)(C) and IRC Notice 2023-91"
-  reference: "IRC Section 408A - Roth IRAs"
   values:
     2024-01-01: 230000
     2023-01-01: 218000
@@ -66,8 +54,6 @@ parameter roth_ira_contribution_phase_out_mfj_low:
 parameter roth_ira_contribution_phase_out_mfj_high:
   description: "Upper MAGI threshold for Roth IRA deduction phaseout (Married Filing Jointly)"
   unit: "USD"
-  source: "26 USC 408A(c)(3)(C) and IRC Notice 2023-91"
-  reference: "IRC Section 408A - Roth IRAs"
   values:
     2024-01-01: 240000
     2023-01-01: 228000
@@ -76,8 +62,6 @@ parameter roth_ira_contribution_phase_out_mfj_high:
 parameter roth_ira_contribution_phase_out_single_low:
   description: "Lower MAGI threshold for Roth IRA deduction phaseout (Single filer)"
   unit: "USD"
-  source: "26 USC 408A(c)(3)(C) and IRC Notice 2023-91"
-  reference: "IRC Section 408A - Roth IRAs"
   values:
     2024-01-01: 146000
     2023-01-01: 138000
@@ -86,8 +70,6 @@ parameter roth_ira_contribution_phase_out_single_low:
 parameter roth_ira_contribution_phase_out_single_high:
   description: "Upper MAGI threshold for Roth IRA deduction phaseout (Single filer)"
   unit: "USD"
-  source: "26 USC 408A(c)(3)(C) and IRC Notice 2023-91"
-  reference: "IRC Section 408A - Roth IRAs"
   values:
     2024-01-01: 161000
     2023-01-01: 153000
@@ -96,8 +78,6 @@ parameter roth_ira_contribution_phase_out_single_high:
 parameter traditional_ira_deduction_phase_out_mfj_low:
   description: "Lower AGI threshold for traditional IRA deduction phaseout (Married Filing Jointly, covered by workplace plan)"
   unit: "USD"
-  source: "26 USC 219(g) and IRC Notice 2023-91"
-  reference: "IRC Section 219(g) - Deduction limitations"
   values:
     2024-01-01: 77000
     2023-01-01: 73000
@@ -106,8 +86,6 @@ parameter traditional_ira_deduction_phase_out_mfj_low:
 parameter traditional_ira_deduction_phase_out_mfj_high:
   description: "Upper AGI threshold for traditional IRA deduction phaseout (Married Filing Jointly, covered by workplace plan)"
   unit: "USD"
-  source: "26 USC 219(g) and IRC Notice 2023-91"
-  reference: "IRC Section 219(g) - Deduction limitations"
   values:
     2024-01-01: 87000
     2023-01-01: 83000
@@ -116,8 +94,6 @@ parameter traditional_ira_deduction_phase_out_mfj_high:
 parameter traditional_ira_deduction_phase_out_single_low:
   description: "Lower AGI threshold for traditional IRA deduction phaseout (Single filer, covered by workplace plan)"
   unit: "USD"
-  source: "26 USC 219(g) and IRC Notice 2023-91"
-  reference: "IRC Section 219(g) - Deduction limitations"
   values:
     2024-01-01: 46000
     2023-01-01: 43800
@@ -126,8 +102,6 @@ parameter traditional_ira_deduction_phase_out_single_low:
 parameter traditional_ira_deduction_phase_out_single_high:
   description: "Upper AGI threshold for traditional IRA deduction phaseout (Single filer, covered by workplace plan)"
   unit: "USD"
-  source: "26 USC 219(g) and IRC Notice 2023-91"
-  reference: "IRC Section 219(g) - Deduction limitations"
   values:
     2024-01-01: 56000
     2023-01-01: 53800
@@ -136,8 +110,6 @@ parameter traditional_ira_deduction_phase_out_single_high:
 parameter early_withdrawal_penalty_rate:
   description: "Additional tax rate on early IRA distributions (before age 59.5)"
   unit: rate
-  source: "26 USC 72(t)"
-  reference: "IRC Section 72(t) - Early distribution penalty"
   values:
     1977-01-01: 0.10
 

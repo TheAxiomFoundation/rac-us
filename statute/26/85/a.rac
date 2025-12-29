@@ -20,7 +20,6 @@ the loss of employment. This includes:
 parameter unemployment_inclusion_rate:
   description: "Fraction of unemployment compensation included in gross income"
   unit: "percentage"
-  reference: "26 USC 85(a), post-2020 CARES Act provisions"
   values:
     2024-01-01: 1.0
     2023-01-01: 1.0

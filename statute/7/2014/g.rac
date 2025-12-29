@@ -71,7 +71,6 @@ parameter vehicle_exclusion:
   unit: "USD"
   period: Month
   label: "SNAP Vehicle Exclusion"
-  reference: "https://www.fns.usda.gov/snap/recipient/eligibility"
   values:
     1977-01-01: 4650
 
@@ -80,7 +79,6 @@ parameter resource_limit:
   unit: "USD"
   period: Month
   label: "SNAP Resource Limit"
-  reference: "https://www.fns.usda.gov/snap/recipient/eligibility"
   values:
     2024-10-01: 2750
     2023-10-01: 2750
@@ -91,7 +89,6 @@ parameter resource_limit_elderly_disabled:
   unit: "USD"
   period: Month
   label: "SNAP Resource Limit (Elderly/Disabled)"
-  reference: "https://www.fns.usda.gov/snap/recipient/eligibility"
   values:
     2024-10-01: 4250
     2023-10-01: 4250

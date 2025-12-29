@@ -49,7 +49,6 @@ imports:
 parameter standard_deduction_schedule:
   description: "SNAP standard deduction by household size, for use with cut()"
   unit: currency-USD
-  source: "7 USC 2014(e)(1)"
   values:
     2024-10-01: [200, 211, 247, 283]
     2023-10-01: [198, 208, 244, 279]
@@ -59,7 +58,6 @@ parameter standard_deduction_schedule:
 parameter excess_shelter_rate:
   description: "USDA defines excess shelter as costs exceeding this fraction of adjusted income."
   unit: rate
-  source: "7 USC 2014(e)(6)(A)"
   values:
     1977-01-01: 0.5
 
@@ -68,7 +66,6 @@ parameter earned_income_deduction_rate:
   unit: "/1"
   period: Month
   label: "SNAP Earned Income Deduction Rate"
-  reference: "https://www.fns.usda.gov/snap/recipient/eligibility"
   values:
     1977-01-01: 0.20
 
@@ -77,7 +74,6 @@ parameter shelter_deduction_cap:
   unit: "USD"
   period: Month
   label: "SNAP Shelter Deduction Cap"
-  reference: "https://www.fns.usda.gov/snap/recipient/eligibility"
   values:
     2024-10-01: 672
     2023-10-01: 624

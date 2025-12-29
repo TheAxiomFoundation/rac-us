@@ -16,14 +16,12 @@ years preceding the taxable year of such loss.
 parameter nol_limitation_rate:
   description: "80% limitation rate on NOL deduction for post-TCJA losses"
   unit: rate
-  source: "26 USC 172(a)(2), as amended by TCJA 2017"
   values:
     2018-01-01: 0.80
 
 parameter farming_loss_carryback_years_param:
   description: "Number of years farming loss can be carried back"
   unit: years
-  source: "26 USC 172(b)(1)(B)"
   values:
     2018-01-01: 2
 

@@ -138,7 +138,6 @@ parameter child_support_noncompliance_rate:
   values:
     1996-01-01: 0.25
   label: "Child Support Sanction Rate"
-  reference: "https://www.acf.hhs.gov/ofa/policy-guidance/tanf-acf-im-2006-02"
 
 variable tanf_work_sanction_applicable:
   entity: Person

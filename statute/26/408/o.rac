@@ -3,8 +3,6 @@
 parameter contribution_limit_excess_tax_rate:
   description: "Excise tax rate on excess IRA contributions"
   unit: rate
-  source: "26 USC 4973"
-  reference: "IRC Section 4973 - Tax on excess contributions"
   values:
     1977-01-01: 0.06
 

@@ -9,7 +9,6 @@ the sum of—
 parameter aotc_phaseout_start_mfj:
   description: "Income threshold for AOTC phaseout (Married Filing Jointly)"
   unit: USD
-  source: "26 USC 25A(d)(2)"
   values:
     2024-01-01: 160000
     2023-01-01: 160000
@@ -17,7 +16,6 @@ parameter aotc_phaseout_start_mfj:
 parameter aotc_phaseout_end_mfj:
   description: "Income threshold for complete AOTC phaseout (Married Filing Jointly)"
   unit: USD
-  source: "26 USC 25A(d)(2)"
   values:
     2024-01-01: 180000
     2023-01-01: 180000
@@ -25,7 +23,6 @@ parameter aotc_phaseout_end_mfj:
 parameter aotc_phaseout_start_single:
   description: "Income threshold for AOTC phaseout (Single)"
   unit: USD
-  source: "26 USC 25A(d)(2)"
   values:
     2024-01-01: 80000
     2023-01-01: 80000
@@ -33,7 +30,6 @@ parameter aotc_phaseout_start_single:
 parameter aotc_phaseout_end_single:
   description: "Income threshold for complete AOTC phaseout (Single)"
   unit: USD
-  source: "26 USC 25A(d)(2)"
   values:
     2024-01-01: 90000
     2023-01-01: 90000
@@ -41,7 +37,6 @@ parameter aotc_phaseout_end_single:
 parameter llc_phaseout_start_mfj:
   description: "Income threshold for LLC phaseout (Married Filing Jointly)"
   unit: USD
-  source: "26 USC 25A(d)(2)"
   values:
     2024-01-01: 160000
     2023-01-01: 160000
@@ -49,7 +44,6 @@ parameter llc_phaseout_start_mfj:
 parameter llc_phaseout_end_mfj:
   description: "Income threshold for complete LLC phaseout (Married Filing Jointly)"
   unit: USD
-  source: "26 USC 25A(d)(2)"
   values:
     2024-01-01: 180000
     2023-01-01: 180000
@@ -57,7 +51,6 @@ parameter llc_phaseout_end_mfj:
 parameter llc_phaseout_start_single:
   description: "Income threshold for LLC phaseout (Single)"
   unit: USD
-  source: "26 USC 25A(d)(2)"
   values:
     2024-01-01: 80000
     2023-01-01: 80000
@@ -65,7 +58,6 @@ parameter llc_phaseout_start_single:
 parameter llc_phaseout_end_single:
   description: "Income threshold for complete LLC phaseout (Single)"
   unit: USD
-  source: "26 USC 25A(d)(2)"
   values:
     2024-01-01: 90000
     2023-01-01: 90000

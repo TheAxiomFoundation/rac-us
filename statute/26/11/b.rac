@@ -32,7 +32,6 @@ input tax_year:
 parameter flat_rate:
   description: "Post-TCJA flat corporate income tax rate"
   unit: rate
-  reference: "26 USC 11(b)"
   values:
     2018-01-01: 0.21
 

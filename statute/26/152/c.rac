@@ -13,14 +13,12 @@ for the calendar year in which the taxable year of the taxpayer begins.
 parameter age_limit_general:
   description: "Age limit for qualifying child (general)"
   unit: years
-  reference: "26 USC 152(c)(3)(A)"
   values:
     2018-01-01: 19
 
 parameter age_limit_student:
   description: "Age limit for qualifying child who is a student"
   unit: years
-  reference: "26 USC 152(c)(3)(A)"
   values:
     2018-01-01: 24
 

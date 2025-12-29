@@ -49,7 +49,6 @@ parameter age_threshold:
   values:
     1974-01-01: 65
   label: "SSI Age Threshold"
-  reference: "https://www.ssa.gov/ssi/eligibility"
 
 parameter resource_limit_individual:
   description: "SSI resource limit for individual"
@@ -57,7 +56,6 @@ parameter resource_limit_individual:
   values:
     2024-01-01: 2000
   label: "SSI Resource Limit (Individual)"
-  reference: "https://www.ssa.gov/ssi/eligibility"
 
 parameter resource_limit_couple:
   description: "SSI resource limit for couple"
@@ -65,7 +63,6 @@ parameter resource_limit_couple:
   values:
     2024-01-01: 3000
   label: "SSI Resource Limit (Couple)"
-  reference: "https://www.ssa.gov/ssi/eligibility"
 
 variable age_requirement:
   entity: Person
