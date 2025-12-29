@@ -129,8 +129,6 @@ variable acp_benefit:
 variable acp_max_benefit:
   imports:
     - 47/1752/a/6#acp_on_tribal_land
-    - 47/1752/parameters/benefit_amount/standard#standard_benefit
-    - 47/1752/parameters/benefit_amount/tribal#tribal_benefit
   entity: Household
   period: Month
   dtype: Money
