@@ -23,3 +23,39 @@ variable tax_imposed:
     # Partnerships: exempt per 26 USC 701
     # Sole proprietorships: taxed at individual level
     return entity_type == C_CORPORATION
+  tests:
+    - name: "C corporation is subject to corporate tax"
+      period: 2024
+      inputs:
+        entity_type: C_CORPORATION
+      expect: true
+
+    - name: "S corporation is exempt from corporate tax"
+      period: 2024
+      inputs:
+        entity_type: S_CORPORATION
+      expect: false
+
+    - name: "Partnership is exempt from corporate tax"
+      period: 2024
+      inputs:
+        entity_type: PARTNERSHIP
+      expect: false
+
+    - name: "Sole proprietorship is exempt from corporate tax"
+      period: 2024
+      inputs:
+        entity_type: SOLE_PROPRIETORSHIP
+      expect: false
+
+    - name: "LLC taxed as C corp is subject to corporate tax"
+      period: 2024
+      inputs:
+        entity_type: C_CORPORATION
+      expect: true
+
+    - name: "LLC taxed as partnership is exempt from corporate tax"
+      period: 2024
+      inputs:
+        entity_type: PARTNERSHIP
+      expect: false

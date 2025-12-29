@@ -26,3 +26,34 @@ variable employer_medicare_tax:
     # Medicare tax applies to ALL wages - no cap unlike Social Security
     # Employer rate matches employee rate
     return irs_employment_income * employer_medicare_rate
+  tests:
+    - name: "Zero wages - no tax"
+      period: 2024
+      inputs:
+        irs_employment_income: 0
+      expect: 0
+    - name: "Low wages - full 1.45% applies"
+      period: 2024
+      inputs:
+        irs_employment_income: 50_000
+      expect: 725  # 50,000 * 0.0145 = 725
+    - name: "Moderate wages - Medicare has no cap"
+      period: 2024
+      inputs:
+        irs_employment_income: 100_000
+      expect: 1_450  # 100,000 * 0.0145 = 1,450
+    - name: "High earner above SS wage base - Medicare still uncapped"
+      period: 2024
+      inputs:
+        irs_employment_income: 200_000
+      expect: 2_900  # 200,000 * 0.0145 = 2,900 (no cap unlike Social Security)
+    - name: "Very high earner - Medicare continues on all wages"
+      period: 2024
+      inputs:
+        irs_employment_income: 500_000
+      expect: 7_250  # 500,000 * 0.0145 = 7,250
+    - name: "Minimum wage worker annual income"
+      period: 2024
+      inputs:
+        irs_employment_income: 15_080  # ~$7.25/hr * 2080 hrs
+      expect: 218.66  # 15,080 * 0.0145 = 218.66

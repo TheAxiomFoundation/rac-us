@@ -66,3 +66,51 @@ variable tax_amount:
     if tax_year >= tcja_effective_year: return taxable_income * flat_rate
     # Pre-TCJA: graduated rates with bubbles
     return compute_graduated_tax(taxable_income, graduated_brackets)
+  tests:
+    - name: "Not subject to corporate tax"
+      period: 2024
+      inputs:
+        is_subject_to_corporate_tax: false
+        taxable_income: 500_000
+        tax_year: 2024
+      expect: 0
+
+    - name: "Zero taxable income"
+      period: 2024
+      inputs:
+        is_subject_to_corporate_tax: true
+        taxable_income: 0
+        tax_year: 2024
+      expect: 0
+
+    - name: "Negative taxable income (loss)"
+      period: 2024
+      inputs:
+        is_subject_to_corporate_tax: true
+        taxable_income: -100_000
+        tax_year: 2024
+      expect: 0
+
+    - name: "Post-TCJA flat 21% rate - small corporation"
+      period: 2024
+      inputs:
+        is_subject_to_corporate_tax: true
+        taxable_income: 100_000
+        tax_year: 2024
+      expect: 21_000  # 100,000 * 0.21
+
+    - name: "Post-TCJA flat 21% rate - large corporation"
+      period: 2024
+      inputs:
+        is_subject_to_corporate_tax: true
+        taxable_income: 10_000_000
+        tax_year: 2024
+      expect: 2_100_000  # 10,000,000 * 0.21
+
+    - name: "Pre-TCJA graduated rates - 15% bracket"
+      period: 2017
+      inputs:
+        is_subject_to_corporate_tax: true
+        taxable_income: 40_000
+        tax_year: 2017
+      expect: 6_000  # 40,000 * 0.15
