@@ -1,0 +1,258 @@
+# 26 USC § 121(a) - Exclusion
+
+text: """
+Gross income shall not include gain from the sale or exchange of property if,
+during the 5-year period ending on the date of the sale or exchange, such
+property has been owned and used by the taxpayer as the taxpayer's principal
+residence for periods aggregating 2 years or more.
+"""
+
+parameter ownership_required:
+  description: "Years of ownership required in 5-year lookback period"
+  unit: years
+  reference: "26 USC 121(a)"
+  values:
+    1997-05-07: 2
+
+parameter use_required:
+  description: "Years of use as principal residence required in 5-year lookback period"
+  unit: years
+  reference: "26 USC 121(a)"
+  values:
+    1997-05-07: 2
+
+input years_owned:
+  entity: TaxUnit
+  period: Year
+  dtype: Decimal
+  label: "Years Owned"
+  description: "Number of years property was owned by taxpayer in 5-year lookback"
+  default: 0
+
+input years_used_as_residence:
+  entity: TaxUnit
+  period: Year
+  dtype: Decimal
+  label: "Years Used as Residence"
+  description: "Number of years property was used as principal residence in 5-year lookback"
+  default: 0
+
+variable meets_ownership_test:
+  entity: TaxUnit
+  period: Year
+  dtype: Boolean
+  description: "Whether taxpayer meets 2-year ownership requirement per 121(a)"
+  formula: return years_owned >= ownership_required
+  tests:
+    - name: "Exactly 2 years owned"
+      period: 2024-01
+      inputs:
+        years_owned: 2
+      expect: true
+    - name: "More than 2 years owned"
+      period: 2024-01
+      inputs:
+        years_owned: 5
+      expect: true
+    - name: "Less than 2 years owned"
+      period: 2024-01
+      inputs:
+        years_owned: 1
+      expect: false
+    - name: "No years owned"
+      period: 2024-01
+      inputs:
+        years_owned: 0
+      expect: false
+    - name: "Just under 2 years (1.99 years)"
+      period: 2024-01
+      inputs:
+        years_owned: 1.99
+      expect: false
+    - name: "Much longer than 2 years"
+      period: 2024-01
+      inputs:
+        years_owned: 10
+      expect: true
+
+variable meets_use_test:
+  entity: TaxUnit
+  period: Year
+  dtype: Boolean
+  description: "Whether taxpayer meets 2-year use requirement per 121(a)"
+  formula: return years_used_as_residence >= use_required
+  tests:
+    - name: "Exactly 2 years used as residence"
+      period: 2024-01
+      inputs:
+        years_used_as_residence: 2
+      expect: true
+    - name: "More than 2 years used as residence"
+      period: 2024-01
+      inputs:
+        years_used_as_residence: 3
+      expect: true
+    - name: "Less than 2 years used as residence"
+      period: 2024-01
+      inputs:
+        years_used_as_residence: 1
+      expect: false
+    - name: "No years used as residence"
+      period: 2024-01
+      inputs:
+        years_used_as_residence: 0
+      expect: false
+    - name: "Rented out during tenure (0.5 years used)"
+      period: 2024-01
+      inputs:
+        years_used_as_residence: 0.5
+      expect: false
+    - name: "Long ownership but only 1 year as residence"
+      period: 2024-01
+      inputs:
+        years_used_as_residence: 1
+      expect: false
+
+variable meets_full_requirements:
+  imports:
+    - 26/121/b#meets_frequency_test
+  entity: TaxUnit
+  period: Year
+  dtype: Boolean
+  description: "Whether taxpayer fully qualifies for exclusion per 121(a) and 121(b)"
+  formula: return meets_ownership_test and meets_use_test and meets_frequency_test
+  tests:
+    - name: "All requirements met"
+      period: 2024-01
+      inputs:
+        meets_ownership_test: true
+        meets_use_test: true
+        meets_frequency_test: true
+      expect: true
+    - name: "Fails ownership test"
+      period: 2024-01
+      inputs:
+        meets_ownership_test: false
+        meets_use_test: true
+        meets_frequency_test: true
+      expect: false
+    - name: "Fails use test"
+      period: 2024-01
+      inputs:
+        meets_ownership_test: true
+        meets_use_test: false
+        meets_frequency_test: true
+      expect: false
+    - name: "Fails frequency test"
+      period: 2024-01
+      inputs:
+        meets_ownership_test: true
+        meets_use_test: true
+        meets_frequency_test: false
+      expect: false
+    - name: "Fails all tests"
+      period: 2024-01
+      inputs:
+        meets_ownership_test: false
+        meets_use_test: false
+        meets_frequency_test: false
+      expect: false
+    - name: "Fails ownership and use tests"
+      period: 2024-01
+      inputs:
+        meets_ownership_test: false
+        meets_use_test: false
+        meets_frequency_test: true
+      expect: false
+
+variable principal_residence_exclusion:
+  imports:
+    - 26/1#filing_status
+    - 26/121/b#applicable_exclusion_limit
+    - 26/121/d#excludable_gain
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: "USD"
+  label: "Principal Residence Gain Exclusion"
+  description: "Amount of gain from sale of principal residence excluded from gross income per 26 USC 121"
+  syntax: python
+  formula: |
+    # The exclusion is the lesser of:
+    # 1. The applicable exclusion limit (based on filing status and full requirements met)
+    # 2. The excludable gain (gain minus depreciation recapture)
+    return min(applicable_exclusion_limit, excludable_gain)
+  default: 0
+  tests:
+    - name: "Single filer, full requirements met, gain within limit"
+      period: 2024-01
+      inputs:
+        filing_status: SINGLE
+        meets_full_requirements: true
+        applicable_exclusion_limit: 250_000
+        excludable_gain: 200_000
+      expect: 200000
+    - name: "Single filer, full requirements met, gain exceeds limit"
+      period: 2024-01
+      inputs:
+        filing_status: SINGLE
+        meets_full_requirements: true
+        applicable_exclusion_limit: 250_000
+        excludable_gain: 400_000
+      expect: 250000
+    - name: "Single filer, does not meet requirements"
+      period: 2024-01
+      inputs:
+        filing_status: SINGLE
+        meets_full_requirements: false
+        applicable_exclusion_limit: 0
+        excludable_gain: 200_000
+      expect: 0
+    - name: "Married filing jointly, full requirements met, gain within limit"
+      period: 2024-01
+      inputs:
+        filing_status: MARRIED_FILING_JOINTLY
+        meets_full_requirements: true
+        applicable_exclusion_limit: 500_000
+        excludable_gain: 400_000
+      expect: 400000
+    - name: "Married filing jointly, full requirements met, gain exceeds limit"
+      period: 2024-01
+      inputs:
+        filing_status: MARRIED_FILING_JOINTLY
+        meets_full_requirements: true
+        applicable_exclusion_limit: 500_000
+        excludable_gain: 600_000
+      expect: 500000
+    - name: "Married filing separately, reduced exclusion"
+      period: 2024-01
+      inputs:
+        filing_status: MARRIED_FILING_SEPARATELY
+        meets_full_requirements: false
+        applicable_exclusion_limit: 125_000
+        excludable_gain: 100_000
+      expect: 100000
+    - name: "Head of household, full requirements met"
+      period: 2024-01
+      inputs:
+        filing_status: HEAD_OF_HOUSEHOLD
+        meets_full_requirements: true
+        applicable_exclusion_limit: 250_000
+        excludable_gain: 180_000
+      expect: 180000
+    - name: "Zero gain excludable (depreciation recapture equals gain)"
+      period: 2024-01
+      inputs:
+        filing_status: SINGLE
+        meets_full_requirements: true
+        applicable_exclusion_limit: 250_000
+        excludable_gain: 0
+      expect: 0
+    - name: "Negative excludable gain (all depreciation)"
+      period: 2024-01
+      inputs:
+        filing_status: SINGLE
+        meets_full_requirements: true
+        applicable_exclusion_limit: 250_000
+        excludable_gain: 0
+      expect: 0

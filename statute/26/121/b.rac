@@ -1,0 +1,275 @@
+# 26 USC § 121(b) - Limitations
+
+text: """
+(1) In general - The amount of gain excluded from gross income under
+subsection (a) with respect to any sale or exchange shall not exceed $250,000.
+
+(2) Special rules for joint returns - In the case of a husband and wife who
+make a joint return for the taxable year of the sale or exchange of the
+property... the limitation shall be $500,000.
+
+(3) Application to only 1 sale or exchange every 2 years - Subsection (a)
+shall not apply to any sale or exchange by the taxpayer if, during the 2-year
+period ending on the date of such sale or exchange, there was any other sale
+or exchange by the taxpayer to which subsection (a) applied.
+"""
+
+parameter single_limit:
+  description: "Maximum exclusion for single taxpayer or married filing separately"
+  unit: USD
+  reference: "26 USC 121(b)(1)"
+  values:
+    1997-05-07: 250_000
+
+parameter joint_limit:
+  description: "Maximum exclusion for married filing jointly"
+  unit: USD
+  reference: "26 USC 121(b)(2)"
+  values:
+    1997-05-07: 500_000
+
+parameter waiting_period:
+  description: "Years since prior exclusion claimed (once-every-2-years limitation)"
+  unit: years
+  reference: "26 USC 121(b)(3)"
+  values:
+    1997-05-07: 2
+
+input prior_exclusion_claimed:
+  entity: TaxUnit
+  period: Year
+  dtype: Boolean
+  label: "Prior Exclusion Claimed"
+  description: "Whether taxpayer claimed Section 121 exclusion in prior 2 years"
+  default: false
+
+input years_since_last_exclusion:
+  entity: TaxUnit
+  period: Year
+  dtype: Decimal
+  label: "Years Since Last Exclusion"
+  description: "Years elapsed since prior Section 121 exclusion claim (if applicable)"
+  default: 3
+
+input spouse_meets_use_test:
+  entity: TaxUnit
+  period: Year
+  dtype: Boolean
+  label: "Spouse Meets Use Test"
+  description: "Whether spouse meets 2-year use requirement (married filing jointly)"
+  default: false
+
+input spouse_prior_exclusion_claimed:
+  entity: TaxUnit
+  period: Year
+  dtype: Boolean
+  label: "Spouse Prior Exclusion Claimed"
+  description: "Whether spouse claimed Section 121 exclusion in prior 2 years"
+  default: false
+
+variable meets_frequency_test:
+  entity: TaxUnit
+  period: Year
+  dtype: Boolean
+  description: "Whether taxpayer meets once-every-2-years limitation per 121(b)(3)"
+  syntax: python
+  formula: |
+    if not prior_exclusion_claimed:
+      return true
+    return years_since_last_exclusion >= waiting_period
+  tests:
+    - name: "No prior exclusion claimed"
+      period: 2024-01
+      inputs:
+        prior_exclusion_claimed: false
+        years_since_last_exclusion: 0
+      expect: true
+    - name: "Prior exclusion claimed, exactly 2 years since"
+      period: 2024-01
+      inputs:
+        prior_exclusion_claimed: true
+        years_since_last_exclusion: 2
+      expect: true
+    - name: "Prior exclusion claimed, more than 2 years since"
+      period: 2024-01
+      inputs:
+        prior_exclusion_claimed: true
+        years_since_last_exclusion: 3
+      expect: true
+    - name: "Prior exclusion claimed, less than 2 years since"
+      period: 2024-01
+      inputs:
+        prior_exclusion_claimed: true
+        years_since_last_exclusion: 1
+      expect: false
+    - name: "Prior exclusion claimed, 0 years since (just claimed)"
+      period: 2024-01
+      inputs:
+        prior_exclusion_claimed: true
+        years_since_last_exclusion: 0
+      expect: false
+    - name: "Long time since prior exclusion"
+      period: 2024-01
+      inputs:
+        prior_exclusion_claimed: true
+        years_since_last_exclusion: 10
+      expect: true
+
+variable qualifies_for_joint_limit:
+  imports:
+    - 26/1#filing_status
+    - 26/121/a#meets_ownership_test
+    - 26/121/a#meets_use_test
+  entity: TaxUnit
+  period: Year
+  dtype: Boolean
+  description: "Whether married filing jointly qualifies for $500,000 limit per 121(b)(2)"
+  syntax: python
+  formula: |
+    if filing_status != JOINT:
+      return false
+    # Either spouse meets ownership (we assume primary taxpayer's ownership)
+    either_spouse_owns = meets_ownership_test
+    # Both spouses must meet use test
+    both_spouses_used = meets_use_test and spouse_meets_use_test
+    # Neither spouse used exclusion in prior 2 years
+    neither_used_recently = meets_frequency_test and not spouse_prior_exclusion_claimed
+    return either_spouse_owns and both_spouses_used and neither_used_recently
+  tests:
+    - name: "Single filer (not married filing jointly)"
+      period: 2024-01
+      inputs:
+        filing_status: SINGLE
+        meets_ownership_test: true
+        meets_use_test: true
+        spouse_meets_use_test: true
+        meets_frequency_test: true
+        spouse_prior_exclusion_claimed: false
+      expect: false
+    - name: "Married filing jointly, all conditions met"
+      period: 2024-01
+      inputs:
+        filing_status: MARRIED_FILING_JOINTLY
+        meets_ownership_test: true
+        meets_use_test: true
+        spouse_meets_use_test: true
+        meets_frequency_test: true
+        spouse_prior_exclusion_claimed: false
+      expect: true
+    - name: "Married filing jointly, primary spouse fails ownership"
+      period: 2024-01
+      inputs:
+        filing_status: MARRIED_FILING_JOINTLY
+        meets_ownership_test: false
+        meets_use_test: true
+        spouse_meets_use_test: true
+        meets_frequency_test: true
+        spouse_prior_exclusion_claimed: false
+      expect: false
+    - name: "Married filing jointly, primary spouse fails use test"
+      period: 2024-01
+      inputs:
+        filing_status: MARRIED_FILING_JOINTLY
+        meets_ownership_test: true
+        meets_use_test: false
+        spouse_meets_use_test: true
+        meets_frequency_test: true
+        spouse_prior_exclusion_claimed: false
+      expect: false
+    - name: "Married filing jointly, spouse fails use test"
+      period: 2024-01
+      inputs:
+        filing_status: MARRIED_FILING_JOINTLY
+        meets_ownership_test: true
+        meets_use_test: true
+        spouse_meets_use_test: false
+        meets_frequency_test: true
+        spouse_prior_exclusion_claimed: false
+      expect: false
+    - name: "Married filing jointly, primary spouse failed frequency test"
+      period: 2024-01
+      inputs:
+        filing_status: MARRIED_FILING_JOINTLY
+        meets_ownership_test: true
+        meets_use_test: true
+        spouse_meets_use_test: true
+        meets_frequency_test: false
+        spouse_prior_exclusion_claimed: false
+      expect: false
+    - name: "Married filing jointly, spouse claimed exclusion recently"
+      period: 2024-01
+      inputs:
+        filing_status: MARRIED_FILING_JOINTLY
+        meets_ownership_test: true
+        meets_use_test: true
+        spouse_meets_use_test: true
+        meets_frequency_test: true
+        spouse_prior_exclusion_claimed: true
+      expect: false
+
+variable applicable_exclusion_limit:
+  imports:
+    - 26/121/c#reduced_exclusion_fraction
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: "USD"
+  description: "Maximum exclusion available based on filing status and requirements per 121(b)"
+  syntax: python
+  formula: |
+    # Determine base limit per 121(b)(1) and 121(b)(2)
+    if qualifies_for_joint_limit:
+      base_limit = joint_limit
+    else:
+      base_limit = single_limit
+    # Apply reduced exclusion fraction if not fully meeting requirements per 121(c)
+    return base_limit * reduced_exclusion_fraction
+  tests:
+    - name: "Single filer, full exclusion (100%)"
+      period: 2024-01
+      inputs:
+        qualifies_for_joint_limit: false
+        reduced_exclusion_fraction: 1.0
+      expect: 250000
+    - name: "Single filer, 50% exclusion"
+      period: 2024-01
+      inputs:
+        qualifies_for_joint_limit: false
+        reduced_exclusion_fraction: 0.5
+      expect: 125000
+    - name: "Single filer, no exclusion (0%)"
+      period: 2024-01
+      inputs:
+        qualifies_for_joint_limit: false
+        reduced_exclusion_fraction: 0.0
+      expect: 0
+    - name: "Married filing jointly, full exclusion (100%)"
+      period: 2024-01
+      inputs:
+        qualifies_for_joint_limit: true
+        reduced_exclusion_fraction: 1.0
+      expect: 500000
+    - name: "Married filing jointly, 50% exclusion (unforeseen circumstances)"
+      period: 2024-01
+      inputs:
+        qualifies_for_joint_limit: true
+        reduced_exclusion_fraction: 0.5
+      expect: 250000
+    - name: "Married filing jointly, 25% exclusion"
+      period: 2024-01
+      inputs:
+        qualifies_for_joint_limit: true
+        reduced_exclusion_fraction: 0.25
+      expect: 125000
+    - name: "Married filing jointly, no exclusion (0%)"
+      period: 2024-01
+      inputs:
+        qualifies_for_joint_limit: true
+        reduced_exclusion_fraction: 0.0
+      expect: 0
+    - name: "Single filer, 75% exclusion"
+      period: 2024-01
+      inputs:
+        qualifies_for_joint_limit: false
+        reduced_exclusion_fraction: 0.75
+      expect: 187500

@@ -1,0 +1,95 @@
+# 26 USC § 121(d) - Special Rules
+
+text: """
+(6) Recognition of gain attributable to depreciation - Subsection (a) shall
+not apply to so much of the gain from the sale of any property as does not
+exceed the portion of the depreciation adjustments (as defined in section
+1250(b)(3)) attributable to periods after May 6, 1997, in respect of such
+property.
+"""
+
+input realized_gain_on_residence:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: "USD"
+  label: "Realized Gain on Residence"
+  description: "Amount of gain realized on sale or exchange of principal residence"
+  default: 0
+
+input depreciation_after_1997:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: "USD"
+  label: "Depreciation After May 6, 1997"
+  description: "Amount of depreciation deductions taken after May 6, 1997 (Section 1250 property)"
+  default: 0
+
+variable excludable_gain:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: "USD"
+  description: "Gain eligible for exclusion per 121(d)(6) (realized gain minus depreciation recapture)"
+  syntax: python
+  formula: |
+    # Depreciation taken after May 6, 1997 is not excludable
+    # It is taxed as unrecaptured Section 1250 gain (25% rate)
+    return max(0, realized_gain_on_residence - depreciation_after_1997)
+  default: 0
+  tests:
+    - name: "No gain realized"
+      period: 2024-01
+      inputs:
+        realized_gain_on_residence: 0
+        depreciation_after_1997: 0
+      expect: 0
+    - name: "Gain with no depreciation"
+      period: 2024-01
+      inputs:
+        realized_gain_on_residence: 200_000
+        depreciation_after_1997: 0
+      expect: 200000
+    - name: "Gain exceeds depreciation recapture"
+      period: 2024-01
+      inputs:
+        realized_gain_on_residence: 300_000
+        depreciation_after_1997: 50_000
+      expect: 250000
+    - name: "Depreciation equals realized gain (no excludable gain)"
+      period: 2024-01
+      inputs:
+        realized_gain_on_residence: 100_000
+        depreciation_after_1997: 100_000
+      expect: 0
+    - name: "Depreciation exceeds realized gain (capped at 0)"
+      period: 2024-01
+      inputs:
+        realized_gain_on_residence: 50_000
+        depreciation_after_1997: 150_000
+      expect: 0
+    - name: "Large gain with moderate depreciation"
+      period: 2024-01
+      inputs:
+        realized_gain_on_residence: 500_000
+        depreciation_after_1997: 75_000
+      expect: 425000
+    - name: "Rental property converted to primary residence"
+      period: 2024-01
+      inputs:
+        realized_gain_on_residence: 400_000
+        depreciation_after_1997: 125_000
+      expect: 275000
+    - name: "Small depreciation on large gain"
+      period: 2024-01
+      inputs:
+        realized_gain_on_residence: 600_000
+        depreciation_after_1997: 10_000
+      expect: 590000
+    - name: "Depreciation before 1997 (not recaptured)"
+      period: 2024-01
+      inputs:
+        realized_gain_on_residence: 200_000
+        depreciation_after_1997: 0
+      expect: 200000

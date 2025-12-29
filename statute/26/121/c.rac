@@ -1,0 +1,132 @@
+# 26 USC § 121(c) - Exclusions for Taxpayers Failing to Meet Certain Requirements
+
+text: """
+(1) In general - In the case of a sale or exchange to which this subsection
+applies, the amount of gain excluded from gross income under subsection (a)
+shall not exceed the amount which bears the same ratio to the amount which
+would be so excluded if the taxpayer met the ownership and use requirements
+of subsection (a) and the frequency requirements of subsection (b)(3) as the
+shorter of (A) the aggregate periods during which such requirements are met,
+or (B) the period after the date of the most recent prior sale or exchange by
+the taxpayer to which subsection (a) applied, bears to 2 years.
+
+(2) Applies to sales or exchanges by reason of a change in place of employment,
+health, or unforeseen circumstances.
+"""
+
+input qualifies_for_reduced_exclusion:
+  entity: TaxUnit
+  period: Year
+  dtype: Boolean
+  label: "Qualifies for Reduced Exclusion"
+  description: "Whether taxpayer qualifies for partial exclusion under 121(c) (unforeseen circumstances)"
+  default: false
+
+variable reduced_exclusion_fraction:
+  imports:
+    - 26/121/a#meets_full_requirements
+    - 26/121/a#years_owned
+    - 26/121/a#ownership_required
+    - 26/121/a#years_used_as_residence
+    - 26/121/a#use_required
+    - 26/121/b#prior_exclusion_claimed
+    - 26/121/b#years_since_last_exclusion
+    - 26/121/b#waiting_period
+  entity: TaxUnit
+  period: Year
+  dtype: Rate
+  description: "Fraction of full exclusion available under 121(c)"
+  syntax: python
+  formula: |
+    if meets_full_requirements:
+      return 1.0
+    if not qualifies_for_reduced_exclusion:
+      return 0.0
+    # Fraction = shorter of (ownership/use time) or (time since last exclusion)
+    # divided by required period (2 years)
+    # Ownership fraction
+    ownership_fraction = min(years_owned / ownership_required, 1.0)
+    # Use fraction
+    use_fraction = min(years_used_as_residence / use_required, 1.0)
+    # Frequency fraction (if applicable)
+    if prior_exclusion_claimed:
+      frequency_fraction = min(years_since_last_exclusion / waiting_period, 1.0)
+    else:
+      frequency_fraction = 1.0
+    # Take the minimum of all applicable fractions
+    return min(ownership_fraction, use_fraction, frequency_fraction)
+  tests:
+    - name: "Meets full requirements (100% exclusion)"
+      period: 2024-01
+      inputs:
+        meets_full_requirements: true
+        qualifies_for_reduced_exclusion: false
+        years_owned: 2
+        years_used_as_residence: 2
+        prior_exclusion_claimed: false
+      expect: 1.0
+    - name: "Does not qualify for reduced exclusion (0%)"
+      period: 2024-01
+      inputs:
+        meets_full_requirements: false
+        qualifies_for_reduced_exclusion: false
+        years_owned: 1
+        years_used_as_residence: 1
+        prior_exclusion_claimed: false
+      expect: 0.0
+    - name: "1 year of ownership and use (50% of 2 years required)"
+      period: 2024-01
+      inputs:
+        meets_full_requirements: false
+        qualifies_for_reduced_exclusion: true
+        years_owned: 1
+        years_used_as_residence: 1
+        prior_exclusion_claimed: false
+      expect: 0.5
+    - name: "1.5 years of ownership and use (75% of 2 years)"
+      period: 2024-01
+      inputs:
+        meets_full_requirements: false
+        qualifies_for_reduced_exclusion: true
+        years_owned: 1.5
+        years_used_as_residence: 1.5
+        prior_exclusion_claimed: false
+      expect: 0.75
+    - name: "1 year ownership, 1.5 years use (ownership is limiting at 50%)"
+      period: 2024-01
+      inputs:
+        meets_full_requirements: false
+        qualifies_for_reduced_exclusion: true
+        years_owned: 1
+        years_used_as_residence: 1.5
+        prior_exclusion_claimed: false
+      expect: 0.5
+    - name: "1 year since last exclusion (50% of 2 year waiting period)"
+      period: 2024-01
+      inputs:
+        meets_full_requirements: false
+        qualifies_for_reduced_exclusion: true
+        years_owned: 2
+        years_used_as_residence: 2
+        prior_exclusion_claimed: true
+        years_since_last_exclusion: 1
+      expect: 0.5
+    - name: "Unforeseen circumstances: 0.5 years owned and used"
+      period: 2024-01
+      inputs:
+        meets_full_requirements: false
+        qualifies_for_reduced_exclusion: true
+        years_owned: 0.5
+        years_used_as_residence: 0.5
+        prior_exclusion_claimed: false
+      expect: 0.25
+    - name: "All factors limiting (1 year own, 0.5 use, 1 year since)"
+      period: 2024-01
+      inputs:
+        meets_full_requirements: false
+        qualifies_for_reduced_exclusion: true
+        years_owned: 1
+        years_used_as_residence: 0.5
+        prior_exclusion_claimed: true
+        years_since_last_exclusion: 1
+      expect: 0.25
