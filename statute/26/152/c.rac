@@ -9,6 +9,21 @@ than one-half of such taxable year,
 (D) who has not provided over one-half of such individual's own support
 for the calendar year in which the taxable year of the taxpayer begins.
 """
+
+parameter age_limit_general:
+  description: "Age limit for qualifying child (general)"
+  unit: years
+  reference: "26 USC 152(c)(3)(A)"
+  values:
+    2018-01-01: 19
+
+parameter age_limit_student:
+  description: "Age limit for qualifying child who is a student"
+  unit: years
+  reference: "26 USC 152(c)(3)(A)"
+  values:
+    2018-01-01: 24
+
 variable is_qualifying_child:
   entity: Person
   period: Year
@@ -24,3 +39,46 @@ variable is_qualifying_child:
     # (C) is permanently and totally disabled at any time during such calendar year
     disabled = is_permanently_disabled
     return under_19 or student_under_24 or disabled
+  tests:
+    - name: "Child under 19 qualifies"
+      period: 2024
+      inputs:
+        age: 15
+        is_student: false
+        is_permanently_disabled: false
+      expect: true
+    - name: "Child at age 18 qualifies (under 19)"
+      period: 2024
+      inputs:
+        age: 18
+        is_student: false
+        is_permanently_disabled: false
+      expect: true
+    - name: "Non-student age 19 does not qualify"
+      period: 2024
+      inputs:
+        age: 19
+        is_student: false
+        is_permanently_disabled: false
+      expect: false
+    - name: "Student under 24 qualifies"
+      period: 2024
+      inputs:
+        age: 21
+        is_student: true
+        is_permanently_disabled: false
+      expect: true
+    - name: "Student at age 24 does not qualify"
+      period: 2024
+      inputs:
+        age: 24
+        is_student: true
+        is_permanently_disabled: false
+      expect: false
+    - name: "Disabled individual qualifies regardless of age"
+      period: 2024
+      inputs:
+        age: 45
+        is_student: false
+        is_permanently_disabled: true
+      expect: true

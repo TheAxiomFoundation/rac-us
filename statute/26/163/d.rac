@@ -27,3 +27,45 @@ variable investment_interest:
   description: "Disallowed investment interest carried to succeeding year per 26 USC 163(d)(2)"
   formula: return max(0, investment_income - investment_expenses)
   default: 0
+  tests:
+    - name: "net_investment_income_positive"
+      period: 2024
+      inputs:
+        investment_income: 15_000
+        investment_expenses: 5_000
+      expect: 10_000
+
+    - name: "net_investment_income_zero_when_expenses_exceed_income"
+      period: 2024
+      inputs:
+        investment_income: 3_000
+        investment_expenses: 8_000
+      expect: 0
+
+    - name: "zero_income_and_expenses"
+      period: 2024
+      inputs:
+        investment_income: 0
+        investment_expenses: 0
+      expect: 0
+
+    - name: "income_equals_expenses"
+      period: 2024
+      inputs:
+        investment_income: 25_000
+        investment_expenses: 25_000
+      expect: 0
+
+    - name: "large_investment_portfolio"
+      period: 2024
+      inputs:
+        investment_income: 150_000
+        investment_expenses: 42_500
+      expect: 107_500
+
+    - name: "small_positive_net_income"
+      period: 2024
+      inputs:
+        investment_income: 1_200
+        investment_expenses: 1_000
+      expect: 200

@@ -21,3 +21,34 @@ variable se_tax_deduction:
   formula: |
     # Exactly one-half of the self-employment tax per statute
     return se_tax_deduction_rate * self_employment_tax
+  tests:
+    - name: "Standard SE tax deduction - half of SE tax"
+      period: 2024
+      inputs:
+        self_employment_tax: 10_000
+      expect: 5_000
+    - name: "High earner SE tax deduction"
+      period: 2024
+      inputs:
+        self_employment_tax: 30_000
+      expect: 15_000
+    - name: "Zero self-employment tax yields zero deduction"
+      period: 2024
+      inputs:
+        self_employment_tax: 0
+      expect: 0
+    - name: "Small self-employment income"
+      period: 2024
+      inputs:
+        self_employment_tax: 1_530
+      expect: 765
+    - name: "Maximum SE tax near Social Security wage base"
+      period: 2024
+      inputs:
+        self_employment_tax: 21_068.40
+      expect: 10_534.20
+    - name: "Fractional SE tax properly halved"
+      period: 2024
+      inputs:
+        self_employment_tax: 7_777.77
+      expect: 3_888.885

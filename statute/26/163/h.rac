@@ -90,3 +90,46 @@ variable qualified_residence_interest:
     # Home equity is tracked separately
     return acquisition_interest
   default: 0
+  tests:
+    - name: "Joint filer with debt under limit"
+      period: 2024
+      inputs:
+        filing_status: MARRIED_FILING_JOINTLY
+        acquisition_debt: 500_000
+        mortgage_interest_paid: 25_000
+      expect: 25_000
+    - name: "Joint filer at exact TCJA limit"
+      period: 2024
+      inputs:
+        filing_status: MARRIED_FILING_JOINTLY
+        acquisition_debt: 750_000
+        mortgage_interest_paid: 37_500
+      expect: 37_500
+    - name: "Joint filer with debt over TCJA limit"
+      period: 2024
+      inputs:
+        filing_status: MARRIED_FILING_JOINTLY
+        acquisition_debt: 1_000_000
+        mortgage_interest_paid: 50_000
+      expect: 37_500
+    - name: "Married filing separately under MFS limit"
+      period: 2024
+      inputs:
+        filing_status: MARRIED_FILING_SEPARATELY
+        acquisition_debt: 300_000
+        mortgage_interest_paid: 15_000
+      expect: 15_000
+    - name: "MFS with debt over limit (proportional reduction)"
+      period: 2024
+      inputs:
+        filing_status: MARRIED_FILING_SEPARATELY
+        acquisition_debt: 750_000
+        mortgage_interest_paid: 37_500
+      expect: 18_750
+    - name: "Single filer with large debt exceeding limit"
+      period: 2024
+      inputs:
+        filing_status: SINGLE
+        acquisition_debt: 1_500_000
+        mortgage_interest_paid: 75_000
+      expect: 37_500
