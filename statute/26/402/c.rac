@@ -23,6 +23,12 @@ parameter rmd_birth_year_thresholds:
     # Schedule: [72, 73, 75]
 
 variable rmd:
+  entity: Person
+  period: Year
+  dtype: Money
+  unit: "USD"
+  label: "Required Minimum Distribution"
+  description: "Minimum amount required to be distributed from qualified retirement plan per 26 USC 402(c)"
   imports: [26/person/age#age]
 
 variable birth_year:

@@ -1,3 +1,20 @@
+text: """
+26 USC § 3304 - Approval of State Laws
+
+(a) Requirements.—The Secretary of Labor shall approve any State law submitted
+to him, within 30 days of such submission, which he finds provides that—
+(1) all compensation is to be paid through public employment offices or
+such other agencies as the Secretary of Labor may approve;
+(2) no compensation shall be payable with respect to any day of unemployment
+occurring within 2 years after the first day of the first period with respect
+to which contributions are required;
+(3) all money received in the unemployment fund shall be used solely in the
+payment of unemployment compensation, exclusive of expenses of administration.
+
+Coverage under FUTA (Federal Unemployment Tax Act) is required for most
+employment, with exceptions specified in section 3306(c).
+"""
+
 variable coverage:
   entity: TaxUnit
   period: Year

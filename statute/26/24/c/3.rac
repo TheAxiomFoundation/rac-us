@@ -1,4 +1,13 @@
-# Helper variable to count qualifying children in tax unit
+text: """
+26 USC § 24(c)(3) - Qualifying Child Requirements
+
+For purposes of this section, the term "qualifying child" means a qualifying
+child of the taxpayer (as defined in section 152(c)) who has not attained
+age 17.
+
+This helper variable counts the number of qualifying children in the tax
+unit for purposes of calculating the Child Tax Credit amount.
+"""
 
 variable num_ctc_qualifying_children:
   imports:

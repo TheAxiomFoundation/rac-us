@@ -117,6 +117,12 @@ input household_income_pct_fpl:
   default: 2.5
 
 variable reconciliation:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: "USD"
+  label: "PTC Reconciliation Container"
+  description: "Reconciliation of advance credit and actual credit per 26 USC 36B(f)"
   imports:
     - 26/36B/a#premium_tax_credit
     - 26/1#filing_status

@@ -5,6 +5,9 @@ chapter over the gross income. Such excess shall be computed with the
 modifications specified in subsection (d).
 """
 variable nol_defined:
+  entity: TaxUnit
+  period: Year
+  dtype: Boolean
   imports:
     - 26/62/a#adjusted_gross_income
     - 26/63/a#taxable_income

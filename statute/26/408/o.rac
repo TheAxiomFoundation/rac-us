@@ -1,4 +1,17 @@
-# and Section 219(b) - Maximum Amount of Deduction (Contribution Limits)
+text: """
+26 USC § 408(o) - Tax on Excess Contributions
+
+For purposes of section 4973, in the case of contributions to individual
+retirement accounts or individual retirement annuities, the term "excess
+contributions" means the sum of—
+(1) the excess (if any) of—
+(A) the amount contributed for the taxable year to the accounts or for
+the annuities (other than a rollover contribution), over
+(B) the amount allowable as a deduction under section 219 for such contributions.
+
+26 USC § 4973 imposes a 6% excise tax on excess contributions left in the
+account at the end of the tax year.
+"""
 
 parameter contribution_limit_excess_tax_rate:
   description: "Excise tax rate on excess IRA contributions"

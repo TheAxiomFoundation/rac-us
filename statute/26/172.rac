@@ -1,3 +1,21 @@
+text: """
+26 USC § 172 - Net Operating Loss Deduction
+
+(a) Deduction allowed.—There shall be allowed as a deduction for the taxable year
+an amount equal to the aggregate of the net operating loss carryovers and net
+operating loss carrybacks to such year.
+
+(b) Net operating loss carrybacks and carryovers.—
+(1) In general.—A net operating loss for any taxable year shall be a net
+operating loss carryback to the extent provided in subsection (b)(1) and a
+net operating loss carryforward.
+
+(2) 80% limitation.—In the case of a net operating loss arising in a taxable
+year beginning after December 31, 2017, the amount of such loss which may be
+taken into account under subsection (a) shall not exceed 80% of taxable income
+(computed without regard to the deduction allowable under this section).
+"""
+
 variable nol_carryforward_pre_2018:
   entity: TaxUnit
   period: Year

@@ -91,7 +91,32 @@ parameter priority_ranges:
     # TODO: add values
 
 variable priority:
-  imports:
+  entity: Person
+  period: Month
+  dtype: Integer
+  syntax: python
+  formula: |
+    # Priority assignment based on category
+    # Using parameters lookup for priority values
+    category = wic_category
+    if category == "pregnant_woman":
+        return priority_by_category.pregnant_woman
+    if category == "breastfeeding_woman":
+        return priority_by_category.breastfeeding_woman
+    if category == "infant":
+        return priority_by_category.infant
+    if category == "child":
+        return priority_by_category.child
+    if category == "postpartum_woman":
+        return priority_by_category.postpartum_woman
+    return 0
+  tests:
+    - name: "Pregnant woman receives priority"
+      inputs: {wic_category: "pregnant_woman"}
+      expect: 1
+    - name: "Unknown category returns 0"
+      inputs: {wic_category: "unknown"}
+      expect: 0
 
 variable wic_priority_level:
   entity: Person

@@ -1,3 +1,21 @@
+text: """
+26 USC § 59 - Other Definitions and Special Rules
+
+(a) Alternative minimum tax foreign tax credit.—For purposes of this part—
+(1) In general.—The alternative minimum tax foreign tax credit for any
+taxable year shall be the credit which would be determined under section 27(a)
+for such taxable year if—
+(A) the pre-credit tentative minimum tax were the tax against which such
+credit was taken for purposes of section 904 for the taxable year and all
+prior taxable years beginning after December 31, 1986,
+(B) section 904 were applied on the basis of alternative minimum taxable
+income instead of taxable income, and
+(C) the determination of whether any income is high-taxed income for
+purposes of section 904(d)(2) were made on the basis of the applicable rate
+specified in section 55(b)(1) in lieu of the highest rate of tax specified
+in section 1.
+"""
+
 input foreign_source_income:
   entity: TaxUnit
   period: Year

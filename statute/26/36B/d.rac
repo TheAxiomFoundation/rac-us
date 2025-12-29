@@ -30,6 +30,11 @@ most recently published poverty line as of the 1st day of the
 regular enrollment period for coverage during such calendar year.
 """
 variable definitions:
+  entity: TaxUnit
+  period: Year
+  dtype: Boolean
+  label: "PTC Definitions Container"
+  description: "Supporting definitions for household income calculation per 26 USC 36B(d)"
   imports:
     - 26/62/a#adjusted_gross_income
 

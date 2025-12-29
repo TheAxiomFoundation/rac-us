@@ -35,6 +35,12 @@ input is_ineligible_for_standard_deduction:
   default: false
 
 variable deduction_choice:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: "USD"
+  label: "Deduction Choice (Standard or Itemized)"
+  description: "The deduction amount taxpayer elects to use per 26 USC 63(e)"
   imports:
     - 26/63/c#standard_deduction
     - 26/63/d#itemized_taxable_income_deductions

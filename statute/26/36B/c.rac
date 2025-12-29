@@ -21,6 +21,11 @@ year beginning in the calendar year in which such individual's
 taxable year begins.
 """
 variable applicable_taxpayer:
+  entity: TaxUnit
+  period: Year
+  dtype: Boolean
+  label: "Applicable Taxpayer for PTC"
+  description: "Meets applicable taxpayer requirements per 26 USC 36B(c)(1)"
   imports:
     - 26/1#filing_status
 

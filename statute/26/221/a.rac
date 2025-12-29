@@ -274,6 +274,10 @@ variable student_loan_interest_deduction_before_phaseout:
       expect: 2500
 
 variable student_loan_interest_deduction:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: "USD"
   syntax: python
   formula: |
     # Check eligibility per 221(d)

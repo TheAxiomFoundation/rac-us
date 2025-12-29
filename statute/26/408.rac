@@ -128,6 +128,11 @@ parameter early_withdrawal_penalty_rate:
     1977-01-01: 0.10
 
 variable ira_definitions:
+  entity: Person
+  period: Year
+  dtype: Boolean
+  label: "IRA Definitions"
+  description: "Imports and references to IRA-related definitions from IRC 402(c)"
   imports:
     - 26/402/c#rmd_divisor
     - 26/402/c#rmd_applicable_age

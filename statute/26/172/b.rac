@@ -28,6 +28,10 @@ parameter farming_loss_carryback_years_param:
     2018-01-01: 2
 
 variable carryback_carryover:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: "USD"
   imports:
     - 26/63/a#taxable_income
     - 26/1#filing_status

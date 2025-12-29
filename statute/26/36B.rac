@@ -1,4 +1,32 @@
+text: """
+26 USC § 36B - Refundable Credit for Coverage Under a Qualified Health Plan
+
+(a) In general.—In the case of an applicable taxpayer, there shall be allowed
+as a credit against the tax imposed by this subtitle for any taxable year an
+amount equal to the premium assistance credit amount of the taxpayer for the
+taxable year.
+
+(b) Premium assistance credit amount.—For purposes of this section—
+(1) In general.—The term 'premium assistance credit amount' means, with
+respect to any taxable year, the sum of the premium assistance amounts
+determined under paragraph (2) with respect to all coverage months of the
+taxpayer occurring during the taxable year.
+
+(2) Premium assistance amount.—The premium assistance amount determined
+under this paragraph with respect to any coverage month is the amount
+(if any) by which—
+(A) the monthly premium for such month for 1 or more qualified health
+plans offered in the individual market within a State which cover the
+taxpayer, the taxpayer's spouse, or any dependent of the taxpayer and
+which were enrolled in through an Exchange established by the State, exceeds
+(B) 1⁄12 of the product of the applicable percentage and the taxpayer's
+household income for the taxable year.
+"""
+
 variable index:
+  entity: TaxUnit
+  period: Month
+  dtype: Money
   imports:
     - 26/36B/a#premium_tax_credit
     - 26/36B/b#applicable_percentage

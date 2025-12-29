@@ -1,3 +1,31 @@
+text: """
+26 USC § 63(c) - Standard Deduction
+
+(2) Basic standard deduction.—For purposes of paragraph (1), the basic standard
+deduction is—
+(A) 200 percent of the dollar amount in effect under subparagraph (C) for the
+taxable year in the case of—
+(i) a joint return, or
+(ii) a surviving spouse,
+(B) $4,400 in the case of a head of household, or
+(C) $3,000 in any other case.
+
+(5) Limitation on basic standard deduction in the case of certain dependents.—
+In the case of an individual with respect to whom a deduction under section 151
+is allowable to another taxpayer for a taxable year beginning in the calendar
+year in which the individual's taxable year begins, the basic standard deduction
+applicable to such individual for such individual's taxable year shall not exceed
+the greater of—
+(A) $500, or
+(B) the sum of $250 and such individual's earned income.
+
+(6) Certain individuals, etc., not eligible for standard deduction.—
+In the case of—
+(A) a married individual filing a separate return where either spouse itemizes,
+(B) a nonresident alien individual,
+the standard deduction shall be zero.
+"""
+
 # Standalone validation version - all logic inline (no imports)
 # Simplified for vectorization - no nested if/else
 

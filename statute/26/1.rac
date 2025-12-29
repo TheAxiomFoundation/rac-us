@@ -108,6 +108,9 @@ parameter brackets:
     rates: bracket_rates
 
 variable income_tax:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
   imports:
     - 26/1#filing_status
 
