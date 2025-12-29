@@ -736,3 +736,43 @@ variable eitc_validation:
         return max(0, phase_in_amount - phase_out_amount)
     return 0
   default: 0
+  tests:
+    - name: "Single, 1 child, $15_000 earned income"
+      period: 2024
+      inputs:
+        num_qualifying_children: 1
+        earned_income: 15_000
+        adjusted_gross_income: 15_000
+        filing_status: SINGLE
+        is_eligible_individual: true
+      expect: 4212.6
+
+    - name: "Joint, 2 children, $30_000 earned income"
+      period: 2024
+      inputs:
+        num_qualifying_children: 2
+        earned_income: 30_000
+        adjusted_gross_income: 30_000
+        filing_status: JOINT
+        is_eligible_individual: true
+      expect: 6884.184
+
+    - name: "Zero earned income"
+      period: 2024
+      inputs:
+        num_qualifying_children: 1
+        earned_income: 0
+        adjusted_gross_income: 0
+        filing_status: SINGLE
+        is_eligible_individual: true
+      expect: 0
+
+    - name: "Ineligible individual"
+      period: 2024
+      inputs:
+        num_qualifying_children: 1
+        earned_income: 15_000
+        adjusted_gross_income: 15_000
+        filing_status: SINGLE
+        is_eligible_individual: false
+      expect: 0
