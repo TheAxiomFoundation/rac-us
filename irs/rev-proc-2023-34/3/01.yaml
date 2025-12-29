@@ -1,0 +1,123 @@
+# Rev. Proc. 2023-34, Section 3.01
+#
+# Inflation-adjusted amounts for tax year 2024
+# Effective for tax year 2024
+
+source:
+  document: "Rev. Proc. 2023-34"
+  section: "3.01"
+  url: "https://www.irs.gov/irb/2023-48_IRB#RP-2023-34"
+  effective_date: 2024-01-01
+
+# =============================================================================
+# TAX RATE BRACKET THRESHOLDS (§ 1)
+# =============================================================================
+
+# Bracket thresholds for Single filers (§ 1(c) as modified by § 1(j)(2)(A))
+single:
+  implements: statute/26/1/f
+  overrides: statute/26/1/brackets/base_thresholds#single
+  indexed_by: rate
+  values:
+    0.10: 0
+    0.12: 11_600
+    0.22: 47_150
+    0.24: 100_525
+    0.32: 191_950
+    0.35: 243_725
+    0.37: 609_350
+
+# Bracket thresholds for Married Filing Jointly (§ 1(a) as modified by § 1(j)(2)(B))
+married_filing_jointly:
+  implements: statute/26/1/f
+  overrides: statute/26/1/brackets/base_thresholds#married_filing_jointly
+  indexed_by: rate
+  values:
+    0.10: 0
+    0.12: 23_200
+    0.22: 94_300
+    0.24: 201_050
+    0.32: 383_900
+    0.35: 487_450
+    0.37: 731_200
+
+# Bracket thresholds for Head of Household (§ 1(b) as modified by § 1(j)(2)(C))
+head_of_household:
+  implements: statute/26/1/f
+  overrides: statute/26/1/brackets/base_thresholds#head_of_household
+  indexed_by: rate
+  values:
+    0.10: 0
+    0.12: 16_550
+    0.22: 63_100
+    0.24: 100_500
+    0.32: 191_950
+    0.35: 243_700
+    0.37: 609_350
+
+# Bracket thresholds for Married Filing Separately (§ 1(d) as modified by § 1(j)(2)(D))
+married_filing_separately:
+  implements: statute/26/1/f
+  overrides: statute/26/1/brackets/base_thresholds#married_filing_separately
+  indexed_by: rate
+  values:
+    0.10: 0
+    0.12: 11_600
+    0.22: 47_150
+    0.24: 100_525
+    0.32: 191_950
+    0.35: 243_725
+    0.37: 365_600
+
+# =============================================================================
+# STANDARD DEDUCTION (§ 63)
+# =============================================================================
+
+# Basic standard deduction amounts per § 63(c)(2)
+basic_joint:
+  implements: statute/26/63/c/4
+  overrides: statute/26/63/c/2#basic_joint
+  value: 29_200
+
+basic_head_of_household:
+  implements: statute/26/63/c/4
+  overrides: statute/26/63/c/2#basic_head_of_household
+  value: 21_900
+
+basic_single:
+  implements: statute/26/63/c/4
+  overrides: statute/26/63/c/2#basic_single
+  value: 14_600
+
+# Additional amounts for aged per § 63(f)(1)
+additional_aged_unmarried:
+  implements: statute/26/63/c/4
+  overrides: statute/26/63/f/1#additional_aged_unmarried
+  value: 1_950
+
+additional_aged_married:
+  implements: statute/26/63/c/4
+  overrides: statute/26/63/f/1#additional_aged_married
+  value: 1_550
+
+# Additional amounts for blind per § 63(f)(2)
+additional_blind_unmarried:
+  implements: statute/26/63/c/4
+  overrides: statute/26/63/f/2#additional_blind_unmarried
+  value: 1_950
+
+additional_blind_married:
+  implements: statute/26/63/c/4
+  overrides: statute/26/63/f/2#additional_blind_married
+  value: 1_550
+
+# Dependent limitation amounts per § 63(c)(5)
+dependent_minimum:
+  implements: statute/26/63/c/4
+  overrides: statute/26/63/c/5#dependent_minimum
+  value: 1_300
+
+dependent_earned_addon:
+  implements: statute/26/63/c/4
+  overrides: statute/26/63/c/5#dependent_earned_addon
+  value: 450

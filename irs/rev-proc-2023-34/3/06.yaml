@@ -15,10 +15,10 @@ earned_income_amount:
   overrides: statute/26/32/b/2/A/base_amounts#earned_income_amount
   indexed_by: num_qualifying_children
   values:
-    0: 8260
-    1: 12390
-    2: 17400
-    3: 17400
+    0: 8_260
+    1: 12_390
+    2: 17_400
+    3: 17_400
 
 # Phaseout threshold amounts per § 32(b)(2)(A)
 # For single/HOH filers - joint filers add joint_return_adjustment
@@ -27,19 +27,19 @@ phaseout_amount:
   overrides: statute/26/32/b/2/A/base_amounts#phaseout_amount
   indexed_by: num_qualifying_children
   values:
-    0: 10330   # Corrected from Rev. Proc. 2023-34
-    1: 22720   # Corrected from Rev. Proc. 2023-34
-    2: 22720
-    3: 22720
+    0: 10_330
+    1: 22_720
+    2: 22_720
+    3: 22_720
 
 # Joint return adjustment per § 32(b)(2)(B)
 joint_return_adjustment:
   implements: statute/26/32/j/1
   overrides: statute/26/32/b/2/B/base_joint_return_adjustment#joint_return_adjustment
-  value: 6920
+  value: 6_920
 
 # Investment income limit per § 32(i)(1)
 disqualified_income_limit:
   implements: statute/26/32/j/1
   overrides: statute/26/32/i/1/base_disqualified_income_limit#disqualified_income_limit
-  value: 11600
+  value: 11_600

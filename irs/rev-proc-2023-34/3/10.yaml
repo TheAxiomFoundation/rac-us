@@ -14,7 +14,7 @@ source:
 refundable_maximum:
   implements: statute/26/24/h/5  # Authority for inflation adjustment
   overrides: statute/26/24/h/5/refundable_maximum#refundable_maximum
-  value: 1700
+  value: 1_700
   citations:
     - "Rev. Proc. 2023-34, Section 3.10(2)"
     - "26 USC § 24(h)(5)(B): $1,400 indexed for cost-of-living"
