@@ -1,3 +1,13 @@
+text: |
+  42 USC § 608(b) - Individual responsibility plans
+
+  (b) Individual responsibility plans.—
+  (1) Assessment.—The State agency responsible for administering the State
+  program shall make an initial assessment of the skills, prior work experience,
+  and employability of each recipient who is at least 18 years of age.
+  (2) Contents of plans.—Based on the assessment, the State agency shall
+  develop an individual responsibility plan for the recipient.
+
 variable benefit_calculation:
   entity: TanfUnit
   period: Month

@@ -1,3 +1,20 @@
+text: |
+  47 USC § 1752(a)(6) - Affordable Connectivity Program
+
+  (a) Definitions.—
+  (6) Eligible household.—The term ''eligible household'' means a household
+  in which—
+  (A) at least one member of the household meets the qualifications in
+  subsection (a)(6)(A) of section 254 of this title;
+  (B) the income of the household for the most recently completed tax year
+  is at or below 200 percent of the Federal Poverty Guidelines;
+  (C) at least one member receives benefits under the free and reduced price
+  school lunch program, or school breakfast program, or WIC;
+  (D) at least one member has received a Federal Pell Grant in the current
+  award year; or
+  (E) at least one member of the household meets the eligibility criteria
+  for a participating provider's existing low-income or COVID-19 program.
+
 # Inputs for ACP eligibility
 input household_size:
   entity: Household

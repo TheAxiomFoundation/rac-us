@@ -1,3 +1,15 @@
+text: |
+  7 USC § 2011 et seq. - Supplemental Nutrition Assistance Program (SNAP)
+
+  The Food and Nutrition Act of 2008 (7 U.S.C. 2011-2036) establishes the
+  Supplemental Nutrition Assistance Program (SNAP) to provide nutrition
+  assistance to low-income households.
+
+  Key provisions:
+  - § 2014: Eligibility (income limits, resource limits)
+  - § 2015: Conditions of participation (work requirements)
+  - § 2017: Value of allotment (benefit calculation)
+
 #
 # This is the top-level SNAP benefit variable that returns the final allotment
 # after eligibility checks and benefit calculations.

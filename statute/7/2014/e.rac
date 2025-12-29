@@ -1,3 +1,17 @@
+text: |
+  7 USC § 2014(e) - Deductions from income
+
+  (e) Deductions from income.—
+  (1) Standard deduction.—The Secretary shall allow a standard deduction for
+  each household in the 48 contiguous States and the District of Columbia,
+  Alaska, Hawaii, Guam, and the Virgin Islands.
+  (2) Earned income deduction.—A deduction of 20 percent of the earned income
+  of the household shall be made.
+  (3) Excess shelter expense deduction.—The Secretary shall allow a deduction
+  for excess shelter expenses.
+  (4) Medical expense deduction.—A deduction shall be allowed for medical
+  expenses for elderly or disabled household members.
+
 input household_size:
   entity: Household
   period: Month

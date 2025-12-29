@@ -1,3 +1,19 @@
+text: |
+  42 USC § 1437f(d) - Housing Choice Voucher Program
+
+  (d) Required provisions and duration of contracts for assistance payments.—
+  Contracts entered into by a public housing agency shall—
+  (1) establish payment standards and subsidy standards that permit a
+  participating family to lease a dwelling unit in the voucher program;
+  (2) provide that the term of any such contract shall be established in
+  accordance with the needs of the program;
+  (3) provide that the owner shall not give preference to a prospective
+  tenant for a dwelling unit because the prospective tenant holds a voucher;
+
+  [Implementing regulations at 24 CFR 982 establish subsidy standards for
+  voucher size (bedroom count), payment standards, and rent reasonableness
+  requirements.]
+
 parameter base_voucher_bedroom_count:
   description: "Base bedroom count for head of household and spouse"
   unit: /1

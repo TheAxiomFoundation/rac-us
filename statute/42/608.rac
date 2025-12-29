@@ -1,3 +1,19 @@
+text: |
+  42 USC § 608 - Prohibitions; requirements
+
+  (a) In general.—A State to which a grant is made under section 603 of this title
+  shall not use any part of the grant to provide assistance to—
+  (1) a family unless each member of the family assigns to the State any rights
+  to support from any other person such family may have;
+  (2) a family that includes an adult who has received assistance for 60 months;
+  (3) a family that includes an individual who is fleeing prosecution or custody
+  for a felony;
+
+  (b) Reduction or termination of assistance.—The State agency may reduce or terminate
+  assistance to a family for non-compliance with program requirements. States must
+  have procedures for sanction and termination of benefits for failure to comply
+  with work requirements under section 607.
+
 # Inputs for TANF sanctions
 imports:
   - 42/607#tanf_work_requirement_exempt

@@ -1,5 +1,20 @@
 # 24 CFR 5.609 & 5.611 - Annual Income and Deductions
 #
+text: |
+  42 USC § 1437f(b) - Income determinations
+
+  (b) Rental assistance payment; assistance under existing housing and moderate
+  rehabilitation programs.—Each assistance contract shall provide that—
+  (1) the amount of the monthly assistance payment with respect to any dwelling
+  unit shall be the difference between the maximum monthly rent which the contract
+  provides that the owner is to receive for the unit and the rent the family is
+  required to pay under section 1437a(a) of this title.
+
+  [Implementing regulations at 24 CFR 5.609-5.611 define annual income and
+  deductions including: childcare expenses, medical expenses for elderly/disabled,
+  disability assistance expenses, dependent allowance, and elderly/disabled household
+  allowance.]
+
 variable hcv_childcare_deduction:
   entity: Household
   period: Year
