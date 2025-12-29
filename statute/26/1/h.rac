@@ -91,6 +91,17 @@ variable net_capital_gain:
     # Short-term gains are taxed as ordinary income, not preferential
     return max(0, long_term_capital_gains)
   default: 0
+  tests:
+    - name: "Positive long-term capital gains"
+      period: 2024
+      inputs:
+        long_term_capital_gains: 10_000
+      expect: 10_000
+    - name: "Zero long-term capital gains"
+      period: 2024
+      inputs:
+        long_term_capital_gains: 0
+      expect: 0
 
 variable adjusted_net_capital_gain:
   entity: TaxUnit
@@ -104,6 +115,19 @@ variable adjusted_net_capital_gain:
     # Section 1(h)(11)(A): net capital gain increased by qualified dividend income
     return net_capital_gain + qualified_dividends
   default: 0
+  tests:
+    - name: "LTCG plus qualified dividends"
+      period: 2024
+      inputs:
+        long_term_capital_gains: 10_000
+        qualified_dividends: 5_000
+      expect: 15_000
+    - name: "Only qualified dividends"
+      period: 2024
+      inputs:
+        long_term_capital_gains: 0
+        qualified_dividends: 8_000
+      expect: 8_000
 
 variable ordinary_income_for_cap_gains:
   imports:
@@ -120,6 +144,23 @@ variable ordinary_income_for_cap_gains:
     # Capital gains "stack" on top of ordinary income for bracket purposes
     return max(0, taxable_income - adjusted_net_capital_gain)
   default: 0
+  tests:
+    - name: "Taxable income minus ANCG"
+      period: 2024
+      inputs:
+        taxable_income: 50_000
+        long_term_capital_gains: 10_000
+        qualified_dividends: 5_000
+      # ordinary = 50k - (10k + 5k) = 35k
+      expect: 35_000
+    - name: "ANCG exceeds taxable income (floor at 0)"
+      period: 2024
+      inputs:
+        taxable_income: 10_000
+        long_term_capital_gains: 15_000
+        qualified_dividends: 0
+      # ordinary = max(0, 10k - 15k) = 0
+      expect: 0
 
 variable capital_gains_tax:
   imports:
@@ -220,6 +261,25 @@ variable qualified_dividend_tax:
         return capital_gains_tax * (qualified_dividends / adjusted_net_capital_gain)
     return 0
   default: 0
+  tests:
+    - name: "Pro-rata share of capital gains tax"
+      period: 2018-01
+      inputs:
+        taxable_income: 60_000
+        long_term_capital_gains: 15_000
+        qualified_dividends: 5_000
+        filing_status: HEAD_OF_HOUSEHOLD
+      # ANCG = 20k, tax = $1,245, qualified = 5k
+      # Pro-rata = 1245 * (5k / 20k) = 1245 * 0.25 = 311.25
+      expect: 311.25
+    - name: "No qualified dividends"
+      period: 2018-01
+      inputs:
+        taxable_income: 50_000
+        long_term_capital_gains: 20_000
+        qualified_dividends: 0
+        filing_status: SINGLE
+      expect: 0
 
 variable net_capital_gain_tax:
   entity: TaxUnit
@@ -235,3 +295,24 @@ variable net_capital_gain_tax:
         return capital_gains_tax * (net_capital_gain / adjusted_net_capital_gain)
     return 0
   default: 0
+  tests:
+    - name: "Pro-rata share of capital gains tax"
+      period: 2018-01
+      inputs:
+        taxable_income: 60_000
+        long_term_capital_gains: 15_000
+        qualified_dividends: 5_000
+        filing_status: HEAD_OF_HOUSEHOLD
+      # ANCG = 20k, tax = $1,245, LTCG = 15k
+      # Pro-rata = 1245 * (15k / 20k) = 1245 * 0.75 = 933.75
+      expect: 933.75
+    - name: "Only LTCG, no dividends"
+      period: 2018-01
+      inputs:
+        taxable_income: 50_000
+        long_term_capital_gains: 20_000
+        qualified_dividends: 0
+        filing_status: SINGLE
+      # All tax attributed to cap gains
+      # Tax from capital_gains_tax test = $1,710
+      expect: 1710
