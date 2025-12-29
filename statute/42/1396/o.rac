@@ -73,6 +73,57 @@ parameter months_per_year:
   values:
     1900-01-01: 12
 
+# Input declarations for Medicaid eligibility variables
+input age:
+  entity: Person
+  period: Year
+  dtype: Integer
+  label: "Age"
+  description: "Age of the individual in years"
+
+input is_pregnant:
+  entity: Person
+  period: Month
+  dtype: Boolean
+  label: "Pregnant"
+  description: "Whether the individual is currently pregnant"
+
+input is_institutionalized:
+  entity: Person
+  period: Month
+  dtype: Boolean
+  label: "Institutionalized"
+  description: "Whether the individual is in an institution (nursing facility, ICF, etc.)"
+
+input is_hospice_enrolled:
+  entity: Person
+  period: Month
+  dtype: Boolean
+  label: "Hospice enrolled"
+  description: "Whether the individual is enrolled in hospice care"
+
+input magi_income_pct_fpl:
+  entity: Person
+  period: Month
+  dtype: Rate
+  label: "MAGI income as percent of FPL"
+  description: "Modified Adjusted Gross Income as a percentage of Federal Poverty Level"
+
+input medicaid_category:
+  entity: Person
+  period: Month
+  dtype: String
+  label: "Medicaid eligibility category"
+  description: "Medicaid eligibility category (infant, child_1_5, child_6_18, pregnant, adult_expansion, etc.)"
+
+input magi_income:
+  entity: Household
+  period: Month
+  dtype: Money
+  unit: USD
+  label: "MAGI income"
+  description: "Modified Adjusted Gross Income for the household"
+
 variable medicaid_preventive_cost_share_exempt:
   entity: Person
   period: Month

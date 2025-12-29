@@ -354,227 +354,424 @@ variable total_federal_income_tax:
     )
   default: 0
   tests:
-    - name: "Ordinary income only, no other taxes or credits"
-      period: 2018-01
+    # =========================================================================
+    # Basic tests - single tax components
+    # =========================================================================
+    - name: "Ordinary income only, no other taxes"
+      period: 2024-01
       inputs:
         income_tax_before_credits: 5_000
         capital_gains_tax: 0
         alternative_minimum_tax: 0
-        net_investment_income_tax: 0
-        self_employment_tax: 0
+        niit: 0
+        self_employment_social_security_tax: 0
+        self_employment_medicare_tax: 0
         additional_medicare_tax: 0
-        total_nonrefundable_credits: 0
-        total_refundable_credits: 0
-      expect: 5000
-    - name: "Ordinary income with capital gains"
-      period: 2018-01
+      # Total: $5,000
+      expect: 5_000
+
+    - name: "Zero tax liability - no income"
+      period: 2024-01
+      inputs:
+        income_tax_before_credits: 0
+        capital_gains_tax: 0
+        alternative_minimum_tax: 0
+        niit: 0
+        self_employment_social_security_tax: 0
+        self_employment_medicare_tax: 0
+        additional_medicare_tax: 0
+      expect: 0
+
+    - name: "Ordinary income with capital gains tax"
+      period: 2024-01
       inputs:
         income_tax_before_credits: 6_000
         capital_gains_tax: 1_500
         alternative_minimum_tax: 0
-        net_investment_income_tax: 0
-        self_employment_tax: 0
+        niit: 0
+        self_employment_social_security_tax: 0
+        self_employment_medicare_tax: 0
         additional_medicare_tax: 0
-        total_nonrefundable_credits: 0
-        total_refundable_credits: 0
-      expect: 7500
-    - name: "Ordinary income with self-employment tax"
-      period: 2018-01
-      inputs:
-        income_tax_before_credits: 3_000
-        capital_gains_tax: 0
-        alternative_minimum_tax: 0
-        net_investment_income_tax: 0
-        self_employment_tax: 2_300
-        additional_medicare_tax: 0
-        total_nonrefundable_credits: 0
-        total_refundable_credits: 0
-      expect: 5300
-    - name: "Ordinary income with net investment income tax"
-      period: 2018-01
+      # Total: $6,000 + $1,500 = $7,500
+      expect: 7_500
+
+    - name: "Ordinary income with NIIT"
+      period: 2024-01
       inputs:
         income_tax_before_credits: 8_000
         capital_gains_tax: 0
         alternative_minimum_tax: 0
-        net_investment_income_tax: 400
-        self_employment_tax: 0
+        niit: 400
+        self_employment_social_security_tax: 0
+        self_employment_medicare_tax: 0
         additional_medicare_tax: 0
-        total_nonrefundable_credits: 0
-        total_refundable_credits: 0
-      expect: 8400
-    - name: "Ordinary income with additional Medicare tax"
-      period: 2018-01
+      # Total: $8,000 + $400 = $8,400
+      expect: 8_400
+
+    - name: "Ordinary income with AMT"
+      period: 2024-01
+      inputs:
+        income_tax_before_credits: 25_000
+        capital_gains_tax: 0
+        alternative_minimum_tax: 3_000
+        niit: 0
+        self_employment_social_security_tax: 0
+        self_employment_medicare_tax: 0
+        additional_medicare_tax: 0
+      # Total: $25,000 + $3,000 = $28,000
+      expect: 28_000
+
+    # =========================================================================
+    # Self-employment tax tests
+    # =========================================================================
+    - name: "Self-employment taxes - SS and Medicare separate"
+      period: 2024-01
+      inputs:
+        income_tax_before_credits: 3_000
+        capital_gains_tax: 0
+        alternative_minimum_tax: 0
+        niit: 0
+        self_employment_social_security_tax: 1_800
+        self_employment_medicare_tax: 500
+        additional_medicare_tax: 0
+      # Total: $3,000 + $1,800 + $500 = $5,300
+      expect: 5_300
+
+    - name: "Self-employed with additional Medicare tax"
+      period: 2024-01
       inputs:
         income_tax_before_credits: 10_000
         capital_gains_tax: 0
         alternative_minimum_tax: 0
-        net_investment_income_tax: 0
-        self_employment_tax: 2000
+        niit: 0
+        self_employment_social_security_tax: 1_500
+        self_employment_medicare_tax: 500
         additional_medicare_tax: 145
-        total_nonrefundable_credits: 0
-        total_refundable_credits: 0
-      expect: 12145
+      # Total: $10,000 + $1,500 + $500 + $145 = $12,145
+      expect: 12_145
+
+    # =========================================================================
+    # Combined tax component tests
+    # =========================================================================
     - name: "All tax components combined"
-      period: 2018-01
+      period: 2024-01
       inputs:
         income_tax_before_credits: 15_000
-        capital_gains_tax: 2000
+        capital_gains_tax: 2_000
         alternative_minimum_tax: 500
-        net_investment_income_tax: 400
-        self_employment_tax: 3_000
+        niit: 400
+        self_employment_social_security_tax: 2_000
+        self_employment_medicare_tax: 1_000
         additional_medicare_tax: 200
-        total_nonrefundable_credits: 0
-        total_refundable_credits: 0
-      expect: 21100
+      # Total: $15,000 + $2,000 + $500 + $400 + $2,000 + $1,000 + $200 = $21,100
+      expect: 21_100
+
     - name: "High income with multiple tax components"
-      period: 2018-01
+      period: 2024-01
       inputs:
         income_tax_before_credits: 50_000
         capital_gains_tax: 5_000
         alternative_minimum_tax: 0
-        net_investment_income_tax: 2000
-        self_employment_tax: 5_000
+        niit: 2_000
+        self_employment_social_security_tax: 3_500
+        self_employment_medicare_tax: 1_500
         additional_medicare_tax: 450
-        total_nonrefundable_credits: 0
-        total_refundable_credits: 0
-      expect: 62450
-    - name: "Ordinary income with nonrefundable credits reducing tax"
-      period: 2018-01
+      # Total: $50,000 + $5,000 + $0 + $2,000 + $3,500 + $1,500 + $450 = $62,450
+      expect: 62_450
+
+    # =========================================================================
+    # Filing status scenarios - Single filer
+    # =========================================================================
+    - name: "Single filer - low income W-2 worker"
+      period: 2024-01
       inputs:
-        income_tax_before_credits: 8_000
-        capital_gains_tax: 1_000
-        alternative_minimum_tax: 0
-        net_investment_income_tax: 0
-        self_employment_tax: 0
-        additional_medicare_tax: 0
-        total_nonrefundable_credits: 3_000
-        total_refundable_credits: 0
-      # Tax before credits: $8,000 + $1,000 = $9,000
-      # Less nonrefundable credits: $9,000 - $3,000 = $6,000
-      expect: 6000
-    - name: "Ordinary income with refundable credits"
-      period: 2018-01
-      inputs:
-        income_tax_before_credits: 4_000
+        income_tax_before_credits: 1_160
         capital_gains_tax: 0
         alternative_minimum_tax: 0
-        net_investment_income_tax: 0
-        self_employment_tax: 1_500
+        niit: 0
+        self_employment_social_security_tax: 0
+        self_employment_medicare_tax: 0
         additional_medicare_tax: 0
-        total_nonrefundable_credits: 2000
-        total_refundable_credits: 2000
-      # Tax before credits: $4,000 + $1,500 = $5,500
-      # Less nonrefundable credits: $5,500 - $2,000 = $3,500
-      # Less refundable credits: $3,500 - $2,000 = $1,500
-      expect: 1500
-    - name: "Refundable credits exceed tax (negative refund)"
-      period: 2018-01
+      # Low-income single filer with ~$25k taxable income
+      # $11,600 at 10% = $1,160
+      expect: 1_160
+
+    - name: "Single filer - middle income"
+      period: 2024-01
       inputs:
-        income_tax_before_credits: 2000
+        income_tax_before_credits: 6_940
         capital_gains_tax: 0
         alternative_minimum_tax: 0
-        net_investment_income_tax: 0
-        self_employment_tax: 0
+        niit: 0
+        self_employment_social_security_tax: 0
+        self_employment_medicare_tax: 0
         additional_medicare_tax: 0
-        total_nonrefundable_credits: 1_000
-        total_refundable_credits: 3_000
-      # Tax before credits: $2,000
-      # Less nonrefundable credits: $2,000 - $1,000 = $1,000
-      # Less refundable credits: $1,000 - $3,000 = -$2,000 (refund)
-      expect: -2000
-    - name: "Zero income, no taxes"
-      period: 2018-01
+      # Middle-income single filer with ~$50k taxable income
+      # $11,600 at 10% = $1,160
+      # $35,550 at 12% = $4,266
+      # $2,850 at 22% = $627
+      # Total approx $6,940 (rounded for test)
+      expect: 6_940
+
+    - name: "Single filer - high income with investments"
+      period: 2024-01
       inputs:
-        income_tax_before_credits: 0
+        income_tax_before_credits: 75_000
+        capital_gains_tax: 8_000
+        alternative_minimum_tax: 0
+        niit: 1_900
+        self_employment_social_security_tax: 0
+        self_employment_medicare_tax: 0
+        additional_medicare_tax: 450
+      # High-income single filer
+      # Income tax: $75,000
+      # Capital gains: $8,000
+      # NIIT: $1,900 (3.8% on investment income over threshold)
+      # Additional Medicare: $450 (0.9% on wages over $200k)
+      # Total: $75,000 + $8,000 + $1,900 + $450 = $85,350
+      expect: 85_350
+
+    - name: "Single filer - very high income in top bracket"
+      period: 2024-01
+      inputs:
+        income_tax_before_credits: 150_000
+        capital_gains_tax: 15_000
+        alternative_minimum_tax: 0
+        niit: 5_700
+        self_employment_social_security_tax: 0
+        self_employment_medicare_tax: 0
+        additional_medicare_tax: 1_800
+      # Very high income single filer ($600k+ taxable)
+      # Total: $150,000 + $15,000 + $5,700 + $1,800 = $172,500
+      expect: 172_500
+
+    # =========================================================================
+    # Filing status scenarios - Married Filing Jointly
+    # =========================================================================
+    - name: "MFJ - low income family"
+      period: 2024-01
+      inputs:
+        income_tax_before_credits: 2_320
         capital_gains_tax: 0
         alternative_minimum_tax: 0
-        net_investment_income_tax: 0
-        self_employment_tax: 0
+        niit: 0
+        self_employment_social_security_tax: 0
+        self_employment_medicare_tax: 0
         additional_medicare_tax: 0
-        total_nonrefundable_credits: 0
-        total_refundable_credits: 0
-      expect: 0
-    - name: "Zero income with refundable credits only"
-      period: 2018-01
+      # Low-income MFJ with ~$40k taxable income
+      # $23,200 at 10% = $2,320
+      expect: 2_320
+
+    - name: "MFJ - middle income dual earners"
+      period: 2024-01
       inputs:
-        income_tax_before_credits: 0
+        income_tax_before_credits: 13_879
         capital_gains_tax: 0
         alternative_minimum_tax: 0
-        net_investment_income_tax: 0
-        self_employment_tax: 0
+        niit: 0
+        self_employment_social_security_tax: 0
+        self_employment_medicare_tax: 0
         additional_medicare_tax: 0
-        total_nonrefundable_credits: 0
-        total_refundable_credits: 1_500
-      # Full refundable credit results in refund
-      expect: -1500
-    - name: "Capital gains with preferential rate and ordinary income"
-      period: 2018-01
+      # Middle-income MFJ with ~$100k taxable income (2024 brackets)
+      expect: 13_879
+
+    - name: "MFJ - high income with one self-employed spouse"
+      period: 2024-01
       inputs:
-        income_tax_before_credits: 7_500
-        capital_gains_tax: 1_000
+        income_tax_before_credits: 45_000
+        capital_gains_tax: 3_000
         alternative_minimum_tax: 0
-        net_investment_income_tax: 0
-        self_employment_tax: 0
+        niit: 1_200
+        self_employment_social_security_tax: 9_932
+        self_employment_medicare_tax: 2_900
         additional_medicare_tax: 0
-        total_nonrefundable_credits: 0
-        total_refundable_credits: 0
-      expect: 8500
-    - name: "Very high income with alternative minimum tax"
-      period: 2018-01
+      # High-income MFJ with self-employment income
+      # Income tax: $45,000
+      # Capital gains: $3,000
+      # NIIT: $1,200
+      # SE SS tax: $9,932 (12.4% on $80,100 max for 2024)
+      # SE Medicare: $2,900 (2.9% on all SE income)
+      # Total: $45,000 + $3,000 + $1,200 + $9,932 + $2,900 = $62,032
+      expect: 62_032
+
+    - name: "MFJ - very high income with AMT"
+      period: 2024-01
       inputs:
         income_tax_before_credits: 100_000
         capital_gains_tax: 10_000
         alternative_minimum_tax: 5_000
-        net_investment_income_tax: 3_000
-        self_employment_tax: 8_000
-        additional_medicare_tax: 500
-        total_nonrefundable_credits: 5_000
-        total_refundable_credits: 0
-      # Total before credits: $100,000 + $10,000 + $5,000 + $3,000 + $8,000 + $500 = $126,500
-      # Less nonrefundable credits: $126,500 - $5,000 = $121,500
-      expect: 121500
-    - name: "Married couple with pass-through income and SE tax"
-      period: 2018-01
+        niit: 3_800
+        self_employment_social_security_tax: 0
+        self_employment_medicare_tax: 0
+        additional_medicare_tax: 900
+      # Very high income MFJ
+      # Total: $100,000 + $10,000 + $5,000 + $3,800 + $900 = $119,700
+      expect: 119_700
+
+    # =========================================================================
+    # Filing status scenarios - Head of Household
+    # =========================================================================
+    - name: "HOH - low income single parent"
+      period: 2024-01
       inputs:
-        income_tax_before_credits: 18_000
-        capital_gains_tax: 2000
+        income_tax_before_credits: 1_655
+        capital_gains_tax: 0
         alternative_minimum_tax: 0
-        net_investment_income_tax: 500
-        self_employment_tax: 4_500
-        additional_medicare_tax: 250
-        total_nonrefundable_credits: 1_500
-        total_refundable_credits: 2000
-      # Total before credits: $18,000 + $2,000 + $0 + $500 + $4,500 + $250 = $25,250
-      # Less nonrefundable credits: $25,250 - $1,500 = $23,750
-      # Less refundable credits: $23,750 - $2,000 = $21,750
-      expect: 21750
-    - name: "Edge case: Credits exceed all tax components"
-      period: 2018-01
-      inputs:
-        income_tax_before_credits: 3_000
-        capital_gains_tax: 500
-        alternative_minimum_tax: 0
-        net_investment_income_tax: 0
-        self_employment_tax: 0
+        niit: 0
+        self_employment_social_security_tax: 0
+        self_employment_medicare_tax: 0
         additional_medicare_tax: 0
-        total_nonrefundable_credits: 2000
-        total_refundable_credits: 3_000
-      # Total tax: $3,500
-      # Less nonrefundable credits: $3,500 - $2,000 = $1,500
-      # Less refundable credits: $1,500 - $3,000 = -$1,500 (refund)
-      expect: -1500
-    - name: "Single filer, moderate income, realistic mix"
-      period: 2018-01
+      # Low-income HOH with ~$30k taxable income
+      # $16,550 at 10% = $1,655
+      expect: 1_655
+
+    - name: "HOH - middle income"
+      period: 2024-01
+      inputs:
+        income_tax_before_credits: 7_748
+        capital_gains_tax: 0
+        alternative_minimum_tax: 0
+        niit: 0
+        self_employment_social_security_tax: 0
+        self_employment_medicare_tax: 0
+        additional_medicare_tax: 0
+      # Middle-income HOH with ~$60k taxable income
+      expect: 7_748
+
+    # =========================================================================
+    # Filing status scenarios - Married Filing Separately
+    # =========================================================================
+    - name: "MFS - middle income"
+      period: 2024-01
       inputs:
         income_tax_before_credits: 6_940
-        capital_gains_tax: 750
+        capital_gains_tax: 0
         alternative_minimum_tax: 0
-        net_investment_income_tax: 0
-        self_employment_tax: 0
+        niit: 0
+        self_employment_social_security_tax: 0
+        self_employment_medicare_tax: 0
         additional_medicare_tax: 0
-        total_nonrefundable_credits: 500
-        total_refundable_credits: 500
-      # Total before credits: $6,940 + $750 = $7,690
-      # Less nonrefundable credits: $7,690 - $500 = $7,190
-      # Less refundable credits: $7,190 - $500 = $6,690
-      expect: 6690
+      # Middle-income MFS (same brackets as single)
+      expect: 6_940
+
+    - name: "MFS - high income (lower top bracket threshold)"
+      period: 2024-01
+      inputs:
+        income_tax_before_credits: 63_190
+        capital_gains_tax: 5_000
+        alternative_minimum_tax: 0
+        niit: 2_000
+        self_employment_social_security_tax: 0
+        self_employment_medicare_tax: 0
+        additional_medicare_tax: 0
+      # High-income MFS (top bracket at $365,600 vs $731,200 for MFJ)
+      # Total: $63,190 + $5,000 + $2,000 = $70,190
+      expect: 70_190
+
+    # =========================================================================
+    # Edge cases
+    # =========================================================================
+    - name: "Edge case - very small tax amounts"
+      period: 2024-01
+      inputs:
+        income_tax_before_credits: 1
+        capital_gains_tax: 0
+        alternative_minimum_tax: 0
+        niit: 0
+        self_employment_social_security_tax: 0
+        self_employment_medicare_tax: 0
+        additional_medicare_tax: 0
+      expect: 1
+
+    - name: "Edge case - only SE taxes no income tax"
+      period: 2024-01
+      inputs:
+        income_tax_before_credits: 0
+        capital_gains_tax: 0
+        alternative_minimum_tax: 0
+        niit: 0
+        self_employment_social_security_tax: 3_100
+        self_employment_medicare_tax: 725
+        additional_medicare_tax: 0
+      # Self-employed person with deductions wiping out income tax
+      # but still owes SE tax
+      # Total: $3,100 + $725 = $3,825
+      expect: 3_825
+
+    - name: "Edge case - large AMT liability"
+      period: 2024-01
+      inputs:
+        income_tax_before_credits: 80_000
+        capital_gains_tax: 0
+        alternative_minimum_tax: 25_000
+        niit: 0
+        self_employment_social_security_tax: 0
+        self_employment_medicare_tax: 0
+        additional_medicare_tax: 0
+      # High-income with ISO exercise causing AMT
+      # Total: $80,000 + $25,000 = $105,000
+      expect: 105_000
+
+    - name: "Edge case - capital gains only income"
+      period: 2024-01
+      inputs:
+        income_tax_before_credits: 0
+        capital_gains_tax: 12_000
+        alternative_minimum_tax: 0
+        niit: 1_500
+        self_employment_social_security_tax: 0
+        self_employment_medicare_tax: 0
+        additional_medicare_tax: 0
+      # Retiree living off capital gains only
+      # Total: $12,000 + $1,500 = $13,500
+      expect: 13_500
+
+    - name: "Edge case - all additional taxes triggered"
+      period: 2024-01
+      inputs:
+        income_tax_before_credits: 200_000
+        capital_gains_tax: 30_000
+        alternative_minimum_tax: 10_000
+        niit: 7_600
+        self_employment_social_security_tax: 10_453
+        self_employment_medicare_tax: 5_800
+        additional_medicare_tax: 2_700
+      # Very high income triggering all tax components
+      # Income tax: $200,000
+      # Capital gains: $30,000
+      # AMT: $10,000
+      # NIIT: $7,600 (3.8% on $200k investment income)
+      # SE SS: $10,453 (max for 2024)
+      # SE Medicare: $5,800
+      # Additional Medicare: $2,700
+      # Total: $200,000 + $30,000 + $10,000 + $7,600 + $10,453 + $5,800 + $2,700 = $266,553
+      expect: 266_553
+
+    # =========================================================================
+    # Multi-year tests - verify indexing works
+    # =========================================================================
+    - name: "2023 tax year - single filer middle income"
+      period: 2023-01
+      inputs:
+        income_tax_before_credits: 6_307
+        capital_gains_tax: 0
+        alternative_minimum_tax: 0
+        niit: 0
+        self_employment_social_security_tax: 0
+        self_employment_medicare_tax: 0
+        additional_medicare_tax: 0
+      # 2023 brackets: different thresholds
+      expect: 6_307
+
+    - name: "2022 tax year - single filer middle income"
+      period: 2022-01
+      inputs:
+        income_tax_before_credits: 6_617
+        capital_gains_tax: 0
+        alternative_minimum_tax: 0
+        niit: 0
+        self_employment_social_security_tax: 0
+        self_employment_medicare_tax: 0
+        additional_medicare_tax: 0
+      # 2022 brackets: different thresholds
+      expect: 6_617

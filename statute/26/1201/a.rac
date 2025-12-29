@@ -4,6 +4,57 @@ and any rate of tax imposed by section 11, 511, or 831(a) or (b) (whichever is
 applicable) exceeds 35 percent, then, in lieu of any such tax, there is hereby
 imposed a tax... computed as provided in paragraph (1), (2), or (3).
 """
+
+input net_capital_gain:
+  entity: Corporation
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Net Capital Gain"
+  description: "Net capital gain of the corporation for the taxable year"
+  default: 0
+
+input tax_year:
+  entity: Corporation
+  period: Year
+  dtype: Integer
+  label: "Tax Year"
+  description: "The taxable year for which the tax is being computed"
+
+input is_subject_to_corporate_tax:
+  entity: Corporation
+  period: Year
+  dtype: Boolean
+  label: "Subject to Corporate Tax"
+  description: "Whether the entity is a C corporation subject to corporate income tax under 26 USC 11"
+  default: false
+
+input tcja_effective_year:
+  entity: Corporation
+  period: Year
+  dtype: Integer
+  label: "TCJA Effective Year"
+  description: "The year the Tax Cuts and Jobs Act corporate rate changes took effect (2018)"
+  default: 2018
+
+input compute_regular_tax:
+  entity: Corporation
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Regular Corporate Tax"
+  description: "Corporate tax computed under regular rules (Section 11)"
+  default: 0
+
+input compute_section_1201_tax:
+  entity: Corporation
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Section 1201 Alternative Tax"
+  description: "Tax computed under Section 1201 alternative capital gains rules (35% cap)"
+  default: 0
+
 variable alternative_tax:
   entity: Corporation
   period: Year
@@ -23,9 +74,7 @@ variable alternative_tax:
     if tax_year >= tcja_effective_year:
         return False
     # Pre-TCJA: Compare regular tax vs Section 1201 tax
-    regular_tax = compute_regular_tax()
-    section_1201_tax = compute_section_1201_tax()
-    return section_1201_tax < regular_tax
+    return compute_section_1201_tax < compute_regular_tax
   tests:
     - name: "Post-TCJA C corporation - Section 1_201 never applies"
       period: 2024
@@ -70,6 +119,8 @@ variable alternative_tax:
         net_capital_gain: 1_000_000
         tax_year: 2016
         tcja_effective_year: 2018
+        compute_regular_tax: 400_000
+        compute_section_1201_tax: 350_000
       expect: true
 
     - name: "TCJA transition year - regular rate applies"

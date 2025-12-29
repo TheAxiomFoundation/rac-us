@@ -687,3 +687,187 @@ tests:
       ira_contribution_limit: 6_500
       ira_phaseout_ratio: 0.5
       ira_deduction: 3_250
+
+  # ============================================================
+  # Additional isolated variable tests
+  # ============================================================
+
+  # --- ira_deduction_before_phaseout: focused tests ---
+  - name: "ira_deduction_before_phaseout: Minimum of contributions and limit - contributions lower"
+    period: 2018-01
+    inputs:
+      person:
+        age: 35
+        traditional_ira_contributions: 2_000
+        has_retirement_plan_at_work: false
+        adjusted_gross_income: 40_000
+    outputs:
+      ira_deduction_before_phaseout: 2_000
+
+  - name: "ira_deduction_before_phaseout: Minimum of contributions and limit - limit lower"
+    period: 2018-01
+    inputs:
+      person:
+        age: 35
+        traditional_ira_contributions: 7_000
+        has_retirement_plan_at_work: false
+        adjusted_gross_income: 40_000
+    outputs:
+      ira_deduction_before_phaseout: 5_500
+
+  - name: "ira_deduction_before_phaseout: With catch-up, contribution exactly at limit"
+    period: 2018-01
+    inputs:
+      person:
+        age: 52
+        traditional_ira_contributions: 6_500
+        has_retirement_plan_at_work: false
+        adjusted_gross_income: 40_000
+    outputs:
+      ira_deduction_before_phaseout: 6_500
+
+  # --- ira_phaseout_ratio: focused tests ---
+  - name: "ira_phaseout_ratio: Verify ratio calculation at 10% phaseout"
+    period: 2018-01
+    inputs:
+      person:
+        age: 35
+        traditional_ira_contributions: 5_500
+        has_retirement_plan_at_work: true
+        adjusted_gross_income: 64_000
+    outputs:
+      # (64_000 - 63_000) / (73_000 - 63_000) = 1_000 / 10_000 = 0.1
+      ira_phaseout_ratio: 0.1
+
+  - name: "ira_phaseout_ratio: Verify ratio calculation at 30% phaseout"
+    period: 2018-01
+    inputs:
+      person:
+        age: 35
+        traditional_ira_contributions: 5_500
+        has_retirement_plan_at_work: true
+        adjusted_gross_income: 66_000
+    outputs:
+      # (66_000 - 63_000) / (73_000 - 63_000) = 3_000 / 10_000 = 0.3
+      ira_phaseout_ratio: 0.3
+
+  - name: "ira_phaseout_ratio: Verify ratio calculation at 90% phaseout"
+    period: 2018-01
+    inputs:
+      person:
+        age: 35
+        traditional_ira_contributions: 5_500
+        has_retirement_plan_at_work: true
+        adjusted_gross_income: 72_000
+    outputs:
+      # (72_000 - 63_000) / (73_000 - 63_000) = 9_000 / 10_000 = 0.9
+      ira_phaseout_ratio: 0.9
+
+  # --- ira_deduction: focused tests ---
+  - name: "ira_deduction: Verify deduction = before_phaseout * (1 - ratio) at 20% phaseout"
+    period: 2018-01
+    inputs:
+      person:
+        age: 35
+        traditional_ira_contributions: 5_500
+        has_retirement_plan_at_work: true
+        adjusted_gross_income: 65_000
+    outputs:
+      # before_phaseout = 5_500, ratio = (65_000 - 63_000) / 10_000 = 0.2
+      # deduction = 5_500 * (1 - 0.2) = 5_500 * 0.8 = 4_400
+      ira_deduction_before_phaseout: 5_500
+      ira_phaseout_ratio: 0.2
+      ira_deduction: 4_400
+
+  - name: "ira_deduction: Verify deduction = before_phaseout * (1 - ratio) at 60% phaseout"
+    period: 2018-01
+    inputs:
+      person:
+        age: 35
+        traditional_ira_contributions: 5_500
+        has_retirement_plan_at_work: true
+        adjusted_gross_income: 69_000
+    outputs:
+      # before_phaseout = 5_500, ratio = (69_000 - 63_000) / 10_000 = 0.6
+      # deduction = 5_500 * (1 - 0.6) = 5_500 * 0.4 = 2_200
+      ira_deduction_before_phaseout: 5_500
+      ira_phaseout_ratio: 0.6
+      ira_deduction: 2_200
+
+  - name: "ira_deduction: Verify deduction = before_phaseout * (1 - ratio) at 80% phaseout"
+    period: 2018-01
+    inputs:
+      person:
+        age: 35
+        traditional_ira_contributions: 5_500
+        has_retirement_plan_at_work: true
+        adjusted_gross_income: 71_000
+    outputs:
+      # before_phaseout = 5_500, ratio = (71_000 - 63_000) / 10_000 = 0.8
+      # deduction = 5_500 * (1 - 0.8) = 5_500 * 0.2 = 1_100
+      ira_deduction_before_phaseout: 5_500
+      ira_phaseout_ratio: 0.8
+      ira_deduction: 1_100
+
+  # --- total_ira_deduction: focused tests ---
+  - name: "total_ira_deduction: Three person tax unit"
+    period: 2018-01
+    inputs:
+      tax_unit:
+        members:
+          - age: 40
+            traditional_ira_contributions: 5_500
+            has_retirement_plan_at_work: false
+            adjusted_gross_income: 75_000
+          - age: 35
+            traditional_ira_contributions: 3_000
+            has_retirement_plan_at_work: false
+            adjusted_gross_income: 60_000
+          - age: 25
+            traditional_ira_contributions: 2_000
+            has_retirement_plan_at_work: false
+            adjusted_gross_income: 30_000
+    outputs:
+      # 5_500 + 3_000 + 2_000 = 10_500
+      total_ira_deduction: 10_500
+
+  - name: "total_ira_deduction: Three person, mixed phaseout statuses"
+    period: 2018-01
+    inputs:
+      tax_unit:
+        members:
+          - age: 40
+            traditional_ira_contributions: 5_500
+            has_retirement_plan_at_work: false
+            adjusted_gross_income: 75_000
+          - age: 35
+            traditional_ira_contributions: 5_500
+            has_retirement_plan_at_work: true
+            adjusted_gross_income: 68_000
+          - age: 30
+            traditional_ira_contributions: 5_500
+            has_retirement_plan_at_work: true
+            adjusted_gross_income: 80_000
+    outputs:
+      # Person 1: no phaseout, deduction = 5_500
+      # Person 2: 50% phaseout, deduction = 2_750
+      # Person 3: fully phased out, deduction = 0
+      # Total = 5_500 + 2_750 + 0 = 8_250
+      total_ira_deduction: 8_250
+
+  - name: "total_ira_deduction: Two people, one zero contribution"
+    period: 2018-01
+    inputs:
+      tax_unit:
+        members:
+          - age: 40
+            traditional_ira_contributions: 5_500
+            has_retirement_plan_at_work: false
+            adjusted_gross_income: 75_000
+          - age: 35
+            traditional_ira_contributions: 0
+            has_retirement_plan_at_work: false
+            adjusted_gross_income: 60_000
+    outputs:
+      # 5_500 + 0 = 5_500
+      total_ira_deduction: 5_500

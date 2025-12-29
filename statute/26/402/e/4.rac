@@ -8,6 +8,62 @@ such amount is received shall be increased by an amount equal to
 10 percent of the portion of such amount which is includible in
 gross income.
 """
+input age:
+  entity: Person
+  period: Year
+  dtype: Integer
+  label: "Age"
+  description: "Age of the person at end of tax year"
+
+input is_disabled:
+  entity: Person
+  period: Year
+  dtype: Boolean
+  label: "Is Disabled"
+  description: "Whether the person has a qualifying disability under IRC 72(m)(7)"
+
+input early_withdrawal_penalty_age:
+  entity: Person
+  period: Year
+  dtype: Decimal
+  label: "Early Withdrawal Penalty Age"
+  description: "Age at which early withdrawal penalty no longer applies (59.5 years)"
+
+input is_qdro_distribution:
+  entity: Person
+  period: Year
+  dtype: Boolean
+  label: "QDRO Distribution"
+  description: "Whether distribution is pursuant to a Qualified Domestic Relations Order per IRC 72(t)(2)(C)"
+
+input is_death_distribution:
+  entity: Person
+  period: Year
+  dtype: Boolean
+  label: "Death Distribution"
+  description: "Whether distribution is made to beneficiary after account owner's death per IRC 72(t)(2)(A)(ii)"
+
+input is_sepp_distribution:
+  entity: Person
+  period: Year
+  dtype: Boolean
+  label: "SEPP Distribution"
+  description: "Whether distribution is part of substantially equal periodic payments per IRC 72(t)(2)(A)(iv)"
+
+input is_age_55_separation_distribution:
+  entity: Person
+  period: Year
+  dtype: Boolean
+  label: "Age 55 Separation Distribution"
+  description: "Whether distribution is made after separation from service at age 55+ per IRC 72(t)(2)(A)(v)"
+
+input is_terminal_illness_distribution:
+  entity: Person
+  period: Year
+  dtype: Boolean
+  label: "Terminal Illness Distribution"
+  description: "Whether distribution is made to terminally ill individual per IRC 72(t)(2)(L)"
+
 variable early_withdrawal:
   imports:
     - 26/402/a#taxable_401k_distribution

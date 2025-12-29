@@ -65,6 +65,24 @@ variable ptc_magi:
     # + tax_exempt_interest
     # + nontaxable_social_security_benefits
     return agi
+  tests:
+    - name: "MAGI equals AGI for single filer"
+      period: 2024
+      inputs:
+        adjusted_gross_income: 50_000
+      expect: 50_000
+
+    - name: "MAGI with zero AGI"
+      period: 2024
+      inputs:
+        adjusted_gross_income: 0
+      expect: 0
+
+    - name: "MAGI for moderate income household"
+      period: 2024
+      inputs:
+        adjusted_gross_income: 75_000
+      expect: 75_000
 
 variable household_income:
   entity: TaxUnit
@@ -78,6 +96,24 @@ variable household_income:
     # Household income = MAGI of taxpayer + MAGI of dependents required to file
     # For simplicity, using tax unit MAGI (which includes all members)
     return ptc_magi
+  tests:
+    - name: "Household income equals MAGI"
+      period: 2024
+      inputs:
+        adjusted_gross_income: 45_000
+      expect: 45_000
+
+    - name: "Household income at 200% FPL level"
+      period: 2024
+      inputs:
+        adjusted_gross_income: 30_120
+      expect: 30_120
+
+    - name: "Household income for family"
+      period: 2024
+      inputs:
+        adjusted_gross_income: 62_400
+      expect: 62_400
 
 variable ptc_federal_poverty_level:
   entity: TaxUnit
@@ -94,6 +130,25 @@ variable ptc_federal_poverty_level:
     # FPL = First person amount + (additional persons * additional amount)
     # Uses 48 contiguous states + DC guidelines (Alaska/Hawaii have higher FPL)
     return fpl_first_person + max(0, size - 1) * fpl_additional_person
+  tests:
+    # 2024 FPL: First person = $15,060, Additional = $5,380
+    - name: "FPL for single person (2024)"
+      period: 2024
+      inputs:
+        tax_unit_size: 1
+      expect: 15_060
+
+    - name: "FPL for family of 2 (2024)"
+      period: 2024
+      inputs:
+        tax_unit_size: 2
+      expect: 20_440  # 15,060 + 5,380
+
+    - name: "FPL for family of 4 (2024)"
+      period: 2024
+      inputs:
+        tax_unit_size: 4
+      expect: 31_200  # 15,060 + (3 * 5,380)
 
 variable household_income_pct_fpl:
   entity: TaxUnit
@@ -109,6 +164,35 @@ variable household_income_pct_fpl:
     if fpl <= 0:
         return 0
     return income / fpl
+  tests:
+    # 2024 FPL for single: $15,060
+    - name: "Income at 100% FPL (single)"
+      period: 2024
+      inputs:
+        adjusted_gross_income: 15_060
+        tax_unit_size: 1
+      expect: 1.0
+
+    - name: "Income at 150% FPL (single)"
+      period: 2024
+      inputs:
+        adjusted_gross_income: 22_590  # 15,060 * 1.5
+        tax_unit_size: 1
+      expect: 1.5
+
+    - name: "Income at 200% FPL (single)"
+      period: 2024
+      inputs:
+        adjusted_gross_income: 30_120  # 15,060 * 2
+        tax_unit_size: 1
+      expect: 2.0
+
+    - name: "Income at 400% FPL (single)"
+      period: 2024
+      inputs:
+        adjusted_gross_income: 60_240  # 15,060 * 4
+        tax_unit_size: 1
+      expect: 4.0
 
 input slcsp_premium:
   entity: TaxUnit
@@ -128,98 +212,20 @@ variable slcsp_premium_monthly:
   description: "Monthly portion of benchmark premium"
   formula: return slcsp_premium / months_per_year
   tests:
-    # 2024 FPL Levels (48 contiguous states + DC)
-    # Individual: $15,060
-    # Family of 2: $20,440
-    # Family of 3: $25,820
-    # Family of 4: $31,200
-    # Family of 5: $36,580
-
-    # Test FPL Calculation - Single Individual
-    - name: "FPL calculation - single at 100% FPL (2024)"
+    - name: "Monthly SLCSP from $4,800 annual"
       period: 2024-01
       inputs:
-        ptc_household_size: 1
-      expect: 15060
+        slcsp_premium: 4_800
+      expect: 400  # 4800 / 12
 
-    - name: "FPL calculation - single at 150% FPL (2024)"
+    - name: "Monthly SLCSP from $6,000 annual"
       period: 2024-01
       inputs:
-        ptc_household_size: 1
-      expect: 15060
+        slcsp_premium: 6_000
+      expect: 500  # 6000 / 12
 
-    - name: "FPL calculation - single at 200% FPL (2024)"
+    - name: "Zero SLCSP when no premium"
       period: 2024-01
       inputs:
-        ptc_household_size: 1
-      expect: 15060
-
-    - name: "FPL calculation - single at 400% FPL (2024)"
-      period: 2024-01
-      inputs:
-        ptc_household_size: 1
-      expect: 15060
-
-    # Test FPL Calculation - Family of 2
-    - name: "FPL calculation - family of 2 at 100% FPL (2024)"
-      period: 2024-01
-      inputs:
-        ptc_household_size: 2
-      expect: 20440
-
-    - name: "FPL calculation - family of 2 at 150% FPL (2024)"
-      period: 2024-01
-      inputs:
-        ptc_household_size: 2
-      expect: 20440
-
-    - name: "FPL calculation - family of 2 at 200% FPL (2024)"
-      period: 2024-01
-      inputs:
-        ptc_household_size: 2
-      expect: 20440
-
-    # Test FPL Calculation - Family of 3
-    - name: "FPL calculation - family of 3 at 100% FPL (2024)"
-      period: 2024-01
-      inputs:
-        ptc_household_size: 3
-      expect: 25820
-
-    - name: "FPL calculation - family of 3 at 200% FPL (2024)"
-      period: 2024-01
-      inputs:
-        ptc_household_size: 3
-      expect: 25820
-
-    # Test FPL Calculation - Family of 4
-    - name: "FPL calculation - family of 4 at 100% FPL (2024)"
-      period: 2024-01
-      inputs:
-        ptc_household_size: 4
-      expect: 31200
-
-    - name: "FPL calculation - family of 4 at 150% FPL (2024)"
-      period: 2024-01
-      inputs:
-        ptc_household_size: 4
-      expect: 31200
-
-    - name: "FPL calculation - family of 4 at 300% FPL (2024)"
-      period: 2024-01
-      inputs:
-        ptc_household_size: 4
-      expect: 31200
-
-    # Test FPL Calculation - Family of 5
-    - name: "FPL calculation - family of 5 at 100% FPL (2024)"
-      period: 2024-01
-      inputs:
-        ptc_household_size: 5
-      expect: 36580
-
-    - name: "FPL calculation - family of 5 at 400% FPL (2024)"
-      period: 2024-01
-      inputs:
-        ptc_household_size: 5
-      expect: 36580
+        slcsp_premium: 0
+      expect: 0

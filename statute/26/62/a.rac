@@ -3,6 +3,258 @@ text: """
 gross income' means, in the case of an individual, gross income minus
 the deductions specified in subsection (a).
 """
+
+# ============================================================================
+# GROSS INCOME COMPONENTS (26 USC §61)
+# ============================================================================
+
+# Compensation for services (§61(a)(1))
+input wages:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Wages"
+  description: "Compensation for services as an employee"
+  default: 0
+
+input salaries:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Salaries"
+  description: "Fixed periodic compensation for services as an employee"
+  default: 0
+
+input tips:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Tips"
+  description: "Gratuities received for services"
+  default: 0
+
+# Business income (§61(a)(2), §1402)
+input self_employment_income:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Self-Employment Income"
+  description: "Net earnings from self-employment per 26 USC 1402(a)"
+  default: 0
+
+input partnership_s_corp_income:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Partnership and S Corporation Income"
+  description: "Distributive share of partnership and S corporation income per 26 USC 701"
+  default: 0
+
+input farm_income:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Farm Income"
+  description: "Net income from farming operations per 26 USC 61(a)(6)"
+  default: 0
+
+# Investment income (§61(a)(3), (4), (5), (7))
+input interest_income:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Interest Income"
+  description: "Taxable interest income per 26 USC 61(a)(4)"
+  default: 0
+
+input dividend_income:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Dividend Income"
+  description: "Dividend income including qualified and ordinary dividends per 26 USC 61(a)(7)"
+  default: 0
+
+input capital_gains:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Capital Gains"
+  description: "Net capital gains from property transactions per 26 USC 61(a)(3)"
+  default: 0
+
+input rental_income:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Rental Income"
+  description: "Net rental income from real property per 26 USC 61(a)(5)"
+  default: 0
+
+# Transfer income (§61(a)(10), §85, §86, §402)
+input taxable_social_security:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Taxable Social Security Benefits"
+  description: "Taxable portion of Social Security benefits per 26 USC 86"
+  default: 0
+
+input pension_income:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Pension Income"
+  description: "Taxable pension and annuity income per 26 USC 61(a)(10)"
+  default: 0
+
+input taxable_unemployment:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Taxable Unemployment Compensation"
+  description: "Unemployment compensation included in income per 26 USC 85(a)"
+  default: 0
+
+input retirement_distributions:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Retirement Distributions"
+  description: "Taxable distributions from qualified retirement plans per 26 USC 402"
+  default: 0
+
+# Other income (§61(a))
+input miscellaneous_income:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Miscellaneous Income"
+  description: "Other taxable income not categorized elsewhere per 26 USC 61(a)"
+  default: 0
+
+# ============================================================================
+# ABOVE-THE-LINE DEDUCTIONS (26 USC §62(a))
+# ============================================================================
+
+# Trade and business deductions (§62(a)(1))
+input self_employment_tax_deduction:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Self-Employment Tax Deduction"
+  description: "Deductible portion (50%) of self-employment tax per 26 USC 164(f)"
+  default: 0
+
+input self_employed_health_insurance_deduction:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Self-Employed Health Insurance Deduction"
+  description: "Health insurance premiums for self-employed individuals per 26 USC 162(l)"
+  default: 0
+
+# Educator expenses (§62(a)(2)(D))
+input educator_expense_deduction:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Educator Expense Deduction"
+  description: "Qualified expenses for eligible educators per 26 USC 62(a)(2)(D)"
+  default: 0
+
+# Losses (§62(a)(4))
+input loss_deduction:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Loss Deduction"
+  description: "Above-the-line deduction for losses from property sales per 26 USC 62(a)(4)"
+  default: 0
+
+# Self-employed pension (§62(a)(6))
+input self_employed_pension_deduction:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Self-Employed Pension Deduction"
+  description: "Contributions to SEP, SIMPLE, or qualified plans by self-employed per 26 USC 62(a)(6)"
+  default: 0
+
+# IRA deduction (§62(a)(7))
+input ira_deduction:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "IRA Deduction"
+  description: "Above-the-line deduction for traditional IRA contributions per 26 USC 219"
+  default: 0
+
+# HSA deduction (§62(a)(12))
+input hsa_deduction:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "HSA Deduction"
+  description: "Above-the-line deduction for HSA contributions per 26 USC 223"
+  default: 0
+
+# Student loan interest (§62(a)(17))
+input student_loan_interest_deduction:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Student Loan Interest Deduction"
+  description: "Above-the-line deduction for student loan interest per 26 USC 221"
+  default: 0
+
+# Tip income deduction (§62(a)(23)) - OBBBA temporary provision
+input tip_income_deduction:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Tip Income Deduction"
+  description: "Above-the-line deduction for qualified tip income per 26 USC 62(a)(23) via Section 74A"
+  default: 0
+
+# Qualified overtime deduction (§62(a)(24)) - OBBBA temporary provision
+input qualified_overtime_deduction:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Qualified Overtime Deduction"
+  description: "Above-the-line deduction for qualified overtime pay per 26 USC 225"
+  default: 0
+
+# ============================================================================
+# ADJUSTED GROSS INCOME CALCULATION
+# ============================================================================
+
 variable adjusted_gross_income:
   imports:
     # Gross income components (26 USC §61)

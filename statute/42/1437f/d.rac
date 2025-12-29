@@ -14,6 +14,51 @@ text: |
   voucher size (bedroom count), payment standards, and rent reasonableness
   requirements.]
 
+input household_size:
+  entity: Household
+  period: Year
+  dtype: Integer
+  unit: /1
+  label: "Household size"
+  description: "Number of persons in the household"
+  default: 1
+
+input head_spouse_bedrooms:
+  entity: Household
+  period: Year
+  dtype: Integer
+  unit: /1
+  label: "Head and spouse bedrooms"
+  description: "Base bedroom count for head of household and spouse"
+  default: 1
+
+input contract_rent:
+  entity: Household
+  period: Month
+  dtype: Money
+  unit: USD
+  label: "Contract rent"
+  description: "Monthly rent amount paid to the property owner"
+  default: 0
+
+input utility_allowance:
+  entity: Household
+  period: Month
+  dtype: Money
+  unit: USD
+  label: "Utility allowance"
+  description: "PHA-determined allowance for tenant-paid utilities"
+  default: 0
+
+input hcv_eligible:
+  entity: Household
+  period: Month
+  dtype: Boolean
+  unit: /1
+  label: "HCV eligible"
+  description: "Whether the household is eligible for Housing Choice Voucher"
+  default: false
+
 parameter base_voucher_bedroom_count:
   description: "Base bedroom count for head of household and spouse"
   unit: /1

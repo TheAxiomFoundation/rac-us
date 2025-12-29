@@ -74,6 +74,33 @@ variable monthly_benchmark_excess:
     excess = slcsp_premium_monthly - monthly_expected_contribution
     return max(0, excess)
   default: 0
+  tests:
+    # At 150% FPL, contribution is 0% under IRA
+    - name: "Benchmark excess at 150% FPL (0% contribution)"
+      period: 2024-01
+      inputs:
+        adjusted_gross_income: 22_590  # 150% FPL
+        tax_unit_size: 1
+        slcsp_premium: 4_800  # $400/month * 12
+      expect: 400  # SLCSP - 0 contribution = $400
+
+    # At 200% FPL, contribution is 2% of income
+    - name: "Benchmark excess at 200% FPL (2% contribution)"
+      period: 2024-01
+      inputs:
+        adjusted_gross_income: 30_120  # 200% FPL
+        tax_unit_size: 1
+        slcsp_premium: 4_800  # $400/month
+      expect: 349.8  # 400 - (30120 * 0.02 / 12) = 400 - 50.2
+
+    # High income: expected contribution exceeds benchmark
+    - name: "Benchmark excess is zero when contribution exceeds SLCSP"
+      period: 2024-01
+      inputs:
+        adjusted_gross_income: 120_000
+        tax_unit_size: 1
+        slcsp_premium: 4_800  # $400/month
+      expect: 0  # max(0, 400 - 850) = 0
 
 variable monthly_premium_assistance:
   entity: TaxUnit
@@ -89,6 +116,36 @@ variable monthly_premium_assistance:
     # (B) the excess of benchmark over expected contribution
     return min(actual_health_premium_monthly, monthly_benchmark_excess)
   default: 0
+  tests:
+    # Assistance limited by actual premium paid
+    - name: "Premium assistance limited by actual premium"
+      period: 2024-01
+      inputs:
+        adjusted_gross_income: 22_590  # 150% FPL - 0% contribution
+        tax_unit_size: 1
+        slcsp_premium: 4_800  # $400/month benchmark
+        actual_health_premium_monthly: 200  # Chose low-cost plan
+      expect: 200  # min(200, 400) = 200
+
+    # Assistance limited by benchmark excess
+    - name: "Premium assistance limited by benchmark excess"
+      period: 2024-01
+      inputs:
+        adjusted_gross_income: 22_590  # 150% FPL
+        tax_unit_size: 1
+        slcsp_premium: 4_800  # $400/month benchmark
+        actual_health_premium_monthly: 500  # Chose expensive plan
+      expect: 400  # min(500, 400) = 400
+
+    # No assistance when benchmark excess is zero
+    - name: "No assistance when income too high"
+      period: 2024-01
+      inputs:
+        adjusted_gross_income: 120_000
+        tax_unit_size: 1
+        slcsp_premium: 4_800  # $400/month
+        actual_health_premium_monthly: 350
+      expect: 0  # min(350, 0) = 0
 
 variable premium_assistance_credit_amount:
   imports:
@@ -111,6 +168,45 @@ variable premium_assistance_credit_amount:
     # (Simplified: monthly_premium_assistance * coverage_months)
     return monthly_premium_assistance * ptc_coverage_months
   default: 0
+  tests:
+    # Full year coverage at 150% FPL
+    - name: "Credit for full year at 150% FPL"
+      period: 2024
+      inputs:
+        adjusted_gross_income: 22_590  # 150% FPL
+        tax_unit_size: 1
+        filing_status: single
+        is_tax_unit_dependent: false
+        slcsp_premium: 4_800  # $400/month
+        actual_health_premium_monthly: 350
+        ptc_coverage_months: 12
+      expect: 4_200  # $350/month * 12 months
+
+    # Partial year coverage
+    - name: "Credit for 6 months coverage"
+      period: 2024
+      inputs:
+        adjusted_gross_income: 22_590
+        tax_unit_size: 1
+        filing_status: single
+        is_tax_unit_dependent: false
+        slcsp_premium: 4_800
+        actual_health_premium_monthly: 350
+        ptc_coverage_months: 6
+      expect: 2_100  # $350/month * 6 months
+
+    # Not applicable taxpayer (below 100% FPL)
+    - name: "Zero credit when not applicable taxpayer"
+      period: 2024
+      inputs:
+        adjusted_gross_income: 10_000  # Below 100% FPL
+        tax_unit_size: 1
+        filing_status: single
+        is_tax_unit_dependent: false
+        slcsp_premium: 4_800
+        actual_health_premium_monthly: 350
+        ptc_coverage_months: 12
+      expect: 0
 
 variable premium_tax_credit:
   entity: TaxUnit

@@ -115,6 +115,27 @@ variable hcv_low_income_limit:
         extra_members = household_size - max_table_size
         return base + (additional * extra_members)
   default: 0
+  tests:
+    - name: "Single person 80% AMI"
+      period: 2024
+      inputs:
+        household_size: 1
+      expect: 57_000
+    - name: "Two person 80% AMI"
+      period: 2024
+      inputs:
+        household_size: 2
+      expect: 65_150
+    - name: "Four person 80% AMI"
+      period: 2024
+      inputs:
+        household_size: 4
+      expect: 81_300
+    - name: "Family of 8 80% AMI"
+      period: 2024
+      inputs:
+        household_size: 8
+      expect: 104_250
 
 variable hcv_income_eligible:
   entity: Household
@@ -209,6 +230,22 @@ variable hcv_family_eligible:
         return True
     return False
   default: false
+  tests:
+    - name: "Single person household eligible"
+      period: 2024
+      inputs:
+        household_size: 1
+      expect: true
+    - name: "Two person household eligible"
+      period: 2024
+      inputs:
+        household_size: 2
+      expect: true
+    - name: "Large family eligible"
+      period: 2024
+      inputs:
+        household_size: 6
+      expect: true
 
 variable hcv_citizenship_eligible:
   entity: Household
@@ -228,6 +265,23 @@ variable hcv_citizenship_eligible:
         return True
     return False
   default: false
+  tests:
+    - name: "Household with eligible citizen/immigrant"
+      period: 2024
+      inputs:
+        has_eligible_citizen_or_immigrant: true
+      expect: true
+    - name: "Household without eligible citizen/immigrant"
+      period: 2024
+      inputs:
+        has_eligible_citizen_or_immigrant: false
+      expect: false
+    - name: "Mixed status household with one eligible member"
+      # At least one eligible member makes household eligible
+      period: 2024
+      inputs:
+        has_eligible_citizen_or_immigrant: true
+      expect: true
 
 variable hcv_eligible:
   entity: Household

@@ -71,6 +71,69 @@ parameter hours_threshold:
   values:
     1993-01-01: 750
 
+# Input Declarations
+
+input lived_apart_from_spouse_all_year:
+  entity: TaxUnit
+  period: Year
+  dtype: Boolean
+  label: "Lived Apart From Spouse All Year"
+  description: "Whether married separate filers lived apart from spouse for entire tax year"
+
+input actively_participates_in_rental:
+  entity: TaxUnit
+  period: Year
+  dtype: Boolean
+  label: "Actively Participates in Rental Real Estate"
+  description: "Whether taxpayer actively participates in rental real estate activities per 26 USC 469(i)(6)"
+
+input hours_in_real_property_trades_businesses:
+  entity: TaxUnit
+  period: Year
+  dtype: Integer
+  unit: hours
+  label: "Hours in Real Property Trades or Businesses"
+  description: "Hours of personal services performed in real property trades or businesses per 26 USC 469(c)(7)(B)"
+
+input materially_participates_in_real_property_business:
+  entity: TaxUnit
+  period: Year
+  dtype: Boolean
+  label: "Materially Participates in Real Property Business"
+  description: "Whether taxpayer materially participates in real property trade or business per 26 USC 469(c)(7)(D)"
+
+input passive_activity_income:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Passive Activity Income"
+  description: "Gross income from all passive activities per 26 USC 469(d)(1)"
+
+input passive_activity_losses:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Passive Activity Losses"
+  description: "Aggregate losses from all passive activities per 26 USC 469(d)(1)"
+
+input rental_real_estate_income:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Rental Real Estate Income"
+  description: "Gross income from rental real estate activities per 26 USC 469(i)"
+
+input rental_real_estate_loss:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Rental Real Estate Loss"
+  description: "Losses from rental real estate activities per 26 USC 469(i)"
+
 # Applicable Allowance Amount - Depends on Filing Status
 # 26 USC Section 469(i)(2)
 variable base_rental_real_estate_allowance:
@@ -307,7 +370,7 @@ variable rental_real_estate_exception:
   imports:
     - 26/469#net_rental_real_estate_loss
     - 26/469#rental_real_estate_allowance_after_phaseout
-    - 26/469#is_real_estate_professional
+    - 26/469#real_estate_professional as is_real_estate_professional
   entity: TaxUnit
   period: Year
   dtype: Money

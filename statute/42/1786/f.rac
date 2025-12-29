@@ -2,6 +2,49 @@ text: """
 The Secretary shall prescribe by regulation... the supplemental foods to
 be made available in the program under this section.
 """
+
+# Input variables for WIC eligibility and category determination
+
+input is_wic_eligible:
+  entity: Person
+  period: Month
+  dtype: Boolean
+  label: "WIC eligible"
+  description: "Whether the person is eligible for WIC (Women, Infants, and Children) program benefits."
+  default: false
+
+input wic_category:
+  entity: Person
+  period: Month
+  dtype: String
+  label: "WIC category"
+  description: "The WIC participant category: infant, child, pregnant_woman, breastfeeding_woman, or postpartum_woman."
+  default: "none"
+
+input is_breastfeeding:
+  entity: Person
+  period: Month
+  dtype: Boolean
+  label: "Breastfeeding"
+  description: "Whether the person is currently breastfeeding an infant."
+  default: false
+
+input is_fully_breastfeeding:
+  entity: Person
+  period: Month
+  dtype: Boolean
+  label: "Fully breastfeeding"
+  description: "Whether the person is exclusively or fully breastfeeding (no formula supplementation)."
+  default: false
+
+input is_fully_breastfed:
+  entity: Person
+  period: Month
+  dtype: Boolean
+  label: "Fully breastfed infant"
+  description: "Whether the infant is exclusively or fully breastfed (receiving no formula)."
+  default: false
+
 variable food_package:
   entity: Household
   period: Month

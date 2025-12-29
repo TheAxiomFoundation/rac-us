@@ -298,6 +298,31 @@ variable tanf_required_work_hours_monthly:
     # Approximate monthly hours from weekly (52 weeks / 12 months)
     return round(tanf_required_work_hours_weekly * weeks_per_month)  # weeks_per_month ~= 4.33
   default: 0
+  tests:
+    - name: "Single parent standard hours (30 weekly * 4.33 = 130 monthly)"
+      period: 2024-01
+      inputs:
+        is_tanf_single_parent: true
+        has_child_under_1: false
+        tanf_work_requirement_exempt: false
+        receives_federal_childcare_assistance: false
+      expect: 130
+    - name: "Single parent with young child reduced hours (20 weekly * 4.33 = 87 monthly)"
+      period: 2024-01
+      inputs:
+        is_tanf_single_parent: true
+        has_child_under_1: true
+        tanf_work_requirement_exempt: false
+        receives_federal_childcare_assistance: false
+      expect: 87
+    - name: "Two-parent family with childcare (55 weekly * 4.33 = 238 monthly)"
+      period: 2024-01
+      inputs:
+        is_tanf_single_parent: false
+        is_tanf_two_parent_family: true
+        tanf_work_requirement_exempt: false
+        receives_federal_childcare_assistance: true
+      expect: 238
 
 variable tanf_hours_in_core_activities:
   entity: Person
@@ -323,6 +348,43 @@ variable tanf_hours_in_core_activities:
     total = total + work_hours_community_service + work_hours_vocational
     return total
   default: 0
+  tests:
+    - name: "Only unsubsidized employment"
+      period: 2024-01
+      inputs:
+        work_hours_unsubsidized: 30
+        work_hours_subsidized_private: 0
+        work_hours_subsidized_public: 0
+        work_hours_work_experience: 0
+        work_hours_on_the_job_training: 0
+        work_hours_job_search_limited: 0
+        work_hours_community_service: 0
+        work_hours_vocational: 0
+      expect: 30
+    - name: "Mixed core activities totaling 40 hours"
+      period: 2024-01
+      inputs:
+        work_hours_unsubsidized: 20
+        work_hours_subsidized_private: 10
+        work_hours_subsidized_public: 0
+        work_hours_work_experience: 5
+        work_hours_on_the_job_training: 3
+        work_hours_job_search_limited: 2
+        work_hours_community_service: 0
+        work_hours_vocational: 0
+      expect: 40
+    - name: "Zero hours in all activities"
+      period: 2024-01
+      inputs:
+        work_hours_unsubsidized: 0
+        work_hours_subsidized_private: 0
+        work_hours_subsidized_public: 0
+        work_hours_work_experience: 0
+        work_hours_on_the_job_training: 0
+        work_hours_job_search_limited: 0
+        work_hours_community_service: 0
+        work_hours_vocational: 0
+      expect: 0
 
 variable tanf_work_requirement_met:
   entity: Person
@@ -339,6 +401,32 @@ variable tanf_work_requirement_met:
     actual_hours = work_hours_monthly
     return actual_hours >= required_hours
   default: true
+  tests:
+    - name: "Single parent meets requirement with 130 hours"
+      period: 2024-01
+      inputs:
+        is_tanf_single_parent: true
+        has_child_under_1: false
+        tanf_work_requirement_exempt: false
+        receives_federal_childcare_assistance: false
+        work_hours_monthly: 130
+      expect: true
+    - name: "Single parent fails with insufficient hours (100 < 130)"
+      period: 2024-01
+      inputs:
+        is_tanf_single_parent: true
+        has_child_under_1: false
+        tanf_work_requirement_exempt: false
+        receives_federal_childcare_assistance: false
+        work_hours_monthly: 100
+      expect: false
+    - name: "Exempt person automatically meets requirement even with zero hours"
+      period: 2024-01
+      inputs:
+        is_tanf_single_parent: true
+        tanf_work_requirement_exempt: true
+        work_hours_monthly: 0
+      expect: true
 
 variable tanf_work_requirement_exempt:
   entity: Person
@@ -367,6 +455,56 @@ variable tanf_work_requirement_exempt:
         return True
     return False
   default: false
+  tests:
+    - name: "Single parent with infant and exemption available"
+      period: 2024-01
+      inputs:
+        is_single_parent: true
+        has_child_under_1: true
+        tanf_infant_care_exemption_available: true
+        is_disabled_unable_to_work: false
+        is_caring_for_disabled_family_member: false
+        is_pregnant: false
+      expect: true
+    - name: "Single parent with infant but exemption already used"
+      period: 2024-01
+      inputs:
+        is_single_parent: true
+        has_child_under_1: true
+        tanf_infant_care_exemption_available: false
+        is_disabled_unable_to_work: false
+        is_caring_for_disabled_family_member: false
+        is_pregnant: false
+      expect: false
+    - name: "Disabled person exempt"
+      period: 2024-01
+      inputs:
+        is_single_parent: false
+        has_child_under_1: false
+        is_disabled_unable_to_work: true
+        is_caring_for_disabled_family_member: false
+        is_pregnant: false
+      expect: true
+    - name: "Third trimester pregnancy exempt"
+      period: 2024-01
+      inputs:
+        is_single_parent: false
+        has_child_under_1: false
+        is_disabled_unable_to_work: false
+        is_caring_for_disabled_family_member: false
+        is_pregnant: true
+        pregnancy_trimester: 3
+      expect: true
+    - name: "Second trimester pregnancy not exempt"
+      period: 2024-01
+      inputs:
+        is_single_parent: false
+        has_child_under_1: false
+        is_disabled_unable_to_work: false
+        is_caring_for_disabled_family_member: false
+        is_pregnant: true
+        pregnancy_trimester: 2
+      expect: false
 
 variable tanf_teen_parent_education_required:
   entity: Person
@@ -381,6 +519,28 @@ variable tanf_teen_parent_education_required:
         return True
     return False
   default: false
+  tests:
+    - name: "18-year-old parent without diploma requires education"
+      period: 2024-01
+      inputs:
+        age: 18
+        has_minor_child: true
+        has_high_school_diploma: false
+      expect: true
+    - name: "18-year-old parent with diploma does not require education"
+      period: 2024-01
+      inputs:
+        age: 18
+        has_minor_child: true
+        has_high_school_diploma: true
+      expect: false
+    - name: "25-year-old parent without diploma does not require education (over age threshold)"
+      period: 2024-01
+      inputs:
+        age: 25
+        has_minor_child: true
+        has_high_school_diploma: false
+      expect: false
 
 variable tanf_teen_parent_education_met:
   entity: Person
@@ -401,6 +561,47 @@ variable tanf_teen_parent_education_met:
         return True
     return False
   default: true
+  tests:
+    - name: "Teen parent enrolled in school meets requirement"
+      period: 2024-01
+      inputs:
+        age: 18
+        has_minor_child: true
+        has_high_school_diploma: false
+        is_enrolled_in_school: true
+        is_enrolled_in_ged_program: false
+        is_enrolled_in_alternative_education: false
+      expect: true
+    - name: "Teen parent enrolled in GED program meets requirement"
+      period: 2024-01
+      inputs:
+        age: 19
+        has_minor_child: true
+        has_high_school_diploma: false
+        is_enrolled_in_school: false
+        is_enrolled_in_ged_program: true
+        is_enrolled_in_alternative_education: false
+      expect: true
+    - name: "Teen parent not enrolled fails requirement"
+      period: 2024-01
+      inputs:
+        age: 17
+        has_minor_child: true
+        has_high_school_diploma: false
+        is_enrolled_in_school: false
+        is_enrolled_in_ged_program: false
+        is_enrolled_in_alternative_education: false
+      expect: false
+    - name: "Adult parent without diploma automatically meets (no requirement)"
+      period: 2024-01
+      inputs:
+        age: 30
+        has_minor_child: true
+        has_high_school_diploma: false
+        is_enrolled_in_school: false
+        is_enrolled_in_ged_program: false
+        is_enrolled_in_alternative_education: false
+      expect: true
 
 variable tanf_unit_work_requirement_met:
   entity: TanfUnit
@@ -418,273 +619,24 @@ variable tanf_unit_work_requirement_met:
     return True
   default: true
   tests:
-    # tanf_required_work_hours_weekly tests
-    - name: "Single parent with young child requires reduced hours"
+    - name: "Single adult unit meets requirement"
       period: 2024-01
       inputs:
-        is_tanf_single_parent: true
-        has_child_under_1: true
+        tanf_unit_adults: 1
+        tanf_work_requirement_met: true
         tanf_work_requirement_exempt: false
-        receives_federal_childcare_assistance: false
-      expect: 20
-      variable: tanf_required_work_hours_weekly
-
-    - name: "Single parent without young child requires standard hours"
+      expect: true
+    - name: "Single adult unit fails requirement"
       period: 2024-01
       inputs:
-        is_tanf_single_parent: true
-        has_child_under_1: false
+        tanf_unit_adults: 1
+        tanf_work_requirement_met: false
         tanf_work_requirement_exempt: false
-        receives_federal_childcare_assistance: false
-      expect: 30
-      variable: tanf_required_work_hours_weekly
-
-    - name: "Two-parent family requires 35 hours"
+      expect: false
+    - name: "Exempt adult unit automatically meets requirement"
       period: 2024-01
       inputs:
-        is_tanf_single_parent: false
-        is_tanf_two_parent_family: true
-        has_child_under_1: false
-        tanf_work_requirement_exempt: false
-        receives_federal_childcare_assistance: false
-      expect: 35
-      variable: tanf_required_work_hours_weekly
-
-    - name: "Two-parent family with childcare requires 55 hours"
-      period: 2024-01
-      inputs:
-        is_tanf_single_parent: false
-        is_tanf_two_parent_family: true
-        has_child_under_1: false
-        tanf_work_requirement_exempt: false
-        receives_federal_childcare_assistance: true
-      expect: 55
-      variable: tanf_required_work_hours_weekly
-
-    - name: "Exempt individual requires zero hours"
-      period: 2024-01
-      inputs:
-        is_tanf_single_parent: true
+        tanf_unit_adults: 1
+        tanf_work_requirement_met: false
         tanf_work_requirement_exempt: true
-      expect: 0
-      variable: tanf_required_work_hours_weekly
-
-    # tanf_required_work_hours_monthly tests
-    - name: "Single parent monthly hours conversion"
-      period: 2024-01
-      inputs:
-        is_tanf_single_parent: true
-        has_child_under_1: false
-        tanf_work_requirement_exempt: false
-        receives_federal_childcare_assistance: false
-      expect: 130
-      variable: tanf_required_work_hours_monthly
-
-    - name: "Two-parent family with childcare monthly hours"
-      period: 2024-01
-      inputs:
-        is_tanf_single_parent: false
-        is_tanf_two_parent_family: true
-        tanf_work_requirement_exempt: false
-        receives_federal_childcare_assistance: true
-      expect: 238
-      variable: tanf_required_work_hours_monthly
-
-    # tanf_hours_in_core_activities tests
-    - name: "Only unsubsidized employment counted"
-      period: 2024-01
-      inputs:
-        work_hours_unsubsidized: 20
-        work_hours_subsidized_private: 0
-        work_hours_subsidized_public: 0
-        work_hours_work_experience: 0
-        work_hours_on_the_job_training: 0
-        work_hours_job_search_limited: 0
-        work_hours_community_service: 0
-        work_hours_vocational: 0
-      expect: 20
-      variable: tanf_hours_in_core_activities
-
-    - name: "Multiple core activities combined"
-      period: 2024-01
-      inputs:
-        work_hours_unsubsidized: 15
-        work_hours_subsidized_private: 10
-        work_hours_subsidized_public: 5
-        work_hours_work_experience: 3
-        work_hours_on_the_job_training: 2
-        work_hours_job_search_limited: 4
-        work_hours_community_service: 1
-        work_hours_vocational: 0
-      expect: 40
-      variable: tanf_hours_in_core_activities
-
-    - name: "All core activities at capacity"
-      period: 2024-01
-      inputs:
-        work_hours_unsubsidized: 10
-        work_hours_subsidized_private: 8
-        work_hours_subsidized_public: 7
-        work_hours_work_experience: 5
-        work_hours_on_the_job_training: 5
-        work_hours_job_search_limited: 3
-        work_hours_community_service: 2
-        work_hours_vocational: 0
-      expect: 40
-      variable: tanf_hours_in_core_activities
-
-    # tanf_work_requirement_met tests
-    - name: "Person meets work requirement"
-      period: 2024-01
-      inputs:
-        is_tanf_single_parent: true
-        has_child_under_1: false
-        tanf_work_requirement_exempt: false
-        receives_federal_childcare_assistance: false
-        work_hours_monthly: 130
       expect: true
-      variable: tanf_work_requirement_met
-
-    - name: "Person fails to meet work requirement"
-      period: 2024-01
-      inputs:
-        is_tanf_single_parent: true
-        has_child_under_1: false
-        tanf_work_requirement_exempt: false
-        receives_federal_childcare_assistance: false
-        work_hours_monthly: 100
-      expect: false
-      variable: tanf_work_requirement_met
-
-    - name: "Exempt person automatically meets requirement"
-      period: 2024-01
-      inputs:
-        is_tanf_single_parent: true
-        tanf_work_requirement_exempt: true
-        work_hours_monthly: 0
-      expect: true
-      variable: tanf_work_requirement_met
-
-    # tanf_work_requirement_exempt tests
-    - name: "Single parent with infant exemption available"
-      period: 2024-01
-      inputs:
-        is_single_parent: true
-        has_child_under_1: true
-        tanf_infant_care_exemption_available: true
-      expect: true
-      variable: tanf_work_requirement_exempt
-
-    - name: "Single parent with infant but exemption used"
-      period: 2024-01
-      inputs:
-        is_single_parent: true
-        has_child_under_1: true
-        tanf_infant_care_exemption_available: false
-      expect: false
-      variable: tanf_work_requirement_exempt
-
-    - name: "Disabled person exempted"
-      period: 2024-01
-      inputs:
-        is_disabled_unable_to_work: true
-      expect: true
-      variable: tanf_work_requirement_exempt
-
-    - name: "Caring for disabled family member exempted"
-      period: 2024-01
-      inputs:
-        is_caring_for_disabled_family_member: true
-      expect: true
-      variable: tanf_work_requirement_exempt
-
-    - name: "Pregnant in third trimester exempted"
-      period: 2024-01
-      inputs:
-        is_pregnant: true
-        pregnancy_trimester: 3
-      expect: true
-      variable: tanf_work_requirement_exempt
-
-    - name: "Pregnant in second trimester not exempted"
-      period: 2024-01
-      inputs:
-        is_pregnant: true
-        pregnancy_trimester: 2
-      expect: false
-      variable: tanf_work_requirement_exempt
-
-    # tanf_teen_parent_education_required tests
-    - name: "Teen parent without diploma must attend education"
-      period: 2024-01
-      inputs:
-        age: 18
-        has_minor_child: true
-        has_high_school_diploma: false
-      expect: true
-      variable: tanf_teen_parent_education_required
-
-    - name: "Teen parent with diploma no education required"
-      period: 2024-01
-      inputs:
-        age: 18
-        has_minor_child: true
-        has_high_school_diploma: true
-      expect: false
-      variable: tanf_teen_parent_education_required
-
-    - name: "Adult without diploma no education requirement"
-      period: 2024-01
-      inputs:
-        age: 25
-        has_minor_child: true
-        has_high_school_diploma: false
-      expect: false
-      variable: tanf_teen_parent_education_required
-
-    # tanf_teen_parent_education_met tests
-    - name: "Teen parent meets education via school enrollment"
-      period: 2024-01
-      inputs:
-        age: 19
-        has_minor_child: true
-        has_high_school_diploma: false
-        is_enrolled_in_school: true
-        is_enrolled_in_ged_program: false
-        is_enrolled_in_alternative_education: false
-      expect: true
-      variable: tanf_teen_parent_education_met
-
-    - name: "Teen parent meets education via GED program"
-      period: 2024-01
-      inputs:
-        age: 20
-        has_minor_child: true
-        has_high_school_diploma: false
-        is_enrolled_in_school: false
-        is_enrolled_in_ged_program: true
-        is_enrolled_in_alternative_education: false
-      expect: true
-      variable: tanf_teen_parent_education_met
-
-    - name: "Teen parent fails education requirement"
-      period: 2024-01
-      inputs:
-        age: 18
-        has_minor_child: true
-        has_high_school_diploma: false
-        is_enrolled_in_school: false
-        is_enrolled_in_ged_program: false
-        is_enrolled_in_alternative_education: false
-      expect: false
-      variable: tanf_teen_parent_education_met
-
-    - name: "Non-teen parent always meets education requirement"
-      period: 2024-01
-      inputs:
-        age: 30
-        has_minor_child: true
-        has_high_school_diploma: false
-        is_enrolled_in_school: false
-      expect: true
-      variable: tanf_teen_parent_education_met

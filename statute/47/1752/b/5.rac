@@ -70,6 +70,17 @@ variable acp_device_received:
     # Input variable - tracked externally via National Lifeline Database
     return has_received_acp_device
   default: false
+  tests:
+    - name: "Household has received ACP device"
+      period: 2024
+      inputs:
+        has_received_acp_device: true
+      expect: true
+    - name: "Household has not received ACP device"
+      period: 2024
+      inputs:
+        has_received_acp_device: false
+      expect: false
 
 
 variable acp_device_eligible:
@@ -96,6 +107,63 @@ variable acp_device_eligible:
       return false
     return true
   default: false
+  tests:
+    - name: "Eligible with valid copay and no prior device"
+      period: 2024-01
+      inputs:
+        acp_eligible: true
+        connected_device_copay: 25
+        has_received_acp_device: false
+      expect: true
+    - name: "Copay at lower boundary ($11 is valid)"
+      period: 2024-01
+      inputs:
+        acp_eligible: true
+        connected_device_copay: 11
+        has_received_acp_device: false
+      expect: true
+    - name: "Copay at upper boundary ($49 is valid)"
+      period: 2024-01
+      inputs:
+        acp_eligible: true
+        connected_device_copay: 49
+        has_received_acp_device: false
+      expect: true
+    - name: "Copay too low ($10 not valid - must be more than $10)"
+      period: 2024-01
+      inputs:
+        acp_eligible: true
+        connected_device_copay: 10
+        has_received_acp_device: false
+      expect: false
+    - name: "Copay too high ($50 not valid - must be less than $50)"
+      period: 2024-01
+      inputs:
+        acp_eligible: true
+        connected_device_copay: 50
+        has_received_acp_device: false
+      expect: false
+    - name: "Already received device per (b)(5)(B)"
+      period: 2024-01
+      inputs:
+        acp_eligible: true
+        connected_device_copay: 25
+        has_received_acp_device: true
+      expect: false
+    - name: "Not ACP eligible per (a)(6)"
+      period: 2024-01
+      inputs:
+        acp_eligible: false
+        connected_device_copay: 25
+        has_received_acp_device: false
+      expect: false
+    - name: "Zero copay (not valid)"
+      period: 2024-01
+      inputs:
+        acp_eligible: true
+        connected_device_copay: 0
+        has_received_acp_device: false
+      expect: false
 
 
 variable acp_device_subsidy:
@@ -115,30 +183,35 @@ variable acp_device_subsidy:
   default: 0
   tests:
     - name: "Eligible household with valid copay"
+      period: 2024-01
       inputs:
         acp_eligible: true
         connected_device_copay: 25
         has_received_acp_device: false
       expect: 100
     - name: "Copay too low (under $10)"
+      period: 2024-01
       inputs:
         acp_eligible: true
         connected_device_copay: 5
         has_received_acp_device: false
       expect: 0
     - name: "Copay too high (over $50)"
+      period: 2024-01
       inputs:
         acp_eligible: true
         connected_device_copay: 60
         has_received_acp_device: false
       expect: 0
     - name: "Already received device"
+      period: 2024-01
       inputs:
         acp_eligible: true
         connected_device_copay: 25
         has_received_acp_device: true
       expect: 0
     - name: "Not ACP eligible"
+      period: 2024-01
       inputs:
         acp_eligible: false
         connected_device_copay: 25

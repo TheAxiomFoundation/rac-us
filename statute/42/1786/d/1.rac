@@ -8,6 +8,83 @@ postpartum women, infants, and children who--
 (6) "infant" - persons under 1 year of age
 (14) "postpartum women" - up to 6 months after pregnancy terminates
 """
+
+# --- Input Variables (Demographic Characteristics) ---
+
+input is_breastfeeding:
+  entity: Person
+  period: Month
+  dtype: Boolean
+  label: "Is Breastfeeding"
+  description: "Whether person is currently breastfeeding"
+  default: false
+
+input is_pregnant:
+  entity: Person
+  period: Month
+  dtype: Boolean
+  label: "Is Pregnant"
+  description: "Whether person is currently pregnant"
+  default: false
+
+input is_postpartum:
+  entity: Person
+  period: Month
+  dtype: Boolean
+  label: "Is Postpartum"
+  description: "Whether person is in postpartum period (pregnancy recently terminated)"
+  default: false
+
+input months_postpartum:
+  entity: Person
+  period: Month
+  dtype: Integer
+  label: "Months Postpartum"
+  description: "Number of months since pregnancy ended"
+  default: 0
+
+input age:
+  entity: Person
+  period: Year
+  dtype: Integer
+  label: "Age"
+  description: "Person's age in years"
+  default: 0
+
+# --- Parameters (Statutory Thresholds) ---
+
+parameter postpartum_max_months_breastfeeding:
+  description: "Maximum months postpartum for breastfeeding women eligibility per 42 USC 1786(b)(3)"
+  unit: month
+  label: "Breastfeeding eligibility period"
+  reference: "https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title42-section1786&num=0&edition=prelim"
+  values:
+    1974-01-01: 12
+
+parameter postpartum_max_months_non_breastfeeding:
+  description: "Maximum months postpartum for non-breastfeeding women eligibility per 42 USC 1786(b)(14)"
+  unit: month
+  label: "Non-breastfeeding postpartum eligibility period"
+  reference: "https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title42-section1786&num=0&edition=prelim"
+  values:
+    1974-01-01: 6
+
+parameter infant_max_years:
+  description: "Maximum age in years for infant category per 42 USC 1786(b)(6)"
+  unit: year
+  label: "Infant maximum age"
+  reference: "https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title42-section1786&num=0&edition=prelim"
+  values:
+    1974-01-01: 1
+
+parameter child_max_years:
+  description: "Maximum age in years for child category per 42 USC 1786(b)(4)"
+  unit: year
+  label: "Child maximum age"
+  reference: "https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title42-section1786&num=0&edition=prelim"
+  values:
+    1974-01-01: 5
+
 variable categorical:
   entity: Person
   period: Month

@@ -5,6 +5,79 @@ taxable year an amount equal to the applicable percentage of so much of
 the qualified retirement savings contributions of the eligible individual
 for the taxable year as do not exceed $2,000.
 """
+
+input traditional_ira_contributions:
+  entity: Person
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Traditional IRA Contributions"
+  description: "Amount contributed to traditional IRA accounts during the year"
+  default: 0
+
+input roth_ira_contributions:
+  entity: Person
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Roth IRA Contributions"
+  description: "Amount contributed to Roth IRA accounts during the year"
+  default: 0
+
+input traditional_401k_contributions:
+  entity: Person
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Traditional 401(k) Contributions"
+  description: "Amount contributed to traditional 401(k) plans during the year"
+  default: 0
+
+input roth_401k_contributions:
+  entity: Person
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Roth 401(k) Contributions"
+  description: "Amount contributed to Roth 401(k) plans during the year"
+  default: 0
+
+input traditional_403b_contributions:
+  entity: Person
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Traditional 403(b) Contributions"
+  description: "Amount contributed to traditional 403(b) plans during the year"
+  default: 0
+
+input roth_403b_contributions:
+  entity: Person
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Roth 403(b) Contributions"
+  description: "Amount contributed to Roth 403(b) plans during the year"
+  default: 0
+
+input self_employed_pension_contributions:
+  entity: Person
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Self-Employed Pension Contributions"
+  description: "Amount contributed to self-employed pension plans (SEP-IRA, SIMPLE IRA) during the year"
+  default: 0
+
+input able_contributions_person:
+  entity: Person
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "ABLE Account Contributions"
+  description: "Amount contributed to ABLE (Achieving a Better Life Experience) accounts during the year"
+  default: 0
+
 variable savers_credit:
   imports:
     - 26/25B/c#is_savers_credit_eligible

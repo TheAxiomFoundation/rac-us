@@ -16,6 +16,44 @@ capital gain property.-- [30% limit for property to 50% orgs]
 property to organizations not described in subparagraph (A).--
 [20% limit for property to 30% orgs]
 """
+
+parameter cash_to_public_charity:
+  description: "Maximum deduction for cash contributions to public charities as a share of AGI"
+  unit: /1
+  period: Year
+  values:
+    2018-01-01: 0.60  # TCJA increased from 50% to 60%
+    1970-01-01: 0.50
+
+parameter property_to_public_charity:
+  description: "Maximum deduction for property contributions to public charities as a share of AGI"
+  unit: /1
+  period: Year
+  values:
+    1970-01-01: 0.30
+
+parameter cash_to_private_foundation:
+  description: "Maximum deduction for cash contributions to private foundations as a share of AGI"
+  unit: /1
+  period: Year
+  values:
+    1970-01-01: 0.30
+
+parameter property_to_private_foundation:
+  description: "Maximum deduction for property contributions to private foundations as a share of AGI"
+  unit: /1
+  period: Year
+  values:
+    1970-01-01: 0.20
+
+parameter overall_limit:
+  description: "Overall maximum charitable contribution deduction as a share of AGI"
+  unit: /1
+  period: Year
+  values:
+    2018-01-01: 0.60  # TCJA increased from 50% to 60%
+    1970-01-01: 0.50
+
 variable percentage_limitations:
   imports: [26/62/a#adjusted_gross_income]
   entity: TaxUnit
@@ -29,12 +67,12 @@ variable percentage_limitations:
     # Contribution base is generally AGI for individuals
     agi = adjusted_gross_income
     # Calculate limits for each category
-    cash_public_limit = agi * p.cash_to_public_charity
-    property_public_limit = agi * p.property_to_public_charity
-    cash_private_limit = agi * p.cash_to_private_foundation
-    property_private_limit = agi * p.property_to_private_foundation
+    cash_public_limit = agi * cash_to_public_charity
+    property_public_limit = agi * property_to_public_charity
+    cash_private_limit = agi * cash_to_private_foundation
+    property_private_limit = agi * property_to_private_foundation
     # Overall limit
-    overall = agi * p.overall_limit
+    overall = agi * overall_limit
     return overall
   default: 0
   tests:

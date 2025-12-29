@@ -27,89 +27,96 @@ requirements of subsection (e)(1)(A), $3,750.
 requirements of subsection (e)(2)(A), $3,750.
 """
 
-# Parameters for the credit
-parameters:
-  credit:
-    critical_minerals_amount:
-      values:
-        2023: 3_750
-        2024: 3_750
-      description: "Credit amount for meeting critical minerals requirements"
-      reference: "26 USC 30D(b)(2)"
-      unit: USD
+# Parameters for the credit amounts
+parameter critical_minerals_amount:
+  description: "Credit amount for meeting critical minerals requirements"
+  reference: "26 USC 30D(b)(2)"
+  unit: USD
+  period: Year
+  values:
+    2023-01-01: 3_750
 
-    battery_components_amount:
-      values:
-        2023: 3_750
-        2024: 3_750
-      description: "Credit amount for meeting battery components requirements"
-      reference: "26 USC 30D(b)(3)"
-      unit: USD
+parameter battery_components_amount:
+  description: "Credit amount for meeting battery components requirements"
+  reference: "26 USC 30D(b)(3)"
+  unit: USD
+  period: Year
+  values:
+    2023-01-01: 3_750
 
-    maximum_credit:
-      values:
-        2023: 7_500
-        2024: 7_500
-      description: "Maximum total credit ($3,750 + $3,750)"
-      reference: "26 USC 30D(b)"
-      unit: USD
+parameter maximum_credit:
+  description: "Maximum total credit ($3,750 + $3,750)"
+  reference: "26 USC 30D(b)"
+  unit: USD
+  period: Year
+  values:
+    2023-01-01: 7_500
 
-  eligibility:
-    min_battery_capacity_kwh:
-      values:
-        2023: 7
-        2024: 7
-      description: "Minimum battery capacity in kWh"
-      reference: "26 USC 30D(d)(1)(F)"
-      unit: kWh
+# Parameters for eligibility requirements
+parameter min_battery_capacity_kwh:
+  description: "Minimum battery capacity in kWh"
+  reference: "26 USC 30D(d)(1)(F)"
+  unit: kWh
+  period: Year
+  values:
+    2023-01-01: 7
 
-    msrp_limit_van_suv_pickup:
-      values:
-        2023: 80_000
-        2024: 80_000
-      description: "MSRP limit for vans, SUVs, and pickup trucks"
-      reference: "26 USC 30D(f)(11)(B)(i)"
-      unit: USD
+parameter msrp_limit_van_suv_pickup:
+  description: "MSRP limit for vans, SUVs, and pickup trucks"
+  reference: "26 USC 30D(f)(11)(B)(i)"
+  unit: USD
+  period: Year
+  values:
+    2023-01-01: 80_000
 
-    msrp_limit_other:
-      values:
-        2023: 55_000
-        2024: 55_000
-      description: "MSRP limit for all other vehicles"
-      reference: "26 USC 30D(f)(11)(B)(ii)"
-      unit: USD
+parameter msrp_limit_other:
+  description: "MSRP limit for all other vehicles"
+  reference: "26 USC 30D(f)(11)(B)(ii)"
+  unit: USD
+  period: Year
+  values:
+    2023-01-01: 55_000
 
-    income_limit:
-      JOINT:
-        values:
-          2023: 300_000
-          2024: 300_000
-        description: "AGI limit for joint filers"
-        reference: "26 USC 30D(f)(10)(B)(i)"
-      SURVIVING_SPOUSE:
-        values:
-          2023: 300_000
-          2024: 300_000
-        description: "AGI limit for surviving spouse"
-        reference: "26 USC 30D(f)(10)(B)(i)"
-      HEAD_OF_HOUSEHOLD:
-        values:
-          2023: 225_000
-          2024: 225_000
-        description: "AGI limit for head of household"
-        reference: "26 USC 30D(f)(10)(B)(ii)"
-      SINGLE:
-        values:
-          2023: 150_000
-          2024: 150_000
-        description: "AGI limit for single filers"
-        reference: "26 USC 30D(f)(10)(B)(iii)"
-      SEPARATE:
-        values:
-          2023: 150_000
-          2024: 150_000
-        description: "AGI limit for married filing separately"
-        reference: "26 USC 30D(f)(10)(B)(iii)"
+# Income limits by filing status
+parameter income_limit_joint:
+  description: "AGI limit for joint filers"
+  reference: "26 USC 30D(f)(10)(B)(i)"
+  unit: USD
+  period: Year
+  values:
+    2023-01-01: 300_000
+
+parameter income_limit_surviving_spouse:
+  description: "AGI limit for surviving spouse"
+  reference: "26 USC 30D(f)(10)(B)(i)"
+  unit: USD
+  period: Year
+  values:
+    2023-01-01: 300_000
+
+parameter income_limit_head_of_household:
+  description: "AGI limit for head of household"
+  reference: "26 USC 30D(f)(10)(B)(ii)"
+  unit: USD
+  period: Year
+  values:
+    2023-01-01: 225_000
+
+parameter income_limit_single:
+  description: "AGI limit for single filers"
+  reference: "26 USC 30D(f)(10)(B)(iii)"
+  unit: USD
+  period: Year
+  values:
+    2023-01-01: 150_000
+
+parameter income_limit_separate:
+  description: "AGI limit for married filing separately"
+  reference: "26 USC 30D(f)(10)(B)(iii)"
+  unit: USD
+  period: Year
+  values:
+    2023-01-01: 150_000
 
 # Input variables for vehicle characteristics
 input purchased_new_clean_vehicle:
@@ -178,7 +185,7 @@ variable new_vehicle_meets_battery_capacity:
   label: "Meets Minimum Battery Capacity"
   description: "Whether vehicle meets the minimum 7 kWh battery capacity requirement"
   formula: |
-    return new_clean_vehicle_battery_capacity_kwh >= p.eligibility.min_battery_capacity_kwh
+    return new_clean_vehicle_battery_capacity_kwh >= min_battery_capacity_kwh
 
 # MSRP limit based on vehicle type - 30D(f)(11)
 variable new_vehicle_msrp_limit:
@@ -190,8 +197,26 @@ variable new_vehicle_msrp_limit:
   description: "MSRP limit based on vehicle classification"
   formula: |
     if new_clean_vehicle_is_van_suv_pickup:
-      return p.eligibility.msrp_limit_van_suv_pickup
-    return p.eligibility.msrp_limit_other
+      return msrp_limit_van_suv_pickup
+    return msrp_limit_other
+  tests:
+    - name: "Sedan/other vehicle - $55k limit"
+      period: 2024
+      inputs:
+        new_clean_vehicle_is_van_suv_pickup: false
+      expect: 55_000
+
+    - name: "SUV - $80k limit"
+      period: 2024
+      inputs:
+        new_clean_vehicle_is_van_suv_pickup: true
+      expect: 80_000
+
+    - name: "Pickup truck - $80k limit"
+      period: 2024
+      inputs:
+        new_clean_vehicle_is_van_suv_pickup: true
+      expect: 80_000
 
 # MSRP eligibility check - 30D(f)(11)
 variable new_vehicle_meets_msrp_limit:
@@ -202,6 +227,48 @@ variable new_vehicle_meets_msrp_limit:
   description: "Whether vehicle MSRP is within the applicable limit"
   formula: |
     return new_clean_vehicle_msrp <= new_vehicle_msrp_limit
+  tests:
+    - name: "Sedan under $55k limit - eligible"
+      period: 2024
+      inputs:
+        new_clean_vehicle_msrp: 45000
+        new_clean_vehicle_is_van_suv_pickup: false
+      expect: true
+
+    - name: "Sedan at exactly $55k limit - eligible"
+      period: 2024
+      inputs:
+        new_clean_vehicle_msrp: 55_000
+        new_clean_vehicle_is_van_suv_pickup: false
+      expect: true
+
+    - name: "Sedan over $55k limit - ineligible"
+      period: 2024
+      inputs:
+        new_clean_vehicle_msrp: 60000
+        new_clean_vehicle_is_van_suv_pickup: false
+      expect: false
+
+    - name: "SUV under $80k limit - eligible"
+      period: 2024
+      inputs:
+        new_clean_vehicle_msrp: 70000
+        new_clean_vehicle_is_van_suv_pickup: true
+      expect: true
+
+    - name: "SUV at exactly $80k limit - eligible"
+      period: 2024
+      inputs:
+        new_clean_vehicle_msrp: 80_000
+        new_clean_vehicle_is_van_suv_pickup: true
+      expect: true
+
+    - name: "SUV over $80k limit - ineligible"
+      period: 2024
+      inputs:
+        new_clean_vehicle_msrp: 85000
+        new_clean_vehicle_is_van_suv_pickup: true
+      expect: false
 
 # AGI limit based on filing status - 30D(f)(10)
 variable new_vehicle_agi_limit:
@@ -213,8 +280,50 @@ variable new_vehicle_agi_limit:
   unit: USD
   label: "Applicable AGI Limit"
   description: "Modified AGI limit based on filing status"
+  syntax: python
   formula: |
-    return p.eligibility.income_limit[filing_status]
+    if filing_status == "JOINT":
+      return income_limit_joint
+    elif filing_status == "SURVIVING_SPOUSE":
+      return income_limit_surviving_spouse
+    elif filing_status == "HEAD_OF_HOUSEHOLD":
+      return income_limit_head_of_household
+    elif filing_status == "SINGLE":
+      return income_limit_single
+    elif filing_status == "SEPARATE":
+      return income_limit_separate
+    else:
+      return income_limit_single
+  tests:
+    - name: "Single filer - $150k limit"
+      period: 2024
+      inputs:
+        filing_status: SINGLE
+      expect: 150_000
+
+    - name: "Joint filer - $300k limit"
+      period: 2024
+      inputs:
+        filing_status: JOINT
+      expect: 300_000
+
+    - name: "Head of household - $225k limit"
+      period: 2024
+      inputs:
+        filing_status: HEAD_OF_HOUSEHOLD
+      expect: 225_000
+
+    - name: "Married filing separately - $150k limit"
+      period: 2024
+      inputs:
+        filing_status: SEPARATE
+      expect: 150_000
+
+    - name: "Surviving spouse - $300k limit"
+      period: 2024
+      inputs:
+        filing_status: SURVIVING_SPOUSE
+      expect: 300_000
 
 # AGI eligibility check - 30D(f)(10)
 variable new_vehicle_meets_income_limit:
@@ -230,6 +339,48 @@ variable new_vehicle_meets_income_limit:
     # Note: Law allows lesser of current year or prior year MAGI
     # For simplicity, using current year AGI
     return adjusted_gross_income <= new_vehicle_agi_limit
+  tests:
+    - name: "Single filer under $150k limit - eligible"
+      period: 2024
+      inputs:
+        filing_status: SINGLE
+        adjusted_gross_income: 100000
+      expect: true
+
+    - name: "Single filer at exactly $150k limit - eligible"
+      period: 2024
+      inputs:
+        filing_status: SINGLE
+        adjusted_gross_income: 150_000
+      expect: true
+
+    - name: "Single filer over $150k limit - ineligible"
+      period: 2024
+      inputs:
+        filing_status: SINGLE
+        adjusted_gross_income: 160000
+      expect: false
+
+    - name: "Joint filer under $300k limit - eligible"
+      period: 2024
+      inputs:
+        filing_status: JOINT
+        adjusted_gross_income: 250000
+      expect: true
+
+    - name: "Joint filer over $300k limit - ineligible"
+      period: 2024
+      inputs:
+        filing_status: JOINT
+        adjusted_gross_income: 350000
+      expect: false
+
+    - name: "Head of household at $225k limit - eligible"
+      period: 2024
+      inputs:
+        filing_status: HEAD_OF_HOUSEHOLD
+        adjusted_gross_income: 225_000
+      expect: true
 
 # Overall eligibility - combines all requirements
 variable new_vehicle_credit_eligible:
@@ -250,6 +401,84 @@ variable new_vehicle_credit_eligible:
     if not new_vehicle_meets_income_limit:
       return false
     return true
+  tests:
+    - name: "No purchase - ineligible"
+      period: 2024
+      inputs:
+        purchased_new_clean_vehicle: false
+      expect: false
+
+    - name: "All requirements met - eligible"
+      period: 2024
+      inputs:
+        purchased_new_clean_vehicle: true
+        new_clean_vehicle_msrp: 45000
+        new_clean_vehicle_battery_capacity_kwh: 75
+        new_clean_vehicle_is_van_suv_pickup: false
+        new_clean_vehicle_final_assembly_north_america: true
+        adjusted_gross_income: 100000
+        filing_status: SINGLE
+      expect: true
+
+    - name: "Not assembled in North America - ineligible"
+      period: 2024
+      inputs:
+        purchased_new_clean_vehicle: true
+        new_clean_vehicle_msrp: 45000
+        new_clean_vehicle_battery_capacity_kwh: 75
+        new_clean_vehicle_is_van_suv_pickup: false
+        new_clean_vehicle_final_assembly_north_america: false
+        adjusted_gross_income: 100000
+        filing_status: SINGLE
+      expect: false
+
+    - name: "Battery capacity below 7 kWh - ineligible"
+      period: 2024
+      inputs:
+        purchased_new_clean_vehicle: true
+        new_clean_vehicle_msrp: 45000
+        new_clean_vehicle_battery_capacity_kwh: 5
+        new_clean_vehicle_is_van_suv_pickup: false
+        new_clean_vehicle_final_assembly_north_america: true
+        adjusted_gross_income: 100000
+        filing_status: SINGLE
+      expect: false
+
+    - name: "MSRP over limit for sedan - ineligible"
+      period: 2024
+      inputs:
+        purchased_new_clean_vehicle: true
+        new_clean_vehicle_msrp: 60000
+        new_clean_vehicle_battery_capacity_kwh: 75
+        new_clean_vehicle_is_van_suv_pickup: false
+        new_clean_vehicle_final_assembly_north_america: true
+        adjusted_gross_income: 100000
+        filing_status: SINGLE
+      expect: false
+
+    - name: "AGI over limit for single filer - ineligible"
+      period: 2024
+      inputs:
+        purchased_new_clean_vehicle: true
+        new_clean_vehicle_msrp: 45000
+        new_clean_vehicle_battery_capacity_kwh: 75
+        new_clean_vehicle_is_van_suv_pickup: false
+        new_clean_vehicle_final_assembly_north_america: true
+        adjusted_gross_income: 160000
+        filing_status: SINGLE
+      expect: false
+
+    - name: "SUV with higher MSRP limit - eligible"
+      period: 2024
+      inputs:
+        purchased_new_clean_vehicle: true
+        new_clean_vehicle_msrp: 70000
+        new_clean_vehicle_battery_capacity_kwh: 100
+        new_clean_vehicle_is_van_suv_pickup: true
+        new_clean_vehicle_final_assembly_north_america: true
+        adjusted_gross_income: 250000
+        filing_status: JOINT
+      expect: true
 
 # Critical minerals component - 30D(b)(2)
 variable new_vehicle_critical_minerals_credit:
@@ -263,8 +492,41 @@ variable new_vehicle_critical_minerals_credit:
     if not new_vehicle_credit_eligible:
       return 0
     if new_clean_vehicle_meets_critical_minerals_requirement:
-      return p.credit.critical_minerals_amount
+      return critical_minerals_amount
     return 0
+  tests:
+    - name: "Not eligible - zero credit"
+      period: 2024
+      inputs:
+        purchased_new_clean_vehicle: false
+        new_clean_vehicle_meets_critical_minerals_requirement: true
+      expect: 0
+
+    - name: "Eligible and meets requirement - $3,750"
+      period: 2024
+      inputs:
+        purchased_new_clean_vehicle: true
+        new_clean_vehicle_msrp: 45000
+        new_clean_vehicle_battery_capacity_kwh: 75
+        new_clean_vehicle_is_van_suv_pickup: false
+        new_clean_vehicle_final_assembly_north_america: true
+        new_clean_vehicle_meets_critical_minerals_requirement: true
+        adjusted_gross_income: 100000
+        filing_status: SINGLE
+      expect: 3_750
+
+    - name: "Eligible but does not meet requirement - zero credit"
+      period: 2024
+      inputs:
+        purchased_new_clean_vehicle: true
+        new_clean_vehicle_msrp: 45000
+        new_clean_vehicle_battery_capacity_kwh: 75
+        new_clean_vehicle_is_van_suv_pickup: false
+        new_clean_vehicle_final_assembly_north_america: true
+        new_clean_vehicle_meets_critical_minerals_requirement: false
+        adjusted_gross_income: 100000
+        filing_status: SINGLE
+      expect: 0
 
 # Battery components credit - 30D(b)(3)
 variable new_vehicle_battery_components_credit:
@@ -278,8 +540,41 @@ variable new_vehicle_battery_components_credit:
     if not new_vehicle_credit_eligible:
       return 0
     if new_clean_vehicle_meets_battery_components_requirement:
-      return p.credit.battery_components_amount
+      return battery_components_amount
     return 0
+  tests:
+    - name: "Not eligible - zero credit"
+      period: 2024
+      inputs:
+        purchased_new_clean_vehicle: false
+        new_clean_vehicle_meets_battery_components_requirement: true
+      expect: 0
+
+    - name: "Eligible and meets requirement - $3,750"
+      period: 2024
+      inputs:
+        purchased_new_clean_vehicle: true
+        new_clean_vehicle_msrp: 45000
+        new_clean_vehicle_battery_capacity_kwh: 75
+        new_clean_vehicle_is_van_suv_pickup: false
+        new_clean_vehicle_final_assembly_north_america: true
+        new_clean_vehicle_meets_battery_components_requirement: true
+        adjusted_gross_income: 100000
+        filing_status: SINGLE
+      expect: 3_750
+
+    - name: "Eligible but does not meet requirement - zero credit"
+      period: 2024
+      inputs:
+        purchased_new_clean_vehicle: true
+        new_clean_vehicle_msrp: 45000
+        new_clean_vehicle_battery_capacity_kwh: 75
+        new_clean_vehicle_is_van_suv_pickup: false
+        new_clean_vehicle_final_assembly_north_america: true
+        new_clean_vehicle_meets_battery_components_requirement: false
+        adjusted_gross_income: 100000
+        filing_status: SINGLE
+      expect: 0
 
 # Main credit calculation - 30D(a), (b)
 variable new_vehicle_credit:
@@ -317,7 +612,7 @@ variable new_vehicle_credit:
         new_clean_vehicle_meets_battery_components_requirement: true
         adjusted_gross_income: 100000
         filing_status: SINGLE
-      expect: 7500
+      expect: 7_500
 
     - name: "Partial credit - critical minerals only"
       period: 2024
@@ -331,7 +626,7 @@ variable new_vehicle_credit:
         new_clean_vehicle_meets_battery_components_requirement: false
         adjusted_gross_income: 100000
         filing_status: SINGLE
-      expect: 3750
+      expect: 3_750
 
     - name: "Partial credit - battery components only"
       period: 2024
@@ -345,7 +640,7 @@ variable new_vehicle_credit:
         new_clean_vehicle_meets_battery_components_requirement: true
         adjusted_gross_income: 100000
         filing_status: SINGLE
-      expect: 3750
+      expect: 3_750
 
     - name: "Zero credit - neither requirement met"
       period: 2024
@@ -387,7 +682,7 @@ variable new_vehicle_credit:
         new_clean_vehicle_meets_battery_components_requirement: true
         adjusted_gross_income: 250000
         filing_status: JOINT
-      expect: 7500
+      expect: 7_500
 
     - name: "Ineligible - joint filer over income limit"
       period: 2024
@@ -429,7 +724,7 @@ variable new_vehicle_credit:
         new_clean_vehicle_meets_battery_components_requirement: true
         adjusted_gross_income: 100000
         filing_status: SINGLE
-      expect: 7500
+      expect: 7_500
 
     - name: "Ineligible - SUV over MSRP limit"
       period: 2024
@@ -485,7 +780,7 @@ variable new_vehicle_credit:
         new_clean_vehicle_meets_battery_components_requirement: true
         adjusted_gross_income: 200000
         filing_status: HEAD_OF_HOUSEHOLD
-      expect: 7500
+      expect: 7_500
 
     - name: "Ineligible - head of household over income limit"
       period: 2024
@@ -513,4 +808,4 @@ variable new_vehicle_credit:
         new_clean_vehicle_meets_battery_components_requirement: true
         adjusted_gross_income: 100000
         filing_status: SINGLE
-      expect: 7500
+      expect: 7_500

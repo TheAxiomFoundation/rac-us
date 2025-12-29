@@ -75,6 +75,39 @@ variable actc_ss_tax_formula:
     # Zero out if less than 3 children (vectorized)
     applies = (num_ctc_qualifying_children >= qualifying_children_threshold)
     return min(ss_excess, max_refundable) * applies
+  tests:
+    - name: "Family with 3 children, SS taxes exceed EITC"
+      period: 2024
+      inputs:
+        social_security_taxes: 6_000
+        earned_income_credit: 2_000
+        num_ctc_qualifying_children: 3
+        refundable_max: 1_700
+      expect: 4_000  # min(6000-2000, 1700*3) = min(4000, 5100) = 4000
+    - name: "Family with 4 children, capped at refundable max"
+      period: 2024
+      inputs:
+        social_security_taxes: 10_000
+        earned_income_credit: 1_000
+        num_ctc_qualifying_children: 4
+        refundable_max: 1_700
+      expect: 6_800  # min(10000-1000, 1700*4) = min(9000, 6800) = 6800
+    - name: "Family with 2 children, SS formula does not apply"
+      period: 2024
+      inputs:
+        social_security_taxes: 5_000
+        earned_income_credit: 1_000
+        num_ctc_qualifying_children: 2
+        refundable_max: 1_700
+      expect: 0  # Less than 3 children, formula returns 0
+    - name: "EITC exceeds SS taxes, zero result"
+      period: 2024
+      inputs:
+        social_security_taxes: 2_000
+        earned_income_credit: 3_000
+        num_ctc_qualifying_children: 3
+        refundable_max: 1_700
+      expect: 0  # max(0, 2000-3000) = 0
 
 variable additional_child_tax_credit:
   imports:
@@ -96,20 +129,52 @@ variable additional_child_tax_credit:
     return min(child_tax_credit_before_limit, max_formula)
   tests:
     - name: "Low income family, $30k earned income, 2 children"
-      period: 2024-01
+      period: 2024
       inputs:
         earned_income: 30_000
         num_ctc_qualifying_children: 2
         child_tax_credit_before_limit: 4_000
         social_security_taxes: 2_295
         earned_income_credit: 0
-      expect: 3400  # min(4000, 0.15*(30000-2500)) = min(4000, 4125) but capped at 1700*2
+        refundable_max: 1_700
+      expect: 3_400  # min(4000, 0.15*(30000-2500)) = min(4000, 4125) but capped at 1700*2
     - name: "Family with 3 children, SS tax formula higher"
-      period: 2024-01
+      period: 2024
       inputs:
         earned_income: 10_000
         num_ctc_qualifying_children: 3
         child_tax_credit_before_limit: 6_000
         social_security_taxes: 5_000
         earned_income_credit: 1_000
-      expect: 4000  # SS formula: min(max(0, 5000-1000), 1700*3) = min(4000, 5100) = 4000
+        refundable_max: 1_700
+      expect: 4_000  # SS formula: min(max(0, 5000-1000), 1700*3) = min(4000, 5100) = 4000
+    - name: "CTC before limit caps the ACTC"
+      period: 2024
+      inputs:
+        earned_income: 50_000
+        num_ctc_qualifying_children: 2
+        child_tax_credit_before_limit: 2_000
+        social_security_taxes: 3_825
+        earned_income_credit: 0
+        refundable_max: 1_700
+      expect: 2_000  # Earned formula = min(0.15*(50000-2500), 3400) = 3400, but CTC caps at 2000
+    - name: "Zero qualifying children, zero ACTC"
+      period: 2024
+      inputs:
+        earned_income: 40_000
+        num_ctc_qualifying_children: 0
+        child_tax_credit_before_limit: 0
+        social_security_taxes: 3_060
+        earned_income_credit: 0
+        refundable_max: 1_700
+      expect: 0  # No qualifying children means no CTC and no ACTC
+    - name: "Earned income below threshold"
+      period: 2024
+      inputs:
+        earned_income: 2_000
+        num_ctc_qualifying_children: 1
+        child_tax_credit_before_limit: 2_000
+        social_security_taxes: 153
+        earned_income_credit: 680
+        refundable_max: 1_700
+      expect: 0  # Earned income below $2500 threshold, earned formula = 0, SS formula = 0 (< 3 kids)

@@ -38,6 +38,44 @@ variable public_health_coverage_eligible:
   formula: |
     return medicaid_eligible or chip_eligible
   default: false
+  tests:
+    # Neither program eligible - not covered
+    - name: "Neither Medicaid nor CHIP eligible"
+      period: 2024-01
+      inputs:
+        medicaid_eligible: false
+        chip_eligible: false
+      expect: false
+
+    # Medicaid only - covered
+    - name: "Medicaid eligible only"
+      period: 2024-01
+      inputs:
+        medicaid_eligible: true
+        chip_eligible: false
+      expect: true
+
+    # CHIP only - covered
+    - name: "CHIP eligible only"
+      period: 2024-01
+      inputs:
+        medicaid_eligible: false
+        chip_eligible: true
+      expect: true
+
+    # Both programs eligible - covered
+    - name: "Both Medicaid and CHIP eligible"
+      period: 2024-01
+      inputs:
+        medicaid_eligible: true
+        chip_eligible: true
+      expect: true
+
+    # Edge case: defaults (both false) - not covered
+    - name: "Default values (no inputs specified)"
+      period: 2024-01
+      inputs: {}
+      expect: false
 
 input household_magi:
   entity: Household

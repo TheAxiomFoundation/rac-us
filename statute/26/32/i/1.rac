@@ -91,7 +91,7 @@ variable has_excessive_investment_income:
       inputs:
         interest_income: 5_000
         dividend_income: 4_000
-        tax_exempt_interest: 2000
+        tax_exempt_interest: 2_000
         net_rent_royalty_income: 1_000
         capital_gain_net_income: 500
         net_passive_income: 0
@@ -102,10 +102,10 @@ variable has_excessive_investment_income:
       inputs:
         interest_income: 10_000
         dividend_income: 5_000
-        tax_exempt_interest: 2000
+        tax_exempt_interest: 2_000
         net_rent_royalty_income: 3_000
         capital_gain_net_income: 5_000
-        net_passive_income: 2000
+        net_passive_income: 2_000
         disqualified_income_limit: 11_600
       expect: true  # Total = 27000, well over limit
     - name: "Only capital gains"

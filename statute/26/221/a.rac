@@ -117,6 +117,32 @@ variable student_loan_interest_phaseout_start:
         return phaseout_joint_start
     # Single, HOH, and Qualifying Widow(er) use single thresholds
     return phaseout_single_start
+  tests:
+    - name: "Single filer phaseout start threshold"
+      period: 2024-01
+      inputs:
+        filing_status: SINGLE
+      expect: 50_000
+    - name: "Married filing jointly phaseout start threshold"
+      period: 2024-01
+      inputs:
+        filing_status: MARRIED_FILING_JOINTLY
+      expect: 100_000
+    - name: "Head of household uses single threshold"
+      period: 2024-01
+      inputs:
+        filing_status: HEAD_OF_HOUSEHOLD
+      expect: 50_000
+    - name: "Qualifying widow(er) uses single threshold"
+      period: 2024-01
+      inputs:
+        filing_status: QUALIFYING_SURVIVING_SPOUSE
+      expect: 50_000
+    - name: "Married filing separately uses single threshold"
+      period: 2024-01
+      inputs:
+        filing_status: MARRIED_FILING_SEPARATELY
+      expect: 50_000
 
 variable student_loan_interest_phaseout_end:
   entity: TaxUnit
@@ -130,6 +156,32 @@ variable student_loan_interest_phaseout_end:
     if filing_status == MARRIED_FILING_JOINTLY:
         return phaseout_joint_end
     return phaseout_single_end
+  tests:
+    - name: "Single filer phaseout end threshold"
+      period: 2024-01
+      inputs:
+        filing_status: SINGLE
+      expect: 65_000
+    - name: "Married filing jointly phaseout end threshold"
+      period: 2024-01
+      inputs:
+        filing_status: MARRIED_FILING_JOINTLY
+      expect: 130_000
+    - name: "Head of household uses single threshold"
+      period: 2024-01
+      inputs:
+        filing_status: HEAD_OF_HOUSEHOLD
+      expect: 65_000
+    - name: "Qualifying widow(er) uses single threshold"
+      period: 2024-01
+      inputs:
+        filing_status: QUALIFYING_SURVIVING_SPOUSE
+      expect: 65_000
+    - name: "Married filing separately uses single threshold"
+      period: 2024-01
+      inputs:
+        filing_status: MARRIED_FILING_SEPARATELY
+      expect: 65_000
 
 variable student_loan_interest_phaseout_ratio:
   entity: TaxUnit

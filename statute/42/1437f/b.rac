@@ -15,6 +15,224 @@ text: |
   disability assistance expenses, dependent allowance, and elderly/disabled household
   allowance.]
 
+# =============================================================================
+# INPUT DECLARATIONS - All external inputs required for HCV calculations
+# =============================================================================
+
+# Employment and Self-Employment Income
+input employment_income:
+  entity: Household
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Employment Income"
+  description: "Gross wages, salaries, tips, and other employee compensation for all household members"
+  default: 0
+
+input self_employment_income:
+  entity: Household
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Self-Employment Income"
+  description: "Net income from self-employment, business, or farming for all household members"
+  default: 0
+
+# Government Benefits
+input social_security_benefits:
+  entity: Household
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Social Security Benefits"
+  description: "Social Security retirement, survivor, or disability insurance benefits (RSDI)"
+  default: 0
+
+input ssi_benefits:
+  entity: Household
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "SSI Benefits"
+  description: "Supplemental Security Income benefits"
+  default: 0
+
+input unemployment_benefits:
+  entity: Household
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Unemployment Benefits"
+  description: "Unemployment insurance compensation"
+  default: 0
+
+input disability_benefits:
+  entity: Household
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Disability Benefits"
+  description: "Disability benefits other than Social Security or SSI"
+  default: 0
+
+input workers_compensation:
+  entity: Household
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Workers Compensation"
+  description: "Workers compensation payments"
+  default: 0
+
+input welfare_assistance:
+  entity: Household
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Welfare Assistance"
+  description: "Public assistance or welfare payments (e.g., TANF)"
+  default: 0
+
+# Retirement and Investment Income
+input pension_income:
+  entity: Household
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Pension Income"
+  description: "Pension and retirement fund distributions"
+  default: 0
+
+input annuity_income:
+  entity: Household
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Annuity Income"
+  description: "Annuity payments received"
+  default: 0
+
+input interest_income:
+  entity: Household
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Interest Income"
+  description: "Interest earned from savings, bonds, and other investments"
+  default: 0
+
+input dividend_income:
+  entity: Household
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Dividend Income"
+  description: "Dividend payments from stocks and mutual funds"
+  default: 0
+
+input net_rental_income:
+  entity: Household
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Net Rental Income"
+  description: "Net income from rental property after expenses"
+  default: 0
+
+# Support and Transfers
+input alimony_received:
+  entity: Household
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Alimony Received"
+  description: "Alimony or spousal support received"
+  default: 0
+
+input child_support_received:
+  entity: Household
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Child Support Received"
+  description: "Child support payments received"
+  default: 0
+
+input regular_gifts_received:
+  entity: Household
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Regular Gifts Received"
+  description: "Regular monetary contributions or gifts from persons not residing in the unit"
+  default: 0
+
+# Expenses for Deductions
+input childcare_expense:
+  entity: Household
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Child Care Expense"
+  description: "Unreimbursed child care expenses enabling a family member to work or attend school"
+  default: 0
+
+input medical_expense:
+  entity: Household
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Medical Expense"
+  description: "Unreimbursed medical expenses for elderly or disabled families"
+  default: 0
+
+input disability_assistance_expense:
+  entity: Household
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Disability Assistance Expense"
+  description: "Unreimbursed expenses for attendant care or auxiliary apparatus enabling a family member to work"
+  default: 0
+
+# Household Characteristics
+input num_dependents:
+  entity: Household
+  period: Year
+  dtype: Integer
+  label: "Number of Dependents"
+  description: "Number of dependents (under 18, disabled, or full-time students, excluding head/spouse/co-head)"
+  default: 0
+
+input has_elderly_disabled:
+  entity: Household
+  period: Year
+  dtype: Boolean
+  label: "Has Elderly or Disabled Member"
+  description: "Whether head, spouse, or sole member is age 62+ or has a disability"
+  default: false
+
+input has_disability_expense:
+  entity: Household
+  period: Year
+  dtype: Boolean
+  label: "Has Disability Assistance Expense"
+  description: "Whether household has qualifying disability assistance expenses enabling work"
+  default: false
+
+# Constants
+input months_per_year:
+  entity: Household
+  period: Year
+  dtype: Integer
+  label: "Months Per Year"
+  description: "Number of months in a year (constant value of 12)"
+  default: 12
+
+# =============================================================================
+# VARIABLE DECLARATIONS - Calculated HCV deductions and income
+# =============================================================================
+
 variable hcv_childcare_deduction:
   entity: Household
   period: Year

@@ -58,6 +58,15 @@ variable is_roth_death_distribution:
     # Placeholder: Would require estate information
     return False
   default: false
+  tests:
+    - name: "Death distribution - placeholder returns false"
+      period: 2024
+      inputs: {}
+      expect: false  # Placeholder implementation
+    - name: "Death distribution - beneficiary scenario (placeholder)"
+      period: 2024
+      inputs: {}
+      expect: false  # Would be true when formula tracks beneficiary status
 
 # Roth IRA owner disability per 408A(d)(2)(A)(iii)
 variable is_roth_owner_disabled:
@@ -70,6 +79,15 @@ variable is_roth_owner_disabled:
     # Placeholder: Would require disability determination
     return False
   default: false
+  tests:
+    - name: "Owner disabled - placeholder returns false"
+      period: 2024
+      inputs: {}
+      expect: false  # Placeholder implementation
+    - name: "Owner disabled - disability scenario (placeholder)"
+      period: 2024
+      inputs: {}
+      expect: false  # Would be true when formula tracks disability per 72(m)(7)
 
 # Roth IRA first-time homebuyer distribution per 408A(d)(2)(A)(iv)
 variable roth_first_home_distribution:
@@ -83,6 +101,15 @@ variable roth_first_home_distribution:
     # Placeholder: Would require tracking lifetime first-home distributions
     return 0
   default: 0
+  tests:
+    - name: "First home distribution - placeholder returns zero"
+      period: 2024
+      inputs: {}
+      expect: 0  # Placeholder implementation
+    - name: "First home distribution - max $10,000 lifetime (placeholder)"
+      period: 2024
+      inputs: {}
+      expect: 0  # Would return up to 10_000 when formula tracks distributions
 
 variable is_qualified_roth_distribution:
   imports:

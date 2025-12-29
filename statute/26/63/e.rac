@@ -53,6 +53,49 @@ variable deduction_choice:
     if is_ineligible_for_standard_deduction:
       return itemized
     return max(std, itemized)
+  tests:
+    - name: "Standard deduction higher than itemized"
+      period: 2024-01
+      inputs:
+        is_ineligible_for_standard_deduction: false
+        standard_deduction: 14_600
+        itemized_taxable_income_deductions: 10_000
+      expect: 14_600
+    - name: "Itemized deductions higher than standard"
+      period: 2024-01
+      inputs:
+        is_ineligible_for_standard_deduction: false
+        standard_deduction: 14_600
+        itemized_taxable_income_deductions: 25_000
+      expect: 25_000
+    - name: "Standard and itemized equal - uses standard"
+      period: 2024-01
+      inputs:
+        is_ineligible_for_standard_deduction: false
+        standard_deduction: 12_000
+        itemized_taxable_income_deductions: 12_000
+      expect: 12_000
+    - name: "Ineligible for standard deduction - must use itemized"
+      period: 2024-01
+      inputs:
+        is_ineligible_for_standard_deduction: true
+        standard_deduction: 14_600
+        itemized_taxable_income_deductions: 8_000
+      expect: 8_000
+    - name: "Ineligible for standard - itemized even when zero"
+      period: 2024-01
+      inputs:
+        is_ineligible_for_standard_deduction: true
+        standard_deduction: 14_600
+        itemized_taxable_income_deductions: 0
+      expect: 0
+    - name: "Zero itemized deductions - uses standard"
+      period: 2024-01
+      inputs:
+        is_ineligible_for_standard_deduction: false
+        standard_deduction: 14_600
+        itemized_taxable_income_deductions: 0
+      expect: 14_600
 
 variable uses_standard_deduction:
   entity: TaxUnit

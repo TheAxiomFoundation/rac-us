@@ -16,6 +16,64 @@ gross income or net gain.
 with respect to the taxpayer, or
 (B) such trade or business consists of trading in financial instruments or commodities.
 """
+
+# Input variables for Net Investment Income Tax calculation
+# These represent income components subject to NIIT per Section 1411(c)
+
+input taxable_interest_income:
+  entity: Person
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Taxable Interest Income"
+  description: "Interest income subject to tax (excludes tax-exempt municipal bond interest)"
+  default: 0
+
+input dividend_income:
+  entity: Person
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Dividend Income"
+  description: "Gross dividend income including qualified and non-qualified dividends"
+  default: 0
+
+input royalty_income:
+  entity: Person
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Royalty Income"
+  description: "Gross royalty income from intellectual property, mineral rights, etc."
+  default: 0
+
+input annuity_income:
+  entity: Person
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Annuity Income"
+  description: "Taxable annuity income"
+  default: 0
+
+input passive_business_income:
+  entity: Person
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Passive Business Income"
+  description: "Income from passive activities per Section 469"
+  default: 0
+
+input loss_limited_net_capital_gains:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Loss-Limited Net Capital Gains"
+  description: "Net capital gains after applying the $3,000 capital loss limitation"
+  default: 0
+
 variable net_investment_income:
   imports:
     - 26/32/i/2/C#rental_income
