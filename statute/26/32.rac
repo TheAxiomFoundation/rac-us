@@ -155,7 +155,7 @@ parameter earned_income_cap_0:
     2020: 4360
     2021: 4425
     2022: 4560
-    2023: 4880
+    2023: 7843
     2024: 8260
 
 parameter earned_income_cap_1:
@@ -169,7 +169,7 @@ parameter earned_income_cap_1:
     2020: 6550
     2021: 6660
     2022: 6935
-    2023: 7430
+    2023: 11750
     2024: 12390
 
 parameter earned_income_cap_2:
@@ -183,7 +183,7 @@ parameter earned_income_cap_2:
     2020: 9200
     2021: 9330
     2022: 9750
-    2023: 10460
+    2023: 16510
     2024: 17400
 
 parameter phaseout_rate_0:
@@ -218,7 +218,7 @@ parameter phaseout_start_0:
     2020: 5450
     2021: 5540
     2022: 5750
-    2023: 6160
+    2023: 9800
     2024: 10330
 
 parameter phaseout_start_1:
@@ -232,7 +232,7 @@ parameter phaseout_start_1:
     2020: 12010
     2021: 12210
     2022: 12750
-    2023: 13660
+    2023: 21560
     2024: 22720
 
 parameter joint_adjustment:
@@ -246,7 +246,7 @@ parameter joint_adjustment:
     2020: 5160
     2021: 5240
     2022: 5450
-    2023: 5840
+    2023: 6570
     2024: 6920
 
 variable eitc_standalone:
