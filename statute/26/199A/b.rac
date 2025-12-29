@@ -41,3 +41,69 @@ variable w2_wage_limitation:
     wages_plus_property = (qbi_w2_wages * w2_wage_property_rate) + (qbi_ubia * ubia_rate)
     return max(wages_only, wages_plus_property)
   default: 0
+  tests:
+    # ============================================================================
+    # W-2 WAGE LIMITATION TESTS - 26 USC 199A(b)(2)(B)
+    # Tests the greater of:
+    #   (i) 50% of W-2 wages, OR
+    #   (ii) 25% of W-2 wages + 2.5% of UBIA
+    # ============================================================================
+    - name: "Wages-only test dominates when no property"
+      period: 2024
+      inputs:
+        qbi_w2_wages: 100_000
+        qbi_ubia: 0
+        w2_wage_limit_rate: 0.50
+        w2_wage_property_rate: 0.25
+        ubia_rate: 0.025
+      expect: 50_000  # max(0.50 * 100_000, 0.25 * 100_000 + 0.025 * 0) = max(50_000, 25_000) = 50_000
+
+    - name: "Property-based test dominates with large UBIA"
+      period: 2024
+      inputs:
+        qbi_w2_wages: 100_000
+        qbi_ubia: 2_000_000
+        w2_wage_limit_rate: 0.50
+        w2_wage_property_rate: 0.25
+        ubia_rate: 0.025
+      expect: 75_000  # max(0.50 * 100_000, 0.25 * 100_000 + 0.025 * 2_000_000) = max(50_000, 25_000 + 50_000) = 75_000
+
+    - name: "Zero wages with property - UBIA only contributes"
+      period: 2024
+      inputs:
+        qbi_w2_wages: 0
+        qbi_ubia: 1_000_000
+        w2_wage_limit_rate: 0.50
+        w2_wage_property_rate: 0.25
+        ubia_rate: 0.025
+      expect: 25_000  # max(0.50 * 0, 0.25 * 0 + 0.025 * 1_000_000) = max(0, 25_000) = 25_000
+
+    - name: "Zero wages and zero property - limitation is zero"
+      period: 2024
+      inputs:
+        qbi_w2_wages: 0
+        qbi_ubia: 0
+        w2_wage_limit_rate: 0.50
+        w2_wage_property_rate: 0.25
+        ubia_rate: 0.025
+      expect: 0  # max(0, 0) = 0
+
+    - name: "Breakeven point where both methods equal"
+      period: 2024
+      inputs:
+        qbi_w2_wages: 100_000
+        qbi_ubia: 1_000_000
+        w2_wage_limit_rate: 0.50
+        w2_wage_property_rate: 0.25
+        ubia_rate: 0.025
+      expect: 50_000  # max(0.50 * 100_000, 0.25 * 100_000 + 0.025 * 1_000_000) = max(50_000, 50_000) = 50_000
+
+    - name: "Realistic business scenario - moderate wages and property"
+      period: 2024
+      inputs:
+        qbi_w2_wages: 200_000
+        qbi_ubia: 500_000
+        w2_wage_limit_rate: 0.50
+        w2_wage_property_rate: 0.25
+        ubia_rate: 0.025
+      expect: 100_000  # max(0.50 * 200_000, 0.25 * 200_000 + 0.025 * 500_000) = max(100_000, 50_000 + 12_500) = 100_000

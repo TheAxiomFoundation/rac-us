@@ -35,3 +35,64 @@ variable initial_amount:
     # All other cases (single, HoH, surviving spouse, or joint with one qualified): $5,000
     return initial_amount_single
   default: 0
+  tests:
+    - name: "No qualified individuals, no initial amount"
+      period: 2024-01-01
+      inputs:
+        num_sec22_qualified_individuals: 0
+        filing_status: SINGLE
+        initial_amount_single: 5_000
+        initial_amount_joint_both: 7_500
+        initial_amount_separate: 3_750
+        qualified_individuals_joint_both_threshold: 2
+      expect: 0
+    - name: "Single filer with one qualified individual"
+      period: 2024-01-01
+      inputs:
+        num_sec22_qualified_individuals: 1
+        filing_status: SINGLE
+        initial_amount_single: 5_000
+        initial_amount_joint_both: 7_500
+        initial_amount_separate: 3_750
+        qualified_individuals_joint_both_threshold: 2
+      expect: 5_000
+    - name: "Head of household with one qualified individual"
+      period: 2024-01-01
+      inputs:
+        num_sec22_qualified_individuals: 1
+        filing_status: HEAD_OF_HOUSEHOLD
+        initial_amount_single: 5_000
+        initial_amount_joint_both: 7_500
+        initial_amount_separate: 3_750
+        qualified_individuals_joint_both_threshold: 2
+      expect: 5_000
+    - name: "Married filing jointly, one spouse qualified"
+      period: 2024-01-01
+      inputs:
+        num_sec22_qualified_individuals: 1
+        filing_status: JOINT
+        initial_amount_single: 5_000
+        initial_amount_joint_both: 7_500
+        initial_amount_separate: 3_750
+        qualified_individuals_joint_both_threshold: 2
+      expect: 5_000
+    - name: "Married filing jointly, both spouses qualified"
+      period: 2024-01-01
+      inputs:
+        num_sec22_qualified_individuals: 2
+        filing_status: JOINT
+        initial_amount_single: 5_000
+        initial_amount_joint_both: 7_500
+        initial_amount_separate: 3_750
+        qualified_individuals_joint_both_threshold: 2
+      expect: 7_500
+    - name: "Married filing separately"
+      period: 2024-01-01
+      inputs:
+        num_sec22_qualified_individuals: 1
+        filing_status: SEPARATE
+        initial_amount_single: 5_000
+        initial_amount_joint_both: 7_500
+        initial_amount_separate: 3_750
+        qualified_individuals_joint_both_threshold: 2
+      expect: 3_750

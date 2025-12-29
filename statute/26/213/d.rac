@@ -41,3 +41,51 @@ variable qualified_medical_expenses:
     # Total qualifying expenses
     return unreimbursed + ltc_allowed
   default: 0
+  tests:
+    - name: "No medical expenses"
+      period: 2024
+      inputs:
+        medical_expenses_paid: 0
+        insurance_reimbursements: 0
+        long_term_care_premiums: 0
+      expect: 0
+
+    - name: "Unreimbursed medical expenses only"
+      period: 2024
+      inputs:
+        medical_expenses_paid: 15_000
+        insurance_reimbursements: 5_000
+        long_term_care_premiums: 0
+      expect: 10_000
+
+    - name: "Fully reimbursed medical expenses"
+      period: 2024
+      inputs:
+        medical_expenses_paid: 8_000
+        insurance_reimbursements: 8_000
+        long_term_care_premiums: 0
+      expect: 0
+
+    - name: "Over-reimbursed expenses floor at zero"
+      period: 2024
+      inputs:
+        medical_expenses_paid: 5_000
+        insurance_reimbursements: 7_000
+        long_term_care_premiums: 0
+      expect: 0
+
+    - name: "Long-term care premiums with medical expenses"
+      period: 2024
+      inputs:
+        medical_expenses_paid: 20_000
+        insurance_reimbursements: 12_000
+        long_term_care_premiums: 4_710
+      expect: 12_710
+
+    - name: "Long-term care premiums only"
+      period: 2024
+      inputs:
+        medical_expenses_paid: 0
+        insurance_reimbursements: 0
+        long_term_care_premiums: 5_880
+      expect: 5_880

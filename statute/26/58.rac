@@ -28,3 +28,51 @@ variable denial_of_losses:
     # For now, we assume this is provided as an input
     return is_material_participant_farming
   default: 0
+  tests:
+    - name: "Non-material participant - no adjustment"
+      period: 2024
+      inputs:
+        is_material_participant_farming: false
+        filing_status: "SINGLE"
+        adjusted_gross_income: 75_000
+      expect: false
+
+    - name: "Material participant in farming"
+      period: 2024
+      inputs:
+        is_material_participant_farming: true
+        filing_status: "SINGLE"
+        adjusted_gross_income: 150_000
+      expect: true
+
+    - name: "Joint filers - not material participant"
+      period: 2024
+      inputs:
+        is_material_participant_farming: false
+        filing_status: "JOINT"
+        adjusted_gross_income: 250_000
+      expect: false
+
+    - name: "Joint filers - material participant"
+      period: 2024
+      inputs:
+        is_material_participant_farming: true
+        filing_status: "JOINT"
+        adjusted_gross_income: 500_000
+      expect: true
+
+    - name: "Head of household - no farming participation"
+      period: 2024
+      inputs:
+        is_material_participant_farming: false
+        filing_status: "HEAD_OF_HOUSEHOLD"
+        adjusted_gross_income: 100_000
+      expect: false
+
+    - name: "High income taxpayer with material participation"
+      period: 2024
+      inputs:
+        is_material_participant_farming: true
+        filing_status: "SINGLE"
+        adjusted_gross_income: 1_000_000
+      expect: true
