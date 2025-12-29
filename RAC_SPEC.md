@@ -43,6 +43,7 @@ All declarations are named (no block-style grouping):
 | `input` | `input name:` | User-provided input |
 | `enum` | `enum name:` | Enumeration type |
 | `function` | `function name:` | Helper function |
+| `indexing_rule` | `indexing_rule name:` | Inflation adjustment rule |
 
 ## Parameter Attributes
 
@@ -79,6 +80,32 @@ variable snap_allotment:
     - name: "Basic case"  # Optional
       inputs: {household_size: 4, snap_net_income: 500}
       expect: 823
+```
+
+## Indexing Rule Attributes
+
+```yaml
+indexing_rule standard_deduction_inflation:
+  description: "Cost-of-living adjustment for standard deduction"
+  base_year: 1987
+  rounding: 50      # round down to nearest $50
+  series: bls/chained_cpi_u  # resolves to arch.time_series
+```
+
+| Attribute | Required | Description |
+|-----------|----------|-------------|
+| `description` | Yes | Human-readable description |
+| `base_year` | Yes | Year from which indexing begins |
+| `rounding` | Yes | Round down to nearest N dollars |
+| `series` | Yes | Path to economic series in arch |
+
+Parameters reference indexing rules via `indexed_by`:
+
+```yaml
+parameter basic_single:
+  indexed_by: 26/63/c/4  # path to file containing indexing_rule
+  values:
+    1988-01-01: 3000  # base statutory value
 ```
 
 ## Import Syntax
