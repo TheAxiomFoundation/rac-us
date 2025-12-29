@@ -23,11 +23,11 @@ for "$600".
 
 variable additional_standard_deduction:
   imports:
-    - 26/63/f/1/additional_aged_unmarried#additional_aged_unmarried
-    - 26/63/f/1/additional_aged_married#additional_aged_married
-    - 26/63/f/2/additional_blind_unmarried#additional_blind_unmarried
-    - 26/63/f/2/additional_blind_married#additional_blind_married
-    - 26/63/f/1/aged_threshold#aged_threshold
+    - 26/63/f/1#additional_aged_unmarried
+    - 26/63/f/1#additional_aged_married
+    - 26/63/f/2#additional_blind_unmarried
+    - 26/63/f/2#additional_blind_married
+    - 26/63/f/1#aged_threshold
     - 26/1#filing_status
   entity: TaxUnit
   period: Year

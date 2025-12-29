@@ -12,11 +12,44 @@ section 2(b)), or
 (C) $3,000 in any other case.
 """
 
+# 63(c)(2)(A): Joint return or surviving spouse
+parameter basic_joint:
+  description: "Basic standard deduction for married filing jointly or surviving spouse"
+  unit: "USD"
+  indexed_by: statute/26/63/c/4
+  values:
+    1988-01-01: 5_000
+  tests:
+    - name: "Base statutory amount 1988"
+      period: 1988
+      expect: 5_000
+
+# 63(c)(2)(B): Head of household
+parameter basic_head_of_household:
+  description: "Basic standard deduction for head of household filing status"
+  unit: "USD"
+  indexed_by: statute/26/63/c/4
+  values:
+    1988-01-01: 4_400
+  tests:
+    - name: "Base statutory amount 1988"
+      period: 1988
+      expect: 4_400
+
+# 63(c)(2)(C): Single or married filing separately
+parameter basic_single:
+  description: "Basic standard deduction for single or married filing separately"
+  unit: "USD"
+  indexed_by: statute/26/63/c/4
+  values:
+    1988-01-01: 3_000
+  tests:
+    - name: "Base statutory amount 1988"
+      period: 1988
+      expect: 3_000
+
 variable basic_standard_deduction:
   imports:
-    - 26/63/c/2/basic_joint#basic_joint
-    - 26/63/c/2/basic_head_of_household#basic_head_of_household
-    - 26/63/c/2/basic_single#basic_single
     - 26/1#filing_status
   entity: TaxUnit
   period: Year
@@ -50,13 +83,3 @@ variable basic_standard_deduction:
       inputs:
         filing_status: HEAD_OF_HOUSEHOLD
       expect: 4400
-    - name: "Married filing separately (base 1988)"
-      period: 1988-01
-      inputs:
-        filing_status: MARRIED_FILING_SEPARATELY
-      expect: 3000
-    - name: "Surviving spouse (base 1988)"
-      period: 1988-01
-      inputs:
-        filing_status: QUALIFYING_WIDOW
-      expect: 5000

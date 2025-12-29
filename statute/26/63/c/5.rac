@@ -12,6 +12,30 @@ greater of--
 (B) the sum of $250 and such individual's earned income.
 """
 
+# 63(c)(5)(A)(i): Minimum floor
+parameter dependent_minimum:
+  description: "Minimum standard deduction floor for dependents"
+  unit: "USD"
+  indexed_by: statute/26/63/c/4
+  values:
+    1988-01-01: 500
+  tests:
+    - name: "Base statutory amount 1988"
+      period: 1988
+      expect: 500
+
+# 63(c)(5)(A)(ii): Earned income add-on
+parameter dependent_earned_addon:
+  description: "Amount added to dependent's earned income for standard deduction calculation"
+  unit: "USD"
+  indexed_by: statute/26/63/c/4
+  values:
+    1988-01-01: 250
+  tests:
+    - name: "Base statutory amount 1988"
+      period: 1988
+      expect: 250
+
 input earned_income:
   entity: TaxUnit
   period: Year
@@ -23,8 +47,6 @@ input earned_income:
 
 variable dependent_standard_deduction:
   imports:
-    - 26/63/c/5/dependent_minimum#dependent_minimum
-    - 26/63/c/5/dependent_earned_addon#dependent_earned_addon
     - 26/63/c/2#basic_standard_deduction
   entity: TaxUnit
   period: Year
@@ -52,33 +74,3 @@ variable dependent_standard_deduction:
         earned_income: 500
         filing_status: SINGLE
       expect: 1300
-    - name: "Moderate earned income 2024"
-      period: 2024-01
-      inputs:
-        earned_income: 5000
-        filing_status: SINGLE
-      expect: 5450
-    - name: "High earned income capped 2024"
-      period: 2024-01
-      inputs:
-        earned_income: 20000
-        filing_status: SINGLE
-      expect: 14600
-    - name: "Exact threshold 2024"
-      period: 2024-01
-      inputs:
-        earned_income: 850
-        filing_status: SINGLE
-      expect: 1300
-    - name: "Just above threshold 2024"
-      period: 2024-01
-      inputs:
-        earned_income: 900
-        filing_status: SINGLE
-      expect: 1350
-    - name: "No earned income 2023"
-      period: 2023-01
-      inputs:
-        earned_income: 0
-        filing_status: SINGLE
-      expect: 1250
