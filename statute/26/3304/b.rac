@@ -1,3 +1,20 @@
+text: """
+26 USC 3304(b) - Extended unemployment compensation
+
+The Secretary shall make no certification for payment to any State unless
+he finds that the law of such State meets the requirements of this section
+regarding extended benefits programs.
+"""
+
+input base_period_wages:
+  entity: Person
+  period: Year
+  dtype: Money
+  unit: "USD"
+  label: "Base Period Wages"
+  description: "Total wages earned during the base period (first 4 of last 5 completed calendar quarters)"
+  default: 0
+
 variable eligibility:
   entity: Person
   period: Year
@@ -12,3 +29,34 @@ variable eligibility:
     # This calculation would typically use quarterly wage data
     return base_period_wages
   default: 0
+  tests:
+    - name: "No base period wages"
+      period: 2024
+      inputs:
+        base_period_wages: 0
+      expect: 0
+    - name: "Low base period wages"
+      period: 2024
+      inputs:
+        base_period_wages: 5_000
+      expect: 5_000
+    - name: "Moderate base period wages"
+      period: 2024
+      inputs:
+        base_period_wages: 25_000
+      expect: 25_000
+    - name: "Standard base period wages"
+      period: 2024
+      inputs:
+        base_period_wages: 50_000
+      expect: 50_000
+    - name: "High base period wages"
+      period: 2024
+      inputs:
+        base_period_wages: 100_000
+      expect: 100_000
+    - name: "Very high base period wages"
+      period: 2024
+      inputs:
+        base_period_wages: 250_000
+      expect: 250_000

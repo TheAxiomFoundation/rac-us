@@ -7,7 +7,44 @@ this section, the term 'alimony or separate maintenance payment' means
 any alimony or separate maintenance payment (as defined in section 71(b))
 which is includible in the gross income of the recipient under section 71.
 (10) Alimony.—The deduction allowed by section 215.
+
+Note: Per the Tax Cuts and Jobs Act of 2017 (TCJA), for divorce or
+separation instruments executed after December 31, 2018, alimony payments
+are not deductible by the payer and not includible in the recipient's income.
+This change applies to instruments executed after 2018 and to instruments
+modified after 2018 if the modification expressly provides that the new
+rules apply.
 """
+
+# 26 USC 215(a) - Alimony deduction rate
+# For pre-2019 agreements: 100% deductible
+# For post-2018 agreements: 0% (TCJA eliminated deduction)
+parameter alimony_deduction_rate:
+  description: "Rate at which alimony paid is deductible (1.0 for pre-2019 agreements)"
+  unit: "Rate"
+  reference: "26 USC 215(a), TCJA P.L. 115-97"
+  values:
+    2024-01-01: 1.0
+    2019-01-01: 1.0
+    2000-01-01: 1.0
+
+input alimony_paid:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: "USD"
+  label: "Alimony Paid"
+  description: "Total alimony or separate maintenance payments made during the tax year"
+  default: 0
+
+input is_pre_2019_divorce_agreement_payer:
+  entity: TaxUnit
+  period: Year
+  dtype: Boolean
+  label: "Pre-2019 Divorce Agreement Payer"
+  description: "Whether the taxpayer pays alimony under a divorce or separation instrument executed before 2019"
+  default: false
+
 variable alimony_deduction:
   imports: [26/1#filing_status]
   entity: TaxUnit
@@ -20,9 +57,46 @@ variable alimony_deduction:
   formula: |
     # Per TCJA: Only pre-2019 divorce instruments allow alimony deduction
     if not is_pre_2019_divorce_agreement_payer:
-    return 0
+        return 0
     # Per 26 USC 215(a): Alimony paid is deductible for pre-2019 agreements
     # The alimony_deduction_rate parameter confirms deduction rules by year
     # but the controlling factor is the agreement date, not the tax year
     return alimony_paid * alimony_deduction_rate
   default: 0
+  tests:
+    - name: "Pre-2019 agreement with $12,000 annual alimony"
+      period: 2024
+      inputs:
+        is_pre_2019_divorce_agreement_payer: true
+        alimony_paid: 12_000
+      expect: 12_000
+    - name: "Pre-2019 agreement with $24,000 annual alimony"
+      period: 2024
+      inputs:
+        is_pre_2019_divorce_agreement_payer: true
+        alimony_paid: 24_000
+      expect: 24_000
+    - name: "Post-2018 agreement gets no deduction per TCJA"
+      period: 2024
+      inputs:
+        is_pre_2019_divorce_agreement_payer: false
+        alimony_paid: 18_000
+      expect: 0
+    - name: "Pre-2019 agreement with zero alimony paid"
+      period: 2024
+      inputs:
+        is_pre_2019_divorce_agreement_payer: true
+        alimony_paid: 0
+      expect: 0
+    - name: "Post-2018 agreement with large payment still gets zero"
+      period: 2024
+      inputs:
+        is_pre_2019_divorce_agreement_payer: false
+        alimony_paid: 50_000
+      expect: 0
+    - name: "Pre-2019 agreement with $6,000 annual alimony (smaller amount)"
+      period: 2024
+      inputs:
+        is_pre_2019_divorce_agreement_payer: true
+        alimony_paid: 6_000
+      expect: 6_000

@@ -12,12 +12,77 @@ taxpayer's earned income derived by the taxpayer from the trade
 or business with respect to which the plan providing the medical
 care coverage is established.
 """
-variable self_employed_health_insurance:
-  imports: [26/1402/a#self_employment_income]
+
+input self_employed_health_insurance_premiums:
   entity: TaxUnit
   period: Year
   dtype: Money
   unit: "USD"
-  label: "Total Self-Employed Health Insurance Deduction"
-  description: "Combined self-employed health insurance deduction for tax unit"
-  formula: return self_employment_income > 0
+  label: "Self-Employed Health Insurance Premiums Paid"
+  description: "Amount paid for health insurance by a self-employed individual"
+  default: 0
+
+input self_employment_earned_income:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: "USD"
+  label: "Self-Employment Earned Income"
+  description: "Earned income from trade or business for which health plan is established"
+  default: 0
+
+variable self_employed_health_insurance:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: "USD"
+  label: "Self-Employed Health Insurance Deduction"
+  description: "Deduction for health insurance costs of self-employed individuals, limited to earned income from self-employment"
+  syntax: python
+  formula: |
+    # No deduction if no premiums paid
+    if self_employed_health_insurance_premiums <= 0:
+        return 0
+    # No deduction if no self-employment income
+    if self_employment_earned_income <= 0:
+        return 0
+    # Deduction is the lesser of premiums paid or self-employment earned income
+    return min(self_employed_health_insurance_premiums, self_employment_earned_income)
+  default: 0
+  tests:
+    - name: "No premiums paid"
+      period: 2024
+      inputs:
+        self_employed_health_insurance_premiums: 0
+        self_employment_earned_income: 50_000
+      expect: 0
+    - name: "No self-employment income"
+      period: 2024
+      inputs:
+        self_employed_health_insurance_premiums: 12_000
+        self_employment_earned_income: 0
+      expect: 0
+    - name: "Premiums less than earned income (full deduction)"
+      period: 2024
+      inputs:
+        self_employed_health_insurance_premiums: 15_000
+        self_employment_earned_income: 75_000
+      expect: 15_000
+    - name: "Premiums exceed earned income (limited deduction)"
+      period: 2024
+      inputs:
+        self_employed_health_insurance_premiums: 25_000
+        self_employment_earned_income: 18_000
+      expect: 18_000
+    - name: "Premiums equal earned income"
+      period: 2024
+      inputs:
+        self_employed_health_insurance_premiums: 30_000
+        self_employment_earned_income: 30_000
+      expect: 30_000
+    - name: "Low-income self-employed with family coverage"
+      period: 2024
+      inputs:
+        self_employed_health_insurance_premiums: 24_000
+        self_employment_earned_income: 10_000
+      expect: 10_000

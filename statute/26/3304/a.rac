@@ -1,10 +1,9 @@
 variable coverage:
   entity: TaxUnit
   period: Year
-  dtype: Money
-  unit: "USD"
-  label: "FUTA tax liability"
-  description: "Federal unemployment tax owed by employer per 26 USC 3301"
+  dtype: Boolean
+  label: "FUTA Coverage Status"
+  description: "Whether employment is covered under FUTA per 26 USC 3304(a)"
   syntax: python
   formula: |
     # Most employment is covered; exceptions defined in 3306(c)
@@ -15,4 +14,55 @@ variable coverage:
     # - Federal government employees (separate system)
     # - Certain nonprofit employees (optional coverage)
     return is_employee and not is_excluded_employment
-  default: 0
+  default: false
+  tests:
+    # ============================================================================
+    # STANDARD COVERED EMPLOYMENT TESTS
+    # ============================================================================
+    - name: "Standard W-2 employee is covered"
+      period: 2024
+      inputs:
+        is_employee: true
+        is_excluded_employment: false
+      expect: true
+
+    - name: "Regular private sector employee with $50_000 wages"
+      period: 2024
+      inputs:
+        is_employee: true
+        is_excluded_employment: false
+      expect: true
+
+    # ============================================================================
+    # EXCLUDED EMPLOYMENT TESTS (per 26 USC 3306(c))
+    # ============================================================================
+    - name: "Self-employed individual not covered"
+      period: 2024
+      inputs:
+        is_employee: false
+        is_excluded_employment: false
+      expect: false
+
+    - name: "Federal government employee excluded"
+      period: 2024
+      inputs:
+        is_employee: true
+        is_excluded_employment: true
+      expect: false
+
+    - name: "Agricultural worker in excluded category"
+      period: 2024
+      inputs:
+        is_employee: true
+        is_excluded_employment: true
+      expect: false
+
+    # ============================================================================
+    # EDGE CASES
+    # ============================================================================
+    - name: "Non-employee with excluded employment flag"
+      period: 2024
+      inputs:
+        is_employee: false
+        is_excluded_employment: true
+      expect: false

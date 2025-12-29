@@ -29,3 +29,101 @@ variable niit_standalone:
     taxable_amount = min(net_investment_income, excess_magi)
     return niit_rate * taxable_amount
   default: 0
+  tests:
+    # ========================================
+    # Basic cases - income below threshold
+    # ========================================
+    - name: "Single filer below threshold - no NIIT"
+      period: 2024
+      inputs:
+        filing_status: SINGLE
+        adjusted_gross_income: 175_000
+        foreign_earned_income_exclusion: 0
+        net_investment_income: 40_000
+        niit_rate: 0.038
+        threshold_other: 200_000
+      # MAGI $175k < threshold $200k, no excess MAGI
+      expect: 0
+
+    # ========================================
+    # Above threshold cases
+    # ========================================
+    - name: "Single filer above threshold - NII is limiting factor"
+      period: 2024
+      inputs:
+        filing_status: SINGLE
+        adjusted_gross_income: 350_000
+        foreign_earned_income_exclusion: 0
+        net_investment_income: 60_000
+        niit_rate: 0.038
+        threshold_other: 200_000
+      # MAGI excess: $350k - $200k = $150k
+      # NII: $60k (limiting factor since $60k < $150k)
+      # Tax: $60,000 * 0.038 = $2,280
+      expect: 2_280
+
+    - name: "Joint filers above threshold - excess MAGI is limiting factor"
+      period: 2024
+      inputs:
+        filing_status: JOINT
+        adjusted_gross_income: 290_000
+        foreign_earned_income_exclusion: 0
+        net_investment_income: 100_000
+        niit_rate: 0.038
+        threshold_joint: 250_000
+      # MAGI excess: $290k - $250k = $40k (limiting factor since $40k < $100k)
+      # NII: $100k
+      # Tax: $40,000 * 0.038 = $1,520
+      expect: 1_520
+
+    # ========================================
+    # Filing status with lower threshold
+    # ========================================
+    - name: "Married filing separately - lower $125k threshold"
+      period: 2024
+      inputs:
+        filing_status: SEPARATE
+        adjusted_gross_income: 200_000
+        foreign_earned_income_exclusion: 0
+        net_investment_income: 55_000
+        niit_rate: 0.038
+        threshold_separate: 125_000
+      # MFS uses $125k threshold (half of joint)
+      # MAGI excess: $200k - $125k = $75k
+      # NII: $55k (limiting factor)
+      # Tax: $55,000 * 0.038 = $2,090
+      expect: 2_090
+
+    # ========================================
+    # Foreign earned income exclusion case
+    # ========================================
+    - name: "FEIE adds to MAGI pushing over threshold"
+      period: 2024
+      inputs:
+        filing_status: SINGLE
+        adjusted_gross_income: 160_000
+        foreign_earned_income_exclusion: 80_000
+        net_investment_income: 25_000
+        niit_rate: 0.038
+        threshold_other: 200_000
+      # MAGI: $160k AGI + $80k FEIE = $240k
+      # MAGI excess: $240k - $200k = $40k
+      # NII: $25k (limiting factor)
+      # Tax: $25,000 * 0.038 = $950
+      expect: 950
+
+    # ========================================
+    # Edge case - exactly at threshold
+    # ========================================
+    - name: "Joint filers exactly at threshold - no NIIT"
+      period: 2024
+      inputs:
+        filing_status: JOINT
+        adjusted_gross_income: 250_000
+        foreign_earned_income_exclusion: 0
+        net_investment_income: 75_000
+        niit_rate: 0.038
+        threshold_joint: 250_000
+      # MAGI $250k = threshold $250k, excess = $0
+      # No tax regardless of NII amount
+      expect: 0
