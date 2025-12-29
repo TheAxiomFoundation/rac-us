@@ -1,4 +1,70 @@
+# 26 USC 32(b)(2)(B) - Joint Return Adjustment for Phaseout
+
+text: """
+(B) Joint returns.—
+In the case of a joint return filed by an eligible individual and such
+individual's spouse, the phaseout amount determined under subparagraph (A)
+shall be increased by $3,000.
+(Note: Base amount of $3,000 is from 2008 enactment per P.L. 110-351,
+adjusted for inflation per 32(j) to $6,920 for 2024)
+"""
+
+# Parameter for joint return adjustment amount
+# Value is 2024 amount per Rev. Proc. 2023-34, Section 3.06
+parameter joint_return_adjustment_amount:
+  description: "Additional phaseout threshold for married filing jointly taxpayers"
+  unit: USD
+  source: "Rev. Proc. 2023-34"
+  reference: "26 USC 32(b)(2)(B)"
+  values:
+    2024-01-01: 6_920
+    2023-01-01: 6_570
+    2022-01-01: 5_980
+
+# 26 USC 32(b)(2)(B) - Joint Return Adjustment
 variable joint_return_adjustment:
+  imports:
+    - 26/1#filing_status
   entity: TaxUnit
   period: Year
   dtype: Money
+  unit: "USD"
+  label: "EITC Joint Return Adjustment"
+  description: "Additional phaseout threshold amount for joint filers per 26 USC 32(b)(2)(B)"
+  syntax: python
+  formula: |
+    # Joint filers get higher phaseout threshold
+    if filing_status == JOINT:
+      return joint_return_adjustment_amount
+    return 0
+  tests:
+    - name: "Joint filers receive adjustment amount"
+      period: 2024
+      inputs:
+        filing_status: JOINT
+      expect: 6_920
+    - name: "Single filers receive no adjustment"
+      period: 2024
+      inputs:
+        filing_status: SINGLE
+      expect: 0
+    - name: "Head of household receives no adjustment"
+      period: 2024
+      inputs:
+        filing_status: HEAD_OF_HOUSEHOLD
+      expect: 0
+    - name: "Married filing separately receives no adjustment"
+      period: 2024
+      inputs:
+        filing_status: MARRIED_FILING_SEPARATELY
+      expect: 0
+    - name: "Qualifying surviving spouse receives no adjustment"
+      period: 2024
+      inputs:
+        filing_status: SURVIVING_SPOUSE
+      expect: 0
+    - name: "2023 joint return adjustment amount"
+      period: 2023
+      inputs:
+        filing_status: JOINT
+      expect: 6_570

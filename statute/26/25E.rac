@@ -26,3 +26,57 @@ variable used_vehicle_credit:
     limit = p.eligibility.income_limit[filing_status]
     return agi <= limit
   default: 0
+  tests:
+    - name: "Single filer under income limit with low-price vehicle"
+      period: 2024
+      inputs:
+        adjusted_gross_income: 60_000
+        filing_status: SINGLE
+        used_clean_vehicle_sale_price: 8_000
+      # Eligible: AGI $60k < $75k limit for single
+      # Credit = min($4,000, 30% of $8,000) = min($4,000, $2,400) = $2,400
+      expect: 2_400
+    - name: "Single filer under income limit with high-price vehicle"
+      period: 2024
+      inputs:
+        adjusted_gross_income: 70_000
+        filing_status: SINGLE
+        used_clean_vehicle_sale_price: 20_000
+      # Eligible: AGI $70k < $75k limit for single
+      # Credit = min($4,000, 30% of $20,000) = min($4,000, $6,000) = $4,000
+      expect: 4_000
+    - name: "Single filer over income limit"
+      period: 2024
+      inputs:
+        adjusted_gross_income: 80_000
+        filing_status: SINGLE
+        used_clean_vehicle_sale_price: 15_000
+      # Not eligible: AGI $80k > $75k limit for single
+      expect: 0
+    - name: "Joint filers under income limit"
+      period: 2024
+      inputs:
+        adjusted_gross_income: 140_000
+        filing_status: JOINT
+        used_clean_vehicle_sale_price: 18_000
+      # Eligible: AGI $140k < $150k limit for joint
+      # Credit = min($4,000, 30% of $18,000) = min($4,000, $5,400) = $4,000
+      expect: 4_000
+    - name: "Joint filers at income limit boundary"
+      period: 2024
+      inputs:
+        adjusted_gross_income: 150_000
+        filing_status: JOINT
+        used_clean_vehicle_sale_price: 12_000
+      # Eligible: AGI $150k = $150k limit for joint (at limit, still eligible)
+      # Credit = min($4,000, 30% of $12,000) = min($4,000, $3,600) = $3,600
+      expect: 3_600
+    - name: "Head of household filer under income limit"
+      period: 2024
+      inputs:
+        adjusted_gross_income: 100_000
+        filing_status: HEAD_OF_HOUSEHOLD
+        used_clean_vehicle_sale_price: 25_000
+      # Eligible: AGI $100k < $112,500 limit for HoH
+      # Credit = min($4,000, 30% of $25,000) = min($4,000, $7,500) = $4,000
+      expect: 4_000

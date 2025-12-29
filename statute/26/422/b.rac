@@ -1,11 +1,109 @@
+# Reference: IRC Section 422(b) - Incentive Stock Options
+
 text: """
-requires that the "bargain element" be included in AMTI.
+26 USC § 422(b) - Incentive stock option defined
+
+For purposes of this part, the term "incentive stock option" means an option
+granted to an individual for any reason connected with his employment by a
+corporation, if granted by the employer corporation or its parent or subsidiary
+corporation, to purchase stock of any of such corporations...
+
+The "bargain element" (difference between fair market value at exercise and
+exercise price) must be included in alternative minimum taxable income (AMTI)
+under Section 56 when ISO shares are exercised and held through year end.
 """
-variable iso_bargain_element:
+
+# Inputs for ISO exercise tracking
+input iso_shares_held_at_year_end:
   entity: TaxUnit
   period: Year
   dtype: Boolean
-  unit: "USD"
   label: "ISO Shares Held at Year End"
-  description: "Whether ISO shares were held through the end of the tax year"
-  default: true
+  description: "Whether ISO shares exercised during the year were still held at year end (triggering AMT preference)"
+  default: false
+
+input iso_exercise_price:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: "USD"
+  label: "ISO Exercise Price"
+  description: "Total amount paid to exercise incentive stock options during the year"
+  default: 0
+
+input iso_fmv_at_exercise:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: "USD"
+  label: "ISO Fair Market Value at Exercise"
+  description: "Fair market value of ISO stock at the time of exercise"
+  default: 0
+
+# The bargain element for AMT purposes
+variable iso_exercise_bargain_element:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: "USD"
+  label: "ISO Bargain Element for AMT"
+  description: "Difference between FMV at exercise and exercise price, included in AMTI when shares are held through year end per 26 USC 422(b) and 56(b)(3)"
+  syntax: python
+  formula: |
+    # ISO bargain element only applies for AMT if shares are held at year end
+    # If shares are sold before year end, it's a disqualifying disposition
+    # and taxed as ordinary income instead
+    if not iso_shares_held_at_year_end:
+      return 0
+    # Bargain element = FMV at exercise - Exercise price paid
+    bargain = iso_fmv_at_exercise - iso_exercise_price
+    return max(0, bargain)
+  default: 0
+  tests:
+    - name: "No ISO exercise"
+      period: 2024
+      inputs:
+        iso_shares_held_at_year_end: false
+        iso_exercise_price: 0
+        iso_fmv_at_exercise: 0
+      expect: 0
+
+    - name: "ISO exercised but sold before year end (disqualifying disposition)"
+      period: 2024
+      inputs:
+        iso_shares_held_at_year_end: false
+        iso_exercise_price: 10_000
+        iso_fmv_at_exercise: 50_000
+      expect: 0
+
+    - name: "ISO exercised and held - basic bargain element"
+      period: 2024
+      inputs:
+        iso_shares_held_at_year_end: true
+        iso_exercise_price: 10_000
+        iso_fmv_at_exercise: 50_000
+      expect: 40_000
+
+    - name: "ISO exercised and held - large bargain element"
+      period: 2024
+      inputs:
+        iso_shares_held_at_year_end: true
+        iso_exercise_price: 25_000
+        iso_fmv_at_exercise: 200_000
+      expect: 175_000
+
+    - name: "ISO exercised at FMV (no bargain element)"
+      period: 2024
+      inputs:
+        iso_shares_held_at_year_end: true
+        iso_exercise_price: 100_000
+        iso_fmv_at_exercise: 100_000
+      expect: 0
+
+    - name: "Underwater ISO (exercise price exceeds FMV)"
+      period: 2024
+      inputs:
+        iso_shares_held_at_year_end: true
+        iso_exercise_price: 75_000
+        iso_fmv_at_exercise: 50_000
+      expect: 0
