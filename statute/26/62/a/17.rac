@@ -1,6 +1,27 @@
 text: """
 (17) Interest on education loans.—The deduction allowed by section 221.
 """
+
+# Input for student loan interest paid during the year
+input student_loan_interest_paid:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: "USD"
+  label: "Student Loan Interest Paid"
+  description: "Total interest paid on qualified education loans during tax year"
+  default: 0
+
+# 26 USC 221(b)(1) - Maximum deduction cap
+parameter max_deduction:
+  description: "Maximum annual student loan interest deduction"
+  unit: "USD"
+  reference: "26 USC 221(b)(1)"
+  values:
+    2024-01-01: 2_500
+    2023-01-01: 2_500
+    2000-01-01: 2_500
+
 variable student_loan_interest_deduction:
   imports: [26/1#filing_status]
   entity: TaxUnit
@@ -8,8 +29,57 @@ variable student_loan_interest_deduction:
   dtype: Money
   unit: "USD"
   label: "Student Loan Interest Deduction"
-  description: "Above-the-line deduction for student loan interest"
+  description: "Above-the-line deduction for student loan interest per 26 USC 221"
   syntax: python
   formula: |
     # Cannot deduct more than paid or the maximum
     return min(student_loan_interest_paid, max_deduction)
+
+tests:
+  - name: "Interest paid below cap - full deduction"
+    period: 2024
+    inputs:
+      tax_unit:
+        student_loan_interest_paid: 1_500
+    outputs:
+      student_loan_interest_deduction: 1_500
+
+  - name: "Interest paid at cap - capped deduction"
+    period: 2024
+    inputs:
+      tax_unit:
+        student_loan_interest_paid: 2_500
+    outputs:
+      student_loan_interest_deduction: 2_500
+
+  - name: "Interest paid exceeds cap - limited to max"
+    period: 2024
+    inputs:
+      tax_unit:
+        student_loan_interest_paid: 4_000
+    outputs:
+      student_loan_interest_deduction: 2_500
+
+  - name: "Zero interest paid - no deduction"
+    period: 2024
+    inputs:
+      tax_unit:
+        student_loan_interest_paid: 0
+    outputs:
+      student_loan_interest_deduction: 0
+
+  - name: "Small interest amount - full deduction"
+    period: 2024
+    inputs:
+      tax_unit:
+        student_loan_interest_paid: 250
+    outputs:
+      student_loan_interest_deduction: 250
+
+  - name: "Historical period 2023 - same cap applies"
+    period: 2023
+    inputs:
+      tax_unit:
+        student_loan_interest_paid: 3_000
+    outputs:
+      student_loan_interest_deduction: 2_500

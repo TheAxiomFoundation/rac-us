@@ -2,20 +2,97 @@ text: """
 (23) Qualified tip income.—In the case of an individual, the deduction
 allowed by section 74A (relating to exclusion for qualified tips).
 """
+
+input qualified_tip_income:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: "USD"
+  label: "Qualified Tip Income"
+  description: "Tips received in qualified occupations (food service, hospitality, etc.)"
+  default: 0
+
+parameter max_deduction:
+  description: "Maximum annual tip income deduction"
+  unit: USD
+  source: "26 USC 74A (OBBBA)"
+  values:
+    2025-01-01: 25_000
+
+parameter termination_year:
+  description: "Final year the tip income deduction is available"
+  unit: years
+  source: "26 USC 74A(g) (OBBBA sunset)"
+  values:
+    2025-01-01: 2028
+
 variable tip_income_deduction:
   imports:
     - 26/1#filing_status
-    - 26/62/a#adjusted_gross_income
     - 26/1402/a#self_employment_income
   entity: TaxUnit
   period: Year
-  dtype: Boolean
+  dtype: Money
   unit: "USD"
-  label: "Tip Income Deduction Available"
-  description: "Whether the tip income deduction is available in this tax year"
+  label: "Tip Income Deduction"
+  description: "Above-the-line deduction for qualified tip income per 26 USC 62(a)(23) via Section 74A"
   syntax: python
   formula: |
-    # For employees, no limit from self-employment
-    # For self-employed, cannot exceed net earnings from trade/business
-    if self_employment_income <= 0: return max_deduction  # Not self-employed, use full cap
-    return min(self_employment_income, max_deduction)
+    # Section 74A(g): No deduction after the termination year
+    if tax_year > termination_year:
+        return 0
+    # Section 74A(e): Married individuals must file jointly
+    if filing_status == MARRIED_FILING_SEPARATELY:
+        return 0
+    # For employees (not self-employed): deduction is lesser of tips or max
+    # For self-employed: also limited to net self-employment earnings
+    base_deduction = min(qualified_tip_income, max_deduction)
+    if self_employment_income <= 0:
+        # Not self-employed, use full capped amount
+        return base_deduction
+    # Self-employed: cannot exceed net earnings from trade/business
+    return min(base_deduction, self_employment_income)
+  default: 0
+  tests:
+    - name: "Employee with tips below max"
+      period: 2025
+      inputs:
+        qualified_tip_income: 15_000
+        self_employment_income: 0
+        filing_status: SINGLE
+      expect: 15_000
+    - name: "Employee with tips at max cap"
+      period: 2025
+      inputs:
+        qualified_tip_income: 30_000
+        self_employment_income: 0
+        filing_status: SINGLE
+      expect: 25_000
+    - name: "Self-employed limited by SE income"
+      period: 2025
+      inputs:
+        qualified_tip_income: 20_000
+        self_employment_income: 12_000
+        filing_status: SINGLE
+      expect: 12_000
+    - name: "Married filing separately disqualified"
+      period: 2025
+      inputs:
+        qualified_tip_income: 10_000
+        self_employment_income: 0
+        filing_status: MARRIED_FILING_SEPARATELY
+      expect: 0
+    - name: "After termination year no deduction"
+      period: 2029
+      inputs:
+        qualified_tip_income: 15_000
+        self_employment_income: 0
+        filing_status: SINGLE
+      expect: 0
+    - name: "Zero tips zero deduction"
+      period: 2025
+      inputs:
+        qualified_tip_income: 0
+        self_employment_income: 0
+        filing_status: SINGLE
+      expect: 0

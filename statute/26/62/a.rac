@@ -62,3 +62,183 @@ variable adjusted_gross_income:
     )
     # Step 3: AGI = Gross Income - Above-the-Line Deductions
     return gross_income - above_the_line_deductions
+  tests:
+    - name: "W-2 employee with no deductions"
+      period: 2024
+      inputs:
+        wages: 75_000
+        salaries: 0
+        tips: 0
+        self_employment_income: 0
+        partnership_s_corp_income: 0
+        farm_income: 0
+        interest_income: 500
+        dividend_income: 200
+        capital_gains: 0
+        rental_income: 0
+        taxable_social_security: 0
+        pension_income: 0
+        taxable_unemployment: 0
+        retirement_distributions: 0
+        miscellaneous_income: 0
+        self_employment_tax_deduction: 0
+        self_employed_health_insurance_deduction: 0
+        educator_expense_deduction: 0
+        loss_deduction: 0
+        self_employed_pension_deduction: 0
+        ira_deduction: 0
+        hsa_deduction: 0
+        student_loan_interest_deduction: 0
+        tip_income_deduction: 0
+        qualified_overtime_deduction: 0
+      expect: 75_700  # 75,000 + 500 + 200
+
+    - name: "Self-employed with SE tax and health insurance deductions"
+      period: 2024
+      inputs:
+        wages: 0
+        salaries: 0
+        tips: 0
+        self_employment_income: 120_000
+        partnership_s_corp_income: 0
+        farm_income: 0
+        interest_income: 1_000
+        dividend_income: 500
+        capital_gains: 0
+        rental_income: 0
+        taxable_social_security: 0
+        pension_income: 0
+        taxable_unemployment: 0
+        retirement_distributions: 0
+        miscellaneous_income: 0
+        self_employment_tax_deduction: 8_478  # 50% of SE tax on $120k
+        self_employed_health_insurance_deduction: 12_000
+        educator_expense_deduction: 0
+        loss_deduction: 0
+        self_employed_pension_deduction: 0
+        ira_deduction: 0
+        hsa_deduction: 0
+        student_loan_interest_deduction: 0
+        tip_income_deduction: 0
+        qualified_overtime_deduction: 0
+      expect: 101_022  # 121,500 - 8,478 - 12,000
+
+    - name: "Teacher with educator expenses and student loan interest"
+      period: 2024
+      inputs:
+        wages: 55_000
+        salaries: 0
+        tips: 0
+        self_employment_income: 0
+        partnership_s_corp_income: 0
+        farm_income: 0
+        interest_income: 100
+        dividend_income: 0
+        capital_gains: 0
+        rental_income: 0
+        taxable_social_security: 0
+        pension_income: 0
+        taxable_unemployment: 0
+        retirement_distributions: 0
+        miscellaneous_income: 0
+        self_employment_tax_deduction: 0
+        self_employed_health_insurance_deduction: 0
+        educator_expense_deduction: 300  # 2024 limit
+        loss_deduction: 0
+        self_employed_pension_deduction: 0
+        ira_deduction: 0
+        hsa_deduction: 0
+        student_loan_interest_deduction: 2_500  # 2024 limit
+        tip_income_deduction: 0
+        qualified_overtime_deduction: 0
+      expect: 52_300  # 55,100 - 300 - 2,500
+
+    - name: "Retiree with pension and Social Security"
+      period: 2024
+      inputs:
+        wages: 0
+        salaries: 0
+        tips: 0
+        self_employment_income: 0
+        partnership_s_corp_income: 0
+        farm_income: 0
+        interest_income: 2_000
+        dividend_income: 3_000
+        capital_gains: 5_000
+        rental_income: 0
+        taxable_social_security: 18_000
+        pension_income: 36_000
+        taxable_unemployment: 0
+        retirement_distributions: 0
+        miscellaneous_income: 0
+        self_employment_tax_deduction: 0
+        self_employed_health_insurance_deduction: 0
+        educator_expense_deduction: 0
+        loss_deduction: 0
+        self_employed_pension_deduction: 0
+        ira_deduction: 0
+        hsa_deduction: 0
+        student_loan_interest_deduction: 0
+        tip_income_deduction: 0
+        qualified_overtime_deduction: 0
+      expect: 64_000  # 2,000 + 3,000 + 5,000 + 18,000 + 36,000
+
+    - name: "Mixed income with HSA and IRA deductions"
+      period: 2024
+      inputs:
+        wages: 85_000
+        salaries: 0
+        tips: 2_000
+        self_employment_income: 0
+        partnership_s_corp_income: 15_000
+        farm_income: 0
+        interest_income: 500
+        dividend_income: 1_200
+        capital_gains: 3_000
+        rental_income: 6_000
+        taxable_social_security: 0
+        pension_income: 0
+        taxable_unemployment: 0
+        retirement_distributions: 0
+        miscellaneous_income: 0
+        self_employment_tax_deduction: 0
+        self_employed_health_insurance_deduction: 0
+        educator_expense_deduction: 0
+        loss_deduction: 0
+        self_employed_pension_deduction: 0
+        ira_deduction: 7_000  # 2024 limit under 50
+        hsa_deduction: 4_150  # 2024 self-only limit
+        student_loan_interest_deduction: 0
+        tip_income_deduction: 0
+        qualified_overtime_deduction: 0
+      expect: 101_550  # 112,700 - 7,000 - 4,150
+
+    - name: "Zero income results in zero AGI"
+      period: 2024
+      inputs:
+        wages: 0
+        salaries: 0
+        tips: 0
+        self_employment_income: 0
+        partnership_s_corp_income: 0
+        farm_income: 0
+        interest_income: 0
+        dividend_income: 0
+        capital_gains: 0
+        rental_income: 0
+        taxable_social_security: 0
+        pension_income: 0
+        taxable_unemployment: 0
+        retirement_distributions: 0
+        miscellaneous_income: 0
+        self_employment_tax_deduction: 0
+        self_employed_health_insurance_deduction: 0
+        educator_expense_deduction: 0
+        loss_deduction: 0
+        self_employed_pension_deduction: 0
+        ira_deduction: 0
+        hsa_deduction: 0
+        student_loan_interest_deduction: 0
+        tip_income_deduction: 0
+        qualified_overtime_deduction: 0
+      expect: 0

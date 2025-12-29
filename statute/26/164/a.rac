@@ -13,4 +13,41 @@ variable deductible_taxes:
   formula: |
     # Total real property minus foreign portion
     return real_property_tax - foreign_real_property_tax
-  default: false
+  default: 0
+  tests:
+    - name: "No taxes paid"
+      period: 2024
+      inputs:
+        real_property_tax: 0
+        foreign_real_property_tax: 0
+      expect: 0
+    - name: "Domestic property taxes only"
+      period: 2024
+      inputs:
+        real_property_tax: 8_500
+        foreign_real_property_tax: 0
+      expect: 8_500
+    - name: "Mixed domestic and foreign property taxes"
+      period: 2024
+      inputs:
+        real_property_tax: 12_000
+        foreign_real_property_tax: 3_000
+      expect: 9_000
+    - name: "All foreign property taxes"
+      period: 2024
+      inputs:
+        real_property_tax: 5_000
+        foreign_real_property_tax: 5_000
+      expect: 0
+    - name: "Large domestic property tax"
+      period: 2024
+      inputs:
+        real_property_tax: 25_000
+        foreign_real_property_tax: 0
+      expect: 25_000
+    - name: "Typical homeowner with some foreign property"
+      period: 2024
+      inputs:
+        real_property_tax: 15_000
+        foreign_real_property_tax: 2_500
+      expect: 12_500
