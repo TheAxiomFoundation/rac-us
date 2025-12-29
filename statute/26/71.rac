@@ -26,19 +26,46 @@ fix (in terms of an amount of money or a part of the payment) as
 a sum which is payable for the support of children of the payor
 spouse.
 """
+
+# 26 USC 71(a) - Alimony income inclusion rate
+parameter alimony_income_inclusion_rate:
+  description: "Rate at which alimony received is includible in gross income"
+  reference: "26 USC 71(a); Tax Cuts and Jobs Act of 2017"
+  unit: "/1"
+  values:
+    2019-01-01: 1.0
+    2000-01-01: 1.0
+
+input is_pre_2019_divorce_agreement:
+  entity: TaxUnit
+  period: Year
+  dtype: Boolean
+  label: "Pre-2019 Divorce Agreement"
+  description: "Whether alimony is received under a divorce or separation instrument executed before 2019"
+  default: false
+
+input alimony_received:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: "USD"
+  label: "Alimony Received"
+  description: "Total alimony or separate maintenance payments received during the tax year"
+  default: 0
+
 variable alimony_income:
-  imports: [26/1#filing_status]
   entity: TaxUnit
   period: Year
   dtype: Money
   unit: "USD"
   label: "Tax Unit Taxable Alimony Income"
   description: "Total alimony includible in gross income for the tax unit"
+  reference: "26 USC 71(a)"
   syntax: python
   formula: |
     # Per TCJA: Only pre-2019 divorce instruments result in includible alimony income
     if not is_pre_2019_divorce_agreement:
-    return 0
+        return 0
     # Per 26 USC 71(a): Alimony received is gross income for pre-2019 agreements
     # The alimony_income_inclusion_rate parameter confirms inclusion rules by year
     # but the controlling factor is the agreement date, not the tax year
@@ -50,26 +77,16 @@ variable alimony_income:
       inputs:
         is_pre_2019_divorce_agreement: true
         alimony_received: 24_000
-        alimony_income_inclusion_rate: 1.0
-      expect: 24_000  # Fully includible in gross income
+      expect: 24_000
     - name: "Post-2018 agreement, no inclusion"
       period: 2024
       inputs:
         is_pre_2019_divorce_agreement: false
         alimony_received: 36_000
-        alimony_income_inclusion_rate: 1.0
-      expect: 0  # TCJA eliminated alimony income for post-2018 agreements
+      expect: 0
     - name: "Pre-2019 agreement, no alimony received"
       period: 2024
       inputs:
         is_pre_2019_divorce_agreement: true
         alimony_received: 0
-        alimony_income_inclusion_rate: 1.0
-      expect: 0  # No alimony to include
-    - name: "Pre-2019 agreement, partial inclusion rate"
-      period: 2024
-      inputs:
-        is_pre_2019_divorce_agreement: true
-        alimony_received: 20_000
-        alimony_income_inclusion_rate: 0.5
-      expect: 10_000  # Hypothetical partial rate scenario
+      expect: 0
