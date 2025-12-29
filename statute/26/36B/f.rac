@@ -136,11 +136,11 @@ variable advance_ptc:
       expect: 0
     - name: "Advance payments during year"
       inputs:
-        advance_ptc: 4800
+        advance_ptc: 4_800
       expect: 4800
     - name: "Large advance payment"
       inputs:
-        advance_ptc: 8500
+        advance_ptc: 8_500
       expect: 8500
 
 variable net_ptc_adjustment:
@@ -160,23 +160,23 @@ variable net_ptc_adjustment:
   tests:
     - name: "Actual equals advance (no adjustment)"
       inputs:
-        premium_tax_credit: 4800
-        advance_ptc: 4800
+        premium_tax_credit: 4_800
+        advance_ptc: 4_800
       expect: 0
     - name: "Actual exceeds advance (refund due)"
       inputs:
-        premium_tax_credit: 5500
-        advance_ptc: 4800
+        premium_tax_credit: 5_500
+        advance_ptc: 4_800
       expect: 700
     - name: "Advance exceeds actual (repayment owed)"
       inputs:
-        premium_tax_credit: 4000
-        advance_ptc: 4800
+        premium_tax_credit: 4_000
+        advance_ptc: 4_800
       expect: -800
     - name: "Large excess advance payment"
       inputs:
-        premium_tax_credit: 3000
-        advance_ptc: 8500
+        premium_tax_credit: 3_000
+        advance_ptc: 8_500
       expect: -5500
 
 variable excess_aptc_repayment_cap:
@@ -287,13 +287,13 @@ variable excess_advance_ptc_repayment:
       expect: 200
     - name: "Excess advance hits repayment cap"
       inputs:
-        net_ptc_adjustment: -1000
+        net_ptc_adjustment: -1_000
         excess_aptc_repayment_cap: 750
       expect: 750
     - name: "Large excess advance with no cap"
       inputs:
-        net_ptc_adjustment: -5500
-        excess_aptc_repayment_cap: 999999
+        net_ptc_adjustment: -5_500
+        excess_aptc_repayment_cap: 999_999
       expect: 5500
 
 variable additional_ptc_refund:
@@ -323,5 +323,5 @@ variable additional_ptc_refund:
       expect: 300
     - name: "Large additional refund"
       inputs:
-        net_ptc_adjustment: 1200
+        net_ptc_adjustment: 1_200
       expect: 1200

@@ -59,7 +59,7 @@ variable qualified_dividend_income:
   tests:
     - name: "Pass-through of qualified dividends input"
       inputs:
-        qualified_dividends: 5000
+        qualified_dividends: 5_000
       expect: 5000
     - name: "Zero qualified dividends"
       inputs:

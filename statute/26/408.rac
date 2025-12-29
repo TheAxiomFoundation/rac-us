@@ -163,12 +163,12 @@ variable traditional_ira_balance:
     - name: "Positive balance"
       period: 2024
       inputs:
-        traditional_ira_balance: 50000
+        traditional_ira_balance: 50_000
       expect: 50000
     - name: "Large balance"
       period: 2024
       inputs:
-        traditional_ira_balance: 500000
+        traditional_ira_balance: 500_000
       expect: 500000
 
 variable roth_ira_balance:
@@ -188,12 +188,12 @@ variable roth_ira_balance:
     - name: "Positive Roth balance"
       period: 2024
       inputs:
-        roth_ira_balance: 75000
+        roth_ira_balance: 75_000
       expect: 75000
     - name: "Large Roth balance"
       period: 2024
       inputs:
-        roth_ira_balance: 250000
+        roth_ira_balance: 250_000
       expect: 250000
 
 variable birth_year:
@@ -279,12 +279,12 @@ variable ira_prior_year_balance:
     - name: "Moderate prior year balance"
       period: 2024
       inputs:
-        ira_prior_year_balance: 100000
+        ira_prior_year_balance: 100_000
       expect: 100000
     - name: "Large prior year balance at retirement"
       period: 2024
       inputs:
-        ira_prior_year_balance: 750000
+        ira_prior_year_balance: 750_000
       expect: 750000
 
 variable ira_required_minimum_distribution:
@@ -312,7 +312,7 @@ variable ira_required_minimum_distribution:
       inputs:
         age: 60
         birth_year: 1964
-        ira_prior_year_balance: 100000
+        ira_prior_year_balance: 100_000
       expect: 0
     - name: "No RMD - no account balance despite being at RMD age"
       period: 2024
@@ -326,28 +326,28 @@ variable ira_required_minimum_distribution:
       inputs:
         age: 73
         birth_year: 1951
-        ira_prior_year_balance: 200000
+        ira_prior_year_balance: 200_000
       expect: 7518
     - name: "RMD calculation - age 75 with $350,000 balance"
       period: 2024
       inputs:
         age: 75
         birth_year: 1949
-        ira_prior_year_balance: 350000
+        ira_prior_year_balance: 350_000
       expect: 10769
     - name: "RMD calculation - age 82 with $500,000 balance"
       period: 2024
       inputs:
         age: 82
         birth_year: 1942
-        ira_prior_year_balance: 500000
+        ira_prior_year_balance: 500_000
       expect: 16393
     - name: "Large RMD - age 90 with $1,000,000 balance"
       period: 2024
       inputs:
         age: 90
         birth_year: 1934
-        ira_prior_year_balance: 1000000
+        ira_prior_year_balance: 1_000_000
       expect: 34483
 
 variable has_simple_ira:
@@ -406,24 +406,24 @@ variable total_ira_balance:
     - name: "Traditional IRA only"
       period: 2024
       inputs:
-        traditional_ira_balance: 150000
+        traditional_ira_balance: 150_000
         roth_ira_balance: 0
       expect: 150000
     - name: "Roth IRA only"
       period: 2024
       inputs:
         traditional_ira_balance: 0
-        roth_ira_balance: 100000
+        roth_ira_balance: 100_000
       expect: 100000
     - name: "Combined traditional and Roth IRAs"
       period: 2024
       inputs:
-        traditional_ira_balance: 200000
-        roth_ira_balance: 150000
+        traditional_ira_balance: 200_000
+        roth_ira_balance: 150_000
       expect: 350000
     - name: "Both IRAs maxed out"
       period: 2024
       inputs:
-        traditional_ira_balance: 500000
-        roth_ira_balance: 300000
+        traditional_ira_balance: 500_000
+        roth_ira_balance: 300_000
       expect: 800000

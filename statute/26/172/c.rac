@@ -33,22 +33,22 @@ variable net_operating_loss:
     - name: "NOL generated from negative modified taxable income"
       period: 2024
       inputs:
-        taxable_income: -50000
+        taxable_income: -50_000
         adjusted_gross_income: 0
         nol_modifications: 0
       expect: 50000
     - name: "NOL with modifications increasing loss"
       period: 2024
       inputs:
-        taxable_income: -30000
+        taxable_income: -30_000
         adjusted_gross_income: 0
-        nol_modifications: 10000
+        nol_modifications: 10_000
       expect: 40000
     - name: "No NOL with positive taxable income"
       period: 2024
       inputs:
-        taxable_income: 50000
-        adjusted_gross_income: 75000
+        taxable_income: 50_000
+        adjusted_gross_income: 75_000
         nol_modifications: 0
       expect: 0
     - name: "No NOL with break-even position"
@@ -99,7 +99,7 @@ variable has_net_operating_loss:
     - name: "Has NOL when net operating loss exists"
       period: 2024
       inputs:
-        taxable_income: -50000
+        taxable_income: -50_000
         adjusted_gross_income: 0
         nol_modifications: 0
       expect: true

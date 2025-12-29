@@ -29,7 +29,7 @@ variable employer_social_security_tax:
   dtype: Money
   unit: "USD"
   label: "Employer Social Security Tax"
-  description: "Employer share of Social Security (OASDI) tax at 6.2% of wages up to wage base per 26 USC 3111(a)"
+  description: "Employer share of Social Security (OASDI) tax at 6.2% of wages up to wage base per 26 USC 3_111(a)"
   syntax: python
   formula: |
     # Social Security tax applies only up to the wage base cap
@@ -103,7 +103,7 @@ variable employer_fica_tax:
   dtype: Money
   unit: "USD"
   label: "Employer FICA Tax"
-  description: "Combined employer Social Security and Medicare tax per 26 USC 3111"
+  description: "Combined employer Social Security and Medicare tax per 26 USC 3_111"
   syntax: python
   formula: |
     # Total employer FICA = Social Security (capped) + Medicare (uncapped)
@@ -119,35 +119,35 @@ variable employer_fica_tax:
       period: 2024
       inputs:
         employer_social_security_tax: 3_100  # 50,000 * 0.062
-        employer_medicare_tax: 725  # 50,000 * 0.0145
+        employer_medicare_tax: 725  # 50,000 * 0.145
       expect: 3_825  # 50,000 * 0.0765
     - name: "Moderate wages below wage base"
       period: 2024
       inputs:
         employer_social_security_tax: 6_200  # 100,000 * 0.062
-        employer_medicare_tax: 1_450  # 100,000 * 0.0145
+        employer_medicare_tax: 1_450  # 100,000 * 0.145
       expect: 7_650  # 100,000 * 0.0765
     - name: "Wages at wage base"
       period: 2024
       inputs:
         employer_social_security_tax: 10_453.20  # 168,600 * 0.062
-        employer_medicare_tax: 2_444.70  # 168,600 * 0.0145
+        employer_medicare_tax: 2_444.70  # 168,600 * 0.145
       expect: 12_897.90  # SS capped + uncapped Medicare
     - name: "Wages above wage base - SS capped, Medicare uncapped"
       period: 2024
       inputs:
         employer_social_security_tax: 10_453.20  # Capped at 168,600 * 0.062
-        employer_medicare_tax: 2_900  # 200,000 * 0.0145
+        employer_medicare_tax: 2_900  # 200,000 * 0.145
       expect: 13_353.20  # SS capped at 10,453.20 + uncapped Medicare
     - name: "High earner - SS capped, Medicare continues"
       period: 2024
       inputs:
         employer_social_security_tax: 10_453.20  # Capped at wage base
-        employer_medicare_tax: 7_250  # 500,000 * 0.0145
+        employer_medicare_tax: 7_250  # 500,000 * 0.145
       expect: 17_703.20  # SS maxed out, Medicare grows with wages
     - name: "Minimum wage worker annual FICA"
       period: 2024
       inputs:
         employer_social_security_tax: 934.96  # 15,080 * 0.062
-        employer_medicare_tax: 218.66  # 15,080 * 0.0145
+        employer_medicare_tax: 218.66  # 15,080 * 0.145
       expect: 1_153.62  # 15,080 * 0.0765

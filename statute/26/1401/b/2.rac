@@ -30,24 +30,24 @@ variable combined_medicare_income:
       period: 2024
       inputs:
         members:
-          - irs_employment_income: 100000
-            net_self_employment_earnings: 50000
+          - irs_employment_income: 100_000
+            net_self_employment_earnings: 50_000
       expect: 150000
     - name: "Two individuals in household"
       period: 2024
       inputs:
         members:
-          - irs_employment_income: 120000
-            net_self_employment_earnings: 40000
-          - irs_employment_income: 80000
-            net_self_employment_earnings: 30000
+          - irs_employment_income: 120_000
+            net_self_employment_earnings: 40_000
+          - irs_employment_income: 80_000
+            net_self_employment_earnings: 30_000
       expect: 270000
     - name: "Only SE income, no wages"
       period: 2024
       inputs:
         members:
           - irs_employment_income: 0
-            net_self_employment_earnings: 75000
+            net_self_employment_earnings: 75_000
       expect: 75000
 
 variable additional_medicare_tax_threshold:
@@ -73,33 +73,33 @@ variable additional_medicare_tax_threshold:
       period: 2024
       inputs:
         filing_status: JOINT
-        threshold_joint: 250000
-        threshold_separate: 125000
-        threshold_single: 200000
+        threshold_joint: 250_000
+        threshold_separate: 125_000
+        threshold_single: 200_000
       expect: 250000
     - name: "Married filing separately threshold"
       period: 2024
       inputs:
         filing_status: SEPARATE
-        threshold_joint: 250000
-        threshold_separate: 125000
-        threshold_single: 200000
+        threshold_joint: 250_000
+        threshold_separate: 125_000
+        threshold_single: 200_000
       expect: 125000
     - name: "Single filer threshold"
       period: 2024
       inputs:
         filing_status: SINGLE
-        threshold_joint: 250000
-        threshold_separate: 125000
-        threshold_single: 200000
+        threshold_joint: 250_000
+        threshold_separate: 125_000
+        threshold_single: 200_000
       expect: 200000
     - name: "Head of household threshold"
       period: 2024
       inputs:
         filing_status: HEAD_OF_HOUSEHOLD
-        threshold_joint: 250000
-        threshold_separate: 125000
-        threshold_single: 200000
+        threshold_joint: 250_000
+        threshold_separate: 125_000
+        threshold_single: 200_000
       expect: 200000
 
 variable se_income_subject_to_additional_medicare_tax:
@@ -108,7 +108,7 @@ variable se_income_subject_to_additional_medicare_tax:
   dtype: Money
   unit: "USD"
   label: "SE Income Subject to Additional Medicare Tax"
-  description: "Self-employment income subject to 0.9% additional tax per 1401(b)(2)"
+  description: "Self-employment income subject to 0.9% additional tax per 1_401(b)(2)"
   syntax: python
   formula: |
     total_se = sum(members, net_self_employment_earnings)
@@ -124,51 +124,51 @@ variable se_income_subject_to_additional_medicare_tax:
       period: 2024
       inputs:
         members:
-          - irs_employment_income: 260000
-            net_self_employment_earnings: 50000
-        additional_medicare_tax_threshold: 250000
+          - irs_employment_income: 260_000
+            net_self_employment_earnings: 50_000
+        additional_medicare_tax_threshold: 250_000
       expect: 50000
     - name: "Wages below threshold - partial SE income subject"
       period: 2024
       inputs:
         members:
-          - irs_employment_income: 200000
-            net_self_employment_earnings: 60000
-        additional_medicare_tax_threshold: 250000
+          - irs_employment_income: 200_000
+            net_self_employment_earnings: 60_000
+        additional_medicare_tax_threshold: 250_000
       expect: 10000
     - name: "Wages and SE both below threshold - no SE income subject"
       period: 2024
       inputs:
         members:
-          - irs_employment_income: 150000
-            net_self_employment_earnings: 40000
-        additional_medicare_tax_threshold: 250000
+          - irs_employment_income: 150_000
+            net_self_employment_earnings: 40_000
+        additional_medicare_tax_threshold: 250_000
       expect: 0
     - name: "No wages, only SE income - portion above threshold subject"
       period: 2024
       inputs:
         members:
           - irs_employment_income: 0
-            net_self_employment_earnings: 280000
-        additional_medicare_tax_threshold: 200000
+            net_self_employment_earnings: 280_000
+        additional_medicare_tax_threshold: 200_000
       expect: 80000
     - name: "Married filing separately lower threshold"
       period: 2024
       inputs:
         members:
-          - irs_employment_income: 100000
-            net_self_employment_earnings: 50000
-        additional_medicare_tax_threshold: 125000
+          - irs_employment_income: 100_000
+            net_self_employment_earnings: 50_000
+        additional_medicare_tax_threshold: 125_000
       expect: 25000
     - name: "Household with two earners, combined exceeds threshold"
       period: 2024
       inputs:
         members:
-          - irs_employment_income: 160000
-            net_self_employment_earnings: 40000
-          - irs_employment_income: 60000
-            net_self_employment_earnings: 30000
-        additional_medicare_tax_threshold: 250000
+          - irs_employment_income: 160_000
+            net_self_employment_earnings: 40_000
+          - irs_employment_income: 60_000
+            net_self_employment_earnings: 30_000
+        additional_medicare_tax_threshold: 250_000
       expect: 40000
 
 variable self_employment_additional_medicare_tax:
@@ -177,13 +177,13 @@ variable self_employment_additional_medicare_tax:
   dtype: Money
   unit: "USD"
   label: "Additional Medicare Tax (Self-Employment)"
-  description: "0.9% additional Medicare tax on SE income above threshold per 26 USC 1401(b)(2)"
+  description: "0.9% additional Medicare tax on SE income above threshold per 26 USC 1_401(b)(2)"
   formula: return additional_rate * se_income_subject_to_additional_medicare_tax
   tests:
     - name: "0.9% tax on SE income above threshold"
       period: 2024
       inputs:
-        se_income_subject_to_additional_medicare_tax: 50000
+        se_income_subject_to_additional_medicare_tax: 50_000
         additional_rate: 0.009
       expect: 450
     - name: "No tax when SE income below threshold"
@@ -195,12 +195,12 @@ variable self_employment_additional_medicare_tax:
     - name: "High earner with substantial SE above threshold"
       period: 2024
       inputs:
-        se_income_subject_to_additional_medicare_tax: 100000
+        se_income_subject_to_additional_medicare_tax: 100_000
         additional_rate: 0.009
       expect: 900
     - name: "Moderate additional Medicare tax"
       period: 2024
       inputs:
-        se_income_subject_to_additional_medicare_tax: 25000
+        se_income_subject_to_additional_medicare_tax: 25_000
         additional_rate: 0.009
       expect: 225

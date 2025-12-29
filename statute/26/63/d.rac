@@ -41,7 +41,7 @@ variable itemized_taxable_income_deductions:
     - name: "Medical expenses only"
       period: 2024-01
       inputs:
-        medical_expense_deduction: 5000
+        medical_expense_deduction: 5_000
         salt_deduction: 0
         interest_deduction: 0
         charitable_deduction: 0
@@ -50,7 +50,7 @@ variable itemized_taxable_income_deductions:
       period: 2024-01
       inputs:
         medical_expense_deduction: 0
-        salt_deduction: 10000
+        salt_deduction: 10_000
         interest_deduction: 0
         charitable_deduction: 0
       expect: 10000
@@ -59,7 +59,7 @@ variable itemized_taxable_income_deductions:
       inputs:
         medical_expense_deduction: 0
         salt_deduction: 0
-        interest_deduction: 8000
+        interest_deduction: 8_000
         charitable_deduction: 0
       expect: 8000
     - name: "Charitable contributions only"
@@ -68,22 +68,22 @@ variable itemized_taxable_income_deductions:
         medical_expense_deduction: 0
         salt_deduction: 0
         interest_deduction: 0
-        charitable_deduction: 3000
+        charitable_deduction: 3_000
       expect: 3000
     - name: "All itemized deductions combined"
       period: 2024-01
       inputs:
-        medical_expense_deduction: 5000
-        salt_deduction: 10000
-        interest_deduction: 8000
-        charitable_deduction: 3000
+        medical_expense_deduction: 5_000
+        salt_deduction: 10_000
+        interest_deduction: 8_000
+        charitable_deduction: 3_000
       expect: 26000
     - name: "Substantial medical and SALT deductions"
       period: 2024-01
       inputs:
-        medical_expense_deduction: 8500
-        salt_deduction: 10000
-        interest_deduction: 6500
+        medical_expense_deduction: 8_500
+        salt_deduction: 10_000
+        interest_deduction: 6_500
         charitable_deduction: 2000
       expect: 27000
 
@@ -110,8 +110,8 @@ variable total_itemized_deductions:
     - name: "Total alias reflects itemized deductions (nonzero)"
       period: 2024-01
       inputs:
-        medical_expense_deduction: 5000
-        salt_deduction: 10000
-        interest_deduction: 8000
-        charitable_deduction: 3000
+        medical_expense_deduction: 5_000
+        salt_deduction: 10_000
+        interest_deduction: 8_000
+        charitable_deduction: 3_000
       expect: 26000

@@ -32,7 +32,7 @@ variable earned_income_credit:
       period: 2024-01
       inputs:
         is_eligible_individual: true
-        initial_credit_amount: 4000
+        initial_credit_amount: 4_000
         credit_reduction_amount: 500
       expect: 3500
     - name: "Eligible individual, no reduction"
@@ -46,15 +46,15 @@ variable earned_income_credit:
       period: 2024-01
       inputs:
         is_eligible_individual: false
-        initial_credit_amount: 6960
-        credit_reduction_amount: 1000
+        initial_credit_amount: 6_960
+        credit_reduction_amount: 1_000
       expect: 0
     - name: "Reduction exceeds credit, result is 0"
       period: 2024-01
       inputs:
         is_eligible_individual: true
         initial_credit_amount: 2000
-        credit_reduction_amount: 3000
+        credit_reduction_amount: 3_000
       expect: 0
     - name: "Zero credit, no reduction"
       period: 2024-01

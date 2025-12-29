@@ -9,8 +9,8 @@ variable alternative_tax:
   period: Year
   dtype: Money
   unit: "USD"
-  label: "Corporate Income Tax (with Section 1201 consideration)"
-  description: "Final corporate tax applying Section 1201 if beneficial"
+  label: "Corporate Income Tax (with Section 1_201 consideration)"
+  description: "Final corporate tax applying Section 1_201 if beneficial"
   syntax: python
   formula: |
     # Only C corporations can use Section 1201
@@ -27,7 +27,7 @@ variable alternative_tax:
     section_1201_tax = compute_section_1201_tax()
     return section_1201_tax < regular_tax
   tests:
-    - name: "Post-TCJA C corporation - Section 1201 never applies"
+    - name: "Post-TCJA C corporation - Section 1_201 never applies"
       period: 2024
       inputs:
         is_subject_to_corporate_tax: true
@@ -36,7 +36,7 @@ variable alternative_tax:
         tcja_effective_year: 2018
       expect: false
 
-    - name: "Non-corporate entity - Section 1201 does not apply"
+    - name: "Non-corporate entity - Section 1_201 does not apply"
       period: 2024
       inputs:
         is_subject_to_corporate_tax: false
@@ -54,7 +54,7 @@ variable alternative_tax:
         tcja_effective_year: 2018
       expect: false
 
-    - name: "Corporation with capital loss - Section 1201 does not apply"
+    - name: "Corporation with capital loss - Section 1_201 does not apply"
       period: 2024
       inputs:
         is_subject_to_corporate_tax: true

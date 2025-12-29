@@ -175,85 +175,85 @@ variable ira_phaseout_ratio:
     - name: "Single, no active participant, no phaseout"
       period: 2024
       inputs:
-        adjusted_gross_income: 100000
+        adjusted_gross_income: 100_000
         filing_status: 1
         is_active_retirement_plan_participant: false
-        ira_contribution_limit: 7000
+        ira_contribution_limit: 7_000
       expect: 0
     - name: "Single, active participant, below phaseout threshold"
       period: 2024
       inputs:
-        adjusted_gross_income: 140000
+        adjusted_gross_income: 140_000
         filing_status: 1
         is_active_retirement_plan_participant: true
       expect: 0
     - name: "Single, active participant, at phaseout start"
       period: 2024
       inputs:
-        adjusted_gross_income: 146000
+        adjusted_gross_income: 146_000
         filing_status: 1
         is_active_retirement_plan_participant: true
       expect: 0
     - name: "Single, active participant, midway in phaseout"
       period: 2024
       inputs:
-        adjusted_gross_income: 153500
+        adjusted_gross_income: 153_500
         filing_status: 1
         is_active_retirement_plan_participant: true
       expect: 0.5
     - name: "Single, active participant, at phaseout end"
       period: 2024
       inputs:
-        adjusted_gross_income: 161000
+        adjusted_gross_income: 161_000
         filing_status: 1
         is_active_retirement_plan_participant: true
       expect: 1
     - name: "Single, active participant, above phaseout"
       period: 2024
       inputs:
-        adjusted_gross_income: 200000
+        adjusted_gross_income: 200_000
         filing_status: 1
         is_active_retirement_plan_participant: true
       expect: 1
     - name: "Married filing jointly, active participant, below phaseout"
       period: 2024
       inputs:
-        adjusted_gross_income: 120000
+        adjusted_gross_income: 120_000
         filing_status: 2
         is_active_retirement_plan_participant: true
       expect: 0
     - name: "Married filing jointly, active participant, midway phaseout"
       period: 2024
       inputs:
-        adjusted_gross_income: 133000
+        adjusted_gross_income: 133_000
         filing_status: 2
         is_active_retirement_plan_participant: true
       expect: 0.5
     - name: "Married filing jointly, active participant, fully phased out"
       period: 2024
       inputs:
-        adjusted_gross_income: 143000
+        adjusted_gross_income: 143_000
         filing_status: 2
         is_active_retirement_plan_participant: true
       expect: 1
     - name: "Married filing separately, active participant"
       period: 2024
       inputs:
-        adjusted_gross_income: 5000
+        adjusted_gross_income: 5_000
         filing_status: 3
         is_active_retirement_plan_participant: true
       expect: 0.5
     - name: "MFS, complete phaseout"
       period: 2024
       inputs:
-        adjusted_gross_income: 10000
+        adjusted_gross_income: 10_000
         filing_status: 3
         is_active_retirement_plan_participant: true
       expect: 1
     - name: "Married jointly, spouse covered, not covered, below phaseout"
       period: 2024
       inputs:
-        adjusted_gross_income: 230000
+        adjusted_gross_income: 230_000
         filing_status: 2
         is_active_retirement_plan_participant: false
         spouse_is_active_retirement_plan_participant: true
@@ -261,7 +261,7 @@ variable ira_phaseout_ratio:
     - name: "Married jointly, spouse covered, not covered, midway phaseout"
       period: 2024
       inputs:
-        adjusted_gross_income: 241000
+        adjusted_gross_income: 241_000
         filing_status: 2
         is_active_retirement_plan_participant: false
         spouse_is_active_retirement_plan_participant: true
@@ -269,7 +269,7 @@ variable ira_phaseout_ratio:
     - name: "Married jointly, spouse covered, not covered, fully phased out"
       period: 2024
       inputs:
-        adjusted_gross_income: 246000
+        adjusted_gross_income: 246_000
         filing_status: 2
         is_active_retirement_plan_participant: false
         spouse_is_active_retirement_plan_participant: true
@@ -296,31 +296,31 @@ variable ira_deduction_after_phaseout:
     - name: "Single, full deduction, no phaseout"
       period: 2024
       inputs:
-        ira_contribution_limit: 7000
+        ira_contribution_limit: 7_000
         ira_phaseout_ratio: 0
       expect: 7000
     - name: "Single, 50% phased out"
       period: 2024
       inputs:
-        ira_contribution_limit: 7000
+        ira_contribution_limit: 7_000
         ira_phaseout_ratio: 0.5
       expect: 3500
     - name: "Single, fully phased out"
       period: 2024
       inputs:
-        ira_contribution_limit: 7000
+        ira_contribution_limit: 7_000
         ira_phaseout_ratio: 1
       expect: 0
     - name: "Age 50+, catch-up, partial phaseout"
       period: 2024
       inputs:
-        ira_contribution_limit: 8000
+        ira_contribution_limit: 8_000
         ira_phaseout_ratio: 0.25
       expect: 6000
     - name: "Rounding test: partial dollar amount"
       period: 2024
       inputs:
-        ira_contribution_limit: 7000
+        ira_contribution_limit: 7_000
         ira_phaseout_ratio: 0.33
       expect: 4690
 

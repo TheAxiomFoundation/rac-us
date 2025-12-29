@@ -82,15 +82,15 @@ variable ctc_phaseout_reduction:
   tests:
     - name: "Income at threshold"
       period: 2024-01
-      inputs: {adjusted_gross_income: 400000, filing_status: JOINT}
+      inputs: {adjusted_gross_income: 400_000, filing_status: JOINT}
       expect: 0
     - name: "Income $1 over threshold"
       period: 2024-01
-      inputs: {adjusted_gross_income: 400001, filing_status: JOINT}
+      inputs: {adjusted_gross_income: 400_001, filing_status: JOINT}
       expect: 50  # $50 for first $1,000 increment
     - name: "Income $10k over threshold"
       period: 2024-01
-      inputs: {adjusted_gross_income: 410000, filing_status: JOINT}
+      inputs: {adjusted_gross_income: 410_000, filing_status: JOINT}
       expect: 500  # 10 * $50
 
 variable child_tax_credit_before_limit:
@@ -110,21 +110,21 @@ variable child_tax_credit_before_limit:
       period: 2024-01
       inputs:
         num_ctc_qualifying_children: 2
-        adjusted_gross_income: 100000
+        adjusted_gross_income: 100_000
         filing_status: JOINT
       expect: 4000
     - name: "Partial phaseout"
       period: 2024-01
       inputs:
         num_ctc_qualifying_children: 2
-        adjusted_gross_income: 420000
+        adjusted_gross_income: 420_000
         filing_status: JOINT
       expect: 3000  # 4000 - (20 * 50)
     - name: "Full phaseout"
       period: 2024-01
       inputs:
         num_ctc_qualifying_children: 1
-        adjusted_gross_income: 500000
+        adjusted_gross_income: 500_000
         filing_status: SINGLE
       expect: 0  # 2000 - (300 * 50) = 2000 - 15000 = 0
 
@@ -146,17 +146,17 @@ variable child_tax_credit:
       period: 2024-01
       inputs:
         num_ctc_qualifying_children: 2
-        adjusted_gross_income: 100000
+        adjusted_gross_income: 100_000
         filing_status: JOINT
-        tax_liability_limit: 10000
+        tax_liability_limit: 10_000
       expect: 4000
     - name: "Tax liability limits credit"
       period: 2024-01
       inputs:
         num_ctc_qualifying_children: 3
-        adjusted_gross_income: 50000
+        adjusted_gross_income: 50_000
         filing_status: SINGLE
-        tax_liability_limit: 3000
+        tax_liability_limit: 3_000
       expect: 3000  # Limited to tax liability
 
 variable ctc_total:
@@ -174,19 +174,19 @@ variable ctc_total:
       period: 2024-01
       inputs:
         num_ctc_qualifying_children: 2
-        adjusted_gross_income: 150000
+        adjusted_gross_income: 150_000
         filing_status: JOINT
-        tax_liability_limit: 15000
-        earned_income: 150000
+        tax_liability_limit: 15_000
+        earned_income: 150_000
       expect: 4000  # Full CTC, no ACTC needed
     - name: "Low income with ACTC"
       period: 2024-01
       inputs:
         num_ctc_qualifying_children: 2
-        adjusted_gross_income: 30000
+        adjusted_gross_income: 30_000
         filing_status: SINGLE
         tax_liability_limit: 500
-        earned_income: 30000
-        social_security_taxes: 2295
+        earned_income: 30_000
+        social_security_taxes: 2_295
         earned_income_credit: 2000
       expect: 3900  # $500 CTC + $3400 ACTC (capped at 1700*2)

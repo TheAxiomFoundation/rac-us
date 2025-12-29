@@ -9,13 +9,13 @@ input taxable_self_employment_income:
   dtype: Money
   unit: "USD"
   label: "Taxable Self-Employment Income"
-  description: "Self-employment income subject to SE tax (gross * 0.9235)"
+  description: "Self-employment income subject to SE tax (gross * 0.9_235)"
   default: 0
   tests:
     - name: "Typical self-employed income"
       period: 2024
       inputs:
-        taxable_self_employment_income: 50000
+        taxable_self_employment_income: 50_000
       expect: 50000
     - name: "Zero self-employment income"
       period: 2024
@@ -25,7 +25,7 @@ input taxable_self_employment_income:
     - name: "High self-employment income"
       period: 2024
       inputs:
-        taxable_self_employment_income: 200000
+        taxable_self_employment_income: 200_000
       expect: 200000
 
 variable self_employment_tax:
@@ -36,7 +36,7 @@ variable self_employment_tax:
   dtype: Money
   unit: "USD"
   label: "Self-Employment Medicare Tax"
-  description: "Hospital Insurance tax on self-employment earnings per 1401(b)"
+  description: "Hospital Insurance tax on self-employment earnings per 1_401(b)"
   syntax: python
   formula: |
     # taxable_self_employment_income from PE is already gross * 0.9235
@@ -45,12 +45,12 @@ variable self_employment_tax:
     - name: "Positive self-employment income"
       period: 2024
       inputs:
-        taxable_self_employment_income: 75000
+        taxable_self_employment_income: 75_000
       expect: 75000
     - name: "Negative income returns zero"
       period: 2024
       inputs:
-        taxable_self_employment_income: -10000
+        taxable_self_employment_income: -10_000
       expect: 0
     - name: "Zero income"
       period: 2024
@@ -64,14 +64,14 @@ variable base_self_employment_tax:
   dtype: Money
   unit: "USD"
   label: "Base Self-Employment Tax"
-  description: "OASDI + base HI taxes on self-employment income per 1401(a) and 1401(b)(1)"
+  description: "OASDI + base HI taxes on self-employment income per 1_401(a) and 1_401(b)(1)"
   formula: return self_employment_social_security_tax + self_employment_medicare_tax
   tests:
     - name: "Social Security (12.4%) and Medicare (2.9%) combined"
       period: 2024
       inputs:
-        self_employment_social_security_tax: 6200
-        self_employment_medicare_tax: 1450
+        self_employment_social_security_tax: 6_200
+        self_employment_medicare_tax: 1_450
       expect: 7650
     - name: "Zero SE taxes when no income"
       period: 2024
@@ -83,7 +83,7 @@ variable base_self_employment_tax:
       period: 2024
       inputs:
         self_employment_social_security_tax: 9932.40
-        self_employment_medicare_tax: 2900
+        self_employment_medicare_tax: 2_900
       expect: 12832.40
 
 variable self_employment_tax:
@@ -92,7 +92,7 @@ variable self_employment_tax:
   dtype: Money
   unit: "USD"
   label: "Self-Employment Tax"
-  description: "Combined OASDI, HI, and Additional Medicare taxes per 1401"
+  description: "Combined OASDI, HI, and Additional Medicare taxes per 1_401"
   syntax: python
   formula: |
     # Base SE tax (OASDI + Medicare at 2.9%)
@@ -103,7 +103,7 @@ variable self_employment_tax:
     - name: "Standard SE tax calculation for moderate income"
       period: 2024
       inputs:
-        base_self_employment_tax: 8900
+        base_self_employment_tax: 8_900
       expect: 8900
     - name: "High earner with substantial SE tax"
       period: 2024

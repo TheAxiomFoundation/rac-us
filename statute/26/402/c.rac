@@ -172,7 +172,7 @@ variable is_rmd_required:
         has_reached_rmd_age: true
         is_still_working_for_plan_sponsor: false
         is_5_percent_owner: false
-        prior_year_401k_balance: 100000
+        prior_year_401k_balance: 100_000
       expect: true
     - name: "Not reached RMD age yet"
       period: 2024
@@ -180,7 +180,7 @@ variable is_rmd_required:
         has_reached_rmd_age: false
         is_still_working_for_plan_sponsor: false
         is_5_percent_owner: false
-        prior_year_401k_balance: 100000
+        prior_year_401k_balance: 100_000
       expect: false
     - name: "Still-working exception: working and not 5% owner"
       period: 2024
@@ -188,7 +188,7 @@ variable is_rmd_required:
         has_reached_rmd_age: true
         is_still_working_for_plan_sponsor: true
         is_5_percent_owner: false
-        prior_year_401k_balance: 100000
+        prior_year_401k_balance: 100_000
       expect: false
     - name: "Still-working exception does not apply: 5% owner"
       period: 2024
@@ -196,7 +196,7 @@ variable is_rmd_required:
         has_reached_rmd_age: true
         is_still_working_for_plan_sponsor: true
         is_5_percent_owner: true
-        prior_year_401k_balance: 100000
+        prior_year_401k_balance: 100_000
       expect: true
     - name: "No account balance"
       period: 2024
@@ -212,7 +212,7 @@ variable is_rmd_required:
         has_reached_rmd_age: true
         is_still_working_for_plan_sponsor: false
         is_5_percent_owner: false
-        prior_year_401k_balance: -1000
+        prior_year_401k_balance: -1_000
       expect: false
     - name: "Retired with 5% ownership (still-working exception does not apply)"
       period: 2024
@@ -220,7 +220,7 @@ variable is_rmd_required:
         has_reached_rmd_age: true
         is_still_working_for_plan_sponsor: false
         is_5_percent_owner: true
-        prior_year_401k_balance: 500000
+        prior_year_401k_balance: 500_000
       expect: true
     - name: "Small account balance"
       period: 2024
@@ -303,49 +303,49 @@ variable required_minimum_distribution:
       period: 2024
       inputs:
         is_rmd_required: false
-        prior_year_401k_balance: 100000
+        prior_year_401k_balance: 100_000
         rmd_divisor: 27.4
       expect: 0
     - name: "Age 72 with $500,000 balance"
       period: 2024
       inputs:
         is_rmd_required: true
-        prior_year_401k_balance: 500000
+        prior_year_401k_balance: 500_000
         rmd_divisor: 27.4
       expect: 18248.18
     - name: "Age 73 with $300,000 balance"
       period: 2024
       inputs:
         is_rmd_required: true
-        prior_year_401k_balance: 300000
+        prior_year_401k_balance: 300_000
         rmd_divisor: 26.5
       expect: 11320.75
     - name: "Age 80 with $250,000 balance"
       period: 2024
       inputs:
         is_rmd_required: true
-        prior_year_401k_balance: 250000
+        prior_year_401k_balance: 250_000
         rmd_divisor: 19.4
       expect: 12886.60
     - name: "Age 85 with $1,000,000 balance"
       period: 2024
       inputs:
         is_rmd_required: true
-        prior_year_401k_balance: 1000000
+        prior_year_401k_balance: 1_000_000
         rmd_divisor: 15.2
       expect: 65789.47
     - name: "Age 90 with modest balance"
       period: 2024
       inputs:
         is_rmd_required: true
-        prior_year_401k_balance: 100000
+        prior_year_401k_balance: 100_000
         rmd_divisor: 11.5
       expect: 8695.65
     - name: "Age 100 with large balance"
       period: 2024
       inputs:
         is_rmd_required: true
-        prior_year_401k_balance: 2000000
+        prior_year_401k_balance: 2_000_000
         rmd_divisor: 5.6
       expect: 357142.86
 

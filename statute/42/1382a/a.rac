@@ -24,7 +24,7 @@ variable income_exclusions:
   dtype: Money
   unit: "USD"
   label: "SSI total countable income"
-  description: "Sum of countable earned and unearned income per 42 USC 1382a"
+  description: "Sum of countable earned and unearned income per 42 USC 1_382a"
   formula: return general_exclusion
   tests:
     - name: "Default general exclusion"

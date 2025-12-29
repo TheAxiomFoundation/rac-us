@@ -70,7 +70,7 @@ variable has_qualified_education_loan:
     - name: "Student has qualified higher education expenses of $15,000"
       period: 2024-01
       inputs:
-        qualified_higher_education_expenses_221: 15000
+        qualified_higher_education_expenses_221: 15_000
       expect: 15000
     - name: "Student has no qualified higher education expenses"
       period: 2024-01
@@ -80,7 +80,7 @@ variable has_qualified_education_loan:
     - name: "Student has modest qualified expenses of $5,000"
       period: 2024-01
       inputs:
-        qualified_higher_education_expenses_221: 5000
+        qualified_higher_education_expenses_221: 5_000
       expect: 5000
 
 variable qualified_higher_education_expenses_221:

@@ -180,7 +180,7 @@ variable acp_categorically_eligible:
   period: Month
   dtype: Boolean
   label: "ACP Categorically Eligible"
-  description: "Eligible through any qualifying program per 47 USC 1752(a)(6)(B)-(F)"
+  description: "Eligible through any qualifying program per 47 USC 1_752(a)(6)(B)-(F)"
   syntax: python
   formula: |
     return acp_school_meal_eligible or acp_pell_grant_eligible or acp_wic_eligible or acp_lifeline_categorical_eligible or acp_tribal_program_eligible
@@ -268,7 +268,7 @@ variable acp_eligible:
   period: Month
   dtype: Boolean
   label: "ACP Eligible"
-  description: "Overall Affordable Connectivity Program eligibility per 47 USC 1752(a)(6)"
+  description: "Overall Affordable Connectivity Program eligibility per 47 USC 1_752(a)(6)"
   syntax: python
   formula: |
     # Check if program is active (benefit amount > 0)
@@ -301,7 +301,7 @@ variable acp_eligible:
       period: 2024-01
       inputs:
         household_size: 3
-        gross_income: 5000
+        gross_income: 5_000
         receives_snap: true
         receives_medicaid: false
         receives_ssi: false
@@ -320,7 +320,7 @@ variable acp_eligible:
       period: 2024-01
       inputs:
         household_size: 2
-        gross_income: 5000
+        gross_income: 5_000
         receives_snap: false
         receives_medicaid: false
         receives_ssi: false
@@ -358,7 +358,7 @@ variable acp_eligible:
       period: 2024-01
       inputs:
         household_size: 2
-        gross_income: 3000
+        gross_income: 3_000
         receives_snap: true
         receives_medicaid: false
         receives_ssi: false
@@ -380,7 +380,7 @@ variable acp_fpl_threshold:
   dtype: Money
   unit: "USD"
   label: "ACP FPL Income Limit"
-  description: "200% of Federal Poverty Level for household size per 47 USC 1752(a)(6)(A)"
+  description: "200% of Federal Poverty Level for household size per 47 USC 1_752(a)(6)(A)"
   syntax: python
   formula: |
     extra_members = max(0, household_size - 1)
@@ -422,7 +422,7 @@ variable acp_income_eligible:
   period: Month
   dtype: Boolean
   label: "ACP Income Eligible"
-  description: "Household income at or below 200% FPL per 47 USC 1752(a)(6)(A)"
+  description: "Household income at or below 200% FPL per 47 USC 1_752(a)(6)(A)"
   syntax: python
   formula: |
     # Use gross income per 47 CFR 54.400(f)
@@ -433,7 +433,7 @@ variable acp_income_eligible:
       period: 2024-01
       inputs:
         household_size: 1
-        gross_income: 2510
+        gross_income: 2_510
       expect: true
     - name: "Single person below threshold (eligible)"
       period: 2024-01
@@ -445,7 +445,7 @@ variable acp_income_eligible:
       period: 2024-01
       inputs:
         household_size: 1
-        gross_income: 2511
+        gross_income: 2_511
       expect: false
     - name: "Four person family at threshold (eligible)"
       period: 2024-01
@@ -457,13 +457,13 @@ variable acp_income_eligible:
       period: 2024-01
       inputs:
         household_size: 4
-        gross_income: 3500
+        gross_income: 3_500
       expect: true
     - name: "Four person family above threshold (ineligible)"
       period: 2024-01
       inputs:
         household_size: 4
-        gross_income: 5500
+        gross_income: 5_500
       expect: false
     - name: "Zero income (eligible)"
       period: 2024-01
@@ -560,7 +560,7 @@ variable acp_on_tribal_land:
   period: Month
   dtype: Boolean
   label: "ACP Household on Tribal Land"
-  description: "Household located on Tribal land for enhanced benefit per 47 USC 1752(a)(7)"
+  description: "Household located on Tribal land for enhanced benefit per 47 USC 1_752(a)(7)"
   formula: return is_on_tribal_land
   default: false
   tests:
@@ -581,7 +581,7 @@ variable acp_pell_grant_eligible:
   period: Month
   dtype: Boolean
   label: "ACP Pell Grant Eligibility"
-  description: "Eligible through Federal Pell Grant receipt per 47 USC 1752(a)(6)(C)"
+  description: "Eligible through Federal Pell Grant receipt per 47 USC 1_752(a)(6)(C)"
   syntax: python
   formula: |
     # At least one member received Pell Grant in current award year
@@ -607,7 +607,7 @@ variable acp_school_meal_eligible:
   period: Month
   dtype: Boolean
   label: "ACP School Meal Eligibility"
-  description: "Eligible through free or reduced price school lunch/breakfast per 47 USC 1752(a)(6)(B)"
+  description: "Eligible through free or reduced price school lunch/breakfast per 47 USC 1_752(a)(6)(B)"
   syntax: python
   formula: |
     # At least one member approved for free or reduced price meals
@@ -716,7 +716,7 @@ variable acp_wic_eligible:
   period: Month
   dtype: Boolean
   label: "ACP WIC Eligibility"
-  description: "Eligible through WIC participation per 47 USC 1752(a)(6)(E)"
+  description: "Eligible through WIC participation per 47 USC 1_752(a)(6)(E)"
   syntax: python
   formula: |
     # At least one member receives WIC

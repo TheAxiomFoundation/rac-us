@@ -9,7 +9,7 @@ variable capital_gain_net_income:
   dtype: Money
   unit: "USD"
   label: "Capital Gain Net Income"
-  description: "Net capital gains (gains minus losses) per 26 USC §1222(11), counted for EITC investment income test"
+  description: "Net capital gains (gains minus losses) per 26 USC §1_222(11), counted for EITC investment income test"
   tests:
     - name: "No capital gains or losses"
       period: 2024

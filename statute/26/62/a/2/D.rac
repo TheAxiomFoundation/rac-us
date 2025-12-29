@@ -121,6 +121,6 @@ tests:
     inputs:
       tax_unit:
         is_eligible_educator: true
-        educator_expenses: 1000
+        educator_expenses: 1_000
     outputs:
       educator_expense_deduction: 300

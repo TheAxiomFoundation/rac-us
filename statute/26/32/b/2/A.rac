@@ -22,10 +22,10 @@ parameter earned_income_amount_by_children:
   reference: "26 USC 32(b)(2)(A)"
   values:
     2024-01-01:
-      0: 8260
-      1: 12390
-      2: 17400
-      3: 17400
+      0: 8_260
+      1: 12_390
+      2: 17_400
+      3: 17_400
 
 # Parameters for phaseout amount by number of qualifying children
 # Values are 2024 amounts per Rev. Proc. 2023-34, Section 3.06
@@ -36,10 +36,10 @@ parameter phaseout_amount_by_children:
   reference: "26 USC 32(b)(2)(A)"
   values:
     2024-01-01:
-      0: 10330
-      1: 22720
-      2: 22720
-      3: 22720
+      0: 10_330
+      1: 22_720
+      2: 22_720
+      3: 22_720
 
 # 26 USC 32(b)(2)(A) - Earned Income Amount
 variable earned_income_amount:
@@ -173,61 +173,61 @@ variable agi_limit:
       inputs:
         num_qualifying_children: 0
         filing_status: SINGLE
-        credit_percentage: {0: 0.0765, 1: 0.34, 2: 0.40, 3: 0.45}
-        phaseout_percentage: {0: 0.0765, 1: 0.1598, 2: 0.2106, 3: 0.2106}
-        joint_return_adjustment: 6920
+        credit_percentage: {0: 0.765, 1: 0.34, 2: 0.40, 3: 0.45}
+        phaseout_percentage: {0: 0.765, 1: 0.1_598, 2: 0.2_106, 3: 0.2_106}
+        joint_return_adjustment: 6_920
       expect: 18590  # 10330 + (0.0765 * 8260) / 0.0765 = 10330 + 8260
     - name: "No children, joint filer - higher AGI limit"
       period: 2024-01
       inputs:
         num_qualifying_children: 0
         filing_status: JOINT
-        credit_percentage: {0: 0.0765, 1: 0.34, 2: 0.40, 3: 0.45}
-        phaseout_percentage: {0: 0.0765, 1: 0.1598, 2: 0.2106, 3: 0.2106}
-        joint_return_adjustment: 6920
+        credit_percentage: {0: 0.765, 1: 0.34, 2: 0.40, 3: 0.45}
+        phaseout_percentage: {0: 0.765, 1: 0.1_598, 2: 0.2_106, 3: 0.2_106}
+        joint_return_adjustment: 6_920
       expect: 25510  # 10330 + 6920 + 8260
     - name: "One child, single filer"
       period: 2024-01
       inputs:
         num_qualifying_children: 1
         filing_status: SINGLE
-        credit_percentage: {0: 0.0765, 1: 0.34, 2: 0.40, 3: 0.45}
-        phaseout_percentage: {0: 0.0765, 1: 0.1598, 2: 0.2106, 3: 0.2106}
-        joint_return_adjustment: 6920
+        credit_percentage: {0: 0.765, 1: 0.34, 2: 0.40, 3: 0.45}
+        phaseout_percentage: {0: 0.765, 1: 0.1_598, 2: 0.2_106, 3: 0.2_106}
+        joint_return_adjustment: 6_920
       expect: 49078.47  # 22720 + (0.34 * 12390) / 0.1598
     - name: "One child, joint filer"
       period: 2024-01
       inputs:
         num_qualifying_children: 1
         filing_status: JOINT
-        credit_percentage: {0: 0.0765, 1: 0.34, 2: 0.40, 3: 0.45}
-        phaseout_percentage: {0: 0.0765, 1: 0.1598, 2: 0.2106, 3: 0.2106}
-        joint_return_adjustment: 6920
+        credit_percentage: {0: 0.765, 1: 0.34, 2: 0.40, 3: 0.45}
+        phaseout_percentage: {0: 0.765, 1: 0.1_598, 2: 0.2_106, 3: 0.2_106}
+        joint_return_adjustment: 6_920
       expect: 55998.47  # 22720 + 6920 + 26358.47
     - name: "Two children, single filer"
       period: 2024-01
       inputs:
         num_qualifying_children: 2
         filing_status: SINGLE
-        credit_percentage: {0: 0.0765, 1: 0.34, 2: 0.40, 3: 0.45}
-        phaseout_percentage: {0: 0.0765, 1: 0.1598, 2: 0.2106, 3: 0.2106}
-        joint_return_adjustment: 6920
+        credit_percentage: {0: 0.765, 1: 0.34, 2: 0.40, 3: 0.45}
+        phaseout_percentage: {0: 0.765, 1: 0.1_598, 2: 0.2_106, 3: 0.2_106}
+        joint_return_adjustment: 6_920
       expect: 55762.11  # 22720 + (0.40 * 17400) / 0.2106
     - name: "Three children, joint filer"
       period: 2024-01
       inputs:
         num_qualifying_children: 3
         filing_status: JOINT
-        credit_percentage: {0: 0.0765, 1: 0.34, 2: 0.40, 3: 0.45}
-        phaseout_percentage: {0: 0.0765, 1: 0.1598, 2: 0.2106, 3: 0.2106}
-        joint_return_adjustment: 6920
+        credit_percentage: {0: 0.765, 1: 0.34, 2: 0.40, 3: 0.45}
+        phaseout_percentage: {0: 0.765, 1: 0.1_598, 2: 0.2_106, 3: 0.2_106}
+        joint_return_adjustment: 6_920
       expect: 66830.67  # 22720 + 6920 + (0.45 * 17400) / 0.2106
     - name: "Zero income edge case"
       period: 2024-01
       inputs:
         num_qualifying_children: 0
         filing_status: SINGLE
-        credit_percentage: {0: 0.0765, 1: 0.34, 2: 0.40, 3: 0.45}
-        phaseout_percentage: {0: 0.0765, 1: 0.1598, 2: 0.2106, 3: 0.2106}
-        joint_return_adjustment: 6920
+        credit_percentage: {0: 0.765, 1: 0.34, 2: 0.40, 3: 0.45}
+        phaseout_percentage: {0: 0.765, 1: 0.1_598, 2: 0.2_106, 3: 0.2_106}
+        joint_return_adjustment: 6_920
       expect: 18590

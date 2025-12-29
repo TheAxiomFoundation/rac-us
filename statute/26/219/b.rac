@@ -75,37 +75,37 @@ variable ira_contribution_limit:
     - name: "Under 50 with full earned income (2024)"
       period: 2024
       inputs:
-        earned_income: 50000
+        earned_income: 50_000
         age: 45
       expect: 7000
     - name: "Age 50 with full earned income (2024)"
       period: 2024
       inputs:
-        earned_income: 50000
+        earned_income: 50_000
         age: 50
       expect: 8000
     - name: "Age 51 with full earned income (2024)"
       period: 2024
       inputs:
-        earned_income: 50000
+        earned_income: 50_000
         age: 51
       expect: 8000
     - name: "Age 49 (catch-up not yet available)"
       period: 2024
       inputs:
-        earned_income: 50000
+        earned_income: 50_000
         age: 49
       expect: 7000
     - name: "Under 50 with low earned income (2024)"
       period: 2024
       inputs:
-        earned_income: 5000
+        earned_income: 5_000
         age: 40
       expect: 5000
     - name: "Age 50+ with low earned income (2024)"
       period: 2024
       inputs:
-        earned_income: 7500
+        earned_income: 7_500
         age: 55
       expect: 7500
     - name: "Zero earned income (2024)"
@@ -117,19 +117,19 @@ variable ira_contribution_limit:
     - name: "Prior year 2023 under 50"
       period: 2023
       inputs:
-        earned_income: 50000
+        earned_income: 50_000
         age: 45
       expect: 6500
     - name: "Prior year 2023 age 50+"
       period: 2023
       inputs:
-        earned_income: 50000
+        earned_income: 50_000
         age: 50
       expect: 7500
     - name: "Negative earned income floor"
       period: 2024
       inputs:
-        earned_income: -1000
+        earned_income: -1_000
         age: 45
       expect: 0
 

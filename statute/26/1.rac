@@ -22,11 +22,11 @@ parameter brackets:
   values:
     # TCJA base thresholds (2018)
     thresholds:
-      single: [0, 9525, 38700, 82500, 157500, 200000, 500000]
-      married_filing_jointly: [0, 19050, 77400, 165000, 315000, 400000, 600000]
-      married_filing_separately: [0, 9525, 38700, 82500, 157500, 200000, 300000]
-      head_of_household: [0, 13600, 51800, 82500, 157500, 200000, 500000]
-      qualifying_widow: [0, 19050, 77400, 165000, 315000, 400000, 600000]
+      single: [0, 9_525, 38_700, 82_500, 157_500, 200_000, 500_000]
+      married_filing_jointly: [0, 19_050, 77_400, 165_000, 315_000, 400_000, 600_000]
+      married_filing_separately: [0, 9_525, 38_700, 82_500, 157_500, 200_000, 300_000]
+      head_of_household: [0, 13_600, 51_800, 82_500, 157_500, 200_000, 500_000]
+      qualifying_widow: [0, 19_050, 77_400, 165_000, 315_000, 400_000, 600_000]
     # Rates are statutory (TCJA)
     rates: [0.10, 0.12, 0.22, 0.24, 0.32, 0.35, 0.37]
 
@@ -59,20 +59,20 @@ variable income_tax_before_credits:
     - name: "Single filer, negative taxable income (capped at 0)"
       period: 2018-01
       inputs:
-        taxable_income: -5000
+        taxable_income: -5_000
         filing_status: SINGLE
       expect: 0
     - name: "Single filer, $10k in 10% bracket"
       period: 2018-01
       inputs:
-        taxable_income: 10000
+        taxable_income: 10_000
         filing_status: SINGLE
       # All $10k at 10%: $10,000 * 0.10 = $1,000
       expect: 1000
     - name: "Single filer, $30k spanning 10% and 12% brackets"
       period: 2018-01
       inputs:
-        taxable_income: 30000
+        taxable_income: 30_000
         filing_status: SINGLE
       # $9,525 at 10%: $952.50
       # $20,475 at 12%: $2,457.00
@@ -81,7 +81,7 @@ variable income_tax_before_credits:
     - name: "Single filer, $50k spanning multiple brackets"
       period: 2018-01
       inputs:
-        taxable_income: 50000
+        taxable_income: 50_000
         filing_status: SINGLE
       # $9,525 at 10%: $952.50
       # $29,175 at 12%: $3,501.00
@@ -91,7 +91,7 @@ variable income_tax_before_credits:
     - name: "Single filer, high income in top bracket"
       period: 2018-01
       inputs:
-        taxable_income: 600000
+        taxable_income: 600_000
         filing_status: SINGLE
       # Progressive calculation across all brackets
       # $9,525 at 10%: $952.50
@@ -112,14 +112,14 @@ variable income_tax_before_credits:
     - name: "Married filing jointly, $40k in 10% bracket"
       period: 2018-01
       inputs:
-        taxable_income: 40000
+        taxable_income: 40_000
         filing_status: JOINT
       # All $40k at 10%: $40,000 * 0.10 = $4,000
       expect: 4000
     - name: "Married filing jointly, $100k spanning 10% and 12%"
       period: 2018-01
       inputs:
-        taxable_income: 100000
+        taxable_income: 100_000
         filing_status: JOINT
       # $19,050 at 10%: $1,905.00
       # $58,350 at 12%: $7,002.00
@@ -129,7 +129,7 @@ variable income_tax_before_credits:
     - name: "Married filing jointly, high income"
       period: 2018-01
       inputs:
-        taxable_income: 500000
+        taxable_income: 500_000
         filing_status: JOINT
       # Progressive calculation across all brackets
       # $19,050 at 10%: $1,905.00
@@ -143,7 +143,7 @@ variable income_tax_before_credits:
     - name: "Head of household, $25k in lower brackets"
       period: 2018-01
       inputs:
-        taxable_income: 25000
+        taxable_income: 25_000
         filing_status: HEAD_OF_HOUSEHOLD
       # $13,600 at 10%: $1,360.00
       # $11,400 at 12%: $1,368.00
@@ -152,7 +152,7 @@ variable income_tax_before_credits:
     - name: "Head of household, $60k spanning brackets"
       period: 2018-01
       inputs:
-        taxable_income: 60000
+        taxable_income: 60_000
         filing_status: HEAD_OF_HOUSEHOLD
       # $13,600 at 10%: $1,360.00
       # $38,200 at 12%: $4,584.00
@@ -162,7 +162,7 @@ variable income_tax_before_credits:
     - name: "Married filing separately, $25k"
       period: 2018-01
       inputs:
-        taxable_income: 25000
+        taxable_income: 25_000
         filing_status: SEPARATE
       # $9,525 at 10%: $952.50
       # $15,475 at 12%: $1,857.00
@@ -171,7 +171,7 @@ variable income_tax_before_credits:
     - name: "Married filing separately, high income"
       period: 2018-01
       inputs:
-        taxable_income: 250000
+        taxable_income: 250_000
         filing_status: SEPARATE
       # Progressive calculation across all brackets
       # $9,525 at 10%: $952.50
@@ -185,7 +185,7 @@ variable income_tax_before_credits:
     - name: "Qualifying widow, $80k"
       period: 2018-01
       inputs:
-        taxable_income: 80000
+        taxable_income: 80_000
         filing_status: QUALIFYING_WIDOW
       # Same brackets as married filing jointly
       # $19,050 at 10%: $1,905.00
@@ -196,14 +196,14 @@ variable income_tax_before_credits:
     - name: "Single filer at bracket boundary (threshold)"
       period: 2018-01
       inputs:
-        taxable_income: 9525
+        taxable_income: 9_525
         filing_status: SINGLE
       # Exactly at 10% bracket ceiling: $9,525 * 0.10 = $952.50
       expect: 952.50
     - name: "Single filer just over bracket boundary"
       period: 2018-01
       inputs:
-        taxable_income: 9526
+        taxable_income: 9_526
         filing_status: SINGLE
       # $9,525 at 10%: $952.50
       # $1 at 12%: $0.12
@@ -212,7 +212,7 @@ variable income_tax_before_credits:
     - name: "Joint filer at second bracket boundary"
       period: 2018-01
       inputs:
-        taxable_income: 77400
+        taxable_income: 77_400
         filing_status: JOINT
       # $19,050 at 10%: $1,905.00
       # $58,350 at 12%: $7,002.00
@@ -228,7 +228,7 @@ variable income_tax_before_credits:
     - name: "Very high income single filer (top bracket)"
       period: 2018-01
       inputs:
-        taxable_income: 1000000
+        taxable_income: 1_000_000
         filing_status: SINGLE
       # Progressive calculation across all 7 brackets
       # $9,525 at 10%: $952.50
@@ -288,7 +288,7 @@ variable total_federal_income_tax:
     - name: "Ordinary income only, no other taxes or credits"
       period: 2018-01
       inputs:
-        income_tax_before_credits: 5000
+        income_tax_before_credits: 5_000
         capital_gains_tax: 0
         alternative_minimum_tax: 0
         net_investment_income_tax: 0
@@ -300,8 +300,8 @@ variable total_federal_income_tax:
     - name: "Ordinary income with capital gains"
       period: 2018-01
       inputs:
-        income_tax_before_credits: 6000
-        capital_gains_tax: 1500
+        income_tax_before_credits: 6_000
+        capital_gains_tax: 1_500
         alternative_minimum_tax: 0
         net_investment_income_tax: 0
         self_employment_tax: 0
@@ -312,11 +312,11 @@ variable total_federal_income_tax:
     - name: "Ordinary income with self-employment tax"
       period: 2018-01
       inputs:
-        income_tax_before_credits: 3000
+        income_tax_before_credits: 3_000
         capital_gains_tax: 0
         alternative_minimum_tax: 0
         net_investment_income_tax: 0
-        self_employment_tax: 2300
+        self_employment_tax: 2_300
         additional_medicare_tax: 0
         total_nonrefundable_credits: 0
         total_refundable_credits: 0
@@ -324,7 +324,7 @@ variable total_federal_income_tax:
     - name: "Ordinary income with net investment income tax"
       period: 2018-01
       inputs:
-        income_tax_before_credits: 8000
+        income_tax_before_credits: 8_000
         capital_gains_tax: 0
         alternative_minimum_tax: 0
         net_investment_income_tax: 400
@@ -336,7 +336,7 @@ variable total_federal_income_tax:
     - name: "Ordinary income with additional Medicare tax"
       period: 2018-01
       inputs:
-        income_tax_before_credits: 10000
+        income_tax_before_credits: 10_000
         capital_gains_tax: 0
         alternative_minimum_tax: 0
         net_investment_income_tax: 0
@@ -348,11 +348,11 @@ variable total_federal_income_tax:
     - name: "All tax components combined"
       period: 2018-01
       inputs:
-        income_tax_before_credits: 15000
+        income_tax_before_credits: 15_000
         capital_gains_tax: 2000
         alternative_minimum_tax: 500
         net_investment_income_tax: 400
-        self_employment_tax: 3000
+        self_employment_tax: 3_000
         additional_medicare_tax: 200
         total_nonrefundable_credits: 0
         total_refundable_credits: 0
@@ -360,11 +360,11 @@ variable total_federal_income_tax:
     - name: "High income with multiple tax components"
       period: 2018-01
       inputs:
-        income_tax_before_credits: 50000
-        capital_gains_tax: 5000
+        income_tax_before_credits: 50_000
+        capital_gains_tax: 5_000
         alternative_minimum_tax: 0
         net_investment_income_tax: 2000
-        self_employment_tax: 5000
+        self_employment_tax: 5_000
         additional_medicare_tax: 450
         total_nonrefundable_credits: 0
         total_refundable_credits: 0
@@ -372,13 +372,13 @@ variable total_federal_income_tax:
     - name: "Ordinary income with nonrefundable credits reducing tax"
       period: 2018-01
       inputs:
-        income_tax_before_credits: 8000
-        capital_gains_tax: 1000
+        income_tax_before_credits: 8_000
+        capital_gains_tax: 1_000
         alternative_minimum_tax: 0
         net_investment_income_tax: 0
         self_employment_tax: 0
         additional_medicare_tax: 0
-        total_nonrefundable_credits: 3000
+        total_nonrefundable_credits: 3_000
         total_refundable_credits: 0
       # Tax before credits: $8,000 + $1,000 = $9,000
       # Less nonrefundable credits: $9,000 - $3,000 = $6,000
@@ -386,11 +386,11 @@ variable total_federal_income_tax:
     - name: "Ordinary income with refundable credits"
       period: 2018-01
       inputs:
-        income_tax_before_credits: 4000
+        income_tax_before_credits: 4_000
         capital_gains_tax: 0
         alternative_minimum_tax: 0
         net_investment_income_tax: 0
-        self_employment_tax: 1500
+        self_employment_tax: 1_500
         additional_medicare_tax: 0
         total_nonrefundable_credits: 2000
         total_refundable_credits: 2000
@@ -407,8 +407,8 @@ variable total_federal_income_tax:
         net_investment_income_tax: 0
         self_employment_tax: 0
         additional_medicare_tax: 0
-        total_nonrefundable_credits: 1000
-        total_refundable_credits: 3000
+        total_nonrefundable_credits: 1_000
+        total_refundable_credits: 3_000
       # Tax before credits: $2,000
       # Less nonrefundable credits: $2,000 - $1,000 = $1,000
       # Less refundable credits: $1,000 - $3,000 = -$2,000 (refund)
@@ -435,14 +435,14 @@ variable total_federal_income_tax:
         self_employment_tax: 0
         additional_medicare_tax: 0
         total_nonrefundable_credits: 0
-        total_refundable_credits: 1500
+        total_refundable_credits: 1_500
       # Full refundable credit results in refund
       expect: -1500
     - name: "Capital gains with preferential rate and ordinary income"
       period: 2018-01
       inputs:
-        income_tax_before_credits: 7500
-        capital_gains_tax: 1000
+        income_tax_before_credits: 7_500
+        capital_gains_tax: 1_000
         alternative_minimum_tax: 0
         net_investment_income_tax: 0
         self_employment_tax: 0
@@ -453,13 +453,13 @@ variable total_federal_income_tax:
     - name: "Very high income with alternative minimum tax"
       period: 2018-01
       inputs:
-        income_tax_before_credits: 100000
-        capital_gains_tax: 10000
-        alternative_minimum_tax: 5000
-        net_investment_income_tax: 3000
-        self_employment_tax: 8000
+        income_tax_before_credits: 100_000
+        capital_gains_tax: 10_000
+        alternative_minimum_tax: 5_000
+        net_investment_income_tax: 3_000
+        self_employment_tax: 8_000
         additional_medicare_tax: 500
-        total_nonrefundable_credits: 5000
+        total_nonrefundable_credits: 5_000
         total_refundable_credits: 0
       # Total before credits: $100,000 + $10,000 + $5,000 + $3,000 + $8,000 + $500 = $126,500
       # Less nonrefundable credits: $126,500 - $5,000 = $121,500
@@ -467,13 +467,13 @@ variable total_federal_income_tax:
     - name: "Married couple with pass-through income and SE tax"
       period: 2018-01
       inputs:
-        income_tax_before_credits: 18000
+        income_tax_before_credits: 18_000
         capital_gains_tax: 2000
         alternative_minimum_tax: 0
         net_investment_income_tax: 500
-        self_employment_tax: 4500
+        self_employment_tax: 4_500
         additional_medicare_tax: 250
-        total_nonrefundable_credits: 1500
+        total_nonrefundable_credits: 1_500
         total_refundable_credits: 2000
       # Total before credits: $18,000 + $2,000 + $0 + $500 + $4,500 + $250 = $25,250
       # Less nonrefundable credits: $25,250 - $1,500 = $23,750
@@ -482,14 +482,14 @@ variable total_federal_income_tax:
     - name: "Edge case: Credits exceed all tax components"
       period: 2018-01
       inputs:
-        income_tax_before_credits: 3000
+        income_tax_before_credits: 3_000
         capital_gains_tax: 500
         alternative_minimum_tax: 0
         net_investment_income_tax: 0
         self_employment_tax: 0
         additional_medicare_tax: 0
         total_nonrefundable_credits: 2000
-        total_refundable_credits: 3000
+        total_refundable_credits: 3_000
       # Total tax: $3,500
       # Less nonrefundable credits: $3,500 - $2,000 = $1,500
       # Less refundable credits: $1,500 - $3,000 = -$1,500 (refund)
@@ -497,7 +497,7 @@ variable total_federal_income_tax:
     - name: "Single filer, moderate income, realistic mix"
       period: 2018-01
       inputs:
-        income_tax_before_credits: 6940
+        income_tax_before_credits: 6_940
         capital_gains_tax: 750
         alternative_minimum_tax: 0
         net_investment_income_tax: 0

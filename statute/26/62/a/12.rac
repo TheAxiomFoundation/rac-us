@@ -106,11 +106,11 @@ tests:
       tax_unit:
         has_hdhp: true
         hsa_coverage_type: self_only
-        hsa_contributions: 4150
+        hsa_contributions: 4_150
         age: 40
     outputs:
-      hsa_contribution_limit: 4150
-      hsa_deduction: 4150
+      hsa_contribution_limit: 4_150
+      hsa_deduction: 4_150
 
   - name: "Self-only coverage with catch-up at age 55"
     period: 2024-01
@@ -118,11 +118,11 @@ tests:
       tax_unit:
         has_hdhp: true
         hsa_coverage_type: self_only
-        hsa_contributions: 5150
+        hsa_contributions: 5_150
         age: 55
     outputs:
-      hsa_contribution_limit: 5150
-      hsa_deduction: 5150
+      hsa_contribution_limit: 5_150
+      hsa_deduction: 5_150
 
   - name: "Family coverage, under age 55"
     period: 2024-01
@@ -130,11 +130,11 @@ tests:
       tax_unit:
         has_hdhp: true
         hsa_coverage_type: family
-        hsa_contributions: 8300
+        hsa_contributions: 8_300
         age: 45
     outputs:
-      hsa_contribution_limit: 8300
-      hsa_deduction: 8300
+      hsa_contribution_limit: 8_300
+      hsa_deduction: 8_300
 
   - name: "Family coverage with catch-up at age 65"
     period: 2024-01
@@ -142,11 +142,11 @@ tests:
       tax_unit:
         has_hdhp: true
         hsa_coverage_type: family
-        hsa_contributions: 9300
+        hsa_contributions: 9_300
         age: 65
     outputs:
-      hsa_contribution_limit: 9300
-      hsa_deduction: 9300
+      hsa_contribution_limit: 9_300
+      hsa_deduction: 9_300
 
   - name: "No HDHP, no deduction allowed"
     period: 2024-01
@@ -154,7 +154,7 @@ tests:
       tax_unit:
         has_hdhp: false
         hsa_coverage_type: self_only
-        hsa_contributions: 4150
+        hsa_contributions: 4_150
         age: 40
     outputs:
       hsa_contribution_limit: 0
@@ -177,10 +177,10 @@ tests:
       tax_unit:
         has_hdhp: true
         hsa_coverage_type: self_only
-        hsa_contributions: 6000
+        hsa_contributions: 6_000
         age: 40
     outputs:
-      hsa_deduction: 4150
+      hsa_deduction: 4_150
 
   - name: "Zero contributions"
     period: 2024-01
@@ -199,11 +199,11 @@ tests:
       tax_unit:
         has_hdhp: true
         hsa_coverage_type: self_only
-        hsa_contributions: 3450
+        hsa_contributions: 3_450
         age: 40
     outputs:
-      hsa_contribution_limit: 3450
-      hsa_deduction: 3450
+      hsa_contribution_limit: 3_450
+      hsa_deduction: 3_450
 
   - name: "2018 limits, family with catch-up"
     period: 2018-01
@@ -211,8 +211,8 @@ tests:
       tax_unit:
         has_hdhp: true
         hsa_coverage_type: family
-        hsa_contributions: 7900
+        hsa_contributions: 7_900
         age: 55
     outputs:
-      hsa_contribution_limit: 7900
-      hsa_deduction: 7900
+      hsa_contribution_limit: 7_900
+      hsa_deduction: 7_900

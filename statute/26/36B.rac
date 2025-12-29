@@ -38,7 +38,7 @@ variable index:
       period: 2024-01
       inputs:
         household_income_pct_fpl: 2.0
-        slcsp_premium_monthly: 1200
+        slcsp_premium_monthly: 1_200
         applicable_percentage: 0.02
       expect: 1176
 

@@ -161,17 +161,17 @@ variable hcv_monthly_adjusted_income:
     - name: "Small annual income"
       period: 2024-01
       inputs:
-        hcv_annual_adjusted_income: 12000
+        hcv_annual_adjusted_income: 12_000
       expect: 1000
     - name: "Moderate annual income"
       period: 2024-01
       inputs:
-        hcv_annual_adjusted_income: 36000
+        hcv_annual_adjusted_income: 36_000
       expect: 3000
     - name: "Large annual income"
       period: 2024-01
       inputs:
-        hcv_annual_adjusted_income: 48000
+        hcv_annual_adjusted_income: 48_000
       expect: 4000
 
 variable hcv_annual_income:
@@ -199,7 +199,7 @@ variable hcv_annual_income:
     - name: "Employment income only"
       period: 2024
       inputs:
-        employment_income: 24000
+        employment_income: 24_000
         self_employment_income: 0
         social_security_benefits: 0
         ssi_benefits: 0
@@ -219,9 +219,9 @@ variable hcv_annual_income:
     - name: "Multiple income sources"
       period: 2024
       inputs:
-        employment_income: 20000
+        employment_income: 20_000
         self_employment_income: 0
-        social_security_benefits: 12000
+        social_security_benefits: 12_000
         ssi_benefits: 0
         pension_income: 0
         annuity_income: 0
@@ -239,15 +239,15 @@ variable hcv_annual_income:
     - name: "All income sources"
       period: 2024
       inputs:
-        employment_income: 20000
-        self_employment_income: 5000
-        social_security_benefits: 10000
+        employment_income: 20_000
+        self_employment_income: 5_000
+        social_security_benefits: 10_000
         ssi_benefits: 0
-        pension_income: 3000
+        pension_income: 3_000
         annuity_income: 0
         alimony_received: 0
         child_support_received: 0
-        regular_gifts_received: 1000
+        regular_gifts_received: 1_000
         unemployment_benefits: 0
         disability_benefits: 0
         workers_compensation: 0
@@ -403,24 +403,24 @@ variable hcv_annual_adjusted_income:
     - name: "Income with no deductions"
       period: 2024
       inputs:
-        hcv_annual_income: 30000
+        hcv_annual_income: 30_000
         hcv_total_deductions: 0
       expect: 30000
     - name: "Income with partial deductions"
       period: 2024
       inputs:
-        hcv_annual_income: 30000
-        hcv_total_deductions: 1360
+        hcv_annual_income: 30_000
+        hcv_total_deductions: 1_360
       expect: 28640
     - name: "Income fully deducted"
       period: 2024
       inputs:
-        hcv_annual_income: 1360
-        hcv_total_deductions: 1360
+        hcv_annual_income: 1_360
+        hcv_total_deductions: 1_360
       expect: 0
     - name: "Income exceeded by deductions"
       period: 2024
       inputs:
         hcv_annual_income: 500
-        hcv_total_deductions: 2360
+        hcv_total_deductions: 2_360
       expect: 0

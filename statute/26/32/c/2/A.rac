@@ -28,7 +28,7 @@ variable earned_income:
     - name: "Wages only"
       period: 2024-01
       inputs:
-        wages: 30000
+        wages: 30_000
         salaries: 0
         tips: 0
         net_earnings_self_employment: 0
@@ -37,9 +37,9 @@ variable earned_income:
     - name: "Wages, salaries, and tips"
       period: 2024-01
       inputs:
-        wages: 20000
-        salaries: 5000
-        tips: 3000
+        wages: 20_000
+        salaries: 5_000
+        tips: 3_000
         net_earnings_self_employment: 0
         se_tax_deduction: 0
       expect: 28000
@@ -49,25 +49,25 @@ variable earned_income:
         wages: 0
         salaries: 0
         tips: 0
-        net_earnings_self_employment: 50000
+        net_earnings_self_employment: 50_000
         se_tax_deduction: 3532.50
       expect: 46467.50  # 50000 - 3532.50
     - name: "Combined wages and self-employment"
       period: 2024-01
       inputs:
-        wages: 25000
+        wages: 25_000
         salaries: 0
         tips: 2000
-        net_earnings_self_employment: 20000
-        se_tax_deduction: 1413
+        net_earnings_self_employment: 20_000
+        se_tax_deduction: 1_413
       expect: 45587  # 25000 + 2000 + (20000 - 1413)
     - name: "Self-employment loss (capped at 0)"
       period: 2024-01
       inputs:
-        wages: 15000
+        wages: 15_000
         salaries: 0
         tips: 0
-        net_earnings_self_employment: -5000
+        net_earnings_self_employment: -5_000
         se_tax_deduction: 0
       expect: 15000  # SE loss doesn't reduce wages for EITC
     - name: "Zero income"
@@ -82,9 +82,9 @@ variable earned_income:
     - name: "SE deduction exceeds SE income"
       period: 2024-01
       inputs:
-        wages: 10000
+        wages: 10_000
         salaries: 0
         tips: 0
-        net_earnings_self_employment: 5000
-        se_tax_deduction: 6000
+        net_earnings_self_employment: 5_000
+        se_tax_deduction: 6_000
       expect: 10000  # SE portion is max(0, 5000-6000) = 0

@@ -193,8 +193,8 @@ variable snap_total_deductions:
       period: 2024-10
       inputs:
         household_size: 4
-        earned_income: 1000
-        gross_income: 1000
+        earned_income: 1_000
+        gross_income: 1_000
         shelter_costs: 0
         has_elderly_disabled: false
         dependent_care_expenses: 0
@@ -205,8 +205,8 @@ variable snap_total_deductions:
       period: 2024-10
       inputs:
         household_size: 4
-        earned_income: 1000
-        gross_income: 1000
+        earned_income: 1_000
+        gross_income: 1_000
         shelter_costs: 500
         has_elderly_disabled: false
         dependent_care_expenses: 0
@@ -217,9 +217,9 @@ variable snap_total_deductions:
       period: 2024-10
       inputs:
         household_size: 4
-        earned_income: 1000
-        gross_income: 1000
-        shelter_costs: 1500
+        earned_income: 1_000
+        gross_income: 1_000
+        shelter_costs: 1_500
         has_elderly_disabled: false
         dependent_care_expenses: 0
         child_support_paid: 0
@@ -312,17 +312,17 @@ variable snap_earned_income_deduction:
     - name: "Average earned income"
       period: 2024-10
       inputs:
-        earned_income: 1000
+        earned_income: 1_000
       expect: 200
     - name: "High earned income"
       period: 2024-10
       inputs:
-        earned_income: 3000
+        earned_income: 3_000
       expect: 600
     - name: "Very high earned income"
       period: 2024-10
       inputs:
-        earned_income: 5000
+        earned_income: 5_000
       expect: 1000
 
 variable snap_pre_shelter_deductions:
@@ -360,7 +360,7 @@ variable snap_pre_shelter_deductions:
       period: 2024-10
       inputs:
         household_size: 2
-        earned_income: 1000
+        earned_income: 1_000
         dependent_care_expenses: 200
         child_support_paid: 150
         medical_expenses: 100
@@ -399,7 +399,7 @@ variable snap_adjusted_income:
       period: 2024-10
       inputs:
         household_size: 1
-        gross_income: 1000
+        gross_income: 1_000
         earned_income: 500
         dependent_care_expenses: 0
         child_support_paid: 0
@@ -419,8 +419,8 @@ variable snap_adjusted_income:
       period: 2024-10
       inputs:
         household_size: 4
-        gross_income: 1500
-        earned_income: 1000
+        gross_income: 1_500
+        earned_income: 1_000
         dependent_care_expenses: 0
         child_support_paid: 0
         medical_expenses: 0
@@ -451,7 +451,7 @@ variable snap_shelter_deduction:
       period: 2024-10
       inputs:
         household_size: 1
-        gross_income: 1000
+        gross_income: 1_000
         earned_income: 500
         shelter_costs: 0
         has_elderly_disabled: false
@@ -463,7 +463,7 @@ variable snap_shelter_deduction:
       period: 2024-10
       inputs:
         household_size: 1
-        gross_income: 1000
+        gross_income: 1_000
         earned_income: 500
         shelter_costs: 200
         has_elderly_disabled: false
@@ -475,7 +475,7 @@ variable snap_shelter_deduction:
       period: 2024-10
       inputs:
         household_size: 1
-        gross_income: 1000
+        gross_income: 1_000
         earned_income: 500
         shelter_costs: 350
         has_elderly_disabled: false
@@ -487,8 +487,8 @@ variable snap_shelter_deduction:
       period: 2024-10
       inputs:
         household_size: 2
-        gross_income: 1200
-        earned_income: 1000
+        gross_income: 1_200
+        earned_income: 1_000
         shelter_costs: 600
         has_elderly_disabled: false
         dependent_care_expenses: 0
@@ -501,7 +501,7 @@ variable snap_shelter_deduction:
         household_size: 4
         gross_income: 2000
         earned_income: 2000
-        shelter_costs: 1500
+        shelter_costs: 1_500
         has_elderly_disabled: false
         dependent_care_expenses: 0
         child_support_paid: 0
@@ -511,8 +511,8 @@ variable snap_shelter_deduction:
       period: 2024-10
       inputs:
         household_size: 2
-        gross_income: 1500
-        earned_income: 1000
+        gross_income: 1_500
+        earned_income: 1_000
         shelter_costs: 2000
         has_elderly_disabled: true
         dependent_care_expenses: 0
@@ -525,7 +525,7 @@ variable snap_shelter_deduction:
         household_size: 4
         gross_income: 2000
         earned_income: 2000
-        shelter_costs: 1500
+        shelter_costs: 1_500
         has_elderly_disabled: false
         dependent_care_expenses: 0
         child_support_paid: 0
@@ -572,7 +572,7 @@ variable snap_net_income:
       period: 2024-10
       inputs:
         household_size: 1
-        gross_income: 1000
+        gross_income: 1_000
         earned_income: 800
         shelter_costs: 400
         has_elderly_disabled: false
@@ -584,8 +584,8 @@ variable snap_net_income:
       period: 2024-10
       inputs:
         household_size: 4
-        gross_income: 1500
-        earned_income: 1000
+        gross_income: 1_500
+        earned_income: 1_000
         shelter_costs: 700
         has_elderly_disabled: false
         dependent_care_expenses: 0
@@ -597,7 +597,7 @@ variable snap_net_income:
       inputs:
         household_size: 4
         gross_income: 2000
-        earned_income: 1600
+        earned_income: 1_600
         shelter_costs: 900
         has_elderly_disabled: false
         dependent_care_expenses: 150

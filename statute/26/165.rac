@@ -51,7 +51,7 @@ variable casualty_loss_per_event:
   tests:
     - name: "Loss exceeds floor - deductible amount"
       inputs:
-        casualty_loss_amount: 1500
+        casualty_loss_amount: 1_500
         casualty_loss_floor: 100
       expect: 1400
     - name: "Loss below floor - no deduction"
@@ -85,7 +85,7 @@ variable total_casualty_loss_before_agi_limit:
       expect: 1600
     - name: "Single casualty event"
       inputs:
-        casualty_loss_per_event: [1200]
+        casualty_loss_per_event: [1_200]
       expect: 1200
     - name: "No casualty losses"
       inputs:
@@ -116,22 +116,22 @@ variable casualty_loss_deduction:
   tests:
     - name: "Standard case - losses exceed 10% AGI threshold"
       inputs:
-        adjusted_gross_income: 50000
-        total_casualty_loss_before_agi_limit: 8000
+        adjusted_gross_income: 50_000
+        total_casualty_loss_before_agi_limit: 8_000
         federally_declared_disaster: false
         agi_floor_rate: 0.10
       expect: 3000
     - name: "Standard case - losses below 10% AGI threshold"
       inputs:
-        adjusted_gross_income: 100000
-        total_casualty_loss_before_agi_limit: 5000
+        adjusted_gross_income: 100_000
+        total_casualty_loss_before_agi_limit: 5_000
         federally_declared_disaster: false
         agi_floor_rate: 0.10
       expect: 0
     - name: "Federally declared disaster - no AGI limitation"
       inputs:
-        adjusted_gross_income: 100000
-        total_casualty_loss_before_agi_limit: 3000
+        adjusted_gross_income: 100_000
+        total_casualty_loss_before_agi_limit: 3_000
         federally_declared_disaster: true
         agi_floor_rate: 0.10
       expect: 3000

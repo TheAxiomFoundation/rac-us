@@ -148,7 +148,7 @@ variable hcv_eligible:
       period: 2024
       inputs:
         household_size: 1
-        hcv_annual_income: 30000
+        hcv_annual_income: 30_000
         hcv_income_eligible: true
         hcv_family_eligible: true
         hcv_citizenship_eligible: true
@@ -157,7 +157,7 @@ variable hcv_eligible:
       period: 2024
       inputs:
         household_size: 4
-        hcv_annual_income: 45000
+        hcv_annual_income: 45_000
         hcv_income_eligible: true
         hcv_family_eligible: true
         hcv_citizenship_eligible: true
@@ -166,7 +166,7 @@ variable hcv_eligible:
       period: 2024
       inputs:
         household_size: 2
-        hcv_annual_income: 80000
+        hcv_annual_income: 80_000
         hcv_income_eligible: false
         hcv_family_eligible: true
         hcv_citizenship_eligible: true
@@ -175,7 +175,7 @@ variable hcv_eligible:
       period: 2024
       inputs:
         household_size: 1
-        hcv_annual_income: 25000
+        hcv_annual_income: 25_000
         hcv_income_eligible: true
         hcv_family_eligible: true
         hcv_citizenship_eligible: false
@@ -184,7 +184,7 @@ variable hcv_eligible:
       period: 2024
       inputs:
         household_size: 1
-        hcv_annual_income: 100000
+        hcv_annual_income: 100_000
         hcv_income_eligible: false
         hcv_family_eligible: false
         hcv_citizenship_eligible: false
@@ -285,36 +285,36 @@ variable hcv_income_eligible:
       period: 2024
       inputs:
         household_size: 1
-        hcv_annual_income: 30000
-        hcv_very_low_income_limit: 35650
+        hcv_annual_income: 30_000
+        hcv_very_low_income_limit: 35_650
       expect: true
     - name: "Single person at limit"
       period: 2024
       inputs:
         household_size: 1
-        hcv_annual_income: 35650
-        hcv_very_low_income_limit: 35650
+        hcv_annual_income: 35_650
+        hcv_very_low_income_limit: 35_650
       expect: true
     - name: "Single person over limit"
       period: 2024
       inputs:
         household_size: 1
-        hcv_annual_income: 40000
-        hcv_very_low_income_limit: 35650
+        hcv_annual_income: 40_000
+        hcv_very_low_income_limit: 35_650
       expect: false
     - name: "Family of 4 eligible"
       period: 2024
       inputs:
         household_size: 4
-        hcv_annual_income: 45000
-        hcv_very_low_income_limit: 50850
+        hcv_annual_income: 45_000
+        hcv_very_low_income_limit: 50_850
       expect: true
     - name: "Family of 4 ineligible"
       period: 2024
       inputs:
         household_size: 4
-        hcv_annual_income: 60000
-        hcv_very_low_income_limit: 50850
+        hcv_annual_income: 60_000
+        hcv_very_low_income_limit: 50_850
       expect: false
 
 variable hcv_extremely_low_income:
@@ -330,27 +330,27 @@ variable hcv_extremely_low_income:
       period: 2024
       inputs:
         household_size: 1
-        hcv_annual_income: 20000
-        hcv_extremely_low_income_limit: 21390
+        hcv_annual_income: 20_000
+        hcv_extremely_low_income_limit: 21_390
       expect: true
     - name: "Single person at extremely low limit"
       period: 2024
       inputs:
         household_size: 1
-        hcv_annual_income: 21390
-        hcv_extremely_low_income_limit: 21390
+        hcv_annual_income: 21_390
+        hcv_extremely_low_income_limit: 21_390
       expect: true
     - name: "Single person over extremely low limit"
       period: 2024
       inputs:
         household_size: 1
-        hcv_annual_income: 30000
-        hcv_extremely_low_income_limit: 21390
+        hcv_annual_income: 30_000
+        hcv_extremely_low_income_limit: 21_390
       expect: false
     - name: "Family of 4 extremely low income"
       period: 2024
       inputs:
         household_size: 4
-        hcv_annual_income: 25000
-        hcv_extremely_low_income_limit: 30510
+        hcv_annual_income: 25_000
+        hcv_extremely_low_income_limit: 30_510
       expect: true

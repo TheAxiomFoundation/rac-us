@@ -85,7 +85,7 @@ variable acp_benefit:
   dtype: Money
   unit: "USD"
   label: "ACP Monthly Benefit"
-  description: "Monthly discount equal to amount charged, up to maximum per 47 USC 1752(a)(7)"
+  description: "Monthly discount equal to amount charged, up to maximum per 47 USC 1_752(a)(7)"
   syntax: python
   formula: |
     # Must be eligible to receive benefit
@@ -138,7 +138,7 @@ variable acp_max_benefit:
   dtype: Money
   unit: "USD"
   label: "ACP Maximum Monthly Benefit"
-  description: "Maximum monthly benefit: $75 on Tribal land, $30 otherwise per 47 USC 1752(a)(7)"
+  description: "Maximum monthly benefit: $75 on Tribal land, $30 otherwise per 47 USC 1_752(a)(7)"
   syntax: python
   formula: |
     if acp_on_tribal_land:

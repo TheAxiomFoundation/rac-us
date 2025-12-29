@@ -115,7 +115,7 @@ variable resource_exclusions:
   dtype: Money
   unit: "USD"
   label: "SSI countable resources"
-  description: "Total resources minus exclusions per 42 USC 1382b(a)"
+  description: "Total resources minus exclusions per 42 USC 1_382b(a)"
   syntax: python
   formula: |
     # Start with total resources

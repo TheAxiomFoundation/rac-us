@@ -108,7 +108,7 @@ variable eligibility:
       inputs:
         household_size: 1
         fpl_by_household_size:
-          1: 1450
+          1: 1_450
           additional_per_person: 490
       expect: 1450
     - name: "Household of 2 FPL calculation"
@@ -116,7 +116,7 @@ variable eligibility:
       inputs:
         household_size: 2
         fpl_by_household_size:
-          1: 1450
+          1: 1_450
           additional_per_person: 490
       expect: 1940
     - name: "Household of 4 FPL calculation"
@@ -124,7 +124,7 @@ variable eligibility:
       inputs:
         household_size: 4
         fpl_by_household_size:
-          1: 1450
+          1: 1_450
           additional_per_person: 490
       expect: 3920
     - name: "Household of 4 with 1 pregnant (counts as 5)"
@@ -132,7 +132,7 @@ variable eligibility:
       inputs:
         household_size: 4
         fpl_by_household_size:
-          1: 1450
+          1: 1_450
           additional_per_person: 490
         members:
           - is_pregnant: true
@@ -216,20 +216,20 @@ variable household_magi:
     - name: "Low income household ($1,000/month)"
       period: 2024-01
       inputs:
-        magi_income: 1000
+        magi_income: 1_000
       expect: 1000
     - name: "Moderate income household ($2,500/month)"
       period: 2024-01
       inputs:
-        magi_income: 2500
+        magi_income: 2_500
       expect: 2500
     - name: "Expansion threshold income (138% FPL for family of 4)"
       period: 2024-01
       inputs:
-        magi_income: 3920
+        magi_income: 3_920
       expect: 3920
     - name: "Above expansion income ($5,000/month)"
       period: 2024-01
       inputs:
-        magi_income: 5000
+        magi_income: 5_000
       expect: 5000

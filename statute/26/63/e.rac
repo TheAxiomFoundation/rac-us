@@ -63,42 +63,42 @@ variable uses_standard_deduction:
       period: 2024-01
       inputs:
         is_ineligible_for_standard_deduction: false
-        standard_deduction: 14600
-        itemized_taxable_income_deductions: 10000
+        standard_deduction: 14_600
+        itemized_taxable_income_deductions: 10_000
       expect: true
     - name: "Standard deduction equal to itemized deductions"
       period: 2024-01
       inputs:
         is_ineligible_for_standard_deduction: false
-        standard_deduction: 10000
-        itemized_taxable_income_deductions: 10000
+        standard_deduction: 10_000
+        itemized_taxable_income_deductions: 10_000
       expect: true
     - name: "Itemized deductions preferred when > standard deduction"
       period: 2024-01
       inputs:
         is_ineligible_for_standard_deduction: false
-        standard_deduction: 10000
-        itemized_taxable_income_deductions: 14600
+        standard_deduction: 10_000
+        itemized_taxable_income_deductions: 14_600
       expect: false
     - name: "Cannot use standard deduction (MFS spouse itemizes)"
       period: 2024-01
       inputs:
         is_ineligible_for_standard_deduction: true
-        standard_deduction: 14600
-        itemized_taxable_income_deductions: 5000
+        standard_deduction: 14_600
+        itemized_taxable_income_deductions: 5_000
       expect: false
     - name: "Must itemize even when standard deduction is higher"
       period: 2024-01
       inputs:
         is_ineligible_for_standard_deduction: true
-        standard_deduction: 20000
-        itemized_taxable_income_deductions: 8000
+        standard_deduction: 20_000
+        itemized_taxable_income_deductions: 8_000
       expect: false
     - name: "Eligible and chooses standard deduction (zero itemized)"
       period: 2024-01
       inputs:
         is_ineligible_for_standard_deduction: false
-        standard_deduction: 14600
+        standard_deduction: 14_600
         itemized_taxable_income_deductions: 0
       expect: true
 
@@ -124,55 +124,55 @@ variable taxable_income_deductions:
       period: 2024-01
       inputs:
         is_ineligible_for_standard_deduction: false
-        standard_deduction: 14600
-        itemized_taxable_income_deductions: 10000
+        standard_deduction: 14_600
+        itemized_taxable_income_deductions: 10_000
       expect: 14600
     - name: "Uses itemized deductions when larger"
       period: 2024-01
       inputs:
         is_ineligible_for_standard_deduction: false
-        standard_deduction: 10000
-        itemized_taxable_income_deductions: 14600
+        standard_deduction: 10_000
+        itemized_taxable_income_deductions: 14_600
       expect: 14600
     - name: "Equal standard and itemized deductions"
       period: 2024-01
       inputs:
         is_ineligible_for_standard_deduction: false
-        standard_deduction: 12500
-        itemized_taxable_income_deductions: 12500
+        standard_deduction: 12_500
+        itemized_taxable_income_deductions: 12_500
       expect: 12500
     - name: "Cannot use standard deduction - must use itemized"
       period: 2024-01
       inputs:
         is_ineligible_for_standard_deduction: true
-        standard_deduction: 14600
-        itemized_taxable_income_deductions: 10000
+        standard_deduction: 14_600
+        itemized_taxable_income_deductions: 10_000
       expect: 10000
     - name: "Ineligible for standard deduction - itemized even if standard higher"
       period: 2024-01
       inputs:
         is_ineligible_for_standard_deduction: true
-        standard_deduction: 20000
-        itemized_taxable_income_deductions: 8000
+        standard_deduction: 20_000
+        itemized_taxable_income_deductions: 8_000
       expect: 8000
     - name: "Eligible taxpayer with zero itemized deductions"
       period: 2024-01
       inputs:
         is_ineligible_for_standard_deduction: false
-        standard_deduction: 14600
+        standard_deduction: 14_600
         itemized_taxable_income_deductions: 0
       expect: 14600
     - name: "High itemized deductions (combined components)"
       period: 2024-01
       inputs:
         is_ineligible_for_standard_deduction: false
-        standard_deduction: 14600
-        itemized_taxable_income_deductions: 26000
+        standard_deduction: 14_600
+        itemized_taxable_income_deductions: 26_000
       expect: 26000
     - name: "Eligible taxpayer choosing standard with minimal itemized"
       period: 2024-01
       inputs:
         is_ineligible_for_standard_deduction: false
-        standard_deduction: 14600
-        itemized_taxable_income_deductions: 5000
+        standard_deduction: 14_600
+        itemized_taxable_income_deductions: 5_000
       expect: 14600

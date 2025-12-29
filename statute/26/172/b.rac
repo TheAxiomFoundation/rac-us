@@ -53,10 +53,10 @@ variable nol_carryforward_allowed:
     - name: "NOL carryforward always allowed post-TCJA"
       period: 2024
       inputs:
-        taxable_income: 50000
+        taxable_income: 50_000
         filing_status: "single"
-        nol_carryforward_pre_tcja: 10000
-        nol_carryforward_post_tcja: 15000
+        nol_carryforward_pre_tcja: 10_000
+        nol_carryforward_post_tcja: 15_000
         farming_loss_carryback: 0
         is_farming_business: false
         current_year_farming_loss: 0
@@ -111,10 +111,10 @@ variable nol_carryback_allowed:
     - name: "General NOL carryback not allowed post-TCJA"
       period: 2024
       inputs:
-        taxable_income: 50000
+        taxable_income: 50_000
         filing_status: "single"
         nol_carryforward_pre_tcja: 0
-        nol_carryforward_post_tcja: 20000
+        nol_carryforward_post_tcja: 20_000
         farming_loss_carryback: 0
         is_farming_business: false
         current_year_farming_loss: 0
@@ -169,24 +169,24 @@ variable farming_loss_carryback_allowed:
     - name: "Farming carryback allowed with farming business and loss"
       period: 2024
       inputs:
-        taxable_income: -30000
+        taxable_income: -30_000
         filing_status: "single"
         nol_carryforward_pre_tcja: 0
         nol_carryforward_post_tcja: 0
         farming_loss_carryback: 0
         is_farming_business: true
-        current_year_farming_loss: 30000
+        current_year_farming_loss: 30_000
       expect: true
     - name: "Farming carryback not allowed without farming business"
       period: 2024
       inputs:
-        taxable_income: -50000
+        taxable_income: -50_000
         filing_status: "single"
         nol_carryforward_pre_tcja: 0
         nol_carryforward_post_tcja: 0
         farming_loss_carryback: 0
         is_farming_business: false
-        current_year_farming_loss: 50000
+        current_year_farming_loss: 50_000
       expect: false
     - name: "Farming carryback not allowed with business but no loss"
       period: 2024
@@ -239,13 +239,13 @@ variable farming_loss_carryback_years:
     - name: "Farming loss carryback 2 years when allowed"
       period: 2024
       inputs:
-        taxable_income: -40000
+        taxable_income: -40_000
         filing_status: "single"
         nol_carryforward_pre_tcja: 0
         nol_carryforward_post_tcja: 0
         farming_loss_carryback: 0
         is_farming_business: true
-        current_year_farming_loss: 40000
+        current_year_farming_loss: 40_000
       expect: 2
     - name: "No carryback years when farming loss carryback not allowed"
       period: 2024
@@ -298,10 +298,10 @@ variable total_nol_carryforward:
     - name: "Total NOL carryforward both pre and post TCJA"
       period: 2024
       inputs:
-        taxable_income: 100000
+        taxable_income: 100_000
         filing_status: "single"
-        nol_carryforward_pre_tcja: 25000
-        nol_carryforward_post_tcja: 35000
+        nol_carryforward_pre_tcja: 25_000
+        nol_carryforward_post_tcja: 35_000
         farming_loss_carryback: 0
         is_farming_business: false
         current_year_farming_loss: 0
@@ -309,9 +309,9 @@ variable total_nol_carryforward:
     - name: "Total NOL only pre-TCJA"
       period: 2024
       inputs:
-        taxable_income: 50000
+        taxable_income: 50_000
         filing_status: "married_filing_jointly"
-        nol_carryforward_pre_tcja: 40000
+        nol_carryforward_pre_tcja: 40_000
         nol_carryforward_post_tcja: 0
         farming_loss_carryback: 0
         is_farming_business: false
@@ -320,10 +320,10 @@ variable total_nol_carryforward:
     - name: "Total NOL only post-TCJA"
       period: 2024
       inputs:
-        taxable_income: 75000
+        taxable_income: 75_000
         filing_status: "single"
         nol_carryforward_pre_tcja: 0
-        nol_carryforward_post_tcja: 50000
+        nol_carryforward_post_tcja: 50_000
         farming_loss_carryback: 0
         is_farming_business: false
         current_year_farming_loss: 0
@@ -380,10 +380,10 @@ variable nol_taxable_income_for_limitation:
     - name: "Taxable income for limitation purposes positive"
       period: 2024
       inputs:
-        taxable_income: 125000
+        taxable_income: 125_000
         filing_status: "married_filing_jointly"
         nol_carryforward_pre_tcja: 0
-        nol_carryforward_post_tcja: 50000
+        nol_carryforward_post_tcja: 50_000
         farming_loss_carryback: 0
         is_farming_business: false
         current_year_farming_loss: 0
@@ -440,10 +440,10 @@ variable nol_limitation_amount:
     - name: "80% limitation on taxable income of 100,000"
       period: 2024
       inputs:
-        taxable_income: 100000
+        taxable_income: 100_000
         filing_status: "single"
         nol_carryforward_pre_tcja: 0
-        nol_carryforward_post_tcja: 50000
+        nol_carryforward_post_tcja: 50_000
         farming_loss_carryback: 0
         is_farming_business: false
         current_year_farming_loss: 0
@@ -451,10 +451,10 @@ variable nol_limitation_amount:
     - name: "80% limitation on taxable income of 50,000"
       period: 2024
       inputs:
-        taxable_income: 50000
+        taxable_income: 50_000
         filing_status: "married_filing_jointly"
         nol_carryforward_pre_tcja: 0
-        nol_carryforward_post_tcja: 60000
+        nol_carryforward_post_tcja: 60_000
         farming_loss_carryback: 0
         is_farming_business: false
         current_year_farming_loss: 0
@@ -511,9 +511,9 @@ variable nol_deduction_pre_tcja:
     - name: "Pre-TCJA NOL less than taxable income"
       period: 2024
       inputs:
-        taxable_income: 100000
+        taxable_income: 100_000
         filing_status: "single"
-        nol_carryforward_pre_tcja: 30000
+        nol_carryforward_pre_tcja: 30_000
         nol_carryforward_post_tcja: 0
         farming_loss_carryback: 0
         is_farming_business: false
@@ -522,9 +522,9 @@ variable nol_deduction_pre_tcja:
     - name: "Pre-TCJA NOL exceeds taxable income"
       period: 2024
       inputs:
-        taxable_income: 40000
+        taxable_income: 40_000
         filing_status: "married_filing_jointly"
-        nol_carryforward_pre_tcja: 80000
+        nol_carryforward_pre_tcja: 80_000
         nol_carryforward_post_tcja: 0
         farming_loss_carryback: 0
         is_farming_business: false
@@ -585,10 +585,10 @@ variable nol_deduction_post_tcja:
     - name: "Post-TCJA NOL subject to 80% limitation"
       period: 2024
       inputs:
-        taxable_income: 100000
+        taxable_income: 100_000
         filing_status: "single"
         nol_carryforward_pre_tcja: 0
-        nol_carryforward_post_tcja: 100000
+        nol_carryforward_post_tcja: 100_000
         farming_loss_carryback: 0
         is_farming_business: false
         current_year_farming_loss: 0
@@ -596,10 +596,10 @@ variable nol_deduction_post_tcja:
     - name: "Post-TCJA NOL less than 80% limit"
       period: 2024
       inputs:
-        taxable_income: 100000
+        taxable_income: 100_000
         filing_status: "single"
         nol_carryforward_pre_tcja: 0
-        nol_carryforward_post_tcja: 50000
+        nol_carryforward_post_tcja: 50_000
         farming_loss_carryback: 0
         is_farming_business: false
         current_year_farming_loss: 0
@@ -607,10 +607,10 @@ variable nol_deduction_post_tcja:
     - name: "Post-TCJA NOL after pre-TCJA deduction"
       period: 2024
       inputs:
-        taxable_income: 100000
+        taxable_income: 100_000
         filing_status: "married_filing_jointly"
-        nol_carryforward_pre_tcja: 40000
-        nol_carryforward_post_tcja: 100000
+        nol_carryforward_pre_tcja: 40_000
+        nol_carryforward_post_tcja: 100_000
         farming_loss_carryback: 0
         is_farming_business: false
         current_year_farming_loss: 0
@@ -673,10 +673,10 @@ variable nol_carryforward_remaining_pre_tcja:
     - name: "Pre-TCJA carryforward fully deducted"
       period: 2024
       inputs:
-        taxable_income: 100000
+        taxable_income: 100_000
         filing_status: "single"
-        nol_carryforward_pre_tcja: 50000
-        nol_carryforward_post_tcja: 30000
+        nol_carryforward_pre_tcja: 50_000
+        nol_carryforward_post_tcja: 30_000
         farming_loss_carryback: 0
         is_farming_business: false
         current_year_farming_loss: 0
@@ -684,9 +684,9 @@ variable nol_carryforward_remaining_pre_tcja:
     - name: "Pre-TCJA carryforward partially used"
       period: 2024
       inputs:
-        taxable_income: 30000
+        taxable_income: 30_000
         filing_status: "single"
-        nol_carryforward_pre_tcja: 50000
+        nol_carryforward_pre_tcja: 50_000
         nol_carryforward_post_tcja: 0
         farming_loss_carryback: 0
         is_farming_business: false
@@ -739,10 +739,10 @@ variable nol_carryforward_remaining_post_tcja:
     - name: "Post-TCJA carryforward fully deducted under 80% limit"
       period: 2024
       inputs:
-        taxable_income: 100000
+        taxable_income: 100_000
         filing_status: "single"
         nol_carryforward_pre_tcja: 0
-        nol_carryforward_post_tcja: 50000
+        nol_carryforward_post_tcja: 50_000
         farming_loss_carryback: 0
         is_farming_business: false
         current_year_farming_loss: 0
@@ -750,10 +750,10 @@ variable nol_carryforward_remaining_post_tcja:
     - name: "Post-TCJA carryforward limited by 80% rule"
       period: 2024
       inputs:
-        taxable_income: 100000
+        taxable_income: 100_000
         filing_status: "single"
         nol_carryforward_pre_tcja: 0
-        nol_carryforward_post_tcja: 100000
+        nol_carryforward_post_tcja: 100_000
         farming_loss_carryback: 0
         is_farming_business: false
         current_year_farming_loss: 0
@@ -764,7 +764,7 @@ variable nol_carryforward_remaining_post_tcja:
         taxable_income: 0
         filing_status: "single"
         nol_carryforward_pre_tcja: 0
-        nol_carryforward_post_tcja: 75000
+        nol_carryforward_post_tcja: 75_000
         farming_loss_carryback: 0
         is_farming_business: false
         current_year_farming_loss: 0

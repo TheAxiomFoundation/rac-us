@@ -46,7 +46,7 @@ parameter graduated_brackets:
   description: "Pre-TCJA graduated corporate tax brackets"
   values:
     1993-01-01:
-      thresholds: [0, 50000, 75000, 100000, 335000, 10000000, 15000000, 18333333]
+      thresholds: [0, 50_000, 75_000, 100_000, 335_000, 10_000_000, 15_000_000, 18_333_333]
       rates: [0.15, 0.25, 0.34, 0.39, 0.34, 0.35, 0.38, 0.35]
 
 variable tax_amount:

@@ -3,7 +3,7 @@ variable medicaid_child_cost_share_exempt:
   period: Month
   dtype: Boolean
   label: "Child exempt from cost sharing"
-  description: "Children under 18 are exempt from cost sharing per 42 USC 1396o(b)(3)(A)"
+  description: "Children under 18 are exempt from cost sharing per 42 USC 1_396o(b)(3)(A)"
   syntax: python
   formula: |
     # Children under child_age_threshold are fully exempt
@@ -17,7 +17,7 @@ variable medicaid_pregnant_cost_share_exempt:
   period: Month
   dtype: Boolean
   label: "Pregnant exempt from cost sharing"
-  description: "Pregnant women are exempt from cost sharing per 42 USC 1396o(b)(3)(B)"
+  description: "Pregnant women are exempt from cost sharing per 42 USC 1_396o(b)(3)(B)"
   formula: return is_pregnant
   default: False
 
@@ -26,7 +26,7 @@ variable medicaid_institutionalized_cost_share_exempt:
   period: Month
   dtype: Boolean
   label: "Institutionalized exempt from cost sharing"
-  description: "Institutionalized individuals exempt per 42 USC 1396o(b)(3)(C)"
+  description: "Institutionalized individuals exempt per 42 USC 1_396o(b)(3)(C)"
   syntax: python
   formula: |
     # Nursing home residents, ICF residents, etc.
@@ -40,7 +40,7 @@ variable medicaid_hospice_cost_share_exempt:
   period: Month
   dtype: Boolean
   label: "Hospice exempt from cost sharing"
-  description: "Individuals in hospice exempt per 42 USC 1396o(b)(3)(D)"
+  description: "Individuals in hospice exempt per 42 USC 1_396o(b)(3)(D)"
   formula: return is_hospice_enrolled
   default: False
 
@@ -220,7 +220,7 @@ variable medicaid_emergency_cost_share_exempt:
   period: Month
   dtype: Boolean
   label: "Emergency services exempt"
-  description: "Emergency services cannot have cost sharing per 42 USC 1396o(b)(2)(D)"
+  description: "Emergency services cannot have cost sharing per 42 USC 1_396o(b)(2)(D)"
   syntax: python
   formula: |
     # This is always true - emergency services are always exempt
@@ -637,7 +637,7 @@ variable medicaid_monthly_cost_share_limit:
     - name: "Low income household cost sharing limit"
       period: 2024-01
       inputs:
-        magi_income: 1000
+        magi_income: 1_000
         aggregate_cost_share_limit: 0.05
       expect: 50
     - name: "Moderate income household cost sharing limit"
@@ -649,7 +649,7 @@ variable medicaid_monthly_cost_share_limit:
     - name: "Higher income household cost sharing limit"
       period: 2024-01
       inputs:
-        magi_income: 4000
+        magi_income: 4_000
         aggregate_cost_share_limit: 0.05
       expect: 200
 

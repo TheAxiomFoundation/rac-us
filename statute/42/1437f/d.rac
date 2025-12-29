@@ -276,19 +276,19 @@ variable hcv_gross_rent:
     - name: "Contract rent only"
       period: 2024-01
       inputs:
-        contract_rent: 1000
+        contract_rent: 1_000
         utility_allowance: 0
       expect: 1000
     - name: "Contract rent with utilities"
       period: 2024-01
       inputs:
-        contract_rent: 1000
+        contract_rent: 1_000
         utility_allowance: 150
       expect: 1150
     - name: "High contract rent"
       period: 2024-01
       inputs:
-        contract_rent: 1500
+        contract_rent: 1_500
         utility_allowance: 100
       expect: 1600
 
@@ -320,31 +320,31 @@ variable hcv_housing_assistance_payment:
       inputs:
         hcv_eligible: false
         hcv_total_tenant_payment: 300
-        hcv_payment_standard: 1150
-        hcv_gross_rent: 1000
+        hcv_payment_standard: 1_150
+        hcv_gross_rent: 1_000
       expect: 0
     - name: "Eligible, moderate income"
       period: 2024-01
       inputs:
         hcv_eligible: true
         hcv_total_tenant_payment: 300
-        hcv_payment_standard: 1150
-        hcv_gross_rent: 1000
+        hcv_payment_standard: 1_150
+        hcv_gross_rent: 1_000
       expect: 700
     - name: "Eligible, high contribution"
       period: 2024-01
       inputs:
         hcv_eligible: true
         hcv_total_tenant_payment: 800
-        hcv_payment_standard: 1150
-        hcv_gross_rent: 1000
+        hcv_payment_standard: 1_150
+        hcv_gross_rent: 1_000
       expect: 200
     - name: "Eligible, gross rent below standard"
       period: 2024-01
       inputs:
         hcv_eligible: true
         hcv_total_tenant_payment: 200
-        hcv_payment_standard: 1150
+        hcv_payment_standard: 1_150
         hcv_gross_rent: 900
       expect: 700
     - name: "Eligible, zero TTP"
@@ -352,15 +352,15 @@ variable hcv_housing_assistance_payment:
       inputs:
         hcv_eligible: true
         hcv_total_tenant_payment: 0
-        hcv_payment_standard: 1150
-        hcv_gross_rent: 1000
+        hcv_payment_standard: 1_150
+        hcv_gross_rent: 1_000
       expect: 850
     - name: "Family share affordable"
       period: 2024-01
       inputs:
         hcv_eligible: true
         hcv_total_tenant_payment: 250
-        hcv_payment_standard: 1000
+        hcv_payment_standard: 1_000
         hcv_gross_rent: 950
       expect: 700
 
@@ -388,13 +388,13 @@ variable hcv_family_payment:
     - name: "Moderate rent and HAP"
       period: 2024-01
       inputs:
-        hcv_gross_rent: 1000
+        hcv_gross_rent: 1_000
         hcv_housing_assistance_payment: 700
       expect: 300
     - name: "High family share"
       period: 2024-01
       inputs:
-        hcv_gross_rent: 1200
+        hcv_gross_rent: 1_200
         hcv_housing_assistance_payment: 600
       expect: 600
     - name: "Full subsidy"
@@ -424,23 +424,23 @@ variable hcv_initial_affordability_check:
     - name: "Affordable - within 40% limit"
       period: 2024-01
       inputs:
-        hcv_gross_rent: 1000
+        hcv_gross_rent: 1_000
         hcv_housing_assistance_payment: 700
-        hcv_monthly_adjusted_income: 1000
+        hcv_monthly_adjusted_income: 1_000
       expect: true
     - name: "Affordable - exactly 40%"
       period: 2024-01
       inputs:
-        hcv_gross_rent: 1000
+        hcv_gross_rent: 1_000
         hcv_housing_assistance_payment: 600
-        hcv_monthly_adjusted_income: 1000
+        hcv_monthly_adjusted_income: 1_000
       expect: true
     - name: "Unaffordable - exceeds 40%"
       period: 2024-01
       inputs:
-        hcv_gross_rent: 1000
+        hcv_gross_rent: 1_000
         hcv_housing_assistance_payment: 500
-        hcv_monthly_adjusted_income: 1000
+        hcv_monthly_adjusted_income: 1_000
       expect: false
     - name: "Affordable with zero income"
       period: 2024-01
@@ -470,22 +470,22 @@ variable hcv_rent_reasonable:
     - name: "Rent within reasonable threshold"
       period: 2024-01
       inputs:
-        hcv_gross_rent: 1150
-        hcv_payment_standard: 1200
+        hcv_gross_rent: 1_150
+        hcv_payment_standard: 1_200
         rent_reasonableness_threshold: 1.0
       expect: true
     - name: "Rent at payment standard"
       period: 2024-01
       inputs:
-        hcv_gross_rent: 1200
-        hcv_payment_standard: 1200
+        hcv_gross_rent: 1_200
+        hcv_payment_standard: 1_200
         rent_reasonableness_threshold: 1.0
       expect: true
     - name: "Rent exceeds reasonable threshold"
       period: 2024-01
       inputs:
-        hcv_gross_rent: 1300
-        hcv_payment_standard: 1200
+        hcv_gross_rent: 1_300
+        hcv_payment_standard: 1_200
         rent_reasonableness_threshold: 1.0
       expect: false
 
@@ -509,25 +509,25 @@ variable hcv_payment_to_owner:
       period: 2024-01
       inputs:
         hcv_housing_assistance_payment: 0
-        contract_rent: 1000
+        contract_rent: 1_000
       expect: 0
     - name: "HAP less than rent"
       period: 2024-01
       inputs:
         hcv_housing_assistance_payment: 700
-        contract_rent: 1000
+        contract_rent: 1_000
       expect: 700
     - name: "HAP exceeds rent"
       period: 2024-01
       inputs:
-        hcv_housing_assistance_payment: 1200
-        contract_rent: 1000
+        hcv_housing_assistance_payment: 1_200
+        contract_rent: 1_000
       expect: 1000
     - name: "HAP equals rent"
       period: 2024-01
       inputs:
-        hcv_housing_assistance_payment: 1000
-        contract_rent: 1000
+        hcv_housing_assistance_payment: 1_000
+        contract_rent: 1_000
       expect: 1000
 
 variable hcv:
@@ -553,5 +553,5 @@ variable hcv:
     - name: "High benefit"
       period: 2024-01
       inputs:
-        hcv_housing_assistance_payment: 1150
+        hcv_housing_assistance_payment: 1_150
       expect: 1150

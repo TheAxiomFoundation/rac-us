@@ -361,13 +361,13 @@ variable standard_deduction:
       expect: 1350
       description: "Dependent formula: $250 + $900 earned income = $1,150, capped at $14,600"
 
-    - name: "Dependent with $5000 earned income 2024"
+    - name: "Dependent with $5_000 earned income 2024"
       period: 2024-01
       inputs:
         filing_status: SINGLE
         is_dependent: true
         is_ineligible_for_standard_deduction: false
-        earned_income: 5000
+        earned_income: 5_000
         age: 17
         is_blind: false
       expect: 5450
@@ -379,7 +379,7 @@ variable standard_deduction:
         filing_status: SINGLE
         is_dependent: true
         is_ineligible_for_standard_deduction: false
-        earned_income: 20000
+        earned_income: 20_000
         age: 19
         is_blind: false
       expect: 14600
@@ -391,7 +391,7 @@ variable standard_deduction:
         filing_status: SINGLE
         is_dependent: true
         is_ineligible_for_standard_deduction: false
-        earned_income: 8000
+        earned_income: 8_000
         age: 67
         is_blind: false
       expect: 8450

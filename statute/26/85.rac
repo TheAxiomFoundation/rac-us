@@ -33,12 +33,12 @@ variable unemployment_in_agi:
     - name: "Single person with unemployment"
       period: 2024-01
       inputs:
-        members: [{unemployment_compensation: 2400}]
+        members: [{unemployment_compensation: 2_400}]
       expect: 2400
     - name: "Two earners with unemployment"
       period: 2024-01
       inputs:
-        members: [{unemployment_compensation: 3000}, {unemployment_compensation: 1500}]
+        members: [{unemployment_compensation: 3_000}, {unemployment_compensation: 1_500}]
       expect: 4500
     - name: "No unemployment"
       period: 2024-01
@@ -48,5 +48,5 @@ variable unemployment_in_agi:
     - name: "Multiple members, some without unemployment"
       period: 2024-01
       inputs:
-        members: [{unemployment_compensation: 2400}, {unemployment_compensation: 0}]
+        members: [{unemployment_compensation: 2_400}, {unemployment_compensation: 0}]
       expect: 2400

@@ -513,7 +513,7 @@ variable tanf_child_support_good_cause_exemption:
       period: 2024-01
       inputs:
         tanf_child_support_cooperation_met: false
-        tanf_benefit_amount: 1000
+        tanf_benefit_amount: 1_000
         child_support_noncompliance_rate: 0.25
       expect: 250
       variable: tanf_child_support_sanction_amount

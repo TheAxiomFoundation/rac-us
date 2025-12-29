@@ -61,37 +61,37 @@ variable llc:
     - name: "Small qualified expenses ($1,000)"
       period: 2024
       inputs:
-        llc_qualified_expenses: 1000
+        llc_qualified_expenses: 1_000
       expect: 200
 
     - name: "Mid-range qualified expenses ($5,000)"
       period: 2024
       inputs:
-        llc_qualified_expenses: 5000
+        llc_qualified_expenses: 5_000
       expect: 1000
 
     - name: "At expense limit ($10,000)"
       period: 2024
       inputs:
-        llc_qualified_expenses: 10000
+        llc_qualified_expenses: 10_000
       expect: 2000
 
     - name: "Expenses exceed limit ($15,000)"
       period: 2024
       inputs:
-        llc_qualified_expenses: 15000
+        llc_qualified_expenses: 15_000
       expect: 2000
 
     - name: "Maximum credit achievable"
       period: 2024
       inputs:
-        llc_qualified_expenses: 10000
+        llc_qualified_expenses: 10_000
       expect: 2000
 
     - name: "Half of maximum credit ($5,000 expenses)"
       period: 2024
       inputs:
-        llc_qualified_expenses: 5000
+        llc_qualified_expenses: 5_000
       expect: 1000
 
     - name: "Minimal qualified expenses ($100)"
@@ -103,11 +103,11 @@ variable llc:
     - name: "Very large qualified expenses ($50,000)"
       period: 2024
       inputs:
-        llc_qualified_expenses: 50000
+        llc_qualified_expenses: 50_000
       expect: 2000
 
     - name: "Expenses just under limit ($9,999)"
       period: 2024
       inputs:
-        llc_qualified_expenses: 9999
+        llc_qualified_expenses: 9_999
       expect: 1999

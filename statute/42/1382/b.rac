@@ -39,7 +39,7 @@ variable federal_benefit_rate:
   dtype: Money
   unit: "USD"
   label: "SSI applicable FBR"
-  description: "FBR after living arrangement reduction per 42 USC 1382(a)(2)(A)"
+  description: "FBR after living arrangement reduction per 42 USC 1_382(a)(2)(A)"
   syntax: python
   formula: |
     if has_eligible_spouse:

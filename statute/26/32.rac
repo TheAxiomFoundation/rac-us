@@ -143,430 +143,430 @@ variable eitc_standalone:
     # ============================================================================
     # PHASE-IN REGION TESTS (Income below cap, increasing credit)
     # ============================================================================
-    - name: "Single, no children, low income phase-in: $5000"
+    - name: "Single, no children, low income phase-in: $5_000"
       period: 2024-01
       inputs:
         num_qualifying_children: 0
-        earned_income: 5000
-        adjusted_gross_income: 5000
+        earned_income: 5_000
+        adjusted_gross_income: 5_000
         filing_status: SINGLE
         is_eligible_individual: true
-        credit_rate_0: 0.0765
+        credit_rate_0: 0.765
         credit_rate_1: 0.34
         credit_rate_2: 0.40
         credit_rate_3: 0.45
-        earned_income_cap_0: 8260
-        earned_income_cap_1: 12390
-        earned_income_cap_2: 17400
-        phaseout_rate_0: 0.0765
-        phaseout_rate_1: 0.1598
-        phaseout_rate_2: 0.2106
-        phaseout_start_0: 10330
-        phaseout_start_1: 22720
-        joint_adjustment: 6920
+        earned_income_cap_0: 8_260
+        earned_income_cap_1: 12_390
+        earned_income_cap_2: 17_400
+        phaseout_rate_0: 0.765
+        phaseout_rate_1: 0.1_598
+        phaseout_rate_2: 0.2_106
+        phaseout_start_0: 10_330
+        phaseout_start_1: 22_720
+        joint_adjustment: 6_920
       expect: 382.5  # 0.0765 * 5000 = 382.50
 
-    - name: "Single, 1 child, low income phase-in: $5000"
+    - name: "Single, 1 child, low income phase-in: $5_000"
       period: 2024-01
       inputs:
         num_qualifying_children: 1
-        earned_income: 5000
-        adjusted_gross_income: 5000
+        earned_income: 5_000
+        adjusted_gross_income: 5_000
         filing_status: SINGLE
         is_eligible_individual: true
-        credit_rate_0: 0.0765
+        credit_rate_0: 0.765
         credit_rate_1: 0.34
         credit_rate_2: 0.40
         credit_rate_3: 0.45
-        earned_income_cap_0: 8260
-        earned_income_cap_1: 12390
-        earned_income_cap_2: 17400
-        phaseout_rate_0: 0.0765
-        phaseout_rate_1: 0.1598
-        phaseout_rate_2: 0.2106
-        phaseout_start_0: 10330
-        phaseout_start_1: 22720
-        joint_adjustment: 6920
+        earned_income_cap_0: 8_260
+        earned_income_cap_1: 12_390
+        earned_income_cap_2: 17_400
+        phaseout_rate_0: 0.765
+        phaseout_rate_1: 0.1_598
+        phaseout_rate_2: 0.2_106
+        phaseout_start_0: 10_330
+        phaseout_start_1: 22_720
+        joint_adjustment: 6_920
       expect: 1700  # 0.34 * 5000 = 1700
 
-    - name: "Single, 2 children, low income phase-in: $8000"
+    - name: "Single, 2 children, low income phase-in: $8_000"
       period: 2024-01
       inputs:
         num_qualifying_children: 2
-        earned_income: 8000
-        adjusted_gross_income: 8000
+        earned_income: 8_000
+        adjusted_gross_income: 8_000
         filing_status: SINGLE
         is_eligible_individual: true
-        credit_rate_0: 0.0765
+        credit_rate_0: 0.765
         credit_rate_1: 0.34
         credit_rate_2: 0.40
         credit_rate_3: 0.45
-        earned_income_cap_0: 8260
-        earned_income_cap_1: 12390
-        earned_income_cap_2: 17400
-        phaseout_rate_0: 0.0765
-        phaseout_rate_1: 0.1598
-        phaseout_rate_2: 0.2106
-        phaseout_start_0: 10330
-        phaseout_start_1: 22720
-        joint_adjustment: 6920
+        earned_income_cap_0: 8_260
+        earned_income_cap_1: 12_390
+        earned_income_cap_2: 17_400
+        phaseout_rate_0: 0.765
+        phaseout_rate_1: 0.1_598
+        phaseout_rate_2: 0.2_106
+        phaseout_start_0: 10_330
+        phaseout_start_1: 22_720
+        joint_adjustment: 6_920
       expect: 3200  # 0.40 * 8000 = 3200
 
-    - name: "Single, 3+ children, low income phase-in: $8000"
+    - name: "Single, 3+ children, low income phase-in: $8_000"
       period: 2024-01
       inputs:
         num_qualifying_children: 3
-        earned_income: 8000
-        adjusted_gross_income: 8000
+        earned_income: 8_000
+        adjusted_gross_income: 8_000
         filing_status: SINGLE
         is_eligible_individual: true
-        credit_rate_0: 0.0765
+        credit_rate_0: 0.765
         credit_rate_1: 0.34
         credit_rate_2: 0.40
         credit_rate_3: 0.45
-        earned_income_cap_0: 8260
-        earned_income_cap_1: 12390
-        earned_income_cap_2: 17400
-        phaseout_rate_0: 0.0765
-        phaseout_rate_1: 0.1598
-        phaseout_rate_2: 0.2106
-        phaseout_start_0: 10330
-        phaseout_start_1: 22720
-        joint_adjustment: 6920
+        earned_income_cap_0: 8_260
+        earned_income_cap_1: 12_390
+        earned_income_cap_2: 17_400
+        phaseout_rate_0: 0.765
+        phaseout_rate_1: 0.1_598
+        phaseout_rate_2: 0.2_106
+        phaseout_start_0: 10_330
+        phaseout_start_1: 22_720
+        joint_adjustment: 6_920
       expect: 3600  # 0.45 * 8000 = 3600
 
     # ============================================================================
     # PLATEAU REGION TESTS (Income at or above cap, maximum credit)
     # ============================================================================
-    - name: "Single, no children, at cap: $8260"
+    - name: "Single, no children, at cap: $8_260"
       period: 2024-01
       inputs:
         num_qualifying_children: 0
-        earned_income: 8260
-        adjusted_gross_income: 8260
+        earned_income: 8_260
+        adjusted_gross_income: 8_260
         filing_status: SINGLE
         is_eligible_individual: true
-        credit_rate_0: 0.0765
+        credit_rate_0: 0.765
         credit_rate_1: 0.34
         credit_rate_2: 0.40
         credit_rate_3: 0.45
-        earned_income_cap_0: 8260
-        earned_income_cap_1: 12390
-        earned_income_cap_2: 17400
-        phaseout_rate_0: 0.0765
-        phaseout_rate_1: 0.1598
-        phaseout_rate_2: 0.2106
-        phaseout_start_0: 10330
-        phaseout_start_1: 22720
-        joint_adjustment: 6920
+        earned_income_cap_0: 8_260
+        earned_income_cap_1: 12_390
+        earned_income_cap_2: 17_400
+        phaseout_rate_0: 0.765
+        phaseout_rate_1: 0.1_598
+        phaseout_rate_2: 0.2_106
+        phaseout_start_0: 10_330
+        phaseout_start_1: 22_720
+        joint_adjustment: 6_920
       expect: 632  # 0.0765 * 8260 = 631.89, rounds to 632
 
-    - name: "Single, 1 child, at cap: $12390"
+    - name: "Single, 1 child, at cap: $12_390"
       period: 2024-01
       inputs:
         num_qualifying_children: 1
-        earned_income: 12390
-        adjusted_gross_income: 12390
+        earned_income: 12_390
+        adjusted_gross_income: 12_390
         filing_status: SINGLE
         is_eligible_individual: true
-        credit_rate_0: 0.0765
+        credit_rate_0: 0.765
         credit_rate_1: 0.34
         credit_rate_2: 0.40
         credit_rate_3: 0.45
-        earned_income_cap_0: 8260
-        earned_income_cap_1: 12390
-        earned_income_cap_2: 17400
-        phaseout_rate_0: 0.0765
-        phaseout_rate_1: 0.1598
-        phaseout_rate_2: 0.2106
-        phaseout_start_0: 10330
-        phaseout_start_1: 22720
-        joint_adjustment: 6920
+        earned_income_cap_0: 8_260
+        earned_income_cap_1: 12_390
+        earned_income_cap_2: 17_400
+        phaseout_rate_0: 0.765
+        phaseout_rate_1: 0.1_598
+        phaseout_rate_2: 0.2_106
+        phaseout_start_0: 10_330
+        phaseout_start_1: 22_720
+        joint_adjustment: 6_920
       expect: 4212.6  # 0.34 * 12390 = 4212.6
 
-    - name: "Single, 2 children, at cap: $17400"
+    - name: "Single, 2 children, at cap: $17_400"
       period: 2024-01
       inputs:
         num_qualifying_children: 2
-        earned_income: 17400
-        adjusted_gross_income: 17400
+        earned_income: 17_400
+        adjusted_gross_income: 17_400
         filing_status: SINGLE
         is_eligible_individual: true
-        credit_rate_0: 0.0765
+        credit_rate_0: 0.765
         credit_rate_1: 0.34
         credit_rate_2: 0.40
         credit_rate_3: 0.45
-        earned_income_cap_0: 8260
-        earned_income_cap_1: 12390
-        earned_income_cap_2: 17400
-        phaseout_rate_0: 0.0765
-        phaseout_rate_1: 0.1598
-        phaseout_rate_2: 0.2106
-        phaseout_start_0: 10330
-        phaseout_start_1: 22720
-        joint_adjustment: 6920
+        earned_income_cap_0: 8_260
+        earned_income_cap_1: 12_390
+        earned_income_cap_2: 17_400
+        phaseout_rate_0: 0.765
+        phaseout_rate_1: 0.1_598
+        phaseout_rate_2: 0.2_106
+        phaseout_start_0: 10_330
+        phaseout_start_1: 22_720
+        joint_adjustment: 6_920
       expect: 6960  # 0.40 * 17400 = 6960
 
-    - name: "Single, 3+ children, at cap: $17400"
+    - name: "Single, 3+ children, at cap: $17_400"
       period: 2024-01
       inputs:
         num_qualifying_children: 3
-        earned_income: 17400
-        adjusted_gross_income: 17400
+        earned_income: 17_400
+        adjusted_gross_income: 17_400
         filing_status: SINGLE
         is_eligible_individual: true
-        credit_rate_0: 0.0765
+        credit_rate_0: 0.765
         credit_rate_1: 0.34
         credit_rate_2: 0.40
         credit_rate_3: 0.45
-        earned_income_cap_0: 8260
-        earned_income_cap_1: 12390
-        earned_income_cap_2: 17400
-        phaseout_rate_0: 0.0765
-        phaseout_rate_1: 0.1598
-        phaseout_rate_2: 0.2106
-        phaseout_start_0: 10330
-        phaseout_start_1: 22720
-        joint_adjustment: 6920
+        earned_income_cap_0: 8_260
+        earned_income_cap_1: 12_390
+        earned_income_cap_2: 17_400
+        phaseout_rate_0: 0.765
+        phaseout_rate_1: 0.1_598
+        phaseout_rate_2: 0.2_106
+        phaseout_start_0: 10_330
+        phaseout_start_1: 22_720
+        joint_adjustment: 6_920
       expect: 7830  # 0.45 * 17400 = 7830
 
-    - name: "Single, 1 child, above cap: $20000"
+    - name: "Single, 1 child, above cap: $20_000"
       period: 2024-01
       inputs:
         num_qualifying_children: 1
-        earned_income: 20000
-        adjusted_gross_income: 20000
+        earned_income: 20_000
+        adjusted_gross_income: 20_000
         filing_status: SINGLE
         is_eligible_individual: true
-        credit_rate_0: 0.0765
+        credit_rate_0: 0.765
         credit_rate_1: 0.34
         credit_rate_2: 0.40
         credit_rate_3: 0.45
-        earned_income_cap_0: 8260
-        earned_income_cap_1: 12390
-        earned_income_cap_2: 17400
-        phaseout_rate_0: 0.0765
-        phaseout_rate_1: 0.1598
-        phaseout_rate_2: 0.2106
-        phaseout_start_0: 10330
-        phaseout_start_1: 22720
-        joint_adjustment: 6920
+        earned_income_cap_0: 8_260
+        earned_income_cap_1: 12_390
+        earned_income_cap_2: 17_400
+        phaseout_rate_0: 0.765
+        phaseout_rate_1: 0.1_598
+        phaseout_rate_2: 0.2_106
+        phaseout_start_0: 10_330
+        phaseout_start_1: 22_720
+        joint_adjustment: 6_920
       expect: 4212.6  # Still at cap, max = 0.34 * 12390
 
     # ============================================================================
     # PHASE-OUT REGION TESTS (Income above threshold, credit reducing)
     # ============================================================================
-    - name: "Single, no children, phaseout begins: $10330"
+    - name: "Single, no children, phaseout begins: $10_330"
       period: 2024-01
       inputs:
         num_qualifying_children: 0
-        earned_income: 10330
-        adjusted_gross_income: 10330
+        earned_income: 10_330
+        adjusted_gross_income: 10_330
         filing_status: SINGLE
         is_eligible_individual: true
-        credit_rate_0: 0.0765
+        credit_rate_0: 0.765
         credit_rate_1: 0.34
         credit_rate_2: 0.40
         credit_rate_3: 0.45
-        earned_income_cap_0: 8260
-        earned_income_cap_1: 12390
-        earned_income_cap_2: 17400
-        phaseout_rate_0: 0.0765
-        phaseout_rate_1: 0.1598
-        phaseout_rate_2: 0.2106
-        phaseout_start_0: 10330
-        phaseout_start_1: 22720
-        joint_adjustment: 6920
+        earned_income_cap_0: 8_260
+        earned_income_cap_1: 12_390
+        earned_income_cap_2: 17_400
+        phaseout_rate_0: 0.765
+        phaseout_rate_1: 0.1_598
+        phaseout_rate_2: 0.2_106
+        phaseout_start_0: 10_330
+        phaseout_start_1: 22_720
+        joint_adjustment: 6_920
       expect: 632  # Max 632, phaseout starts but income = threshold, so 0 reduction
 
-    - name: "Single, no children, partial phaseout: $15000"
+    - name: "Single, no children, partial phaseout: $15_000"
       period: 2024-01
       inputs:
         num_qualifying_children: 0
-        earned_income: 15000
-        adjusted_gross_income: 15000
+        earned_income: 15_000
+        adjusted_gross_income: 15_000
         filing_status: SINGLE
         is_eligible_individual: true
-        credit_rate_0: 0.0765
+        credit_rate_0: 0.765
         credit_rate_1: 0.34
         credit_rate_2: 0.40
         credit_rate_3: 0.45
-        earned_income_cap_0: 8260
-        earned_income_cap_1: 12390
-        earned_income_cap_2: 17400
-        phaseout_rate_0: 0.0765
-        phaseout_rate_1: 0.1598
-        phaseout_rate_2: 0.2106
-        phaseout_start_0: 10330
-        phaseout_start_1: 22720
-        joint_adjustment: 6920
+        earned_income_cap_0: 8_260
+        earned_income_cap_1: 12_390
+        earned_income_cap_2: 17_400
+        phaseout_rate_0: 0.765
+        phaseout_rate_1: 0.1_598
+        phaseout_rate_2: 0.2_106
+        phaseout_start_0: 10_330
+        phaseout_start_1: 22_720
+        joint_adjustment: 6_920
       expect: 274.635  # Phase-in: 0.0765 * 8260 = 631.89; Reduction: 0.0765 * (15000 - 10330) = 357.255; Credit: 631.89 - 357.255 = 274.635
 
-    - name: "Single, 1 child, phaseout begins: $22720"
+    - name: "Single, 1 child, phaseout begins: $22_720"
       period: 2024-01
       inputs:
         num_qualifying_children: 1
-        earned_income: 22720
-        adjusted_gross_income: 22720
+        earned_income: 22_720
+        adjusted_gross_income: 22_720
         filing_status: SINGLE
         is_eligible_individual: true
-        credit_rate_0: 0.0765
+        credit_rate_0: 0.765
         credit_rate_1: 0.34
         credit_rate_2: 0.40
         credit_rate_3: 0.45
-        earned_income_cap_0: 8260
-        earned_income_cap_1: 12390
-        earned_income_cap_2: 17400
-        phaseout_rate_0: 0.0765
-        phaseout_rate_1: 0.1598
-        phaseout_rate_2: 0.2106
-        phaseout_start_0: 10330
-        phaseout_start_1: 22720
-        joint_adjustment: 6920
+        earned_income_cap_0: 8_260
+        earned_income_cap_1: 12_390
+        earned_income_cap_2: 17_400
+        phaseout_rate_0: 0.765
+        phaseout_rate_1: 0.1_598
+        phaseout_rate_2: 0.2_106
+        phaseout_start_0: 10_330
+        phaseout_start_1: 22_720
+        joint_adjustment: 6_920
       expect: 4212.6  # Max 4212.6, income = threshold, no reduction yet
 
-    - name: "Single, 1 child, partial phaseout: $35000"
+    - name: "Single, 1 child, partial phaseout: $35_000"
       period: 2024-01
       inputs:
         num_qualifying_children: 1
-        earned_income: 35000
-        adjusted_gross_income: 35000
+        earned_income: 35_000
+        adjusted_gross_income: 35_000
         filing_status: SINGLE
         is_eligible_individual: true
-        credit_rate_0: 0.0765
+        credit_rate_0: 0.765
         credit_rate_1: 0.34
         credit_rate_2: 0.40
         credit_rate_3: 0.45
-        earned_income_cap_0: 8260
-        earned_income_cap_1: 12390
-        earned_income_cap_2: 17400
-        phaseout_rate_0: 0.0765
-        phaseout_rate_1: 0.1598
-        phaseout_rate_2: 0.2106
-        phaseout_start_0: 10330
-        phaseout_start_1: 22720
-        joint_adjustment: 6920
+        earned_income_cap_0: 8_260
+        earned_income_cap_1: 12_390
+        earned_income_cap_2: 17_400
+        phaseout_rate_0: 0.765
+        phaseout_rate_1: 0.1_598
+        phaseout_rate_2: 0.2_106
+        phaseout_start_0: 10_330
+        phaseout_start_1: 22_720
+        joint_adjustment: 6_920
       expect: 2305.944  # Phase-in: 4212.6; Reduction: 0.1598 * (35000 - 22720) = 1961.136; Credit: 4212.6 - 1961.136 = 2251.464
 
-    - name: "Single, 2 children, partial phaseout: $40000"
+    - name: "Single, 2 children, partial phaseout: $40_000"
       period: 2024-01
       inputs:
         num_qualifying_children: 2
-        earned_income: 40000
-        adjusted_gross_income: 40000
+        earned_income: 40_000
+        adjusted_gross_income: 40_000
         filing_status: SINGLE
         is_eligible_individual: true
-        credit_rate_0: 0.0765
+        credit_rate_0: 0.765
         credit_rate_1: 0.34
         credit_rate_2: 0.40
         credit_rate_3: 0.45
-        earned_income_cap_0: 8260
-        earned_income_cap_1: 12390
-        earned_income_cap_2: 17400
-        phaseout_rate_0: 0.0765
-        phaseout_rate_1: 0.1598
-        phaseout_rate_2: 0.2106
-        phaseout_start_0: 10330
-        phaseout_start_1: 22720
-        joint_adjustment: 6920
+        earned_income_cap_0: 8_260
+        earned_income_cap_1: 12_390
+        earned_income_cap_2: 17_400
+        phaseout_rate_0: 0.765
+        phaseout_rate_1: 0.1_598
+        phaseout_rate_2: 0.2_106
+        phaseout_start_0: 10_330
+        phaseout_start_1: 22_720
+        joint_adjustment: 6_920
       expect: 3320.832  # Phase-in: 6960; Reduction: 0.2106 * (40000 - 22720) = 3639.168; Credit: max(0, 6960 - 3639.168) = 3320.832
 
     # ============================================================================
     # JOINT FILER TESTS (higher phaseout thresholds)
     # ============================================================================
-    - name: "Joint, 1 child, phaseout with adjustment: $35000"
+    - name: "Joint, 1 child, phaseout with adjustment: $35_000"
       period: 2024-01
       inputs:
         num_qualifying_children: 1
-        earned_income: 35000
-        adjusted_gross_income: 35000
+        earned_income: 35_000
+        adjusted_gross_income: 35_000
         filing_status: JOINT
         is_eligible_individual: true
-        credit_rate_0: 0.0765
+        credit_rate_0: 0.765
         credit_rate_1: 0.34
         credit_rate_2: 0.40
         credit_rate_3: 0.45
-        earned_income_cap_0: 8260
-        earned_income_cap_1: 12390
-        earned_income_cap_2: 17400
-        phaseout_rate_0: 0.0765
-        phaseout_rate_1: 0.1598
-        phaseout_rate_2: 0.2106
-        phaseout_start_0: 10330
-        phaseout_start_1: 22720
-        joint_adjustment: 6920
+        earned_income_cap_0: 8_260
+        earned_income_cap_1: 12_390
+        earned_income_cap_2: 17_400
+        phaseout_rate_0: 0.765
+        phaseout_rate_1: 0.1_598
+        phaseout_rate_2: 0.2_106
+        phaseout_start_0: 10_330
+        phaseout_start_1: 22_720
+        joint_adjustment: 6_920
       expect: 3356.072  # Phase-in: 4212.6; Threshold: 22720 + 6920 = 29640; Reduction: 0.1598 * (35000 - 29640) = 856.528; Credit: 4212.6 - 856.528 = 3356.072
 
-    - name: "Joint, 2 children, at higher phaseout threshold: $29640"
+    - name: "Joint, 2 children, at higher phaseout threshold: $29_640"
       period: 2024-01
       inputs:
         num_qualifying_children: 2
-        earned_income: 29640
-        adjusted_gross_income: 29640
+        earned_income: 29_640
+        adjusted_gross_income: 29_640
         filing_status: JOINT
         is_eligible_individual: true
-        credit_rate_0: 0.0765
+        credit_rate_0: 0.765
         credit_rate_1: 0.34
         credit_rate_2: 0.40
         credit_rate_3: 0.45
-        earned_income_cap_0: 8260
-        earned_income_cap_1: 12390
-        earned_income_cap_2: 17400
-        phaseout_rate_0: 0.0765
-        phaseout_rate_1: 0.1598
-        phaseout_rate_2: 0.2106
-        phaseout_start_0: 10330
-        phaseout_start_1: 22720
-        joint_adjustment: 6920
+        earned_income_cap_0: 8_260
+        earned_income_cap_1: 12_390
+        earned_income_cap_2: 17_400
+        phaseout_rate_0: 0.765
+        phaseout_rate_1: 0.1_598
+        phaseout_rate_2: 0.2_106
+        phaseout_start_0: 10_330
+        phaseout_start_1: 22_720
+        joint_adjustment: 6_920
       expect: 6960  # At threshold, no phaseout yet
 
-    - name: "Joint, 2 children, partial phaseout: $45000"
+    - name: "Joint, 2 children, partial phaseout: $45_000"
       period: 2024-01
       inputs:
         num_qualifying_children: 2
-        earned_income: 45000
-        adjusted_gross_income: 45000
+        earned_income: 45_000
+        adjusted_gross_income: 45_000
         filing_status: JOINT
         is_eligible_individual: true
-        credit_rate_0: 0.0765
+        credit_rate_0: 0.765
         credit_rate_1: 0.34
         credit_rate_2: 0.40
         credit_rate_3: 0.45
-        earned_income_cap_0: 8260
-        earned_income_cap_1: 12390
-        earned_income_cap_2: 17400
-        phaseout_rate_0: 0.0765
-        phaseout_rate_1: 0.1598
-        phaseout_rate_2: 0.2106
-        phaseout_start_0: 10330
-        phaseout_start_1: 22720
-        joint_adjustment: 6920
+        earned_income_cap_0: 8_260
+        earned_income_cap_1: 12_390
+        earned_income_cap_2: 17_400
+        phaseout_rate_0: 0.765
+        phaseout_rate_1: 0.1_598
+        phaseout_rate_2: 0.2_106
+        phaseout_start_0: 10_330
+        phaseout_start_1: 22_720
+        joint_adjustment: 6_920
       expect: 3725.184  # Phase-in: 6960; Reduction: 0.2106 * (45000 - 29640) = 3234.816; Credit: 6960 - 3234.816 = 3725.184
 
     # ============================================================================
     # HEAD OF HOUSEHOLD TESTS
     # ============================================================================
-    - name: "Head of household, 1 child, phaseout: $35000"
+    - name: "Head of household, 1 child, phaseout: $35_000"
       period: 2024-01
       inputs:
         num_qualifying_children: 1
-        earned_income: 35000
-        adjusted_gross_income: 35000
+        earned_income: 35_000
+        adjusted_gross_income: 35_000
         filing_status: HEAD_OF_HOUSEHOLD
         is_eligible_individual: true
-        credit_rate_0: 0.0765
+        credit_rate_0: 0.765
         credit_rate_1: 0.34
         credit_rate_2: 0.40
         credit_rate_3: 0.45
-        earned_income_cap_0: 8260
-        earned_income_cap_1: 12390
-        earned_income_cap_2: 17400
-        phaseout_rate_0: 0.0765
-        phaseout_rate_1: 0.1598
-        phaseout_rate_2: 0.2106
-        phaseout_start_0: 10330
-        phaseout_start_1: 22720
-        joint_adjustment: 6920
+        earned_income_cap_0: 8_260
+        earned_income_cap_1: 12_390
+        earned_income_cap_2: 17_400
+        phaseout_rate_0: 0.765
+        phaseout_rate_1: 0.1_598
+        phaseout_rate_2: 0.2_106
+        phaseout_start_0: 10_330
+        phaseout_start_1: 22_720
+        joint_adjustment: 6_920
       expect: 2305.944  # Same as SINGLE (no adjustment for HOH), Reduction: 0.1598 * (35000 - 22720) = 1961.136; Credit: 4212.6 - 1961.136 = 2251.464
 
     # ============================================================================
@@ -580,114 +580,114 @@ variable eitc_standalone:
         adjusted_gross_income: 0
         filing_status: SINGLE
         is_eligible_individual: true
-        credit_rate_0: 0.0765
+        credit_rate_0: 0.765
         credit_rate_1: 0.34
         credit_rate_2: 0.40
         credit_rate_3: 0.45
-        earned_income_cap_0: 8260
-        earned_income_cap_1: 12390
-        earned_income_cap_2: 17400
-        phaseout_rate_0: 0.0765
-        phaseout_rate_1: 0.1598
-        phaseout_rate_2: 0.2106
-        phaseout_start_0: 10330
-        phaseout_start_1: 22720
-        joint_adjustment: 6920
+        earned_income_cap_0: 8_260
+        earned_income_cap_1: 12_390
+        earned_income_cap_2: 17_400
+        phaseout_rate_0: 0.765
+        phaseout_rate_1: 0.1_598
+        phaseout_rate_2: 0.2_106
+        phaseout_start_0: 10_330
+        phaseout_start_1: 22_720
+        joint_adjustment: 6_920
       expect: 0
 
-    - name: "Single, 1 child, completely phased out: $50000"
+    - name: "Single, 1 child, completely phased out: $50_000"
       period: 2024-01
       inputs:
         num_qualifying_children: 1
-        earned_income: 50000
-        adjusted_gross_income: 50000
+        earned_income: 50_000
+        adjusted_gross_income: 50_000
         filing_status: SINGLE
         is_eligible_individual: true
-        credit_rate_0: 0.0765
+        credit_rate_0: 0.765
         credit_rate_1: 0.34
         credit_rate_2: 0.40
         credit_rate_3: 0.45
-        earned_income_cap_0: 8260
-        earned_income_cap_1: 12390
-        earned_income_cap_2: 17400
-        phaseout_rate_0: 0.0765
-        phaseout_rate_1: 0.1598
-        phaseout_rate_2: 0.2106
-        phaseout_start_0: 10330
-        phaseout_start_1: 22720
-        joint_adjustment: 6920
+        earned_income_cap_0: 8_260
+        earned_income_cap_1: 12_390
+        earned_income_cap_2: 17_400
+        phaseout_rate_0: 0.765
+        phaseout_rate_1: 0.1_598
+        phaseout_rate_2: 0.2_106
+        phaseout_start_0: 10_330
+        phaseout_start_1: 22_720
+        joint_adjustment: 6_920
       expect: 0  # Phaseout threshold + ~26,368 / 0.1598 = 165k so not fully phased out; max(0, 4212.6 - 0.1598*(50000-22720)) = 4212.6 - 4368.6 = 0
 
-    - name: "Single, no children, completely phased out: $20000"
+    - name: "Single, no children, completely phased out: $20_000"
       period: 2024-01
       inputs:
         num_qualifying_children: 0
-        earned_income: 20000
-        adjusted_gross_income: 20000
+        earned_income: 20_000
+        adjusted_gross_income: 20_000
         filing_status: SINGLE
         is_eligible_individual: true
-        credit_rate_0: 0.0765
+        credit_rate_0: 0.765
         credit_rate_1: 0.34
         credit_rate_2: 0.40
         credit_rate_3: 0.45
-        earned_income_cap_0: 8260
-        earned_income_cap_1: 12390
-        earned_income_cap_2: 17400
-        phaseout_rate_0: 0.0765
-        phaseout_rate_1: 0.1598
-        phaseout_rate_2: 0.2106
-        phaseout_start_0: 10330
-        phaseout_start_1: 22720
-        joint_adjustment: 6920
+        earned_income_cap_0: 8_260
+        earned_income_cap_1: 12_390
+        earned_income_cap_2: 17_400
+        phaseout_rate_0: 0.765
+        phaseout_rate_1: 0.1_598
+        phaseout_rate_2: 0.2_106
+        phaseout_start_0: 10_330
+        phaseout_start_1: 22_720
+        joint_adjustment: 6_920
       expect: 0  # Max 632; Reduction: 0.0765 * (20000 - 10330) = 738.655; Credit: max(0, 632 - 738.655) = 0
 
     # ============================================================================
     # INVESTMENT INCOME LIMIT TESTS
     # ============================================================================
-    - name: "Single, 1 child, just below investment income limit: $11599"
+    - name: "Single, 1 child, just below investment income limit: $11_599"
       period: 2024-01
       inputs:
         num_qualifying_children: 1
-        earned_income: 12390
-        adjusted_gross_income: 12390
+        earned_income: 12_390
+        adjusted_gross_income: 12_390
         filing_status: SINGLE
         is_eligible_individual: true
-        credit_rate_0: 0.0765
+        credit_rate_0: 0.765
         credit_rate_1: 0.34
         credit_rate_2: 0.40
         credit_rate_3: 0.45
-        earned_income_cap_0: 8260
-        earned_income_cap_1: 12390
-        earned_income_cap_2: 17400
-        phaseout_rate_0: 0.0765
-        phaseout_rate_1: 0.1598
-        phaseout_rate_2: 0.2106
-        phaseout_start_0: 10330
-        phaseout_start_1: 22720
-        joint_adjustment: 6920
+        earned_income_cap_0: 8_260
+        earned_income_cap_1: 12_390
+        earned_income_cap_2: 17_400
+        phaseout_rate_0: 0.765
+        phaseout_rate_1: 0.1_598
+        phaseout_rate_2: 0.2_106
+        phaseout_start_0: 10_330
+        phaseout_start_1: 22_720
+        joint_adjustment: 6_920
       expect: 4212.6  # At cap
 
-    - name: "Single, 1 child, just at investment income limit: $11600"
+    - name: "Single, 1 child, just at investment income limit: $11_600"
       period: 2024-01
       inputs:
         num_qualifying_children: 1
-        earned_income: 12390
-        adjusted_gross_income: 12390
+        earned_income: 12_390
+        adjusted_gross_income: 12_390
         filing_status: SINGLE
         is_eligible_individual: true
-        credit_rate_0: 0.0765
+        credit_rate_0: 0.765
         credit_rate_1: 0.34
         credit_rate_2: 0.40
         credit_rate_3: 0.45
-        earned_income_cap_0: 8260
-        earned_income_cap_1: 12390
-        earned_income_cap_2: 17400
-        phaseout_rate_0: 0.0765
-        phaseout_rate_1: 0.1598
-        phaseout_rate_2: 0.2106
-        phaseout_start_0: 10330
-        phaseout_start_1: 22720
-        joint_adjustment: 6920
+        earned_income_cap_0: 8_260
+        earned_income_cap_1: 12_390
+        earned_income_cap_2: 17_400
+        phaseout_rate_0: 0.765
+        phaseout_rate_1: 0.1_598
+        phaseout_rate_2: 0.2_106
+        phaseout_start_0: 10_330
+        phaseout_start_1: 22_720
+        joint_adjustment: 6_920
       expect: 4212.6  # At cap
 
     # ============================================================================
@@ -697,239 +697,239 @@ variable eitc_standalone:
       period: 2024-01
       inputs:
         num_qualifying_children: 2
-        earned_income: 30000
-        adjusted_gross_income: 30000
+        earned_income: 30_000
+        adjusted_gross_income: 30_000
         filing_status: SINGLE
         is_eligible_individual: false
-        credit_rate_0: 0.0765
+        credit_rate_0: 0.765
         credit_rate_1: 0.34
         credit_rate_2: 0.40
         credit_rate_3: 0.45
-        earned_income_cap_0: 8260
-        earned_income_cap_1: 12390
-        earned_income_cap_2: 17400
-        phaseout_rate_0: 0.0765
-        phaseout_rate_1: 0.1598
-        phaseout_rate_2: 0.2106
-        phaseout_start_0: 10330
-        phaseout_start_1: 22720
-        joint_adjustment: 6920
+        earned_income_cap_0: 8_260
+        earned_income_cap_1: 12_390
+        earned_income_cap_2: 17_400
+        phaseout_rate_0: 0.765
+        phaseout_rate_1: 0.1_598
+        phaseout_rate_2: 0.2_106
+        phaseout_start_0: 10_330
+        phaseout_start_1: 22_720
+        joint_adjustment: 6_920
       expect: 0
 
     - name: "Ineligible individual with 3+ children gets 0"
       period: 2024-01
       inputs:
         num_qualifying_children: 4
-        earned_income: 15000
-        adjusted_gross_income: 15000
+        earned_income: 15_000
+        adjusted_gross_income: 15_000
         filing_status: SINGLE
         is_eligible_individual: false
-        credit_rate_0: 0.0765
+        credit_rate_0: 0.765
         credit_rate_1: 0.34
         credit_rate_2: 0.40
         credit_rate_3: 0.45
-        earned_income_cap_0: 8260
-        earned_income_cap_1: 12390
-        earned_income_cap_2: 17400
-        phaseout_rate_0: 0.0765
-        phaseout_rate_1: 0.1598
-        phaseout_rate_2: 0.2106
-        phaseout_start_0: 10330
-        phaseout_start_1: 22720
-        joint_adjustment: 6920
+        earned_income_cap_0: 8_260
+        earned_income_cap_1: 12_390
+        earned_income_cap_2: 17_400
+        phaseout_rate_0: 0.765
+        phaseout_rate_1: 0.1_598
+        phaseout_rate_2: 0.2_106
+        phaseout_start_0: 10_330
+        phaseout_start_1: 22_720
+        joint_adjustment: 6_920
       expect: 0
 
     # ============================================================================
     # MORE THAN 3 CHILDREN TESTS (should cap at 3)
     # ============================================================================
-    - name: "Single, 4 children, capped at 3-child rate: $10000"
+    - name: "Single, 4 children, capped at 3-child rate: $10_000"
       period: 2024-01
       inputs:
         num_qualifying_children: 4
-        earned_income: 10000
-        adjusted_gross_income: 10000
+        earned_income: 10_000
+        adjusted_gross_income: 10_000
         filing_status: SINGLE
         is_eligible_individual: true
-        credit_rate_0: 0.0765
+        credit_rate_0: 0.765
         credit_rate_1: 0.34
         credit_rate_2: 0.40
         credit_rate_3: 0.45
-        earned_income_cap_0: 8260
-        earned_income_cap_1: 12390
-        earned_income_cap_2: 17400
-        phaseout_rate_0: 0.0765
-        phaseout_rate_1: 0.1598
-        phaseout_rate_2: 0.2106
-        phaseout_start_0: 10330
-        phaseout_start_1: 22720
-        joint_adjustment: 6920
+        earned_income_cap_0: 8_260
+        earned_income_cap_1: 12_390
+        earned_income_cap_2: 17_400
+        phaseout_rate_0: 0.765
+        phaseout_rate_1: 0.1_598
+        phaseout_rate_2: 0.2_106
+        phaseout_start_0: 10_330
+        phaseout_start_1: 22_720
+        joint_adjustment: 6_920
       expect: 4500  # 0.45 * 10000 = 4500 (uses 3+ child rate)
 
-    - name: "Single, 5 children, capped at 3-child rate: $17400"
+    - name: "Single, 5 children, capped at 3-child rate: $17_400"
       period: 2024-01
       inputs:
         num_qualifying_children: 5
-        earned_income: 17400
-        adjusted_gross_income: 17400
+        earned_income: 17_400
+        adjusted_gross_income: 17_400
         filing_status: SINGLE
         is_eligible_individual: true
-        credit_rate_0: 0.0765
+        credit_rate_0: 0.765
         credit_rate_1: 0.34
         credit_rate_2: 0.40
         credit_rate_3: 0.45
-        earned_income_cap_0: 8260
-        earned_income_cap_1: 12390
-        earned_income_cap_2: 17400
-        phaseout_rate_0: 0.0765
-        phaseout_rate_1: 0.1598
-        phaseout_rate_2: 0.2106
-        phaseout_start_0: 10330
-        phaseout_start_1: 22720
-        joint_adjustment: 6920
+        earned_income_cap_0: 8_260
+        earned_income_cap_1: 12_390
+        earned_income_cap_2: 17_400
+        phaseout_rate_0: 0.765
+        phaseout_rate_1: 0.1_598
+        phaseout_rate_2: 0.2_106
+        phaseout_start_0: 10_330
+        phaseout_start_1: 22_720
+        joint_adjustment: 6_920
       expect: 7830  # 0.45 * 17400 = 7830 (uses 3+ child rate, at cap)
 
     # ============================================================================
     # EDGE CASES AND BOUNDARY TESTS
     # ============================================================================
-    - name: "Single, 1 child, just before phaseout: $22719"
+    - name: "Single, 1 child, just before phaseout: $22_719"
       period: 2024-01
       inputs:
         num_qualifying_children: 1
-        earned_income: 22719
-        adjusted_gross_income: 22719
+        earned_income: 22_719
+        adjusted_gross_income: 22_719
         filing_status: SINGLE
         is_eligible_individual: true
-        credit_rate_0: 0.0765
+        credit_rate_0: 0.765
         credit_rate_1: 0.34
         credit_rate_2: 0.40
         credit_rate_3: 0.45
-        earned_income_cap_0: 8260
-        earned_income_cap_1: 12390
-        earned_income_cap_2: 17400
-        phaseout_rate_0: 0.0765
-        phaseout_rate_1: 0.1598
-        phaseout_rate_2: 0.2106
-        phaseout_start_0: 10330
-        phaseout_start_1: 22720
-        joint_adjustment: 6920
+        earned_income_cap_0: 8_260
+        earned_income_cap_1: 12_390
+        earned_income_cap_2: 17_400
+        phaseout_rate_0: 0.765
+        phaseout_rate_1: 0.1_598
+        phaseout_rate_2: 0.2_106
+        phaseout_start_0: 10_330
+        phaseout_start_1: 22_720
+        joint_adjustment: 6_920
       expect: 4212.6  # Still at max
 
-    - name: "Single, 1 child, just after phaseout begins: $22721"
+    - name: "Single, 1 child, just after phaseout begins: $22_721"
       period: 2024-01
       inputs:
         num_qualifying_children: 1
-        earned_income: 22721
-        adjusted_gross_income: 22721
+        earned_income: 22_721
+        adjusted_gross_income: 22_721
         filing_status: SINGLE
         is_eligible_individual: true
-        credit_rate_0: 0.0765
+        credit_rate_0: 0.765
         credit_rate_1: 0.34
         credit_rate_2: 0.40
         credit_rate_3: 0.45
-        earned_income_cap_0: 8260
-        earned_income_cap_1: 12390
-        earned_income_cap_2: 17400
-        phaseout_rate_0: 0.0765
-        phaseout_rate_1: 0.1598
-        phaseout_rate_2: 0.2106
-        phaseout_start_0: 10330
-        phaseout_start_1: 22720
-        joint_adjustment: 6920
+        earned_income_cap_0: 8_260
+        earned_income_cap_1: 12_390
+        earned_income_cap_2: 17_400
+        phaseout_rate_0: 0.765
+        phaseout_rate_1: 0.1_598
+        phaseout_rate_2: 0.2_106
+        phaseout_start_0: 10_330
+        phaseout_start_1: 22_720
+        joint_adjustment: 6_920
       expect: 4210.44  # 4212.6 - 0.1598 * 1 = 4210.4402
 
-    - name: "Joint, 2 children, above AGI threshold: $62688"
+    - name: "Joint, 2 children, above AGI threshold: $62_688"
       period: 2024-01
       inputs:
         num_qualifying_children: 2
-        earned_income: 62688
-        adjusted_gross_income: 62688
+        earned_income: 62_688
+        adjusted_gross_income: 62_688
         filing_status: JOINT
         is_eligible_individual: true
-        credit_rate_0: 0.0765
+        credit_rate_0: 0.765
         credit_rate_1: 0.34
         credit_rate_2: 0.40
         credit_rate_3: 0.45
-        earned_income_cap_0: 8260
-        earned_income_cap_1: 12390
-        earned_income_cap_2: 17400
-        phaseout_rate_0: 0.0765
-        phaseout_rate_1: 0.1598
-        phaseout_rate_2: 0.2106
-        phaseout_start_0: 10330
-        phaseout_start_1: 22720
-        joint_adjustment: 6920
+        earned_income_cap_0: 8_260
+        earned_income_cap_1: 12_390
+        earned_income_cap_2: 17_400
+        phaseout_rate_0: 0.765
+        phaseout_rate_1: 0.1_598
+        phaseout_rate_2: 0.2_106
+        phaseout_start_0: 10_330
+        phaseout_start_1: 22_720
+        joint_adjustment: 6_920
       expect: 0  # Completely phased out
 
     # ============================================================================
     # ORIGINAL TESTS (preserved for backward compatibility)
     # ============================================================================
-    - name: "Single, no children, $8000 earned income"
+    - name: "Single, no children, $8_000 earned income"
       period: 2024-01
       inputs:
         num_qualifying_children: 0
-        earned_income: 8000
-        adjusted_gross_income: 8000
+        earned_income: 8_000
+        adjusted_gross_income: 8_000
         filing_status: SINGLE
         is_eligible_individual: true
-        credit_rate_0: 0.0765
+        credit_rate_0: 0.765
         credit_rate_1: 0.34
         credit_rate_2: 0.40
         credit_rate_3: 0.45
-        earned_income_cap_0: 8260
-        earned_income_cap_1: 12390
-        earned_income_cap_2: 17400
-        phaseout_rate_0: 0.0765
-        phaseout_rate_1: 0.1598
-        phaseout_rate_2: 0.2106
-        phaseout_start_0: 10330
-        phaseout_start_1: 22720
-        joint_adjustment: 6920
+        earned_income_cap_0: 8_260
+        earned_income_cap_1: 12_390
+        earned_income_cap_2: 17_400
+        phaseout_rate_0: 0.765
+        phaseout_rate_1: 0.1_598
+        phaseout_rate_2: 0.2_106
+        phaseout_start_0: 10_330
+        phaseout_start_1: 22_720
+        joint_adjustment: 6_920
       expect: 612  # 0.0765 * 8000 = 612
 
-    - name: "Single, 1 child, $15000 earned income"
+    - name: "Single, 1 child, $15_000 earned income"
       period: 2024-01
       inputs:
         num_qualifying_children: 1
-        earned_income: 15000
-        adjusted_gross_income: 15000
+        earned_income: 15_000
+        adjusted_gross_income: 15_000
         filing_status: SINGLE
         is_eligible_individual: true
-        credit_rate_0: 0.0765
+        credit_rate_0: 0.765
         credit_rate_1: 0.34
         credit_rate_2: 0.40
         credit_rate_3: 0.45
-        earned_income_cap_0: 8260
-        earned_income_cap_1: 12390
-        earned_income_cap_2: 17400
-        phaseout_rate_0: 0.0765
-        phaseout_rate_1: 0.1598
-        phaseout_rate_2: 0.2106
-        phaseout_start_0: 10330
-        phaseout_start_1: 22720
-        joint_adjustment: 6920
+        earned_income_cap_0: 8_260
+        earned_income_cap_1: 12_390
+        earned_income_cap_2: 17_400
+        phaseout_rate_0: 0.765
+        phaseout_rate_1: 0.1_598
+        phaseout_rate_2: 0.2_106
+        phaseout_start_0: 10_330
+        phaseout_start_1: 22_720
+        joint_adjustment: 6_920
       expect: 4212.6  # 0.34 * 12390 = 4212.6 (at cap, no phaseout yet)
 
-    - name: "Joint, 2 children, $30000 earned income"
+    - name: "Joint, 2 children, $30_000 earned income"
       period: 2024-01
       inputs:
         num_qualifying_children: 2
-        earned_income: 30000
-        adjusted_gross_income: 30000
+        earned_income: 30_000
+        adjusted_gross_income: 30_000
         filing_status: JOINT
         is_eligible_individual: true
-        credit_rate_0: 0.0765
+        credit_rate_0: 0.765
         credit_rate_1: 0.34
         credit_rate_2: 0.40
         credit_rate_3: 0.45
-        earned_income_cap_0: 8260
-        earned_income_cap_1: 12390
-        earned_income_cap_2: 17400
-        phaseout_rate_0: 0.0765
-        phaseout_rate_1: 0.1598
-        phaseout_rate_2: 0.2106
-        phaseout_start_0: 10330
-        phaseout_start_1: 22720
-        joint_adjustment: 6920
+        earned_income_cap_0: 8_260
+        earned_income_cap_1: 12_390
+        earned_income_cap_2: 17_400
+        phaseout_rate_0: 0.765
+        phaseout_rate_1: 0.1_598
+        phaseout_rate_2: 0.2_106
+        phaseout_start_0: 10_330
+        phaseout_start_1: 22_720
+        joint_adjustment: 6_920
       expect: 6884.184  # Phase-in: 0.40 * 17400 = 6960; Phaseout threshold: 22720 + 6920 = 29640; Reduction: 0.2106 * (30000-29640) = 75.816; Credit: 6960 - 75.816 = 6884.184
 
     - name: "Zero earned income"
@@ -940,19 +940,19 @@ variable eitc_standalone:
         adjusted_gross_income: 0
         filing_status: SINGLE
         is_eligible_individual: true
-        credit_rate_0: 0.0765
+        credit_rate_0: 0.765
         credit_rate_1: 0.34
         credit_rate_2: 0.40
         credit_rate_3: 0.45
-        earned_income_cap_0: 8260
-        earned_income_cap_1: 12390
-        earned_income_cap_2: 17400
-        phaseout_rate_0: 0.0765
-        phaseout_rate_1: 0.1598
-        phaseout_rate_2: 0.2106
-        phaseout_start_0: 10330
-        phaseout_start_1: 22720
-        joint_adjustment: 6920
+        earned_income_cap_0: 8_260
+        earned_income_cap_1: 12_390
+        earned_income_cap_2: 17_400
+        phaseout_rate_0: 0.765
+        phaseout_rate_1: 0.1_598
+        phaseout_rate_2: 0.2_106
+        phaseout_start_0: 10_330
+        phaseout_start_1: 22_720
+        joint_adjustment: 6_920
       expect: 0
 
 # 26 USC 32 - Earned Income Credit (Validation Version)

@@ -26,28 +26,28 @@ variable elderly_disabled_credit:
     - name: "No qualified individuals, no credit"
       period: 2024-01-01
       inputs:
-        adjusted_sec22_amount: 5000
+        adjusted_sec22_amount: 5_000
         num_sec22_qualified_individuals: 0
         applicable_percentage: 0.15
       expect: 0
     - name: "One qualified individual, standard credit"
       period: 2024-01-01
       inputs:
-        adjusted_sec22_amount: 5000
+        adjusted_sec22_amount: 5_000
         num_sec22_qualified_individuals: 1
         applicable_percentage: 0.15
       expect: 750
     - name: "Two qualified individuals, higher base amount"
       period: 2024-01-01
       inputs:
-        adjusted_sec22_amount: 7500
+        adjusted_sec22_amount: 7_500
         num_sec22_qualified_individuals: 2
         applicable_percentage: 0.15
       expect: 1125
     - name: "Credit with fully reduced section 22 amount"
       period: 2024-01-01
       inputs:
-        adjusted_sec22_amount: 2500
+        adjusted_sec22_amount: 2_500
         num_sec22_qualified_individuals: 1
         applicable_percentage: 0.15
       expect: 375
@@ -61,21 +61,21 @@ variable elderly_disabled_credit:
     - name: "Maximum credit scenario"
       period: 2024-01-01
       inputs:
-        adjusted_sec22_amount: 7500
+        adjusted_sec22_amount: 7_500
         num_sec22_qualified_individuals: 2
         applicable_percentage: 0.15
       expect: 1125
     - name: "Single elderly person with modest reduction"
       period: 2024-01-01
       inputs:
-        adjusted_sec22_amount: 4000
+        adjusted_sec22_amount: 4_000
         num_sec22_qualified_individuals: 1
         applicable_percentage: 0.15
       expect: 600
     - name: "Disabled individual under age 65"
       period: 2024-01-01
       inputs:
-        adjusted_sec22_amount: 3500
+        adjusted_sec22_amount: 3_500
         num_sec22_qualified_individuals: 1
         applicable_percentage: 0.15
       expect: 525

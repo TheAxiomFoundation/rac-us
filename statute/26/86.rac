@@ -96,7 +96,7 @@ variable combined_income:
   tests:
     - name: "Basic combined income"
       period: 2024-01
-      inputs: {adjusted_gross_income: 50000}
+      inputs: {adjusted_gross_income: 50_000}
       expect: 50000
     - name: "Zero income"
       period: 2024-01
@@ -148,64 +148,64 @@ variable taxable_social_security_amount:
       period: 2024-01
       inputs:
         filing_status: SINGLE
-        combined_income: 20000
-        tax_unit_social_security: 15000
+        combined_income: 20_000
+        tax_unit_social_security: 15_000
       expect: 0
     - name: "At threshold (single, no tax)"
       period: 2024-01
       inputs:
         filing_status: SINGLE
-        combined_income: 25000
-        tax_unit_social_security: 15000
+        combined_income: 25_000
+        tax_unit_social_security: 15_000
       expect: 0
     - name: "Tier 1 partial taxation (single)"
       period: 2024-01
       inputs:
         filing_status: SINGLE
-        combined_income: 35000
-        tax_unit_social_security: 12000
+        combined_income: 35_000
+        tax_unit_social_security: 12_000
       expect: 5000  # min(6000, 5000) = 5000
     - name: "Tier 1 half benefits (single)"
       period: 2024-01
       inputs:
         filing_status: SINGLE
-        combined_income: 60000
-        tax_unit_social_security: 10000
+        combined_income: 60_000
+        tax_unit_social_security: 10_000
       expect: 5000  # min(5000, 17500) = 5000
     - name: "Joint filers below threshold"
       period: 2024-01
       inputs:
         filing_status: MARRIED_FILING_JOINTLY
-        combined_income: 30000
-        tax_unit_social_security: 16000
+        combined_income: 30_000
+        tax_unit_social_security: 16_000
       expect: 0
     - name: "Joint filers tier 1 partial"
       period: 2024-01
       inputs:
         filing_status: MARRIED_FILING_JOINTLY
-        combined_income: 40000
-        tax_unit_social_security: 14000
+        combined_income: 40_000
+        tax_unit_social_security: 14_000
       expect: 4000  # min(7000, 4000) = 4000
     - name: "Joint filers significant income"
       period: 2024-01
       inputs:
         filing_status: MARRIED_FILING_JOINTLY
-        combined_income: 60000
-        tax_unit_social_security: 18000
+        combined_income: 60_000
+        tax_unit_social_security: 18_000
       expect: 9000  # min(9000, 14000) = 9000
     - name: "Married filing separately (zero base)"
       period: 2024-01
       inputs:
         filing_status: MARRIED_FILING_SEPARATELY
-        combined_income: 5000
-        tax_unit_social_security: 8000
+        combined_income: 5_000
+        tax_unit_social_security: 8_000
       expect: 2500  # min(4000, 2500) = 2500
     - name: "High income benefits all taxable"
       period: 2024-01
       inputs:
         filing_status: SINGLE
-        combined_income: 100000
-        tax_unit_social_security: 20000
+        combined_income: 100_000
+        tax_unit_social_security: 20_000
       expect: 10000  # min(10000, 37500) = 10000
 
 
@@ -234,18 +234,18 @@ variable taxable_social_security:
     - name: "All benefits taxable (100%)"
       period: 2024-01
       inputs:
-        tax_unit_social_security: 10000
-        taxable_social_security_amount: 10000
+        tax_unit_social_security: 10_000
+        taxable_social_security_amount: 10_000
       expect: 1.0
     - name: "Half benefits taxable (50%)"
       period: 2024-01
       inputs:
-        tax_unit_social_security: 10000
-        taxable_social_security_amount: 5000
+        tax_unit_social_security: 10_000
+        taxable_social_security_amount: 5_000
       expect: 0.5
     - name: "No benefits taxable (0%)"
       period: 2024-01
       inputs:
-        tax_unit_social_security: 10000
+        tax_unit_social_security: 10_000
         taxable_social_security_amount: 0
       expect: 0.0

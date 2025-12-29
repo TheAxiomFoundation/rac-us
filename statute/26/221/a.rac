@@ -176,61 +176,61 @@ variable student_loan_interest_phaseout_ratio:
       period: 2024-01
       inputs:
         filing_status: SINGLE
-        adjusted_gross_income: 40000
+        adjusted_gross_income: 40_000
       expect: 0
     - name: "Single filer at phaseout start (AGI $50,000)"
       period: 2024-01
       inputs:
         filing_status: SINGLE
-        adjusted_gross_income: 50000
+        adjusted_gross_income: 50_000
       expect: 0
     - name: "Single filer midway through phaseout (AGI $57,500)"
       period: 2024-01
       inputs:
         filing_status: SINGLE
-        adjusted_gross_income: 57500
+        adjusted_gross_income: 57_500
       expect: 0.5
     - name: "Single filer at phaseout end (AGI $65,000)"
       period: 2024-01
       inputs:
         filing_status: SINGLE
-        adjusted_gross_income: 65000
+        adjusted_gross_income: 65_000
       expect: 1
     - name: "Single filer above phaseout (AGI $75,000)"
       period: 2024-01
       inputs:
         filing_status: SINGLE
-        adjusted_gross_income: 75000
+        adjusted_gross_income: 75_000
       expect: 1
     - name: "MFJ below phaseout (AGI $90,000)"
       period: 2024-01
       inputs:
         filing_status: MARRIED_FILING_JOINTLY
-        adjusted_gross_income: 90000
+        adjusted_gross_income: 90_000
       expect: 0
     - name: "MFJ at phaseout start (AGI $100,000)"
       period: 2024-01
       inputs:
         filing_status: MARRIED_FILING_JOINTLY
-        adjusted_gross_income: 100000
+        adjusted_gross_income: 100_000
       expect: 0
     - name: "MFJ midway through phaseout (AGI $115,000)"
       period: 2024-01
       inputs:
         filing_status: MARRIED_FILING_JOINTLY
-        adjusted_gross_income: 115000
+        adjusted_gross_income: 115_000
       expect: 0.5
     - name: "MFJ at phaseout end (AGI $130,000)"
       period: 2024-01
       inputs:
         filing_status: MARRIED_FILING_JOINTLY
-        adjusted_gross_income: 130000
+        adjusted_gross_income: 130_000
       expect: 1
     - name: "MFJ above phaseout (AGI $150,000)"
       period: 2024-01
       inputs:
         filing_status: MARRIED_FILING_JOINTLY
-        adjusted_gross_income: 150000
+        adjusted_gross_income: 150_000
       expect: 1
 
 variable student_loan_interest_deduction_before_phaseout:
@@ -250,17 +250,17 @@ variable student_loan_interest_deduction_before_phaseout:
     - name: "Interest below $2,500 cap - single member"
       period: 2024-01
       inputs:
-        members_student_loan_interest_paid: 1500
+        members_student_loan_interest_paid: 1_500
       expect: 1500
     - name: "Interest exceeds $2,500 cap - single member"
       period: 2024-01
       inputs:
-        members_student_loan_interest_paid: 3000
+        members_student_loan_interest_paid: 3_000
       expect: 2500
     - name: "Exactly at $2,500 cap"
       period: 2024-01
       inputs:
-        members_student_loan_interest_paid: 2500
+        members_student_loan_interest_paid: 2_500
       expect: 2500
     - name: "No interest paid"
       period: 2024-01
@@ -270,7 +270,7 @@ variable student_loan_interest_deduction_before_phaseout:
     - name: "Multiple members totaling $3,000 (should cap at $2,500)"
       period: 2024-01
       inputs:
-        members_student_loan_interest_paid: 3000
+        members_student_loan_interest_paid: 3_000
       expect: 2500
 
 variable student_loan_interest_deduction:
@@ -290,7 +290,7 @@ variable student_loan_interest_deduction:
       period: 2024-01
       inputs:
         filing_status: SINGLE
-        adjusted_gross_income: 40000
+        adjusted_gross_income: 40_000
         members_student_loan_interest_paid: 2000
         student_loan_interest_deduction_eligible: true
       expect: 2000
@@ -298,15 +298,15 @@ variable student_loan_interest_deduction:
       period: 2024-01
       inputs:
         filing_status: SINGLE
-        adjusted_gross_income: 40000
-        members_student_loan_interest_paid: 3500
+        adjusted_gross_income: 40_000
+        members_student_loan_interest_paid: 3_500
         student_loan_interest_deduction_eligible: true
       expect: 2500
     - name: "Eligible single with $2,000 interest, AGI at phaseout midpoint ($57,500)"
       period: 2024-01
       inputs:
         filing_status: SINGLE
-        adjusted_gross_income: 57500
+        adjusted_gross_income: 57_500
         members_student_loan_interest_paid: 2000
         student_loan_interest_deduction_eligible: true
       expect: 1000
@@ -314,7 +314,7 @@ variable student_loan_interest_deduction:
       period: 2024-01
       inputs:
         filing_status: SINGLE
-        adjusted_gross_income: 70000
+        adjusted_gross_income: 70_000
         members_student_loan_interest_paid: 2000
         student_loan_interest_deduction_eligible: true
       expect: 0
@@ -322,31 +322,31 @@ variable student_loan_interest_deduction:
       period: 2024-01
       inputs:
         filing_status: MARRIED_FILING_JOINTLY
-        adjusted_gross_income: 100000
-        members_student_loan_interest_paid: 2500
+        adjusted_gross_income: 100_000
+        members_student_loan_interest_paid: 2_500
         student_loan_interest_deduction_eligible: true
       expect: 2500
     - name: "Married filing jointly with $2,500 interest, AGI $115,000 (midpoint)"
       period: 2024-01
       inputs:
         filing_status: MARRIED_FILING_JOINTLY
-        adjusted_gross_income: 115000
-        members_student_loan_interest_paid: 2500
+        adjusted_gross_income: 115_000
+        members_student_loan_interest_paid: 2_500
         student_loan_interest_deduction_eligible: true
       expect: 1250
     - name: "Married filing jointly with $2,500 interest, AGI $140,000 (above phaseout)"
       period: 2024-01
       inputs:
         filing_status: MARRIED_FILING_JOINTLY
-        adjusted_gross_income: 140000
-        members_student_loan_interest_paid: 2500
+        adjusted_gross_income: 140_000
+        members_student_loan_interest_paid: 2_500
         student_loan_interest_deduction_eligible: true
       expect: 0
     - name: "Ineligible taxpayer (e.g., claimed as dependent)"
       period: 2024-01
       inputs:
         filing_status: SINGLE
-        adjusted_gross_income: 40000
+        adjusted_gross_income: 40_000
         members_student_loan_interest_paid: 2000
         student_loan_interest_deduction_eligible: false
       expect: 0
@@ -354,7 +354,7 @@ variable student_loan_interest_deduction:
       period: 2024-01
       inputs:
         filing_status: MARRIED_FILING_SEPARATELY
-        adjusted_gross_income: 40000
+        adjusted_gross_income: 40_000
         members_student_loan_interest_paid: 2000
         student_loan_interest_deduction_eligible: false
       expect: 0

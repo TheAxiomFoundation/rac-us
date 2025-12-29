@@ -113,7 +113,7 @@ variable education_credits:
     - name: "AOTC only at maximum"
       period: 2024
       inputs:
-        american_opportunity_credit: 2500
+        american_opportunity_credit: 2_500
         lifetime_learning_credit: 0
       expect: 2500
 
@@ -127,15 +127,15 @@ variable education_credits:
     - name: "Combined credits"
       period: 2024
       inputs:
-        american_opportunity_credit: 2500
+        american_opportunity_credit: 2_500
         lifetime_learning_credit: 2000
       expect: 4500
 
     - name: "Partial AOTC and partial LLC"
       period: 2024
       inputs:
-        american_opportunity_credit: 1500
-        lifetime_learning_credit: 1000
+        american_opportunity_credit: 1_500
+        lifetime_learning_credit: 1_000
       expect: 2500
 
     - name: "Small AOTC only"

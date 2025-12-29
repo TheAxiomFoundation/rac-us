@@ -45,34 +45,34 @@ variable distributions:
       period: 2024
       inputs:
         traditional_ira_distribution: 0
-        traditional_ira_basis: 10000
-        traditional_ira_total_value: 100000
+        traditional_ira_basis: 10_000
+        traditional_ira_total_value: 100_000
       expect: 0
     - name: "Distribution with no basis (all taxable)"
       period: 2024
       inputs:
-        traditional_ira_distribution: 5000
+        traditional_ira_distribution: 5_000
         traditional_ira_basis: 0
-        traditional_ira_total_value: 50000
+        traditional_ira_total_value: 50_000
       expect: 5000
     - name: "Distribution with basis ratio 1:2"
       period: 2024
       inputs:
-        traditional_ira_distribution: 10000
-        traditional_ira_basis: 50000
-        traditional_ira_total_value: 100000
+        traditional_ira_distribution: 10_000
+        traditional_ira_basis: 50_000
+        traditional_ira_total_value: 100_000
       expect: 5000
     - name: "Distribution with basis ratio 1:3 (after-tax contributions)"
       period: 2024
       inputs:
-        traditional_ira_distribution: 12000
-        traditional_ira_basis: 30000
-        traditional_ira_total_value: 90000
+        traditional_ira_distribution: 12_000
+        traditional_ira_basis: 30_000
+        traditional_ira_total_value: 90_000
       expect: 8000
     - name: "Small distribution, high basis"
       period: 2024
       inputs:
         traditional_ira_distribution: 2000
-        traditional_ira_basis: 50000
-        traditional_ira_total_value: 60000
+        traditional_ira_basis: 50_000
+        traditional_ira_total_value: 60_000
       expect: 1667

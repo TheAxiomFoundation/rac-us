@@ -71,8 +71,8 @@ variable ira_deduction:
     - name: "Young adult, no coverage, no phaseout (2024)"
       period: 2024
       inputs:
-        earned_income: 50000
-        adjusted_gross_income: 50000
+        earned_income: 50_000
+        adjusted_gross_income: 50_000
         filing_status: 1
         is_active_retirement_plan_participant: false
         age: 30
@@ -80,8 +80,8 @@ variable ira_deduction:
     - name: "Age 50+, no coverage (2024)"
       period: 2024
       inputs:
-        earned_income: 50000
-        adjusted_gross_income: 50000
+        earned_income: 50_000
+        adjusted_gross_income: 50_000
         filing_status: 1
         is_active_retirement_plan_participant: false
         age: 55
@@ -89,8 +89,8 @@ variable ira_deduction:
     - name: "Single, active participant, below phaseout (2024)"
       period: 2024
       inputs:
-        earned_income: 100000
-        adjusted_gross_income: 140000
+        earned_income: 100_000
+        adjusted_gross_income: 140_000
         filing_status: 1
         is_active_retirement_plan_participant: true
         age: 35
@@ -98,8 +98,8 @@ variable ira_deduction:
     - name: "Single, active participant, fully phased out (2024)"
       period: 2024
       inputs:
-        earned_income: 200000
-        adjusted_gross_income: 200000
+        earned_income: 200_000
+        adjusted_gross_income: 200_000
         filing_status: 1
         is_active_retirement_plan_participant: true
         age: 35
@@ -107,8 +107,8 @@ variable ira_deduction:
     - name: "Single, active participant, partially phased out at midpoint (2024)"
       period: 2024
       inputs:
-        earned_income: 100000
-        adjusted_gross_income: 153500
+        earned_income: 100_000
+        adjusted_gross_income: 153_500
         filing_status: 1
         is_active_retirement_plan_participant: true
         age: 35
@@ -116,8 +116,8 @@ variable ira_deduction:
     - name: "Married filing jointly, active participant, below phaseout (2024)"
       period: 2024
       inputs:
-        earned_income: 100000
-        adjusted_gross_income: 120000
+        earned_income: 100_000
+        adjusted_gross_income: 120_000
         filing_status: 2
         is_active_retirement_plan_participant: true
         age: 40
@@ -125,8 +125,8 @@ variable ira_deduction:
     - name: "Married filing jointly, active participant, fully phased out (2024)"
       period: 2024
       inputs:
-        earned_income: 200000
-        adjusted_gross_income: 200000
+        earned_income: 200_000
+        adjusted_gross_income: 200_000
         filing_status: 2
         is_active_retirement_plan_participant: true
         age: 40
@@ -134,8 +134,8 @@ variable ira_deduction:
     - name: "Married filing separately, active participant (2024)"
       period: 2024
       inputs:
-        earned_income: 100000
-        adjusted_gross_income: 5000
+        earned_income: 100_000
+        adjusted_gross_income: 5_000
         filing_status: 3
         is_active_retirement_plan_participant: true
         age: 40
@@ -144,7 +144,7 @@ variable ira_deduction:
       period: 2024
       inputs:
         earned_income: 0
-        adjusted_gross_income: 100000
+        adjusted_gross_income: 100_000
         filing_status: 1
         is_active_retirement_plan_participant: false
         age: 40
@@ -152,8 +152,8 @@ variable ira_deduction:
     - name: "Prior year 2023, age 50+, active participant at threshold"
       period: 2023
       inputs:
-        earned_income: 100000
-        adjusted_gross_income: 116000
+        earned_income: 100_000
+        adjusted_gross_income: 116_000
         filing_status: 1
         is_active_retirement_plan_participant: true
         age: 55
@@ -161,8 +161,8 @@ variable ira_deduction:
     - name: "Age 50+ catch-up with phaseout"
       period: 2024
       inputs:
-        earned_income: 100000
-        adjusted_gross_income: 155000
+        earned_income: 100_000
+        adjusted_gross_income: 155_000
         filing_status: 1
         is_active_retirement_plan_participant: true
         age: 52

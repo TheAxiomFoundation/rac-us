@@ -73,17 +73,17 @@ tests:
     period: 2024-01
     inputs:
       tax_unit:
-        self_employment_income: 100000
-        self_employed_pension_contributions: 25000
+        self_employment_income: 100_000
+        self_employed_pension_contributions: 25_000
     outputs:
-      self_employed_pension_deduction: 25000
+      self_employed_pension_deduction: 25_000
 
   - name: "No self-employment income"
     period: 2024-01
     inputs:
       tax_unit:
         self_employment_income: 0
-        self_employed_pension_contributions: 10000
+        self_employed_pension_contributions: 10_000
     outputs:
       self_employed_pension_limit: 0
       self_employed_pension_deduction: 0
@@ -92,52 +92,52 @@ tests:
     period: 2024-01
     inputs:
       tax_unit:
-        self_employment_income: 100000
-        self_employed_pension_contributions: 15000
+        self_employment_income: 100_000
+        self_employed_pension_contributions: 15_000
     outputs:
-      self_employed_pension_deduction: 15000
+      self_employed_pension_deduction: 15_000
 
   - name: "Contribution exceeds limit, capped"
     period: 2024-01
     inputs:
       tax_unit:
-        self_employment_income: 100000
-        self_employed_pension_contributions: 35000
+        self_employment_income: 100_000
+        self_employed_pension_contributions: 35_000
     outputs:
-      self_employed_pension_deduction: 25000
+      self_employed_pension_deduction: 25_000
 
   - name: "High self-employment income"
     period: 2024-01
     inputs:
       tax_unit:
-        self_employment_income: 200000
-        self_employed_pension_contributions: 50000
+        self_employment_income: 200_000
+        self_employed_pension_contributions: 50_000
     outputs:
-      self_employed_pension_deduction: 50000
+      self_employed_pension_deduction: 50_000
 
   - name: "Low self-employment income"
     period: 2024-01
     inputs:
       tax_unit:
-        self_employment_income: 30000
-        self_employed_pension_contributions: 7500
+        self_employment_income: 30_000
+        self_employed_pension_contributions: 7_500
     outputs:
-      self_employed_pension_deduction: 7500
+      self_employed_pension_deduction: 7_500
 
   - name: "25% of SE income rule"
     period: 2024-01
     inputs:
       tax_unit:
-        self_employment_income: 80000
-        self_employed_pension_contributions: 20000
+        self_employment_income: 80_000
+        self_employed_pension_contributions: 20_000
     outputs:
-      self_employed_pension_deduction: 20000
+      self_employed_pension_deduction: 20_000
 
   - name: "No contributions"
     period: 2024-01
     inputs:
       tax_unit:
-        self_employment_income: 100000
+        self_employment_income: 100_000
         self_employed_pension_contributions: 0
     outputs:
       self_employed_pension_deduction: 0

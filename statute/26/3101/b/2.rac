@@ -37,7 +37,7 @@ variable additional_medicare_tax:
   dtype: Money
   unit: "USD"
   label: "Additional Medicare Tax"
-  description: "0.9% additional Medicare tax on wages above threshold per 26 USC 3101(b)(2)"
+  description: "0.9% additional Medicare tax on wages above threshold per 26 USC 3_101(b)(2)"
   syntax: python
   formula: |
     # Both wages and self-employment income are subject to the tax

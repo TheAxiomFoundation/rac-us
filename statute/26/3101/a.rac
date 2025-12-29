@@ -29,7 +29,7 @@ variable employee_social_security_tax:
   dtype: Money
   unit: "USD"
   label: "Employee Social Security Tax"
-  description: "Employee share of Social Security (OASDI) tax at 6.2% of wages up to wage base per 26 USC 3101(a)"
+  description: "Employee share of Social Security (OASDI) tax at 6.2% of wages up to wage base per 26 USC 3_101(a)"
   syntax: python
   formula: |
     # Social Security tax applies only up to the wage base cap
@@ -126,7 +126,7 @@ variable employee_fica_tax:
   dtype: Money
   unit: "USD"
   label: "Employee FICA Tax"
-  description: "Combined employee Social Security and Medicare taxes per 26 USC 3101"
+  description: "Combined employee Social Security and Medicare taxes per 26 USC 3_101"
   syntax: python
   formula: |
     # Sum of Social Security (6.2%) and Medicare (1.45%) employee taxes
@@ -184,5 +184,5 @@ variable employee_fica_tax:
       period: 2024
       inputs:
         employee_social_security_tax: 0.062
-        employee_medicare_tax: 0.0145
+        employee_medicare_tax: 0.145
       expect: 0.0765

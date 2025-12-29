@@ -62,7 +62,7 @@ variable person_unemployment_included:
   tests:
     - name: "Unemployment fully included"
       period: 2024-01
-      inputs: {unemployment_compensation: 6000}
+      inputs: {unemployment_compensation: 6_000}
       expect: 6000
     - name: "No unemployment"
       period: 2024-01
@@ -70,9 +70,9 @@ variable person_unemployment_included:
       expect: 0
     - name: "High unemployment benefit"
       period: 2024-01
-      inputs: {unemployment_compensation: 15000}
+      inputs: {unemployment_compensation: 15_000}
       expect: 15000
     - name: "Federal pandemic unemployment assistance (high amount)"
       period: 2024-01
-      inputs: {unemployment_compensation: 3600}
+      inputs: {unemployment_compensation: 3_600}
       expect: 3600

@@ -109,8 +109,8 @@ variable enrolled_in_qualified_health_plan:
     - name: "Income eligible - at 100% FPL (2024)"
       period: 2024-01
       inputs:
-        household_income: 15060
-        ptc_federal_poverty_level: 15060
+        household_income: 15_060
+        ptc_federal_poverty_level: 15_060
         ptc_household_size: 1
         filing_status: SINGLE
         is_tax_unit_dependent: false
@@ -119,8 +119,8 @@ variable enrolled_in_qualified_health_plan:
     - name: "Income eligible - at 150% FPL (2024)"
       period: 2024-01
       inputs:
-        household_income: 22590
-        ptc_federal_poverty_level: 15060
+        household_income: 22_590
+        ptc_federal_poverty_level: 15_060
         ptc_household_size: 1
         filing_status: SINGLE
         is_tax_unit_dependent: false
@@ -129,8 +129,8 @@ variable enrolled_in_qualified_health_plan:
     - name: "Income eligible - at 200% FPL (2024)"
       period: 2024-01
       inputs:
-        household_income: 30120
-        ptc_federal_poverty_level: 15060
+        household_income: 30_120
+        ptc_federal_poverty_level: 15_060
         ptc_household_size: 1
         filing_status: SINGLE
         is_tax_unit_dependent: false
@@ -139,8 +139,8 @@ variable enrolled_in_qualified_health_plan:
     - name: "Income eligible - at 300% FPL (2024)"
       period: 2024-01
       inputs:
-        household_income: 45180
-        ptc_federal_poverty_level: 15060
+        household_income: 45_180
+        ptc_federal_poverty_level: 15_060
         ptc_household_size: 1
         filing_status: SINGLE
         is_tax_unit_dependent: false
@@ -149,8 +149,8 @@ variable enrolled_in_qualified_health_plan:
     - name: "Income eligible - at 400% FPL (2024)"
       period: 2024-01
       inputs:
-        household_income: 60240
-        ptc_federal_poverty_level: 15060
+        household_income: 60_240
+        ptc_federal_poverty_level: 15_060
         ptc_household_size: 1
         filing_status: SINGLE
         is_tax_unit_dependent: false
@@ -159,8 +159,8 @@ variable enrolled_in_qualified_health_plan:
     - name: "Income eligible - above 400% FPL (IRA allows)"
       period: 2024-01
       inputs:
-        household_income: 90000
-        ptc_federal_poverty_level: 15060
+        household_income: 90_000
+        ptc_federal_poverty_level: 15_060
         ptc_household_size: 1
         filing_status: SINGLE
         is_tax_unit_dependent: false
@@ -169,8 +169,8 @@ variable enrolled_in_qualified_health_plan:
     - name: "Income ineligible - below 100% FPL"
       period: 2024-01
       inputs:
-        household_income: 10000
-        ptc_federal_poverty_level: 15060
+        household_income: 10_000
+        ptc_federal_poverty_level: 15_060
         ptc_household_size: 1
         filing_status: SINGLE
         is_tax_unit_dependent: false
@@ -179,8 +179,8 @@ variable enrolled_in_qualified_health_plan:
     - name: "Income ineligible - claimed as dependent"
       period: 2024-01
       inputs:
-        household_income: 30000
-        ptc_federal_poverty_level: 15060
+        household_income: 30_000
+        ptc_federal_poverty_level: 15_060
         ptc_household_size: 1
         filing_status: SINGLE
         is_tax_unit_dependent: true
@@ -190,8 +190,8 @@ variable enrolled_in_qualified_health_plan:
     - name: "Filing status ineligible - married filing separately"
       period: 2024-01
       inputs:
-        household_income: 30000
-        ptc_federal_poverty_level: 15060
+        household_income: 30_000
+        ptc_federal_poverty_level: 15_060
         ptc_household_size: 1
         filing_status: MARRIED_FILING_SEPARATELY
         is_tax_unit_dependent: false
@@ -200,8 +200,8 @@ variable enrolled_in_qualified_health_plan:
     - name: "Filing status eligible - single"
       period: 2024-01
       inputs:
-        household_income: 30000
-        ptc_federal_poverty_level: 15060
+        household_income: 30_000
+        ptc_federal_poverty_level: 15_060
         ptc_household_size: 1
         filing_status: SINGLE
         is_tax_unit_dependent: false
@@ -210,8 +210,8 @@ variable enrolled_in_qualified_health_plan:
     - name: "Filing status eligible - married filing jointly"
       period: 2024-01
       inputs:
-        household_income: 40000
-        ptc_federal_poverty_level: 20440
+        household_income: 40_000
+        ptc_federal_poverty_level: 20_440
         ptc_household_size: 2
         filing_status: JOINT
         is_tax_unit_dependent: false
@@ -220,8 +220,8 @@ variable enrolled_in_qualified_health_plan:
     - name: "Filing status eligible - head of household"
       period: 2024-01
       inputs:
-        household_income: 30000
-        ptc_federal_poverty_level: 15060
+        household_income: 30_000
+        ptc_federal_poverty_level: 15_060
         ptc_household_size: 1
         filing_status: HEAD_OF_HOUSEHOLD
         is_tax_unit_dependent: false
@@ -231,8 +231,8 @@ variable enrolled_in_qualified_health_plan:
     - name: "Income eligible - family of 4 at 200% FPL (2024)"
       period: 2024-01
       inputs:
-        household_income: 62400
-        ptc_federal_poverty_level: 31200
+        household_income: 62_400
+        ptc_federal_poverty_level: 31_200
         ptc_household_size: 4
         filing_status: JOINT
         is_tax_unit_dependent: false
@@ -241,8 +241,8 @@ variable enrolled_in_qualified_health_plan:
     - name: "Income eligible - family of 4 below 100% FPL threshold"
       period: 2024-01
       inputs:
-        household_income: 20000
-        ptc_federal_poverty_level: 31200
+        household_income: 20_000
+        ptc_federal_poverty_level: 31_200
         ptc_household_size: 4
         filing_status: JOINT
         is_tax_unit_dependent: false
@@ -252,8 +252,8 @@ variable enrolled_in_qualified_health_plan:
     - name: "Edge case - exactly at 100% FPL (single)"
       period: 2024-01
       inputs:
-        household_income: 15060
-        ptc_federal_poverty_level: 15060
+        household_income: 15_060
+        ptc_federal_poverty_level: 15_060
         ptc_household_size: 1
         filing_status: SINGLE
         is_tax_unit_dependent: false
@@ -262,8 +262,8 @@ variable enrolled_in_qualified_health_plan:
     - name: "Edge case - just below 100% FPL (single)"
       period: 2024-01
       inputs:
-        household_income: 15059
-        ptc_federal_poverty_level: 15060
+        household_income: 15_059
+        ptc_federal_poverty_level: 15_060
         ptc_household_size: 1
         filing_status: SINGLE
         is_tax_unit_dependent: false
@@ -272,8 +272,8 @@ variable enrolled_in_qualified_health_plan:
     - name: "Edge case - exactly at 400% FPL (single)"
       period: 2024-01
       inputs:
-        household_income: 60240
-        ptc_federal_poverty_level: 15060
+        household_income: 60_240
+        ptc_federal_poverty_level: 15_060
         ptc_household_size: 1
         filing_status: SINGLE
         is_tax_unit_dependent: false
@@ -282,8 +282,8 @@ variable enrolled_in_qualified_health_plan:
     - name: "Edge case - well above 400% FPL (IRA eligible)"
       period: 2024-01
       inputs:
-        household_income: 120000
-        ptc_federal_poverty_level: 15060
+        household_income: 120_000
+        ptc_federal_poverty_level: 15_060
         ptc_household_size: 1
         filing_status: SINGLE
         is_tax_unit_dependent: false

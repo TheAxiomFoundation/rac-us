@@ -59,7 +59,7 @@ variable liheap_energy_burden_factor:
   dtype: Rate
   unit: "/1"
   label: "LIHEAP Energy Burden Factor"
-  description: "Energy burden calculation per 42 USC 8624(c)(5)(A)(i) - ratio of energy costs to income, used for benefit targeting"
+  description: "Energy burden calculation per 42 USC 8_624(c)(5)(A)(i) - ratio of energy costs to income, used for benefit targeting"
   syntax: python
   formula: |
     # Energy burden = energy costs / income
@@ -146,7 +146,7 @@ variable liheap_combined_factor:
   dtype: Rate
   unit: "/1"
   label: "LIHEAP Combined Benefit Factor"
-  description: "Weighted combination of income and energy burden factors per 42 USC 8624(c)(5)"
+  description: "Weighted combination of income and energy burden factors per 42 USC 8_624(c)(5)"
   syntax: python
   formula: |
     # Combined factor = weighted average of income factor and energy burden factor
@@ -197,7 +197,7 @@ variable liheap_priority_multiplier_applied:
   dtype: Rate
   unit: "/1"
   label: "LIHEAP Priority Multiplier Applied"
-  description: "Benefit multiplier for priority households per 42 USC 8624(c)(5)(A)(ii-iv)"
+  description: "Benefit multiplier for priority households per 42 USC 8_624(c)(5)(A)(ii-iv)"
   syntax: python
   formula: |
     # Priority households receive enhanced benefits
@@ -239,7 +239,7 @@ variable liheap_cooling_assistance:
   dtype: Money
   unit: "USD"
   label: "LIHEAP Cooling Assistance"
-  description: "Home cooling assistance benefit per 42 USC 8624(b)(1)(B) and (c)(5)"
+  description: "Home cooling assistance benefit per 42 USC 8_624(b)(1)(B) and (c)(5)"
   syntax: python
   formula: |
     # Cooling assistance = base * combined_factor * priority_multiplier * cooling_fraction
@@ -340,7 +340,7 @@ variable liheap_heating_assistance:
   dtype: Money
   unit: "USD"
   label: "LIHEAP Heating Assistance"
-  description: "Home heating assistance benefit per 42 USC 8624(b)(1)(A) and (c)(5)"
+  description: "Home heating assistance benefit per 42 USC 8_624(b)(1)(A) and (c)(5)"
   syntax: python
   formula: |
     # Heating assistance = base * combined_factor * priority_multiplier * (1 - cooling_fraction)
@@ -438,7 +438,7 @@ variable liheap_total_assistance:
   dtype: Money
   unit: "USD"
   label: "LIHEAP Total Assistance"
-  description: "Total LIHEAP assistance (heating + cooling) per 42 USC 8624"
+  description: "Total LIHEAP assistance (heating + cooling) per 42 USC 8_624"
   syntax: python
   formula: |
     # Total = heating + cooling, which equals base * combined_factor * priority_multiplier

@@ -97,7 +97,7 @@ input depreciation_after_1997:
   dtype: Money
   unit: "USD"
   label: "Depreciation After May 6, 1997"
-  description: "Amount of depreciation deductions taken after May 6, 1997 (Section 1250 property)"
+  description: "Amount of depreciation deductions taken after May 6, 1997 (Section 1_250 property)"
   default: 0
 
 input spouse_meets_use_test:
@@ -137,16 +137,16 @@ variable principal_residence_exclusion:
       inputs:
         filing_status: SINGLE
         meets_full_requirements: true
-        applicable_exclusion_limit: 250000
-        excludable_gain: 200000
+        applicable_exclusion_limit: 250_000
+        excludable_gain: 200_000
       expect: 200000
     - name: "Single filer, full requirements met, gain exceeds limit"
       period: 2024-01
       inputs:
         filing_status: SINGLE
         meets_full_requirements: true
-        applicable_exclusion_limit: 250000
-        excludable_gain: 400000
+        applicable_exclusion_limit: 250_000
+        excludable_gain: 400_000
       expect: 250000
     - name: "Single filer, does not meet requirements"
       period: 2024-01
@@ -154,46 +154,46 @@ variable principal_residence_exclusion:
         filing_status: SINGLE
         meets_full_requirements: false
         applicable_exclusion_limit: 0
-        excludable_gain: 200000
+        excludable_gain: 200_000
       expect: 0
     - name: "Married filing jointly, full requirements met, gain within limit"
       period: 2024-01
       inputs:
         filing_status: MARRIED_FILING_JOINTLY
         meets_full_requirements: true
-        applicable_exclusion_limit: 500000
-        excludable_gain: 400000
+        applicable_exclusion_limit: 500_000
+        excludable_gain: 400_000
       expect: 400000
     - name: "Married filing jointly, full requirements met, gain exceeds limit"
       period: 2024-01
       inputs:
         filing_status: MARRIED_FILING_JOINTLY
         meets_full_requirements: true
-        applicable_exclusion_limit: 500000
-        excludable_gain: 600000
+        applicable_exclusion_limit: 500_000
+        excludable_gain: 600_000
       expect: 500000
     - name: "Married filing separately, reduced exclusion"
       period: 2024-01
       inputs:
         filing_status: MARRIED_FILING_SEPARATELY
         meets_full_requirements: false
-        applicable_exclusion_limit: 125000
-        excludable_gain: 100000
+        applicable_exclusion_limit: 125_000
+        excludable_gain: 100_000
       expect: 100000
     - name: "Head of household, full requirements met"
       period: 2024-01
       inputs:
         filing_status: HEAD_OF_HOUSEHOLD
         meets_full_requirements: true
-        applicable_exclusion_limit: 250000
-        excludable_gain: 180000
+        applicable_exclusion_limit: 250_000
+        excludable_gain: 180_000
       expect: 180000
     - name: "Zero gain excludable (depreciation recapture equals gain)"
       period: 2024-01
       inputs:
         filing_status: SINGLE
         meets_full_requirements: true
-        applicable_exclusion_limit: 250000
+        applicable_exclusion_limit: 250_000
         excludable_gain: 0
       expect: 0
     - name: "Negative excludable gain (all depreciation)"
@@ -201,7 +201,7 @@ variable principal_residence_exclusion:
       inputs:
         filing_status: SINGLE
         meets_full_requirements: true
-        applicable_exclusion_limit: 250000
+        applicable_exclusion_limit: 250_000
         excludable_gain: 0
       expect: 0
 
@@ -638,48 +638,48 @@ variable excludable_gain:
     - name: "Gain with no depreciation"
       period: 2024-01
       inputs:
-        realized_gain_on_residence: 200000
+        realized_gain_on_residence: 200_000
         depreciation_after_1997: 0
       expect: 200000
     - name: "Gain exceeds depreciation recapture"
       period: 2024-01
       inputs:
-        realized_gain_on_residence: 300000
-        depreciation_after_1997: 50000
+        realized_gain_on_residence: 300_000
+        depreciation_after_1997: 50_000
       expect: 250000
     - name: "Depreciation equals realized gain (no excludable gain)"
       period: 2024-01
       inputs:
-        realized_gain_on_residence: 100000
-        depreciation_after_1997: 100000
+        realized_gain_on_residence: 100_000
+        depreciation_after_1997: 100_000
       expect: 0
     - name: "Depreciation exceeds realized gain (capped at 0)"
       period: 2024-01
       inputs:
-        realized_gain_on_residence: 50000
-        depreciation_after_1997: 150000
+        realized_gain_on_residence: 50_000
+        depreciation_after_1997: 150_000
       expect: 0
     - name: "Large gain with moderate depreciation"
       period: 2024-01
       inputs:
-        realized_gain_on_residence: 500000
-        depreciation_after_1997: 75000
+        realized_gain_on_residence: 500_000
+        depreciation_after_1997: 75_000
       expect: 425000
     - name: "Rental property converted to primary residence"
       period: 2024-01
       inputs:
-        realized_gain_on_residence: 400000
-        depreciation_after_1997: 125000
+        realized_gain_on_residence: 400_000
+        depreciation_after_1997: 125_000
       expect: 275000
     - name: "Small depreciation on large gain"
       period: 2024-01
       inputs:
-        realized_gain_on_residence: 600000
-        depreciation_after_1997: 10000
+        realized_gain_on_residence: 600_000
+        depreciation_after_1997: 10_000
       expect: 590000
     - name: "Depreciation before 1997 (not recaptured)"
       period: 2024-01
       inputs:
-        realized_gain_on_residence: 200000
+        realized_gain_on_residence: 200_000
         depreciation_after_1997: 0
       expect: 200000

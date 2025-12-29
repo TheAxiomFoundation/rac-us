@@ -3,7 +3,7 @@ variable coverage:
   period: Year
   dtype: Boolean
   label: "FUTA Coverage Status"
-  description: "Whether employment is covered under FUTA per 26 USC 3304(a)"
+  description: "Whether employment is covered under FUTA per 26 USC 3_304(a)"
   syntax: python
   formula: |
     # Most employment is covered; exceptions defined in 3306(c)

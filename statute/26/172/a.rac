@@ -43,26 +43,26 @@ variable nol_deduction:
     - name: "NOL deduction with pre and post-TCJA carryforwards"
       period: 2024
       inputs:
-        taxable_income: 100000
-        nol_deduction_pre_2018: 30000
-        nol_deduction_post_2017: 50000
+        taxable_income: 100_000
+        nol_deduction_pre_2018: 30_000
+        nol_deduction_post_2017: 50_000
         farming_loss_carryback: 0
       expect: 80000
     - name: "NOL deduction capped at taxable income"
       period: 2024
       inputs:
-        taxable_income: 50000
-        nol_deduction_pre_2018: 40000
-        nol_deduction_post_2017: 60000
+        taxable_income: 50_000
+        nol_deduction_pre_2018: 40_000
+        nol_deduction_post_2017: 60_000
         farming_loss_carryback: 0
       expect: 50000
     - name: "NOL deduction with farming carryback"
       period: 2024
       inputs:
-        taxable_income: 100000
+        taxable_income: 100_000
         nol_deduction_pre_2018: 0
-        nol_deduction_post_2017: 60000
-        farming_loss_carryback: 10000
+        nol_deduction_post_2017: 60_000
+        farming_loss_carryback: 10_000
       expect: 70000
     - name: "No NOL deduction with zero carryforwards"
       period: 2024
@@ -117,8 +117,8 @@ variable nol_deduction_claimed:
     - name: "NOL deduction is claimed when deduction is positive"
       period: 2024
       inputs:
-        taxable_income: 100000
-        nol_deduction_pre_2018: 25000
+        taxable_income: 100_000
+        nol_deduction_pre_2018: 25_000
         nol_deduction_post_2017: 0
         farming_loss_carryback: 0
       expect: true
@@ -163,8 +163,8 @@ variable taxable_income_before_nol:
     - name: "Taxable income before NOL with deduction"
       period: 2024
       inputs:
-        taxable_income: 75000
-        nol_deduction_pre_2018: 25000
+        taxable_income: 75_000
+        nol_deduction_pre_2018: 25_000
         nol_deduction_post_2017: 0
         farming_loss_carryback: 0
       expect: 100000
@@ -213,10 +213,10 @@ variable amt_nol_deduction:
     - name: "AMT NOL deduction equals regular NOL deduction"
       period: 2024
       inputs:
-        taxable_income: 100000
-        nol_deduction_pre_2018: 30000
-        nol_deduction_post_2017: 40000
-        farming_loss_carryback: 5000
+        taxable_income: 100_000
+        nol_deduction_pre_2018: 30_000
+        nol_deduction_post_2017: 40_000
+        farming_loss_carryback: 5_000
       expect: 75000
     - name: "AMT NOL deduction zero when no carryforwards"
       period: 2024

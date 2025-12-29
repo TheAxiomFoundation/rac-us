@@ -60,7 +60,7 @@ variable niit:
   dtype: Money
   unit: "USD"
   label: "Net Investment Income Tax"
-  description: "3.8% surtax on investment income for high-income taxpayers per Section 1411(a)"
+  description: "3.8% surtax on investment income for high-income taxpayers per Section 1_411(a)"
   syntax: python
   formula: |
     # Section 1411(d): Modified AGI = AGI + foreign earned income exclusion
@@ -407,7 +407,7 @@ variable niit_standalone:
   dtype: Money
   unit: "USD"
   label: "Net Investment Income Tax (Standalone)"
-  description: "3.8% surtax on investment income for high-income taxpayers per Section 1411(a) - validation version"
+  description: "3.8% surtax on investment income for high-income taxpayers per Section 1_411(a) - validation version"
   syntax: python
   formula: |
     # Section 1411(d): Modified AGI = AGI + foreign earned income exclusion

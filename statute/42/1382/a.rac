@@ -72,7 +72,7 @@ variable age_requirement:
   period: Month
   dtype: Boolean
   label: "SSI categorical eligibility"
-  description: "Individual is aged (65+), blind, or disabled per 42 USC 1382(a)(1)(A)"
+  description: "Individual is aged (65+), blind, or disabled per 42 USC 1_382(a)(1)(A)"
   formula: return age >= age_threshold
   default: False
   tests:
@@ -108,7 +108,7 @@ variable citizenship:
   period: Month
   dtype: Boolean
   label: "SSI residency eligibility"
-  description: "Is resident of the United States per 42 USC 1382c(a)(1)(B)"
+  description: "Is resident of the United States per 42 USC 1_382c(a)(1)(B)"
   formula: return is_us_citizen or is_qualified_alien
   default: False
   tests:
@@ -151,7 +151,7 @@ variable resource_test:
   dtype: Boolean
   unit: "USD"
   label: "SSI resource eligibility"
-  description: "Resources do not exceed limit per 42 USC 1382(a)(3)(B)"
+  description: "Resources do not exceed limit per 42 USC 1_382(a)(3)(B)"
   syntax: python
   formula: |
     if has_eligible_spouse:
@@ -171,7 +171,7 @@ variable resource_test:
     - name: "Individual with resources below limit"
       period: 2024-01
       inputs:
-        countable_resources: 1500
+        countable_resources: 1_500
         has_eligible_spouse: false
       # $1,500 is below individual limit of $2,000
       expect: true
@@ -192,7 +192,7 @@ variable resource_test:
     - name: "Individual with high resources exceeding limit"
       period: 2024-01
       inputs:
-        countable_resources: 5000
+        countable_resources: 5_000
         has_eligible_spouse: false
       # $5,000 far exceeds individual limit
       expect: false
@@ -206,21 +206,21 @@ variable resource_test:
     - name: "Couple with resources below limit"
       period: 2024-01
       inputs:
-        countable_resources: 2500
+        countable_resources: 2_500
         has_eligible_spouse: true
       # $2,500 is below couple limit of $3,000
       expect: true
     - name: "Couple with resources at limit"
       period: 2024-01
       inputs:
-        countable_resources: 3000
+        countable_resources: 3_000
         has_eligible_spouse: true
       # $3,000 equals couple limit, should pass
       expect: true
     - name: "Couple with resources exceeding limit"
       period: 2024-01
       inputs:
-        countable_resources: 3001
+        countable_resources: 3_001
         has_eligible_spouse: true
       # $3,001 exceeds couple limit of $3,000
       expect: false

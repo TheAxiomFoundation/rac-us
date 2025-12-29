@@ -32,7 +32,7 @@ variable personal_exemption:
       period: 2024
       inputs: {}
       expect: 0
-      description: "Personal exemptions suspended under TCJA Section 11041 for tax years 2018-2025"
+      description: "Personal exemptions suspended under TCJA Section 11_041 for tax years 2018-2025"
 
     - name: "Personal exemption suspended 2023"
       period: 2023

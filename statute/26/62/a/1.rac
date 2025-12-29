@@ -58,7 +58,7 @@ tests:
     period: 2024-01
     inputs:
       tax_unit:
-        self_employment_tax_paid: 3856
+        self_employment_tax_paid: 3_856
     outputs:
       self_employment_tax_deduction: 1928
 
@@ -74,17 +74,17 @@ tests:
     period: 2024-01
     inputs:
       tax_unit:
-        self_employment_tax_paid: 8500
+        self_employment_tax_paid: 8_500
     outputs:
-      self_employment_tax_deduction: 4250
+      self_employment_tax_deduction: 4_250
 
   - name: "Health insurance premiums deduction"
     period: 2024-01
     inputs:
       tax_unit:
-        self_employed_health_insurance_premiums: 6000
+        self_employed_health_insurance_premiums: 6_000
     outputs:
-      self_employed_health_insurance_deduction: 6000
+      self_employed_health_insurance_deduction: 6_000
 
   - name: "No health insurance premiums"
     period: 2024-01
@@ -98,24 +98,24 @@ tests:
     period: 2024-01
     inputs:
       tax_unit:
-        self_employment_tax_paid: 4000
-        self_employed_health_insurance_premiums: 7200
+        self_employment_tax_paid: 4_000
+        self_employed_health_insurance_premiums: 7_200
     outputs:
       self_employment_tax_deduction: 2000
-      self_employed_health_insurance_deduction: 7200
+      self_employed_health_insurance_deduction: 7_200
 
   - name: "High health insurance premiums"
     period: 2024-01
     inputs:
       tax_unit:
-        self_employed_health_insurance_premiums: 15000
+        self_employed_health_insurance_premiums: 15_000
     outputs:
-      self_employed_health_insurance_deduction: 15000
+      self_employed_health_insurance_deduction: 15_000
 
   - name: "50% of SE tax calculation"
     period: 2024-01
     inputs:
       tax_unit:
-        self_employment_tax_paid: 5000
+        self_employment_tax_paid: 5_000
     outputs:
-      self_employment_tax_deduction: 2500
+      self_employment_tax_deduction: 2_500

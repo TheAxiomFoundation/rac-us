@@ -241,13 +241,13 @@ variable snap_expected_contribution:
       period: 2024-10
       inputs:
         household_size: 4
-        snap_net_income: 1000
+        snap_net_income: 1_000
       expect: 300
     - name: "Very large net income"
       period: 2024-10
       inputs:
         household_size: 6
-        snap_net_income: 2500
+        snap_net_income: 2_500
       expect: 750
     - name: "Rounding test (0.4 cents rounds down)"
       period: 2024-10
@@ -294,13 +294,13 @@ variable snap_calculated_benefit:
       period: 2024-10
       inputs:
         household_size: 4
-        snap_net_income: 1500
+        snap_net_income: 1_500
       expect: 525
     - name: "Benefit reduced to zero by contribution"
       period: 2024-10
       inputs:
         household_size: 1
-        snap_net_income: 1000
+        snap_net_income: 1_000
       expect: -8
 
 variable snap_minimum_benefit:
@@ -423,7 +423,7 @@ variable snap_allotment:
       inputs:
         household_size: 4
         snap_eligible: true
-        snap_calculated_benefit: 1200
+        snap_calculated_benefit: 1_200
         snap_minimum_benefit: 0
         snap_max_allotment: 975
       expect: 975
@@ -450,16 +450,16 @@ variable snap_allotment:
       inputs:
         household_size: 8
         snap_eligible: true
-        snap_calculated_benefit: 1500
+        snap_calculated_benefit: 1_500
         snap_minimum_benefit: 0
-        snap_max_allotment: 1756
+        snap_max_allotment: 1_756
       expect: 1500
     - name: "Very large household (15 persons)"
       period: 2024-10
       inputs:
         household_size: 15
         snap_eligible: true
-        snap_calculated_benefit: 3000
+        snap_calculated_benefit: 3_000
         snap_minimum_benefit: 0
-        snap_max_allotment: 3316
+        snap_max_allotment: 3_316
       expect: 3000

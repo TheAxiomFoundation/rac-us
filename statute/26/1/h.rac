@@ -69,11 +69,11 @@ parameter capital_gains_brackets:
     # TCJA base thresholds (2018)
     # First threshold is where 0% ends, second is where 15% ends
     thresholds:
-      single: [0, 38600, 425800]
-      married_filing_jointly: [0, 77200, 479000]
-      married_filing_separately: [0, 38600, 239500]
-      head_of_household: [0, 51700, 452400]
-      qualifying_widow: [0, 77200, 479000]
+      single: [0, 38_600, 425_800]
+      married_filing_jointly: [0, 77_200, 479_000]
+      married_filing_separately: [0, 38_600, 239_500]
+      head_of_household: [0, 51_700, 452_400]
+      qualifying_widow: [0, 77_200, 479_000]
     # Rates: 0% up to first threshold, 15% up to second, 20% above
     rates: [0.00, 0.15, 0.20]
 
@@ -85,7 +85,7 @@ variable net_capital_gain:
   dtype: Money
   unit: "USD"
   label: "Net Capital Gain"
-  description: "Net long-term capital gains after netting with short-term losses per 26 USC 1222"
+  description: "Net long-term capital gains after netting with short-term losses per 26 USC 1_222"
   syntax: python
   formula: |
     # Net capital gain = LTCG - STCL, but cannot be negative here
@@ -148,8 +148,8 @@ variable capital_gains_tax:
     - name: "Single filer, $30k taxable income, $10k LTCG, fully in 0% bracket"
       period: 2018-01
       inputs:
-        taxable_income: 30000
-        long_term_capital_gains: 10000
+        taxable_income: 30_000
+        long_term_capital_gains: 10_000
         qualified_dividends: 0
         filing_status: SINGLE
       # Ordinary = $30k - $10k = $20k. Start at $20k in brackets.
@@ -159,8 +159,8 @@ variable capital_gains_tax:
     - name: "Single filer, $50k taxable income, $20k LTCG, spans 0% and 15%"
       period: 2018-01
       inputs:
-        taxable_income: 50000
-        long_term_capital_gains: 20000
+        taxable_income: 50_000
+        long_term_capital_gains: 20_000
         qualified_dividends: 0
         filing_status: SINGLE
       # Ordinary = $50k - $20k = $30k. Start at $30k.
@@ -171,9 +171,9 @@ variable capital_gains_tax:
     - name: "Joint filer, $500k taxable income, $50k ANCG, spans 15% and 20%"
       period: 2018-01
       inputs:
-        taxable_income: 500000
-        long_term_capital_gains: 30000
-        qualified_dividends: 20000
+        taxable_income: 500_000
+        long_term_capital_gains: 30_000
+        qualified_dividends: 20_000
         filing_status: JOINT
       # Ordinary = $500k - $50k = $450k. Start at $450k.
       # 0% threshold joint = $77,200 (already passed)
@@ -185,9 +185,9 @@ variable capital_gains_tax:
     - name: "Head of household, $60k taxable income, $20k ANCG"
       period: 2018-01
       inputs:
-        taxable_income: 60000
-        long_term_capital_gains: 15000
-        qualified_dividends: 5000
+        taxable_income: 60_000
+        long_term_capital_gains: 15_000
+        qualified_dividends: 5_000
         filing_status: HEAD_OF_HOUSEHOLD
       # Ordinary = $60k - $20k = $40k. Start at $40k.
       # 0% threshold HOH = $51,700. Room = $11,700 at 0%.
@@ -197,8 +197,8 @@ variable capital_gains_tax:
     - name: "MFS, $250k taxable income, $20k LTCG, spans 15% and 20%"
       period: 2018-01
       inputs:
-        taxable_income: 250000
-        long_term_capital_gains: 20000
+        taxable_income: 250_000
+        long_term_capital_gains: 20_000
         qualified_dividends: 0
         filing_status: SEPARATE
       # Ordinary = $250k - $20k = $230k. Start at $230k.

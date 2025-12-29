@@ -214,7 +214,7 @@ variable liheap_categorically_eligible:
   period: Year
   dtype: Boolean
   label: "LIHEAP Categorically Eligible"
-  description: "Categorical eligibility via TANF, SSI, SNAP, or VA benefits per 42 USC 8624(b)(2)(A)"
+  description: "Categorical eligibility via TANF, SSI, SNAP, or VA benefits per 42 USC 8_624(b)(2)(A)"
   syntax: python
   formula: |
     # Per 42 USC 8624(b)(2)(A), households are eligible if any member receives:
@@ -252,7 +252,7 @@ variable liheap_income_eligible:
   period: Year
   dtype: Boolean
   label: "LIHEAP Income Eligible"
-  description: "Income eligibility based on 150% FPL per 42 USC 8624(b)(2)(B)"
+  description: "Income eligibility based on 150% FPL per 42 USC 8_624(b)(2)(B)"
   syntax: python
   formula: |
     # Per 42 USC 8624(b)(2)(B), income must not exceed 150% FPL
@@ -290,7 +290,7 @@ variable liheap_eligible:
   period: Year
   dtype: Boolean
   label: "LIHEAP Eligible"
-  description: "Overall LIHEAP eligibility per 42 USC 8624(b)(2)"
+  description: "Overall LIHEAP eligibility per 42 USC 8_624(b)(2)"
   syntax: python
   formula: |
     # Eligible if either:
@@ -359,7 +359,7 @@ variable liheap_priority_household:
   period: Year
   dtype: Boolean
   label: "LIHEAP Priority Household"
-  description: "Whether household qualifies for priority/enhanced benefits per 42 USC 8624(b)(5)"
+  description: "Whether household qualifies for priority/enhanced benefits per 42 USC 8_624(b)(5)"
   syntax: python
   formula: |
     # Per 42 USC 8624(b)(5), priority goes to households with:

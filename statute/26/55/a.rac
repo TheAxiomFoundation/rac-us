@@ -80,14 +80,14 @@ variable amt:
       period: 2024-01
       inputs:
         filing_status: MARRIED_FILING_JOINTLY
-        amti: 100000
-        exemption_joint: 133300
-        amt_bracket_joint: 232600
-        phaseout_threshold_joint: 1000000
+        amti: 100_000
+        exemption_joint: 133_300
+        amt_bracket_joint: 232_600
+        phaseout_threshold_joint: 1_000_000
         phaseout_rate: 0.25
         amt_rate_low: 0.26
         amt_rate_high: 0.28
-        regular_tax: 12000
+        regular_tax: 12_000
         amt_foreign_tax_credit: 0
       expect: 0
 
@@ -96,14 +96,14 @@ variable amt:
       period: 2024-01
       inputs:
         filing_status: SINGLE
-        amti: 300000
-        exemption_single: 85700
-        amt_bracket_single: 116300
-        phaseout_threshold_single: 500000
+        amti: 300_000
+        exemption_single: 85_700
+        amt_bracket_single: 116_300
+        phaseout_threshold_single: 500_000
         phaseout_rate: 0.25
         amt_rate_low: 0.26
         amt_rate_high: 0.28
-        regular_tax: 50000
+        regular_tax: 50_000
         amt_foreign_tax_credit: 0
       expect: 7678
 
@@ -112,14 +112,14 @@ variable amt:
       period: 2024-01
       inputs:
         filing_status: MARRIED_FILING_JOINTLY
-        amti: 1500000
-        exemption_joint: 133300
-        amt_bracket_joint: 232600
-        phaseout_threshold_joint: 1000000
+        amti: 1_500_000
+        exemption_joint: 133_300
+        amt_bracket_joint: 232_600
+        phaseout_threshold_joint: 1_000_000
         phaseout_rate: 0.25
         amt_rate_low: 0.26
         amt_rate_high: 0.28
-        regular_tax: 350000
+        regular_tax: 350_000
         amt_foreign_tax_credit: 0
       expect: 63024
 
@@ -128,14 +128,14 @@ variable amt:
       period: 2024-01
       inputs:
         filing_status: MARRIED_FILING_SEPARATELY
-        amti: 400000
-        exemption_married_separate: 66650
-        amt_bracket_married_separate: 116300
-        phaseout_threshold_married_separate: 500000
+        amti: 400_000
+        exemption_married_separate: 66_650
+        amt_bracket_married_separate: 116_300
+        phaseout_threshold_married_separate: 500_000
         phaseout_rate: 0.25
         amt_rate_low: 0.26
         amt_rate_high: 0.28
-        regular_tax: 75000
+        regular_tax: 75_000
         amt_foreign_tax_credit: 0
       expect: 11012
 
@@ -144,14 +144,14 @@ variable amt:
       period: 2024-01
       inputs:
         filing_status: QUALIFYING_WIDOW
-        amti: 500000
-        exemption_joint: 133300
-        amt_bracket_joint: 232600
-        phaseout_threshold_joint: 1000000
+        amti: 500_000
+        exemption_joint: 133_300
+        amt_bracket_joint: 232_600
+        phaseout_threshold_joint: 1_000_000
         phaseout_rate: 0.25
         amt_rate_low: 0.26
         amt_rate_high: 0.28
-        regular_tax: 90000
+        regular_tax: 90_000
         amt_foreign_tax_credit: 0
       expect: 26516
 
@@ -160,14 +160,14 @@ variable amt:
       period: 2024-01
       inputs:
         filing_status: SINGLE
-        amti: 2000000
-        exemption_single: 85700
-        amt_bracket_single: 116300
-        phaseout_threshold_single: 500000
+        amti: 2_000_000
+        exemption_single: 85_700
+        amt_bracket_single: 116_300
+        phaseout_threshold_single: 500_000
         phaseout_rate: 0.25
         amt_rate_low: 0.26
         amt_rate_high: 0.28
-        regular_tax: 200000
+        regular_tax: 200_000
         amt_foreign_tax_credit: 0
       expect: 157674
 
@@ -176,14 +176,14 @@ variable amt:
       period: 2024-01
       inputs:
         filing_status: MARRIED_FILING_JOINTLY
-        amti: 250000
-        exemption_joint: 133300
-        amt_bracket_joint: 232600
-        phaseout_threshold_joint: 1000000
+        amti: 250_000
+        exemption_joint: 133_300
+        amt_bracket_joint: 232_600
+        phaseout_threshold_joint: 1_000_000
         phaseout_rate: 0.25
         amt_rate_low: 0.26
         amt_rate_high: 0.28
-        regular_tax: 50000
+        regular_tax: 50_000
         amt_foreign_tax_credit: 0
       expect: 0
 
@@ -192,14 +192,14 @@ variable amt:
       period: 2024-01
       inputs:
         filing_status: SINGLE
-        amti: 600000
-        exemption_single: 85700
-        amt_bracket_single: 116300
-        phaseout_threshold_single: 500000
+        amti: 600_000
+        exemption_single: 85_700
+        amt_bracket_single: 116_300
+        phaseout_threshold_single: 500_000
         phaseout_rate: 0.25
         amt_rate_low: 0.26
         amt_rate_high: 0.28
-        regular_tax: 50000
+        regular_tax: 50_000
         amt_foreign_tax_credit: 0
       expect: 48678
 
@@ -208,15 +208,15 @@ variable amt:
       period: 2024-01
       inputs:
         filing_status: MARRIED_FILING_JOINTLY
-        amti: 800000
-        exemption_joint: 133300
-        amt_bracket_joint: 232600
-        phaseout_threshold_joint: 1000000
+        amti: 800_000
+        exemption_joint: 133_300
+        amt_bracket_joint: 232_600
+        phaseout_threshold_joint: 1_000_000
         phaseout_rate: 0.25
         amt_rate_low: 0.26
         amt_rate_high: 0.28
-        regular_tax: 100000
-        amt_foreign_tax_credit: 5000
+        regular_tax: 100_000
+        amt_foreign_tax_credit: 5_000
       expect: 27024
 
     # Test 10: Minimum AMTI with no AMT
@@ -224,13 +224,13 @@ variable amt:
       period: 2024-01
       inputs:
         filing_status: SINGLE
-        amti: 10000
-        exemption_single: 85700
-        amt_bracket_single: 116300
-        phaseout_threshold_single: 500000
+        amti: 10_000
+        exemption_single: 85_700
+        amt_bracket_single: 116_300
+        phaseout_threshold_single: 500_000
         phaseout_rate: 0.25
         amt_rate_low: 0.26
         amt_rate_high: 0.28
-        regular_tax: 1000
+        regular_tax: 1_000
         amt_foreign_tax_credit: 0
       expect: 0

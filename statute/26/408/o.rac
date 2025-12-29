@@ -42,9 +42,9 @@ variable contribution_limits:
     total_contributions = traditional_ira_contributions + roth_ira_contributions
     # Determine applicable limit based on age and account type
     if age >= 50:
-        limit = 8000  # 2024 limit for age 50+
+        limit = 8_000  # 2024 limit for age 50+
     else:
-        limit = 7000  # 2024 limit for under 50
+        limit = 7_000  # 2024 limit for under 50
 
     if total_contributions > limit:
         excess = total_contributions - limit
@@ -62,35 +62,35 @@ variable contribution_limits:
     - name: "At limit - under 50"
       period: 2024
       inputs:
-        traditional_ira_contributions: 5000
+        traditional_ira_contributions: 5_000
         roth_ira_contributions: 2000
         age: 40
       expect: 0
     - name: "Excess contributions - under 50"
       period: 2024
       inputs:
-        traditional_ira_contributions: 5000
-        roth_ira_contributions: 3000
+        traditional_ira_contributions: 5_000
+        roth_ira_contributions: 3_000
         age: 45
       expect: 60
     - name: "At limit - age 50+"
       period: 2024
       inputs:
-        traditional_ira_contributions: 6000
+        traditional_ira_contributions: 6_000
         roth_ira_contributions: 2000
         age: 52
       expect: 0
     - name: "Excess contributions - age 50+"
       period: 2024
       inputs:
-        traditional_ira_contributions: 5000
-        roth_ira_contributions: 4000
+        traditional_ira_contributions: 5_000
+        roth_ira_contributions: 4_000
         age: 55
       expect: 60
     - name: "Significant excess - both account types"
       period: 2024
       inputs:
-        traditional_ira_contributions: 10000
-        roth_ira_contributions: 5000
+        traditional_ira_contributions: 10_000
+        roth_ira_contributions: 5_000
         age: 48
       expect: 180

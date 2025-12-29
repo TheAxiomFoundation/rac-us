@@ -140,20 +140,20 @@ variable hcv_adjusted_income_contribution:
       inputs:
         hcv_monthly_adjusted_income: 0
       expect: 0
-    - name: "Low adjusted income (30% of $1000)"
+    - name: "Low adjusted income (30% of $1_000)"
       period: 2024-01
       inputs:
-        hcv_monthly_adjusted_income: 1000
+        hcv_monthly_adjusted_income: 1_000
       expect: 300
     - name: "Moderate adjusted income (30% of $2000)"
       period: 2024-01
       inputs:
         hcv_monthly_adjusted_income: 2000
       expect: 600
-    - name: "High adjusted income (30% of $3000)"
+    - name: "High adjusted income (30% of $3_000)"
       period: 2024-01
       inputs:
-        hcv_monthly_adjusted_income: 3000
+        hcv_monthly_adjusted_income: 3_000
       expect: 900
 
 variable hcv_gross_income_contribution:
@@ -175,20 +175,20 @@ variable hcv_gross_income_contribution:
       inputs:
         hcv_annual_income: 0
       expect: 0
-    - name: "Low annual income (10% of $24000)"
+    - name: "Low annual income (10% of $24_000)"
       period: 2024-01
       inputs:
-        hcv_annual_income: 24000
+        hcv_annual_income: 24_000
       expect: 200
-    - name: "Moderate annual income (10% of $36000)"
+    - name: "Moderate annual income (10% of $36_000)"
       period: 2024-01
       inputs:
-        hcv_annual_income: 36000
+        hcv_annual_income: 36_000
       expect: 300
-    - name: "High annual income (10% of $48000)"
+    - name: "High annual income (10% of $48_000)"
       period: 2024-01
       inputs:
-        hcv_annual_income: 48000
+        hcv_annual_income: 48_000
       expect: 400
 
 variable hcv_total_tenant_payment:

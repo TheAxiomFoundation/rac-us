@@ -456,22 +456,22 @@ variable free_meal_income_eligible:
   default: false
   tests:
     - name: "Family of 1, income 100% FPL"
-      inputs: {household_size: 1, household_gross_income: 15060}
+      inputs: {household_size: 1, household_gross_income: 15_060}
       expect: true
     - name: "Family of 1, income 130% FPL (at threshold)"
-      inputs: {household_size: 1, household_gross_income: 19578}
+      inputs: {household_size: 1, household_gross_income: 19_578}
       expect: true
     - name: "Family of 1, income 140% FPL (above threshold)"
-      inputs: {household_size: 1, household_gross_income: 21084}
+      inputs: {household_size: 1, household_gross_income: 21_084}
       expect: false
     - name: "Family of 4, income 100% FPL"
-      inputs: {household_size: 4, household_gross_income: 31200}
+      inputs: {household_size: 4, household_gross_income: 31_200}
       expect: true
     - name: "Family of 4, income 130% FPL (at threshold)"
-      inputs: {household_size: 4, household_gross_income: 40560}
+      inputs: {household_size: 4, household_gross_income: 40_560}
       expect: true
     - name: "Family of 4, income 185% FPL (above free, should be reduced)"
-      inputs: {household_size: 4, household_gross_income: 57720}
+      inputs: {household_size: 4, household_gross_income: 57_720}
       expect: false
 
 
@@ -509,28 +509,28 @@ variable reduced_meal_income_eligible:
   default: false
   tests:
     - name: "Family of 1, income 130% FPL (at free boundary, not reduced)"
-      inputs: {household_size: 1, household_gross_income: 19578}
+      inputs: {household_size: 1, household_gross_income: 19_578}
       expect: false
     - name: "Family of 1, income 140% FPL (in reduced range)"
-      inputs: {household_size: 1, household_gross_income: 21084}
+      inputs: {household_size: 1, household_gross_income: 21_084}
       expect: true
     - name: "Family of 1, income 185% FPL (at reduced boundary)"
-      inputs: {household_size: 1, household_gross_income: 27861}
+      inputs: {household_size: 1, household_gross_income: 27_861}
       expect: true
     - name: "Family of 1, income 200% FPL (above reduced)"
-      inputs: {household_size: 1, household_gross_income: 30120}
+      inputs: {household_size: 1, household_gross_income: 30_120}
       expect: false
     - name: "Family of 4, income 130% FPL (at free boundary)"
-      inputs: {household_size: 4, household_gross_income: 40560}
+      inputs: {household_size: 4, household_gross_income: 40_560}
       expect: false
     - name: "Family of 4, income 160% FPL (in reduced range)"
-      inputs: {household_size: 4, household_gross_income: 49920}
+      inputs: {household_size: 4, household_gross_income: 49_920}
       expect: true
     - name: "Family of 4, income 185% FPL (at reduced boundary)"
-      inputs: {household_size: 4, household_gross_income: 57720}
+      inputs: {household_size: 4, household_gross_income: 57_720}
       expect: true
     - name: "Family of 4, income 200% FPL (above reduced)"
-      inputs: {household_size: 4, household_gross_income: 62400}
+      inputs: {household_size: 4, household_gross_income: 62_400}
       expect: false
 
 variable school_meal_subsidized_eligible:
@@ -548,13 +548,13 @@ variable school_meal_subsidized_eligible:
   default: false
   tests:
     - name: "Family of 4 at 100% FPL (free eligible)"
-      inputs: {household_size: 4, household_gross_income: 31200}
+      inputs: {household_size: 4, household_gross_income: 31_200}
       expect: true
     - name: "Family of 4 at 160% FPL (reduced eligible)"
-      inputs: {household_size: 4, household_gross_income: 49920}
+      inputs: {household_size: 4, household_gross_income: 49_920}
       expect: true
     - name: "Family of 4 at 200% FPL (not eligible)"
-      inputs: {household_size: 4, household_gross_income: 62400}
+      inputs: {household_size: 4, household_gross_income: 62_400}
       expect: false
 
 
@@ -587,16 +587,16 @@ variable school_meal_subsidy_annual:
   default: 0
   tests:
     - name: "SNAP household gets free meal subsidy"
-      inputs: {household_receives_snap: true, household_size: 1, household_gross_income: 30000}
+      inputs: {household_receives_snap: true, household_size: 1, household_gross_income: 30_000}
       expect: 1680
     - name: "Income-eligible family gets free meal subsidy"
-      inputs: {household_receives_snap: false, household_size: 4, household_gross_income: 31200}
+      inputs: {household_receives_snap: false, household_size: 4, household_gross_income: 31_200}
       expect: 1680
     - name: "Reduced-price eligible family"
-      inputs: {household_receives_snap: false, household_size: 4, household_gross_income: 49920}
+      inputs: {household_receives_snap: false, household_size: 4, household_gross_income: 49_920}
       expect: 1050
     - name: "Above reduced-price threshold gets no subsidy"
-      inputs: {household_receives_snap: false, household_size: 4, household_gross_income: 62400}
+      inputs: {household_receives_snap: false, household_size: 4, household_gross_income: 62_400}
       expect: 0
 
 
@@ -632,29 +632,29 @@ variable school_meal_tier_determination:
   default: PAID
   tests:
     - name: "SNAP household determined as FREE"
-      inputs: {household_receives_snap: true, household_size: 1, household_gross_income: 30000, attends_cep_school: false}
+      inputs: {household_receives_snap: true, household_size: 1, household_gross_income: 30_000, attends_cep_school: false}
       expect: FREE
     - name: "CEP school student determined as FREE"
-      inputs: {household_receives_snap: false, household_size: 1, household_gross_income: 30000, attends_cep_school: true}
+      inputs: {household_receives_snap: false, household_size: 1, household_gross_income: 30_000, attends_cep_school: true}
       expect: FREE
     - name: "Family at 100% FPL determined as FREE"
-      inputs: {household_receives_snap: false, household_size: 4, household_gross_income: 31200, attends_cep_school: false}
+      inputs: {household_receives_snap: false, household_size: 4, household_gross_income: 31_200, attends_cep_school: false}
       expect: FREE
     - name: "Family at 130% FPL (boundary) determined as FREE"
-      inputs: {household_receives_snap: false, household_size: 4, household_gross_income: 40560, attends_cep_school: false}
+      inputs: {household_receives_snap: false, household_size: 4, household_gross_income: 40_560, attends_cep_school: false}
       expect: FREE
     - name: "Family at 160% FPL determined as REDUCED"
-      inputs: {household_receives_snap: false, household_size: 4, household_gross_income: 49920, attends_cep_school: false}
+      inputs: {household_receives_snap: false, household_size: 4, household_gross_income: 49_920, attends_cep_school: false}
       expect: REDUCED
     - name: "Family at 185% FPL (boundary) determined as REDUCED"
-      inputs: {household_receives_snap: false, household_size: 4, household_gross_income: 57720, attends_cep_school: false}
+      inputs: {household_receives_snap: false, household_size: 4, household_gross_income: 57_720, attends_cep_school: false}
       expect: REDUCED
     - name: "Family at 200% FPL determined as PAID"
-      inputs: {household_receives_snap: false, household_size: 4, household_gross_income: 62400, attends_cep_school: false}
+      inputs: {household_receives_snap: false, household_size: 4, household_gross_income: 62_400, attends_cep_school: false}
       expect: PAID
     - name: "Foster child determined as FREE"
-      inputs: {is_foster_child: true, household_size: 1, household_gross_income: 30000, attends_cep_school: false}
+      inputs: {is_foster_child: true, household_size: 1, household_gross_income: 30_000, attends_cep_school: false}
       expect: FREE
     - name: "Homeless youth determined as FREE"
-      inputs: {is_homeless: true, household_size: 1, household_gross_income: 30000, attends_cep_school: false}
+      inputs: {is_homeless: true, household_size: 1, household_gross_income: 30_000, attends_cep_school: false}
       expect: FREE
