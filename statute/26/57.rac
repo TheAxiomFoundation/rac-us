@@ -35,3 +35,51 @@ variable preferences:
     excess = percentage_depletion - cost_depletion
     return max(0, excess)
   default: 0
+  tests:
+    - name: "No depletion - zero preference"
+      period: 2024
+      inputs:
+        percentage_depletion: 0
+        cost_depletion: 0
+      expect: 0
+      description: "No depletion claimed results in zero preference"
+
+    - name: "Percentage equals cost - zero preference"
+      period: 2024
+      inputs:
+        percentage_depletion: 50_000
+        cost_depletion: 50_000
+      expect: 0
+      description: "When percentage depletion equals cost depletion, no preference"
+
+    - name: "Cost exceeds percentage - zero preference"
+      period: 2024
+      inputs:
+        percentage_depletion: 25_000
+        cost_depletion: 40_000
+      expect: 0
+      description: "When cost depletion exceeds percentage, preference is zero (not negative)"
+
+    - name: "Percentage exceeds cost - basic preference"
+      period: 2024
+      inputs:
+        percentage_depletion: 75_000
+        cost_depletion: 50_000
+      expect: 25_000
+      description: "Excess of percentage over cost: $75,000 - $50,000 = $25,000 preference"
+
+    - name: "Large excess - oil and gas example"
+      period: 2024
+      inputs:
+        percentage_depletion: 150_000
+        cost_depletion: 30_000
+      expect: 120_000
+      description: "Substantial excess common in natural resources: $150,000 - $30,000 = $120,000"
+
+    - name: "Zero cost depletion - full preference"
+      period: 2024
+      inputs:
+        percentage_depletion: 100_000
+        cost_depletion: 0
+      expect: 100_000
+      description: "When no cost basis remains, entire percentage depletion is preference"

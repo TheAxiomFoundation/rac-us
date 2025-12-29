@@ -10,18 +10,119 @@ investment company;
 (3) 100 percent, in the case of qualifying dividends [from affiliates].
 substituting "65 percent" for "50 percent".
 """
+
+input dividends_received:
+  entity: Corporation
+  period: Year
+  dtype: Money
+  unit: "USD"
+  label: "Dividends Received"
+  description: "Total dividends received from domestic corporations"
+  default: 0
+
+input ownership_percentage:
+  entity: Corporation
+  period: Year
+  dtype: Rate
+  unit: "/1"
+  label: "Ownership Percentage"
+  description: "Percentage of voting stock owned in the dividend-paying corporation"
+  default: 0
+
+parameter ownership_threshold_affiliated:
+  description: "Ownership threshold for affiliated corporation status (80%)"
+  unit: "/1"
+  source: "26 USC 243(b)(2)"
+  values:
+    1987-01-01: 0.80
+
+parameter ownership_threshold_20_percent:
+  description: "Ownership threshold for 20-percent owned corporation status"
+  unit: "/1"
+  source: "26 USC 243(c)(1)"
+  values:
+    1987-01-01: 0.20
+
+parameter deduction_rate_affiliated:
+  description: "Deduction rate for dividends from affiliated corporations (80%+ ownership)"
+  unit: "/1"
+  source: "26 USC 243(a)(3)"
+  values:
+    1987-01-01: 1.00
+
+parameter deduction_rate_20_percent:
+  description: "Deduction rate for dividends from 20-percent owned corporations"
+  unit: "/1"
+  source: "26 USC 243(c)"
+  values:
+    2018-01-01: 0.65
+    1987-01-01: 0.80
+
+parameter deduction_rate_portfolio:
+  description: "Deduction rate for portfolio dividends (less than 20% ownership)"
+  unit: "/1"
+  source: "26 USC 243(a)(1)"
+  values:
+    2018-01-01: 0.50
+    1987-01-01: 0.70
+
 variable dividends_received_deduction:
   entity: Corporation
   period: Year
   dtype: Money
   unit: "USD"
   label: "Dividends Received Deduction"
-  description: "Final DRD after all limitations"
+  description: "Deduction for dividends received from domestic corporations under IRC 243"
   syntax: python
   formula: |
+    # Determine applicable deduction rate based on ownership percentage
     if ownership_percentage >= ownership_threshold_affiliated:
-        return deduction_rate_affiliated
-    if ownership_percentage >= ownership_threshold_20_percent:
-        return deduction_rate_20_percent
-    return deduction_rate_portfolio
-  default: False
+        rate = deduction_rate_affiliated
+    elif ownership_percentage >= ownership_threshold_20_percent:
+        rate = deduction_rate_20_percent
+    else:
+        rate = deduction_rate_portfolio
+    return dividends_received * rate
+  default: 0
+  tests:
+    - name: "Portfolio dividends (less than 20% ownership)"
+      period: 2024
+      inputs:
+        dividends_received: 100_000
+        ownership_percentage: 0.10
+      expect: 50_000
+
+    - name: "20-percent owned corporation (exactly 20%)"
+      period: 2024
+      inputs:
+        dividends_received: 100_000
+        ownership_percentage: 0.20
+      expect: 65_000
+
+    - name: "20-percent owned corporation (50% ownership)"
+      period: 2024
+      inputs:
+        dividends_received: 200_000
+        ownership_percentage: 0.50
+      expect: 130_000
+
+    - name: "Affiliated corporation (exactly 80%)"
+      period: 2024
+      inputs:
+        dividends_received: 100_000
+        ownership_percentage: 0.80
+      expect: 100_000
+
+    - name: "Wholly-owned subsidiary (100% ownership)"
+      period: 2024
+      inputs:
+        dividends_received: 500_000
+        ownership_percentage: 1.00
+      expect: 500_000
+
+    - name: "No dividends received"
+      period: 2024
+      inputs:
+        dividends_received: 0
+        ownership_percentage: 0.50
+      expect: 0

@@ -46,3 +46,64 @@ variable distributions:
         return True
     return False
   default: 0
+  tests:
+    - name: "Qualified - age 59.5 with 5-year rule satisfied"
+      period: 2024
+      inputs:
+        is_roth_ira_5_year_satisfied: true
+        age: 60
+        early_withdrawal_penalty_age: 59.5
+        is_roth_death_distribution: false
+        is_roth_owner_disabled: false
+        roth_first_home_distribution: 0
+      expect: true  # Qualifies under (i) - age 59.5+
+    - name: "Qualified - death distribution with 5-year rule"
+      period: 2024
+      inputs:
+        is_roth_ira_5_year_satisfied: true
+        age: 45
+        early_withdrawal_penalty_age: 59.5
+        is_roth_death_distribution: true
+        is_roth_owner_disabled: false
+        roth_first_home_distribution: 0
+      expect: true  # Qualifies under (ii) - death
+    - name: "Qualified - disability with 5-year rule"
+      period: 2024
+      inputs:
+        is_roth_ira_5_year_satisfied: true
+        age: 50
+        early_withdrawal_penalty_age: 59.5
+        is_roth_death_distribution: false
+        is_roth_owner_disabled: true
+        roth_first_home_distribution: 0
+      expect: true  # Qualifies under (iii) - disability
+    - name: "Qualified - first-time homebuyer with 5-year rule"
+      period: 2024
+      inputs:
+        is_roth_ira_5_year_satisfied: true
+        age: 35
+        early_withdrawal_penalty_age: 59.5
+        is_roth_death_distribution: false
+        is_roth_owner_disabled: false
+        roth_first_home_distribution: 10_000
+      expect: true  # Qualifies under (iv) - first home up to $10,000
+    - name: "Non-qualified - 5-year rule not satisfied"
+      period: 2024
+      inputs:
+        is_roth_ira_5_year_satisfied: false
+        age: 65
+        early_withdrawal_penalty_age: 59.5
+        is_roth_death_distribution: false
+        is_roth_owner_disabled: false
+        roth_first_home_distribution: 0
+      expect: false  # Fails 5-year requirement per (B)
+    - name: "Non-qualified - under 59.5 no special conditions"
+      period: 2024
+      inputs:
+        is_roth_ira_5_year_satisfied: true
+        age: 40
+        early_withdrawal_penalty_age: 59.5
+        is_roth_death_distribution: false
+        is_roth_owner_disabled: false
+        roth_first_home_distribution: 0
+      expect: false  # No qualifying condition met

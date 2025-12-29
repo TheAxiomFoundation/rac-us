@@ -40,3 +40,40 @@ variable adjustments:
     if uses_standard_deduction: return 0
     return state_local_taxes
   default: 0
+  tests:
+    - name: "Standard deduction filer - no adjustment"
+      period: 2024
+      inputs:
+        uses_standard_deduction: true
+        state_local_taxes: 15_000
+      expect: 0
+    - name: "Itemizer with SALT deduction - full add-back"
+      period: 2024
+      inputs:
+        uses_standard_deduction: false
+        state_local_taxes: 25_000
+      expect: 25_000
+    - name: "Itemizer with zero SALT"
+      period: 2024
+      inputs:
+        uses_standard_deduction: false
+        state_local_taxes: 0
+      expect: 0
+    - name: "Itemizer with high SALT - exceeds SALT cap"
+      period: 2024
+      inputs:
+        uses_standard_deduction: false
+        state_local_taxes: 50_000
+      expect: 50_000
+    - name: "Itemizer with modest SALT deduction"
+      period: 2024
+      inputs:
+        uses_standard_deduction: false
+        state_local_taxes: 8_500
+      expect: 8_500
+    - name: "Standard deduction with zero SALT"
+      period: 2024
+      inputs:
+        uses_standard_deduction: true
+        state_local_taxes: 0
+      expect: 0
