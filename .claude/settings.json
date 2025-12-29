@@ -1,0 +1,14 @@
+{
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "prompt",
+            "prompt": "Check if Claude should stop working.\n\n1. Run 'bd ready | grep Audit | wc -l' to count remaining audit issues\n2. If there are remaining audit issues:\n   - Respond with {\"decision\": \"block\", \"reason\": \"N audit issues remain. Use Task tool to spawn parallel cosilico:rac-reviewer agents for batches of 5-10 files at a time.\"}\n3. If no audit issues remain:\n   - Respond with {\"decision\": \"approve\", \"reason\": \"All audit issues complete\"}\n\nIMPORTANT: When blocking, include this instruction in the reason:\n\"Spawn parallel agents using Task tool with subagent_type='cosilico:rac-reviewer' for each batch. Example: launch 5 agents in a single message, each reviewing a different RAC file.\""
+          }
+        ]
+      }
+    ]
+  }
+}
