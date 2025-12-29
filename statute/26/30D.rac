@@ -1,9 +1,134 @@
+# 26 USC 30D - New Clean Vehicle Credit
+#
+# The credit is comprised of two components of $3,750 each:
+#   - Critical minerals component: 30D(b)(2)
+#   - Battery components component: 30D(b)(3)
+# Maximum total credit: $7,500
+#
+# Eligibility requirements:
+#   - Final assembly in North America: 30D(d)(1)(G)
+#   - Minimum 7 kWh battery capacity: 30D(d)(1)(F)
+#   - MSRP limits: 30D(f)(11) - $80k for vans/SUVs/pickups, $55k for others
+#   - AGI limits: 30D(f)(10) - $300k joint, $225k HoH, $150k single/other
+
 text: """
 (a) ALLOWANCE OF CREDIT. -- There shall be allowed as a credit against the
 tax imposed by this chapter for the taxable year an amount equal to the sum
 of the credit amounts determined under subsection (b) with respect to each
 new clean vehicle placed in service by the taxpayer during the taxable year.
+
+(b) CREDIT AMOUNT. -- For purposes of subsection (a), the credit amount
+determined under this subsection with respect to any new clean vehicle is
+the sum of the credit amounts determined under paragraphs (2) and (3).
+
+(2) CRITICAL MINERALS. -- In the case of a vehicle that meets the
+requirements of subsection (e)(1)(A), $3,750.
+
+(3) BATTERY COMPONENTS. -- In the case of a vehicle that meets the
+requirements of subsection (e)(2)(A), $3,750.
 """
+
+# Parameters for the credit
+parameters:
+  credit:
+    critical_minerals_amount:
+      values:
+        2023: 3750
+        2024: 3750
+      description: "Credit amount for meeting critical minerals requirements"
+      reference: "26 USC 30D(b)(2)"
+      unit: "USD"
+
+    battery_components_amount:
+      values:
+        2023: 3750
+        2024: 3750
+      description: "Credit amount for meeting battery components requirements"
+      reference: "26 USC 30D(b)(3)"
+      unit: "USD"
+
+    maximum_credit:
+      values:
+        2023: 7500
+        2024: 7500
+      description: "Maximum total credit ($3,750 + $3,750)"
+      reference: "26 USC 30D(b)"
+      unit: "USD"
+
+  eligibility:
+    min_battery_capacity_kwh:
+      values:
+        2023: 7
+        2024: 7
+      description: "Minimum battery capacity in kWh"
+      reference: "26 USC 30D(d)(1)(F)"
+      unit: "kWh"
+
+    msrp_limit_van_suv_pickup:
+      values:
+        2023: 80000
+        2024: 80000
+      description: "MSRP limit for vans, SUVs, and pickup trucks"
+      reference: "26 USC 30D(f)(11)(B)(i)"
+      unit: "USD"
+
+    msrp_limit_other:
+      values:
+        2023: 55000
+        2024: 55000
+      description: "MSRP limit for all other vehicles"
+      reference: "26 USC 30D(f)(11)(B)(ii)"
+      unit: "USD"
+
+    income_limit:
+      JOINT:
+        values:
+          2023: 300000
+          2024: 300000
+        description: "AGI limit for joint filers"
+        reference: "26 USC 30D(f)(10)(B)(i)"
+      SURVIVING_SPOUSE:
+        values:
+          2023: 300000
+          2024: 300000
+        description: "AGI limit for surviving spouse"
+        reference: "26 USC 30D(f)(10)(B)(i)"
+      HEAD_OF_HOUSEHOLD:
+        values:
+          2023: 225000
+          2024: 225000
+        description: "AGI limit for head of household"
+        reference: "26 USC 30D(f)(10)(B)(ii)"
+      SINGLE:
+        values:
+          2023: 150000
+          2024: 150000
+        description: "AGI limit for single filers"
+        reference: "26 USC 30D(f)(10)(B)(iii)"
+      SEPARATE:
+        values:
+          2023: 150000
+          2024: 150000
+        description: "AGI limit for married filing separately"
+        reference: "26 USC 30D(f)(10)(B)(iii)"
+
+# Input variables for vehicle characteristics
+input purchased_new_clean_vehicle:
+  entity: TaxUnit
+  period: Year
+  dtype: Boolean
+  label: "Purchased New Clean Vehicle"
+  description: "Whether taxpayer purchased a qualifying new clean vehicle during the tax year"
+  default: false
+
+input new_clean_vehicle_msrp:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: "USD"
+  label: "New Clean Vehicle MSRP"
+  description: "Manufacturer's suggested retail price of the new clean vehicle"
+  default: 0
 
 input new_clean_vehicle_battery_capacity_kwh:
   entity: TaxUnit
@@ -14,56 +139,388 @@ input new_clean_vehicle_battery_capacity_kwh:
   description: "Battery capacity in kilowatt-hours of new clean vehicle"
   default: 0
 
+input new_clean_vehicle_is_van_suv_pickup:
+  entity: TaxUnit
+  period: Year
+  dtype: Boolean
+  label: "New Clean Vehicle Is Van/SUV/Pickup"
+  description: "Whether the new clean vehicle is classified as a van, SUV, or pickup truck"
+  default: false
+
+input new_clean_vehicle_final_assembly_north_america:
+  entity: TaxUnit
+  period: Year
+  dtype: Boolean
+  label: "Final Assembly in North America"
+  description: "Whether vehicle final assembly occurred in North America"
+  default: false
+
+input new_clean_vehicle_meets_critical_minerals_requirement:
+  entity: TaxUnit
+  period: Year
+  dtype: Boolean
+  label: "Meets Critical Minerals Requirement"
+  description: "Whether the vehicle meets the critical minerals sourcing requirements of 30D(e)(1)(A)"
+  default: false
+
+input new_clean_vehicle_meets_battery_components_requirement:
+  entity: TaxUnit
+  period: Year
+  dtype: Boolean
+  label: "Meets Battery Components Requirement"
+  description: "Whether the vehicle meets the battery components requirements of 30D(e)(2)(A)"
+  default: false
+
+# Eligibility check for battery capacity - 30D(d)(1)(F)
+variable new_vehicle_meets_battery_capacity:
+  entity: TaxUnit
+  period: Year
+  dtype: Boolean
+  label: "Meets Minimum Battery Capacity"
+  description: "Whether vehicle meets the minimum 7 kWh battery capacity requirement"
+  reference: "26 USC 30D(d)(1)(F)"
+  formula: |
+    return new_clean_vehicle_battery_capacity_kwh >= p.eligibility.min_battery_capacity_kwh
+
+# MSRP limit based on vehicle type - 30D(f)(11)
+variable new_vehicle_msrp_limit:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: "USD"
+  label: "Applicable MSRP Limit"
+  description: "MSRP limit based on vehicle classification"
+  reference: "26 USC 30D(f)(11)(B)"
+  formula: |
+    if new_clean_vehicle_is_van_suv_pickup:
+      return p.eligibility.msrp_limit_van_suv_pickup
+    return p.eligibility.msrp_limit_other
+
+# MSRP eligibility check - 30D(f)(11)
+variable new_vehicle_meets_msrp_limit:
+  entity: TaxUnit
+  period: Year
+  dtype: Boolean
+  label: "Meets MSRP Limit"
+  description: "Whether vehicle MSRP is within the applicable limit"
+  reference: "26 USC 30D(f)(11)"
+  formula: |
+    return new_clean_vehicle_msrp <= new_vehicle_msrp_limit
+
+# AGI limit based on filing status - 30D(f)(10)
+variable new_vehicle_agi_limit:
+  imports:
+    - 26/1#filing_status
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: "USD"
+  label: "Applicable AGI Limit"
+  description: "Modified AGI limit based on filing status"
+  reference: "26 USC 30D(f)(10)(B)"
+  formula: |
+    return p.eligibility.income_limit[filing_status]
+
+# AGI eligibility check - 30D(f)(10)
+variable new_vehicle_meets_income_limit:
+  imports:
+    - 26/1#filing_status
+    - 26/62/a#adjusted_gross_income
+  entity: TaxUnit
+  period: Year
+  dtype: Boolean
+  label: "Meets Income Limit"
+  description: "Whether taxpayer's AGI is within the applicable limit"
+  reference: "26 USC 30D(f)(10)"
+  formula: |
+    # Note: Law allows lesser of current year or prior year MAGI
+    # For simplicity, using current year AGI
+    return adjusted_gross_income <= new_vehicle_agi_limit
+
+# Overall eligibility - combines all requirements
+variable new_vehicle_credit_eligible:
+  entity: TaxUnit
+  period: Year
+  dtype: Boolean
+  label: "Eligible for New Clean Vehicle Credit"
+  description: "Whether taxpayer meets all eligibility requirements for the credit"
+  reference: "26 USC 30D(d), (f)(10), (f)(11)"
+  formula: |
+    if not purchased_new_clean_vehicle:
+      return false
+    if not new_clean_vehicle_final_assembly_north_america:
+      return false
+    if not new_vehicle_meets_battery_capacity:
+      return false
+    if not new_vehicle_meets_msrp_limit:
+      return false
+    if not new_vehicle_meets_income_limit:
+      return false
+    return true
+
+# Critical minerals component - 30D(b)(2)
+variable new_vehicle_critical_minerals_credit:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: "USD"
+  label: "Critical Minerals Credit Component"
+  description: "Credit amount for meeting critical minerals requirements"
+  reference: "26 USC 30D(b)(2)"
+  formula: |
+    if not new_vehicle_credit_eligible:
+      return 0
+    if new_clean_vehicle_meets_critical_minerals_requirement:
+      return p.credit.critical_minerals_amount
+    return 0
+
+# Battery components credit - 30D(b)(3)
+variable new_vehicle_battery_components_credit:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: "USD"
+  label: "Battery Components Credit Component"
+  description: "Credit amount for meeting battery components requirements"
+  reference: "26 USC 30D(b)(3)"
+  formula: |
+    if not new_vehicle_credit_eligible:
+      return 0
+    if new_clean_vehicle_meets_battery_components_requirement:
+      return p.credit.battery_components_amount
+    return 0
+
+# Main credit calculation - 30D(a), (b)
 variable new_vehicle_credit:
   imports:
     - 26/1#filing_status
     - 26/62/a#adjusted_gross_income
-    - 26/1#income_tax_before_credits
   entity: TaxUnit
   period: Year
   dtype: Money
   unit: "USD"
   label: "New Clean Vehicle Credit"
   description: "Credit for new clean vehicles per 26 USC 30D"
+  reference: "26 USC 30D(a), (b)"
   syntax: python
   formula: |
-    capacity = new_clean_vehicle_battery_capacity_kwh
-    min_capacity = p.eligibility.min_battery_capacity_kwh
-    return capacity >= min_capacity
+    # Sum of critical minerals and battery components credits
+    # Maximum $7,500 ($3,750 + $3,750)
+    return new_vehicle_critical_minerals_credit + new_vehicle_battery_components_credit
   default: 0
   tests:
-    - name: "Battery capacity below minimum - ineligible"
+    - name: "No purchase - zero credit"
       period: 2024
       inputs:
-        new_clean_vehicle_battery_capacity_kwh: 5
-      expect: false
+        purchased_new_clean_vehicle: false
+      expect: 0
 
-    - name: "Battery capacity exactly at minimum threshold"
+    - name: "Full credit - meets both requirements"
       period: 2024
       inputs:
-        new_clean_vehicle_battery_capacity_kwh: 7
-      expect: true
-
-    - name: "Battery capacity above minimum - eligible"
-      period: 2024
-      inputs:
+        purchased_new_clean_vehicle: true
+        new_clean_vehicle_msrp: 45000
         new_clean_vehicle_battery_capacity_kwh: 75
-      expect: true
+        new_clean_vehicle_is_van_suv_pickup: false
+        new_clean_vehicle_final_assembly_north_america: true
+        new_clean_vehicle_meets_critical_minerals_requirement: true
+        new_clean_vehicle_meets_battery_components_requirement: true
+        adjusted_gross_income: 100000
+        filing_status: SINGLE
+      expect: 7500
 
-    - name: "Zero battery capacity - ineligible"
+    - name: "Partial credit - critical minerals only"
       period: 2024
       inputs:
-        new_clean_vehicle_battery_capacity_kwh: 0
-      expect: false
+        purchased_new_clean_vehicle: true
+        new_clean_vehicle_msrp: 45000
+        new_clean_vehicle_battery_capacity_kwh: 75
+        new_clean_vehicle_is_van_suv_pickup: false
+        new_clean_vehicle_final_assembly_north_america: true
+        new_clean_vehicle_meets_critical_minerals_requirement: true
+        new_clean_vehicle_meets_battery_components_requirement: false
+        adjusted_gross_income: 100000
+        filing_status: SINGLE
+      expect: 3750
 
-    - name: "Small plug-in hybrid battery capacity - ineligible"
+    - name: "Partial credit - battery components only"
       period: 2024
       inputs:
-        new_clean_vehicle_battery_capacity_kwh: 4
-      expect: false
+        purchased_new_clean_vehicle: true
+        new_clean_vehicle_msrp: 45000
+        new_clean_vehicle_battery_capacity_kwh: 75
+        new_clean_vehicle_is_van_suv_pickup: false
+        new_clean_vehicle_final_assembly_north_america: true
+        new_clean_vehicle_meets_critical_minerals_requirement: false
+        new_clean_vehicle_meets_battery_components_requirement: true
+        adjusted_gross_income: 100000
+        filing_status: SINGLE
+      expect: 3750
 
-    - name: "Large EV battery capacity - eligible"
+    - name: "Zero credit - neither requirement met"
       period: 2024
       inputs:
+        purchased_new_clean_vehicle: true
+        new_clean_vehicle_msrp: 45000
+        new_clean_vehicle_battery_capacity_kwh: 75
+        new_clean_vehicle_is_van_suv_pickup: false
+        new_clean_vehicle_final_assembly_north_america: true
+        new_clean_vehicle_meets_critical_minerals_requirement: false
+        new_clean_vehicle_meets_battery_components_requirement: false
+        adjusted_gross_income: 100000
+        filing_status: SINGLE
+      expect: 0
+
+    - name: "Ineligible - AGI over limit for single filer"
+      period: 2024
+      inputs:
+        purchased_new_clean_vehicle: true
+        new_clean_vehicle_msrp: 45000
+        new_clean_vehicle_battery_capacity_kwh: 75
+        new_clean_vehicle_is_van_suv_pickup: false
+        new_clean_vehicle_final_assembly_north_america: true
+        new_clean_vehicle_meets_critical_minerals_requirement: true
+        new_clean_vehicle_meets_battery_components_requirement: true
+        adjusted_gross_income: 160000
+        filing_status: SINGLE
+      expect: 0
+
+    - name: "Eligible - joint filer at higher income limit"
+      period: 2024
+      inputs:
+        purchased_new_clean_vehicle: true
+        new_clean_vehicle_msrp: 45000
+        new_clean_vehicle_battery_capacity_kwh: 75
+        new_clean_vehicle_is_van_suv_pickup: false
+        new_clean_vehicle_final_assembly_north_america: true
+        new_clean_vehicle_meets_critical_minerals_requirement: true
+        new_clean_vehicle_meets_battery_components_requirement: true
+        adjusted_gross_income: 250000
+        filing_status: JOINT
+      expect: 7500
+
+    - name: "Ineligible - joint filer over income limit"
+      period: 2024
+      inputs:
+        purchased_new_clean_vehicle: true
+        new_clean_vehicle_msrp: 45000
+        new_clean_vehicle_battery_capacity_kwh: 75
+        new_clean_vehicle_is_van_suv_pickup: false
+        new_clean_vehicle_final_assembly_north_america: true
+        new_clean_vehicle_meets_critical_minerals_requirement: true
+        new_clean_vehicle_meets_battery_components_requirement: true
+        adjusted_gross_income: 350000
+        filing_status: JOINT
+      expect: 0
+
+    - name: "Ineligible - MSRP over limit for sedan"
+      period: 2024
+      inputs:
+        purchased_new_clean_vehicle: true
+        new_clean_vehicle_msrp: 60000
+        new_clean_vehicle_battery_capacity_kwh: 75
+        new_clean_vehicle_is_van_suv_pickup: false
+        new_clean_vehicle_final_assembly_north_america: true
+        new_clean_vehicle_meets_critical_minerals_requirement: true
+        new_clean_vehicle_meets_battery_components_requirement: true
+        adjusted_gross_income: 100000
+        filing_status: SINGLE
+      expect: 0
+
+    - name: "Eligible - SUV with higher MSRP limit"
+      period: 2024
+      inputs:
+        purchased_new_clean_vehicle: true
+        new_clean_vehicle_msrp: 70000
         new_clean_vehicle_battery_capacity_kwh: 100
-      expect: true
+        new_clean_vehicle_is_van_suv_pickup: true
+        new_clean_vehicle_final_assembly_north_america: true
+        new_clean_vehicle_meets_critical_minerals_requirement: true
+        new_clean_vehicle_meets_battery_components_requirement: true
+        adjusted_gross_income: 100000
+        filing_status: SINGLE
+      expect: 7500
+
+    - name: "Ineligible - SUV over MSRP limit"
+      period: 2024
+      inputs:
+        purchased_new_clean_vehicle: true
+        new_clean_vehicle_msrp: 85000
+        new_clean_vehicle_battery_capacity_kwh: 100
+        new_clean_vehicle_is_van_suv_pickup: true
+        new_clean_vehicle_final_assembly_north_america: true
+        new_clean_vehicle_meets_critical_minerals_requirement: true
+        new_clean_vehicle_meets_battery_components_requirement: true
+        adjusted_gross_income: 100000
+        filing_status: SINGLE
+      expect: 0
+
+    - name: "Ineligible - battery capacity below minimum"
+      period: 2024
+      inputs:
+        purchased_new_clean_vehicle: true
+        new_clean_vehicle_msrp: 45000
+        new_clean_vehicle_battery_capacity_kwh: 5
+        new_clean_vehicle_is_van_suv_pickup: false
+        new_clean_vehicle_final_assembly_north_america: true
+        new_clean_vehicle_meets_critical_minerals_requirement: true
+        new_clean_vehicle_meets_battery_components_requirement: true
+        adjusted_gross_income: 100000
+        filing_status: SINGLE
+      expect: 0
+
+    - name: "Ineligible - not assembled in North America"
+      period: 2024
+      inputs:
+        purchased_new_clean_vehicle: true
+        new_clean_vehicle_msrp: 45000
+        new_clean_vehicle_battery_capacity_kwh: 75
+        new_clean_vehicle_is_van_suv_pickup: false
+        new_clean_vehicle_final_assembly_north_america: false
+        new_clean_vehicle_meets_critical_minerals_requirement: true
+        new_clean_vehicle_meets_battery_components_requirement: true
+        adjusted_gross_income: 100000
+        filing_status: SINGLE
+      expect: 0
+
+    - name: "Eligible - head of household under income limit"
+      period: 2024
+      inputs:
+        purchased_new_clean_vehicle: true
+        new_clean_vehicle_msrp: 50000
+        new_clean_vehicle_battery_capacity_kwh: 80
+        new_clean_vehicle_is_van_suv_pickup: false
+        new_clean_vehicle_final_assembly_north_america: true
+        new_clean_vehicle_meets_critical_minerals_requirement: true
+        new_clean_vehicle_meets_battery_components_requirement: true
+        adjusted_gross_income: 200000
+        filing_status: HEAD_OF_HOUSEHOLD
+      expect: 7500
+
+    - name: "Ineligible - head of household over income limit"
+      period: 2024
+      inputs:
+        purchased_new_clean_vehicle: true
+        new_clean_vehicle_msrp: 50000
+        new_clean_vehicle_battery_capacity_kwh: 80
+        new_clean_vehicle_is_van_suv_pickup: false
+        new_clean_vehicle_final_assembly_north_america: true
+        new_clean_vehicle_meets_critical_minerals_requirement: true
+        new_clean_vehicle_meets_battery_components_requirement: true
+        adjusted_gross_income: 250000
+        filing_status: HEAD_OF_HOUSEHOLD
+      expect: 0
+
+    - name: "Battery capacity exactly at minimum threshold - eligible"
+      period: 2024
+      inputs:
+        purchased_new_clean_vehicle: true
+        new_clean_vehicle_msrp: 45000
+        new_clean_vehicle_battery_capacity_kwh: 7
+        new_clean_vehicle_is_van_suv_pickup: false
+        new_clean_vehicle_final_assembly_north_america: true
+        new_clean_vehicle_meets_critical_minerals_requirement: true
+        new_clean_vehicle_meets_battery_components_requirement: true
+        adjusted_gross_income: 100000
+        filing_status: SINGLE
+      expect: 7500
