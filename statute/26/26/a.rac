@@ -19,3 +19,45 @@ variable tax_liability_before_credits:
     # Regular tax is the income tax computed under Section 1
     # Self-employment tax is separate and not limited by Section 26
     return income_tax_before_credits
+  tests:
+    # Test 1: Zero income tax means no nonrefundable credits can be claimed
+    - name: "Zero income tax - no credit capacity"
+      period: 2024
+      inputs:
+        income_tax_before_credits: 0
+      expect: 0
+
+    # Test 2: Low income taxpayer with modest credit capacity
+    - name: "Low income taxpayer with $1,500 tax"
+      period: 2024
+      inputs:
+        income_tax_before_credits: 1_500
+      expect: 1_500
+
+    # Test 3: Middle income taxpayer with moderate credit capacity
+    - name: "Middle income taxpayer with $8,000 tax"
+      period: 2024
+      inputs:
+        income_tax_before_credits: 8_000
+      expect: 8_000
+
+    # Test 4: Higher income taxpayer with substantial credit capacity
+    - name: "Higher income taxpayer with $25,000 tax"
+      period: 2024
+      inputs:
+        income_tax_before_credits: 25_000
+      expect: 25_000
+
+    # Test 5: High income taxpayer with large credit capacity
+    - name: "High income taxpayer with $75,000 tax"
+      period: 2024
+      inputs:
+        income_tax_before_credits: 75_000
+      expect: 75_000
+
+    # Test 6: Very small tax liability edge case
+    - name: "Very small tax liability - $1"
+      period: 2024
+      inputs:
+        income_tax_before_credits: 1
+      expect: 1

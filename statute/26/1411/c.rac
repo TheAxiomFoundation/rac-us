@@ -49,3 +49,94 @@ variable net_investment_income:
     # TODO: Add allocable_investment_deductions when available
     return max(0, gross_nii)
   default: 0
+  tests:
+    # ========================================
+    # Basic investment income aggregation
+    # ========================================
+    - name: "Interest and dividends only"
+      period: 2024
+      inputs:
+        taxable_interest_income: 5_000
+        dividend_income: 3_000
+        rental_income: 0
+        royalty_income: 0
+        annuity_income: 0
+        loss_limited_net_capital_gains: 0
+        passive_business_income: 0
+      # NII = $5,000 + $3,000 = $8,000
+      expect: 8_000
+
+    - name: "All investment income types"
+      period: 2024
+      inputs:
+        taxable_interest_income: 10_000
+        dividend_income: 8_000
+        rental_income: 12_000
+        royalty_income: 5_000
+        annuity_income: 6_000
+        loss_limited_net_capital_gains: 0
+        passive_business_income: 0
+      # NII = $10k + $8k + $12k + $5k + $6k = $41,000
+      expect: 41_000
+
+    - name: "Zero investment income"
+      period: 2024
+      inputs:
+        taxable_interest_income: 0
+        dividend_income: 0
+        rental_income: 0
+        royalty_income: 0
+        annuity_income: 0
+        loss_limited_net_capital_gains: 0
+        passive_business_income: 0
+      expect: 0
+
+    # ========================================
+    # Capital gains component
+    # ========================================
+    - name: "Capital gains with investment income"
+      period: 2024
+      inputs:
+        taxable_interest_income: 2_000
+        dividend_income: 4_000
+        rental_income: 0
+        royalty_income: 0
+        annuity_income: 0
+        loss_limited_net_capital_gains: 25_000
+        passive_business_income: 0
+      # Investment income: $2k + $4k = $6k
+      # Capital gains: $25k
+      # NII = $6k + $25k = $31,000
+      expect: 31_000
+
+    - name: "Capital gains only"
+      period: 2024
+      inputs:
+        taxable_interest_income: 0
+        dividend_income: 0
+        rental_income: 0
+        royalty_income: 0
+        annuity_income: 0
+        loss_limited_net_capital_gains: 50_000
+        passive_business_income: 0
+      # NII = $50,000 (capital gains only)
+      expect: 50_000
+
+    # ========================================
+    # Passive business income component
+    # ========================================
+    - name: "Passive income with other investment income"
+      period: 2024
+      inputs:
+        taxable_interest_income: 3_000
+        dividend_income: 2_000
+        rental_income: 8_000
+        royalty_income: 0
+        annuity_income: 0
+        loss_limited_net_capital_gains: 10_000
+        passive_business_income: 15_000
+      # Investment income: $3k + $2k + $8k = $13k
+      # Capital gains: $10k
+      # Passive: $15k
+      # NII = $13k + $10k + $15k = $38,000
+      expect: 38_000

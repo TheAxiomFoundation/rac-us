@@ -41,3 +41,189 @@ for by the employee would be considered employment-related expenses
 under section 21(b)(2) (relating to expenses for household and
 dependent care services necessary for gainful employment).
 """
+
+# Parameters for Section 129(d)(4) - Principal shareholders/owners limitation
+
+parameter max_shareholder_benefit_share:
+  description: "Maximum share of DCAP benefits that can go to 5%+ shareholders/owners"
+  unit: rate
+  reference: "26 USC 129(d)(4)"
+  values:
+    1981-01-01: 0.25
+
+parameter shareholder_ownership_threshold:
+  description: "Ownership threshold above which shareholder limitation applies"
+  unit: rate
+  reference: "26 USC 129(d)(4)"
+  values:
+    1981-01-01: 0.05
+
+# Variable to determine if someone is a principal shareholder/owner per 129(d)(4)
+
+input ownership_percentage:
+  entity: Person
+  period: Year
+  dtype: Rate
+  label: "Ownership Percentage"
+  description: "Person's ownership percentage (stock, capital, or profits interest) in the employer"
+  default: 0
+
+variable is_principal_shareholder:
+  entity: Person
+  period: Year
+  dtype: Boolean
+  label: "Is Principal Shareholder/Owner"
+  description: "Whether person owns more than 5% of employer per 26 USC 129(d)(4)"
+  syntax: python
+  formula: |
+    # Principal shareholder is anyone owning more than 5% of stock/capital/profits
+    return ownership_percentage > shareholder_ownership_threshold
+  tests:
+    - name: "No ownership - not a principal shareholder"
+      period: 2024
+      inputs:
+        ownership_percentage: 0
+      expect: false
+
+    - name: "4% ownership - not a principal shareholder (below threshold)"
+      period: 2024
+      inputs:
+        ownership_percentage: 0.04
+      expect: false
+
+    - name: "5% ownership - not a principal shareholder (at threshold, not above)"
+      period: 2024
+      inputs:
+        ownership_percentage: 0.05
+      expect: false
+
+    - name: "6% ownership - is a principal shareholder (above threshold)"
+      period: 2024
+      inputs:
+        ownership_percentage: 0.06
+      expect: true
+
+    - name: "10% ownership - is a principal shareholder"
+      period: 2024
+      inputs:
+        ownership_percentage: 0.10
+      expect: true
+
+    - name: "100% ownership - is a principal shareholder (sole owner)"
+      period: 2024
+      inputs:
+        ownership_percentage: 1.0
+      expect: true
+
+# Variable to check if DCAP passes the 25% shareholder limitation test
+
+input total_dcap_benefits_paid:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  label: "Total DCAP Benefits Paid"
+  description: "Total dependent care assistance benefits paid by employer during the year"
+  default: 0
+
+input dcap_benefits_to_shareholders:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  label: "DCAP Benefits to Principal Shareholders"
+  description: "Amount of DCAP benefits paid to 5%+ shareholders, their spouses, and dependents"
+  default: 0
+
+variable dcap_shareholder_benefit_share:
+  entity: TaxUnit
+  period: Year
+  dtype: Rate
+  label: "DCAP Shareholder Benefit Share"
+  description: "Share of DCAP benefits provided to principal shareholders (5%+ owners) per 26 USC 129(d)(4)"
+  syntax: python
+  formula: |
+    # Avoid division by zero - if no benefits paid, share is 0
+    if total_dcap_benefits_paid == 0:
+        return 0
+    return dcap_benefits_to_shareholders / total_dcap_benefits_paid
+  tests:
+    - name: "No benefits paid - zero share"
+      period: 2024
+      inputs:
+        total_dcap_benefits_paid: 0
+        dcap_benefits_to_shareholders: 0
+      expect: 0
+
+    - name: "No shareholder benefits - zero share"
+      period: 2024
+      inputs:
+        total_dcap_benefits_paid: 100_000
+        dcap_benefits_to_shareholders: 0
+      expect: 0
+
+    - name: "10% to shareholders - below limit"
+      period: 2024
+      inputs:
+        total_dcap_benefits_paid: 100_000
+        dcap_benefits_to_shareholders: 10_000
+      expect: 0.10
+
+    - name: "25% to shareholders - at limit"
+      period: 2024
+      inputs:
+        total_dcap_benefits_paid: 200_000
+        dcap_benefits_to_shareholders: 50_000
+      expect: 0.25
+
+    - name: "40% to shareholders - above limit"
+      period: 2024
+      inputs:
+        total_dcap_benefits_paid: 50_000
+        dcap_benefits_to_shareholders: 20_000
+      expect: 0.40
+
+variable dcap_passes_shareholder_test:
+  entity: TaxUnit
+  period: Year
+  dtype: Boolean
+  label: "DCAP Passes Shareholder Test"
+  description: "Whether DCAP satisfies 25% limit on benefits to principal shareholders per 26 USC 129(d)(4)"
+  syntax: python
+  formula: |
+    # Pass test if shareholder share is at or below 25% limit
+    return dcap_shareholder_benefit_share <= max_shareholder_benefit_share
+  tests:
+    - name: "No benefits paid - passes test"
+      period: 2024
+      inputs:
+        dcap_shareholder_benefit_share: 0
+      expect: true
+
+    - name: "10% to shareholders - passes test"
+      period: 2024
+      inputs:
+        dcap_shareholder_benefit_share: 0.10
+      expect: true
+
+    - name: "24% to shareholders - passes test (just under limit)"
+      period: 2024
+      inputs:
+        dcap_shareholder_benefit_share: 0.24
+      expect: true
+
+    - name: "25% to shareholders - passes test (at limit)"
+      period: 2024
+      inputs:
+        dcap_shareholder_benefit_share: 0.25
+      expect: true
+
+    - name: "26% to shareholders - fails test (just over limit)"
+      period: 2024
+      inputs:
+        dcap_shareholder_benefit_share: 0.26
+      expect: false
+
+    - name: "50% to shareholders - fails test (well over limit)"
+      period: 2024
+      inputs:
+        dcap_shareholder_benefit_share: 0.50
+      expect: false

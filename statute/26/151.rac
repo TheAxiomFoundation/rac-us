@@ -26,3 +26,42 @@ variable personal_exemption:
     # Returns 0 during suspension period
     return exemption_amount
   default: 0
+  tests:
+    # TCJA SUSPENSION PERIOD (2018-2025)
+    - name: "Personal exemption suspended 2024"
+      period: 2024
+      inputs: {}
+      expect: 0
+      description: "Personal exemptions suspended under TCJA Section 11041 for tax years 2018-2025"
+
+    - name: "Personal exemption suspended 2023"
+      period: 2023
+      inputs: {}
+      expect: 0
+      description: "TCJA suspension applies through 2025"
+
+    - name: "Personal exemption suspended at TCJA start 2018"
+      period: 2018
+      inputs: {}
+      expect: 0
+      description: "First year of TCJA suspension period"
+
+    # PRE-TCJA HISTORICAL YEARS
+    - name: "Personal exemption 2017 pre-TCJA"
+      period: 2017
+      inputs: {}
+      expect: 4_050
+      description: "Last year before TCJA suspension - full $4,050 exemption allowed"
+
+    - name: "Personal exemption 2016"
+      period: 2016
+      inputs: {}
+      expect: 4_050
+      description: "Pre-TCJA exemption amount per 26 USC 151"
+
+    # POST-TCJA SUNSET (after 2025)
+    - name: "Personal exemption after TCJA sunset 2026"
+      period: 2026
+      inputs: {}
+      expect: 0
+      description: "TCJA provisions sunset after 2025 - exemption may be restored pending legislation"

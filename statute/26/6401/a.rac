@@ -23,3 +23,46 @@ variable total_refundable_credits:
     # These are NOT limited by tax liability and can create refunds
     return earned_income_credit + additional_child_tax_credit + education_credits_refundable
   default: 0
+  tests:
+    - name: "All three refundable credits present"
+      period: 2024
+      inputs:
+        earned_income_credit: 3_500
+        additional_child_tax_credit: 1_700
+        education_credits_refundable: 1_000
+      expect: 6_200
+    - name: "Only EITC, no other credits"
+      period: 2024
+      inputs:
+        earned_income_credit: 7_830
+        additional_child_tax_credit: 0
+        education_credits_refundable: 0
+      expect: 7_830
+    - name: "Only ACTC, no other credits"
+      period: 2024
+      inputs:
+        earned_income_credit: 0
+        additional_child_tax_credit: 3_400
+        education_credits_refundable: 0
+      expect: 3_400
+    - name: "Only education credit refundable"
+      period: 2024
+      inputs:
+        earned_income_credit: 0
+        additional_child_tax_credit: 0
+        education_credits_refundable: 1_000
+      expect: 1_000
+    - name: "No refundable credits"
+      period: 2024
+      inputs:
+        earned_income_credit: 0
+        additional_child_tax_credit: 0
+        education_credits_refundable: 0
+      expect: 0
+    - name: "Maximum credits scenario"
+      period: 2024
+      inputs:
+        earned_income_credit: 7_830
+        additional_child_tax_credit: 5_100
+        education_credits_refundable: 1_000
+      expect: 13_930
