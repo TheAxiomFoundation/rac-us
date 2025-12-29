@@ -1,87 +1,124 @@
-# ---- Merged from self_employment_tax.rac ----
+text: """
+26 USC 1401(a) - Old-Age, Survivors, and Disability Insurance
 
-# 26 USC 1401 - Tax on Self-Employment Income
-#
+(a) Old-age, survivors, and disability insurance.
+In addition to other taxes, there shall be imposed for each taxable year,
+on the self-employment income of every individual, a tax equal to 12.4 percent
+of the amount of the self-employment income for such taxable year.
+"""
 
-input taxable_self_employment_income:
+# Self-Employment Tax - OASDI Component
+# Per 26 USC 1401(a) - 12.4% on self-employment income up to wage base
+
+# OASDI tax rate for self-employment
+parameter se_oasdi_rate:
+  values:
+    1984-01-01: 0.124  # 12.4% combined employer + employee share
+  reference: "26 USC 1401(a) - OASDI tax rate on self-employment income"
+
+# Social Security wage base
+# Per 26 USC 3121(a)(1), as adjusted annually
+parameter social_security_wage_base:
+  values:
+    2023-01-01: 160200
+    2024-01-01: 168600
+    2025-01-01: 176100
+  reference: "SSA annual determination - contribution and benefit base"
+
+input net_self_employment_earnings:
   entity: Person
   period: Year
   dtype: Money
   unit: "USD"
-  label: "Taxable Self-Employment Income"
-  description: "Self-employment income subject to SE tax (gross * 0.9_235)"
+  label: "Net Self-Employment Earnings"
+  description: "Net earnings from self-employment per 26 USC 1402"
   default: 0
-  tests:
-    - name: "Typical self-employed income"
-      period: 2024
-      inputs:
-        taxable_self_employment_income: 50_000
-      expect: 50000
-    - name: "Zero self-employment income"
-      period: 2024
-      inputs:
-        taxable_self_employment_income: 0
-      expect: 0
-    - name: "High self-employment income"
-      period: 2024
-      inputs:
-        taxable_self_employment_income: 200_000
-      expect: 200000
 
-variable base_self_employment_tax:
+input irs_employment_income:
   entity: Person
   period: Year
   dtype: Money
   unit: "USD"
-  label: "Base Self-Employment Tax"
-  description: "OASDI + base HI taxes on self-employment income per 1_401(a) and 1_401(b)(1)"
-  formula: return self_employment_social_security_tax + self_employment_medicare_tax
-  tests:
-    - name: "Social Security (12.4%) and Medicare (2.9%) combined"
-      period: 2024
-      inputs:
-        self_employment_social_security_tax: 6_200
-        self_employment_medicare_tax: 1_450
-      expect: 7650
-    - name: "Zero SE taxes when no income"
-      period: 2024
-      inputs:
-        self_employment_social_security_tax: 0
-        self_employment_medicare_tax: 0
-      expect: 0
-    - name: "High earner with wage base limit on SS"
-      period: 2024
-      inputs:
-        self_employment_social_security_tax: 9932.40
-        self_employment_medicare_tax: 2_900
-      expect: 12832.40
+  label: "Employment Income"
+  description: "Wages subject to FICA taxes"
+  default: 0
 
-variable self_employment_tax:
+variable se_income_subject_to_oasdi:
   entity: Person
   period: Year
   dtype: Money
   unit: "USD"
-  label: "Self-Employment Tax"
-  description: "Combined OASDI, HI, and Additional Medicare taxes per 1_401"
+  label: "SE Income Subject to OASDI"
+  description: "Self-employment income subject to OASDI tax (limited by wage base minus wages)"
   syntax: python
   formula: |
-    # Base SE tax (OASDI + Medicare at 2.9%)
-    # Note: Additional Medicare Tax (0.9% above threshold) is calculated
-    # separately at TaxUnit level and added in final tax computation
-    return base_self_employment_tax
+    # Per 26 USC 1401(a) and 3121(a)(1):
+    # SE income subject to OASDI is limited by wage base minus FICA wages
+    remaining_wage_base = max(0, social_security_wage_base - irs_employment_income)
+    return min(net_self_employment_earnings, remaining_wage_base)
   tests:
-    - name: "Standard SE tax calculation for moderate income"
+    - name: "Full SE income subject when no wages"
       period: 2024
       inputs:
-        base_self_employment_tax: 8_900
-      expect: 8900
-    - name: "High earner with substantial SE tax"
+        net_self_employment_earnings: 50000
+        irs_employment_income: 0
+        social_security_wage_base: 168600
+      expect: 50000
+    - name: "SE income limited by remaining wage base"
       period: 2024
       inputs:
-        base_self_employment_tax: 15732.40
-      expect: 15732.40
-    - name: "Zero SE tax when no self-employment income"
+        net_self_employment_earnings: 50000
+        irs_employment_income: 150000
+        social_security_wage_base: 168600
+      expect: 18600
+    - name: "No SE income subject when wages exceed base"
       period: 2024
       inputs:
-        base_self_employment_tax: 0
+        net_self_employment_earnings: 50000
+        irs_employment_income: 200000
+        social_security_wage_base: 168600
       expect: 0
+    - name: "High SE income capped at wage base"
+      period: 2024
+      inputs:
+        net_self_employment_earnings: 200000
+        irs_employment_income: 0
+        social_security_wage_base: 168600
+      expect: 168600
+
+variable self_employment_social_security_tax:
+  entity: Person
+  period: Year
+  dtype: Money
+  unit: "USD"
+  label: "Self-Employment OASDI Tax"
+  description: "Old-age, survivors, and disability insurance tax per 26 USC 1401(a)"
+  syntax: python
+  formula: |
+    # Per 26 USC 1401(a): 12.4% of self-employment income up to wage base
+    return se_income_subject_to_oasdi * se_oasdi_rate
+  tests:
+    - name: "Standard OASDI calculation"
+      period: 2024
+      inputs:
+        se_income_subject_to_oasdi: 50000
+        se_oasdi_rate: 0.124
+      expect: 6200
+    - name: "Maximum OASDI at wage base"
+      period: 2024
+      inputs:
+        se_income_subject_to_oasdi: 168600
+        se_oasdi_rate: 0.124
+      expect: 20906.40
+    - name: "Zero SE tax when no SE income"
+      period: 2024
+      inputs:
+        se_income_subject_to_oasdi: 0
+        se_oasdi_rate: 0.124
+      expect: 0
+    - name: "Partial SE income after wage offset"
+      period: 2024
+      inputs:
+        se_income_subject_to_oasdi: 18600
+        se_oasdi_rate: 0.124
+      expect: 2306.40

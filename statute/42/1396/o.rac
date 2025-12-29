@@ -1,3 +1,87 @@
+text: """
+42 USC § 1396o - Use of enrollment fees, premiums, deductions, cost-sharing, and similar charges
+
+(a) Imposition of certain charges under plan in case of individuals described in section 1396a(a)(10)(A) or (E)
+
+Subject to subsections (g), (i), and (j), the State plan shall provide that in the
+case of individuals described in subparagraph (A) or (E)(i) of section 1396a(a)(10)
+of this title who are eligible under the plan—
+...
+(3) any deduction, cost sharing, or similar charge imposed under the plan with
+respect to other such individuals or other care and services will be nominal in amount
+(as determined by the Secretary in regulations which shall, if such determination is
+with respect to deductions, cost sharing, or similar charges imposed with respect to
+eligible individuals described in subsection (b)(1), provide for differentials in such
+nominal amounts based on the income of such individuals).
+
+(b) Imposition of certain charges under plan in case of individuals other than those described in section 1396a(a)(10)(A) or (E)
+
+Subject to subsections (g), (i), and (j), the State plan shall provide that in the
+case of individuals other than those described in subparagraph (A) or (E)(i) of
+section 1396a(a)(10) of this title...
+"""
+
+# Medicaid Cost Sharing - 42 USC § 1396o
+# Nominal copayment amounts are defined by regulation at 42 CFR 447.54
+
+# Federal maximum nominal copayment amount
+# Per 42 CFR 447.54(a)(1): nominal copayments may not exceed $4 for services
+# subject to periodic adjustment
+parameter nominal_copayment_max:
+  values:
+    1982-01-01: 1.00  # Original nominal amount
+    2003-01-01: 3.00  # Increased per DRA implementation
+    2006-01-01: 4.00  # Current maximum per 42 CFR 447.54
+  reference: "42 CFR 447.54(a)(1) - Federal maximum nominal copayment"
+
+# Copayment rate for individuals 100-150% FPL
+parameter copayment_rate_100_150_fpl:
+  values:
+    2006-01-01: 0.10
+  reference: "42 CFR 447.52(b)(1) - Cost sharing for services at 100-150% FPL"
+
+# Copayment rate for individuals above 150% FPL
+parameter copayment_rate_150_plus_fpl:
+  values:
+    2006-01-01: 0.20
+  reference: "42 CFR 447.52(b)(2) - Cost sharing for services above 150% FPL"
+
+# FPL threshold for nominal cost sharing tier
+parameter nominal_tier_fpl_threshold:
+  values:
+    1982-01-01: 1.00
+  reference: "42 USC 1396o(a)(3) - Nominal cost sharing for individuals below 100% FPL"
+
+# FPL threshold for moderate cost sharing tier
+parameter moderate_tier_fpl_threshold:
+  values:
+    2006-01-01: 1.50
+  reference: "42 USC 1396o-1(a)(3)(A)(ii) - Higher cost sharing above 150% FPL"
+
+# FPL threshold for premium eligibility
+parameter premium_fpl_threshold:
+  values:
+    2006-01-01: 1.50
+  reference: "42 USC 1396o(c) - Premium threshold at 150% FPL"
+
+# Child age threshold for cost sharing exemption
+parameter child_age_threshold:
+  values:
+    1982-01-01: 18
+  reference: "42 USC 1396o(a)(2)(B) - Children under 18 exempt from cost sharing"
+
+# Aggregate cost share limit as percentage of income
+parameter aggregate_cost_share_limit:
+  values:
+    2006-01-01: 0.05
+  reference: "42 USC 1396o-1(e)(1) - Aggregate limit of 5% of family income"
+
+# Months per year (for annual calculations)
+parameter months_per_year:
+  values:
+    1900-01-01: 12
+  reference: "Standard calendar conversion"
+
 variable medicaid_preventive_cost_share_exempt:
   entity: Person
   period: Month
@@ -20,6 +104,12 @@ variable medicaid_child_cost_share_exempt:
   entity: Person
   period: Month
   dtype: Boolean
+  label: "Child cost sharing exempt"
+  description: "Children under age threshold exempt from cost sharing per 42 USC 1396o(a)(2)(B)"
+  syntax: python
+  formula: |
+    # Per 42 USC 1396o(a)(2)(B): no cost sharing for individuals under 18
+    return age < child_age_threshold
   tests:
     - name: "Child under age threshold is exempt"
       period: 2024-01
@@ -56,6 +146,12 @@ variable medicaid_pregnant_cost_share_exempt:
   entity: Person
   period: Month
   dtype: Boolean
+  label: "Pregnant cost sharing exempt"
+  description: "Pregnant individuals exempt from cost sharing per 42 USC 1396o(a)(2)(B)"
+  syntax: python
+  formula: |
+    # Per 42 USC 1396o(a)(2)(B): no cost sharing for pregnancy-related services
+    return is_pregnant
   tests:
     - name: "Pregnant woman is exempt"
       period: 2024-01
@@ -77,6 +173,12 @@ variable medicaid_institutionalized_cost_share_exempt:
   entity: Person
   period: Month
   dtype: Boolean
+  label: "Institutionalized cost sharing exempt"
+  description: "Institutionalized individuals exempt from cost sharing per 42 USC 1396o(a)(2)(A)"
+  syntax: python
+  formula: |
+    # Per 42 USC 1396o(a)(2)(A): no cost sharing for institutional services
+    return is_institutionalized
   tests:
     - name: "Institutionalized person is exempt"
       period: 2024-01
@@ -93,6 +195,12 @@ variable medicaid_hospice_cost_share_exempt:
   entity: Person
   period: Month
   dtype: Boolean
+  label: "Hospice cost sharing exempt"
+  description: "Hospice-enrolled individuals exempt from cost sharing per 42 USC 1396o(a)(2)(D)"
+  syntax: python
+  formula: |
+    # Per 42 USC 1396o(a)(2)(D): no cost sharing for hospice care
+    return is_hospice_enrolled
   tests:
     - name: "Hospice enrolled person is exempt"
       period: 2024-01
@@ -109,6 +217,17 @@ variable medicaid_cost_share_exempt:
   entity: Person
   period: Month
   dtype: Boolean
+  label: "Cost sharing exempt"
+  description: "Individual exempt from all cost sharing per 42 USC 1396o(a)(2)"
+  syntax: python
+  formula: |
+    # Per 42 USC 1396o(a)(2): certain populations are exempt from cost sharing
+    return (
+        medicaid_child_cost_share_exempt or
+        medicaid_pregnant_cost_share_exempt or
+        medicaid_institutionalized_cost_share_exempt or
+        medicaid_hospice_cost_share_exempt
+    )
   tests:
     - name: "Child exempt means cost share exempt"
       period: 2024-01
@@ -155,6 +274,12 @@ variable medicaid_nominal_cost_share_tier:
   entity: Person
   period: Month
   dtype: Boolean
+  label: "Nominal cost sharing tier"
+  description: "Individual qualifies for nominal cost sharing per 42 USC 1396o(a)(3)"
+  syntax: python
+  formula: |
+    # Per 42 USC 1396o(a)(3): nominal cost sharing for individuals below 100% FPL
+    return magi_income_pct_fpl < nominal_tier_fpl_threshold
   tests:
     - name: "Income below 100% FPL qualifies for nominal tier"
       period: 2024-01
@@ -185,6 +310,15 @@ variable medicaid_moderate_cost_share_tier:
   entity: Person
   period: Month
   dtype: Boolean
+  label: "Moderate cost sharing tier"
+  description: "Individual in 100-150% FPL tier per 42 USC 1396o-1(a)(3)(A)"
+  syntax: python
+  formula: |
+    # Per 42 USC 1396o-1(a)(3)(A): moderate cost sharing for 100-150% FPL
+    return (
+        magi_income_pct_fpl >= nominal_tier_fpl_threshold and
+        magi_income_pct_fpl < moderate_tier_fpl_threshold
+    )
   tests:
     - name: "Income between 100-150% FPL qualifies for moderate tier"
       period: 2024-01
@@ -219,6 +353,12 @@ variable medicaid_higher_cost_share_tier:
   entity: Person
   period: Month
   dtype: Boolean
+  label: "Higher cost sharing tier"
+  description: "Individual above 150% FPL tier per 42 USC 1396o-1(a)(3)(A)"
+  syntax: python
+  formula: |
+    # Per 42 USC 1396o-1(a)(3)(A)(ii): higher cost sharing above 150% FPL
+    return magi_income_pct_fpl >= moderate_tier_fpl_threshold
   tests:
     - name: "Income above 150% FPL qualifies for higher tier"
       period: 2024-01
@@ -243,6 +383,20 @@ variable medicaid_max_copayment_rate:
   entity: Person
   period: Month
   dtype: Rate
+  label: "Maximum copayment rate"
+  description: "Maximum copayment rate based on income tier per 42 CFR 447.52"
+  syntax: python
+  formula: |
+    # Per 42 CFR 447.52: copayment rates vary by income tier
+    if medicaid_cost_share_exempt:
+        return 0
+    if medicaid_nominal_cost_share_tier:
+        return 0  # Nominal tier uses flat copayment, not rate
+    if medicaid_moderate_cost_share_tier:
+        return copayment_rate_100_150_fpl
+    if medicaid_higher_cost_share_tier:
+        return copayment_rate_150_plus_fpl
+    return 0
   tests:
     - name: "Cost share exempt pays zero copayment"
       period: 2024-01
@@ -283,6 +437,17 @@ variable medicaid_nominal_copayment:
   entity: Person
   period: Month
   dtype: Money
+  unit: "USD"
+  label: "Nominal copayment amount"
+  description: "Nominal copayment for individuals below 100% FPL per 42 CFR 447.54"
+  syntax: python
+  formula: |
+    # Per 42 CFR 447.54: nominal copayments for individuals below 100% FPL
+    if medicaid_cost_share_exempt:
+        return 0
+    if medicaid_nominal_cost_share_tier:
+        return nominal_copayment_max
+    return 0  # Higher tiers use rate-based copayment, not nominal
   tests:
     - name: "Cost share exempt pays zero nominal copayment"
       period: 2024-01
@@ -311,6 +476,18 @@ variable medicaid_premium_applicable:
   entity: Person
   period: Month
   dtype: Boolean
+  label: "Premium applicable"
+  description: "Whether premium can be charged per 42 USC 1396o(c)"
+  syntax: python
+  formula: |
+    # Per 42 USC 1396o(c): premiums only for certain populations above FPL threshold
+    if medicaid_cost_share_exempt:
+        return False
+    # Protected categories cannot be charged premiums
+    if medicaid_category in ("infant", "child_1_5", "child_6_18", "pregnant"):
+        return False
+    # Must be above premium threshold
+    return magi_income_pct_fpl >= premium_fpl_threshold
   tests:
     - name: "Cost share exempt cannot be charged premium"
       period: 2024-01
@@ -381,6 +558,16 @@ variable medicaid_max_monthly_premium:
   entity: Person
   period: Month
   dtype: Money
+  unit: "USD"
+  label: "Maximum monthly premium"
+  description: "Maximum premium that can be charged per 42 USC 1396o(c)"
+  syntax: python
+  formula: |
+    # Per 42 USC 1396o(c): premium amounts subject to state implementation
+    # This is a placeholder - actual amounts vary by state and program
+    if not medicaid_premium_applicable:
+        return 0
+    return 0  # State-specific implementation required
   tests:
     - name: "Premium not applicable means zero premium"
       period: 2024-01
@@ -397,6 +584,13 @@ variable medicaid_monthly_cost_share_limit:
   entity: Household
   period: Month
   dtype: Money
+  unit: "USD"
+  label: "Monthly cost sharing limit"
+  description: "Maximum monthly cost sharing per 42 USC 1396o-1(e)(1)"
+  syntax: python
+  formula: |
+    # Per 42 USC 1396o-1(e)(1): aggregate cost sharing limited to 5% of income
+    return magi_income * aggregate_cost_share_limit
   tests:
     - name: "No income means no cost sharing limit"
       period: 2024-01
@@ -427,6 +621,13 @@ variable medicaid_annual_cost_share_limit:
   entity: Household
   period: Year
   dtype: Money
+  unit: "USD"
+  label: "Annual cost sharing limit"
+  description: "Maximum annual cost sharing per 42 USC 1396o-1(e)(1)"
+  syntax: python
+  formula: |
+    # Per 42 USC 1396o-1(e)(1): annual limit is 12x monthly limit
+    return medicaid_monthly_cost_share_limit * months_per_year
   tests:
     - name: "Annual limit is 12 times monthly limit"
       period: 2024
@@ -451,6 +652,12 @@ variable medicaid_emergency_cost_share_exempt:
   entity: Person
   period: Month
   dtype: Boolean
+  label: "Emergency services exempt"
+  description: "Emergency services exempt from cost sharing per 42 USC 1396o(a)(2)(D)"
+  syntax: python
+  formula: |
+    # Per 42 USC 1396o(a)(2)(D): emergency services always exempt from cost sharing
+    return True
   tests:
     - name: "Emergency services always exempt"
       period: 2024-01

@@ -1,0 +1,43 @@
+text: """
+26 USC 63(b) - Individuals Who Do Not Itemize Their Deductions
+
+(b) Individuals who do not itemize their deductions.— In the case of
+an individual who does not elect to itemize his deductions for the
+taxable year, for purposes of this subtitle, the term 'taxable
+income' means adjusted gross income, minus—
+(1) the standard deduction, and
+(2) the deduction for personal exemptions provided in section 151.
+"""
+
+# 26 USC 63(b) - Taxable Income for Non-Itemizers
+# For taxpayers who use the standard deduction:
+# taxable income = AGI - standard deduction - personal exemptions
+
+# Note: The actual taxable_income variable is in 63/a.rac and handles
+# both (a) itemizers and (b) non-itemizers by importing the appropriate
+# deduction choice from 63/e.rac
+
+variable uses_standard_deduction:
+  entity: TaxUnit
+  period: Year
+  dtype: Boolean
+  label: "Uses Standard Deduction"
+  description: "Whether taxpayer uses standard deduction instead of itemizing"
+  syntax: python
+  formula: |
+    # Per 63(b): taxpayers who do not elect to itemize use standard deduction
+    # This is determined by comparing standard vs itemized deductions
+    # (handled in 63/e.rac)
+    return not elects_to_itemize
+  default: True
+  tests:
+    - name: "Taxpayer using standard deduction"
+      period: 2024
+      inputs:
+        elects_to_itemize: false
+      expect: true
+    - name: "Taxpayer electing to itemize"
+      period: 2024
+      inputs:
+        elects_to_itemize: true
+      expect: false

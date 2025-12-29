@@ -1,0 +1,60 @@
+text: """
+26 USC 1401(b)(1) - Hospital Insurance
+
+(b) Hospital insurance.—
+(1) In general.
+In addition to the tax imposed by the preceding subsection, there shall be
+imposed for each taxable year, on the self-employment income of every
+individual, a tax equal to 2.9 percent of the amount of the self-employment
+income for such taxable year.
+"""
+
+# Self-Employment Tax - Hospital Insurance (Medicare) Base Component
+# Per 26 USC 1401(b)(1) - 2.9% on all self-employment income (no wage base cap)
+
+imports:
+  - 26/1401/a#net_self_employment_earnings
+
+# Hospital Insurance (Medicare) tax rate for self-employment
+parameter se_hospital_insurance_rate:
+  values:
+    1984-01-01: 0.029  # 2.9% combined employer + employee share
+  reference: "26 USC 1401(b)(1) - Hospital Insurance tax rate on self-employment income"
+
+variable self_employment_medicare_tax:
+  entity: Person
+  period: Year
+  dtype: Money
+  unit: "USD"
+  label: "Self-Employment Medicare Tax"
+  description: "Hospital Insurance tax per 26 USC 1401(b)(1)"
+  syntax: python
+  formula: |
+    # Per 26 USC 1401(b)(1): 2.9% of all self-employment income
+    # Unlike OASDI, there is no wage base cap for Medicare
+    return net_self_employment_earnings * se_hospital_insurance_rate
+  tests:
+    - name: "Standard Medicare calculation"
+      period: 2024
+      inputs:
+        net_self_employment_earnings: 50000
+        se_hospital_insurance_rate: 0.029
+      expect: 1450
+    - name: "High earner Medicare (no cap)"
+      period: 2024
+      inputs:
+        net_self_employment_earnings: 500000
+        se_hospital_insurance_rate: 0.029
+      expect: 14500
+    - name: "Zero Medicare tax when no SE income"
+      period: 2024
+      inputs:
+        net_self_employment_earnings: 0
+        se_hospital_insurance_rate: 0.029
+      expect: 0
+    - name: "Moderate SE income Medicare tax"
+      period: 2024
+      inputs:
+        net_self_employment_earnings: 100000
+        se_hospital_insurance_rate: 0.029
+      expect: 2900

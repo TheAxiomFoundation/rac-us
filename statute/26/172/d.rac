@@ -1,16 +1,41 @@
 text: """
-(d) Modifications.-- The modifications referred to in this section are
+26 USC 172(d) - Modifications
+
+(d) Modifications.— The modifications referred to in this section are
 as follows:
-(1) Net operating loss deduction.-- No net operating loss deduction
+
+(1) Net operating loss deduction.— No net operating loss deduction
 shall be allowed.
-(2) Capital gains and losses of taxpayers other than corporations.--
+
+(2) Capital gains and losses of taxpayers other than corporations.—
 (A) Losses from sales or exchanges of capital assets shall be
 allowed only to the extent of gains from such sales or exchanges.
 (B) Exclusions and deductions under section 1202.
-(3) Deduction for personal exemptions.-- No deduction shall be allowed
+
+(3) Deduction for personal exemptions.— No deduction shall be allowed
 under section 151 (relating to personal exemptions).
-(4) Nonbusiness deductions of taxpayers other than corporations.--
+
+(4) Nonbusiness deductions of taxpayers other than corporations.—
 [Detailed modifications for nonbusiness deductions]
+
+(5) Computation of deduction for dividends received, etc.— The
+deductions allowed by sections 243 (relating to dividends received by
+corporations), 244 (relating to dividends received on certain preferred
+stock of public utilities), and 245 (relating to dividends received
+from certain foreign corporations) shall be computed without regard
+to section 246(b).
+
+(6) Modifications related to real estate investment trusts.— In the
+case of any taxable year for which part II of subchapter M applies to
+the taxpayer— [REIT-specific rules apply]
+
+(7) [Repealed by Tax Cuts and Jobs Act]
+
+(8) Qualified business income.— Any deduction under section 199A
+shall not be allowed.
+
+(9) Deduction for foreign-derived intangible income.— The deduction
+under section 250 shall not be allowed.
 """
 variable nol_modification_prior_nol:
   entity: TaxUnit
@@ -250,6 +275,104 @@ variable nol_modification_nonbusiness:
         prior_nol_deduction_claimed: 0
       expect: 0
 
+variable nol_modification_dividends:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: "USD"
+  label: "NOL Modification - Dividends"
+  description: "Adjustment for dividend-received deductions per 172(d)(5)"
+  syntax: python
+  formula: |
+    # Per 172(d)(5): For corporations, compute dividends-received deduction
+    # without regard to section 246(b) limitations during loss years
+    # This allows full DRD even when it would create/increase a loss
+    # For individuals, this doesn't apply
+    return 0  # Simplified - full implementation would track corporate DRD
+  default: 0
+  tests:
+    - name: "Individual - no dividend modification"
+      period: 2024
+      inputs: {}
+      expect: 0
+
+variable nol_modification_reit:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: "USD"
+  label: "NOL Modification - REIT"
+  description: "Adjustment for REIT income per 172(d)(6)"
+  syntax: python
+  formula: |
+    # Per 172(d)(6): REITs apply special adjustments when computing NOL
+    # Incorporates REIT-specific income modifications per section 857
+    # For non-REIT taxpayers, this is zero
+    return 0  # Simplified - full implementation would handle REIT rules
+  default: 0
+  tests:
+    - name: "Non-REIT - no modification"
+      period: 2024
+      inputs: {}
+      expect: 0
+
+# Note: 172(d)(7) was repealed by TCJA
+
+variable nol_modification_qbi:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: "USD"
+  label: "NOL Modification - QBI"
+  description: "Add back section 199A QBI deduction per 172(d)(8)"
+  syntax: python
+  formula: |
+    # Per 172(d)(8): QBI deduction under section 199A is not allowed
+    # when computing the NOL - add it back
+    return qbi_deduction
+  default: 0
+  tests:
+    - name: "Add back QBI deduction"
+      period: 2024
+      inputs:
+        qbi_deduction: 25000
+      expect: 25000
+    - name: "No QBI deduction"
+      period: 2024
+      inputs:
+        qbi_deduction: 0
+      expect: 0
+    - name: "Large QBI add-back"
+      period: 2024
+      inputs:
+        qbi_deduction: 100000
+      expect: 100000
+
+variable nol_modification_fdii:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: "USD"
+  label: "NOL Modification - FDII"
+  description: "Add back section 250 FDII deduction per 172(d)(9)"
+  syntax: python
+  formula: |
+    # Per 172(d)(9): FDII/GILTI deduction under section 250 is not allowed
+    # when computing the NOL - add it back (applies to corporations)
+    return fdii_deduction
+  default: 0
+  tests:
+    - name: "Add back FDII deduction"
+      period: 2024
+      inputs:
+        fdii_deduction: 50000
+      expect: 50000
+    - name: "No FDII deduction"
+      period: 2024
+      inputs:
+        fdii_deduction: 0
+      expect: 0
+
 variable nol_modifications:
   entity: TaxUnit
   period: Year
@@ -262,10 +385,14 @@ variable nol_modifications:
     # Sum all modifications that adjust taxable income for NOL purposes
     # These are added to taxable income before determining if NOL exists
     return (
-    nol_modification_prior_nol +
-    nol_modification_capital_losses +
-    nol_modification_exemptions +
-    nol_modification_nonbusiness
+        nol_modification_prior_nol +
+        nol_modification_capital_losses +
+        nol_modification_exemptions +
+        nol_modification_nonbusiness +
+        nol_modification_dividends +
+        nol_modification_reit +
+        nol_modification_qbi +
+        nol_modification_fdii
     )
   default: 0
   tests:

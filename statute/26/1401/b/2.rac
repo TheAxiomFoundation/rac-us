@@ -1,14 +1,49 @@
 text: """
-(2) Additional tax -
+26 USC 1401(b)(2) - Additional Tax
+
+(2) Additional tax.—
 In addition to the tax imposed by paragraph (1), there shall be imposed for
 each taxable year, on the self-employment income of every individual, a tax
 equal to 0.9 percent of so much of the self-employment income (as defined
-in section 1402(b)) as exceeds -
+in section 1402(b)) as exceeds—
 (A) in the case of a joint return, $250,000,
 (B) in the case of a married individual (as defined in section 7703)
-filing a separate return, $125,000, and
+filing a separate return, 1/2 of the dollar amount determined under
+subparagraph (A), and
 (C) in any other case, $200,000.
 """
+
+# Additional Medicare Tax - 26 USC 1401(b)(2)
+# 0.9% on SE income above thresholds (effective for tax years after 2012)
+
+imports:
+  - 26/1401/a#net_self_employment_earnings
+  - 26/1401/a#irs_employment_income
+
+# Additional Medicare Tax rate
+parameter additional_medicare_rate:
+  values:
+    2013-01-01: 0.009  # 0.9% additional rate
+  reference: "26 USC 1401(b)(2) - Additional Medicare Tax rate"
+
+# Threshold for joint returns
+parameter additional_medicare_threshold_joint:
+  values:
+    2013-01-01: 250000
+  reference: "26 USC 1401(b)(2)(A) - Joint return threshold"
+
+# Threshold for married filing separately
+parameter additional_medicare_threshold_separate:
+  values:
+    2013-01-01: 125000
+  reference: "26 USC 1401(b)(2)(B) - MFS threshold (1/2 of joint)"
+
+# Threshold for single, HOH, surviving spouse
+parameter additional_medicare_threshold_single:
+  values:
+    2013-01-01: 200000
+  reference: "26 USC 1401(b)(2)(C) - Single/HOH threshold"
+
 variable additional_medicare_tax:
   imports:
     - 26/1#filing_status
@@ -63,43 +98,43 @@ variable additional_medicare_tax_threshold:
     # (B) Married filing separately = $125k
     # (C) Any other case = $200k (Single, HOH, Surviving Spouse)
     if filing_status == JOINT:
-        return threshold_joint
+        return additional_medicare_threshold_joint
     elif filing_status == SEPARATE:
-        return threshold_separate
+        return additional_medicare_threshold_separate
     else:
-        return threshold_single
+        return additional_medicare_threshold_single
   tests:
     - name: "Joint return threshold"
       period: 2024
       inputs:
         filing_status: JOINT
-        threshold_joint: 250_000
-        threshold_separate: 125_000
-        threshold_single: 200_000
+        additional_medicare_threshold_joint: 250000
+        additional_medicare_threshold_separate: 125000
+        additional_medicare_threshold_single: 200000
       expect: 250000
     - name: "Married filing separately threshold"
       period: 2024
       inputs:
         filing_status: SEPARATE
-        threshold_joint: 250_000
-        threshold_separate: 125_000
-        threshold_single: 200_000
+        additional_medicare_threshold_joint: 250000
+        additional_medicare_threshold_separate: 125000
+        additional_medicare_threshold_single: 200000
       expect: 125000
     - name: "Single filer threshold"
       period: 2024
       inputs:
         filing_status: SINGLE
-        threshold_joint: 250_000
-        threshold_separate: 125_000
-        threshold_single: 200_000
+        additional_medicare_threshold_joint: 250000
+        additional_medicare_threshold_separate: 125000
+        additional_medicare_threshold_single: 200000
       expect: 200000
     - name: "Head of household threshold"
       period: 2024
       inputs:
         filing_status: HEAD_OF_HOUSEHOLD
-        threshold_joint: 250_000
-        threshold_separate: 125_000
-        threshold_single: 200_000
+        additional_medicare_threshold_joint: 250000
+        additional_medicare_threshold_separate: 125000
+        additional_medicare_threshold_single: 200000
       expect: 200000
 
 variable se_income_subject_to_additional_medicare_tax:
@@ -177,30 +212,30 @@ variable self_employment_additional_medicare_tax:
   dtype: Money
   unit: "USD"
   label: "Additional Medicare Tax (Self-Employment)"
-  description: "0.9% additional Medicare tax on SE income above threshold per 26 USC 1_401(b)(2)"
-  formula: return additional_rate * se_income_subject_to_additional_medicare_tax
+  description: "0.9% additional Medicare tax on SE income above threshold per 26 USC 1401(b)(2)"
+  formula: return additional_medicare_rate * se_income_subject_to_additional_medicare_tax
   tests:
     - name: "0.9% tax on SE income above threshold"
       period: 2024
       inputs:
-        se_income_subject_to_additional_medicare_tax: 50_000
-        additional_rate: 0.009
+        se_income_subject_to_additional_medicare_tax: 50000
+        additional_medicare_rate: 0.009
       expect: 450
     - name: "No tax when SE income below threshold"
       period: 2024
       inputs:
         se_income_subject_to_additional_medicare_tax: 0
-        additional_rate: 0.009
+        additional_medicare_rate: 0.009
       expect: 0
     - name: "High earner with substantial SE above threshold"
       period: 2024
       inputs:
-        se_income_subject_to_additional_medicare_tax: 100_000
-        additional_rate: 0.009
+        se_income_subject_to_additional_medicare_tax: 100000
+        additional_medicare_rate: 0.009
       expect: 900
     - name: "Moderate additional Medicare tax"
       period: 2024
       inputs:
-        se_income_subject_to_additional_medicare_tax: 25_000
-        additional_rate: 0.009
+        se_income_subject_to_additional_medicare_tax: 25000
+        additional_medicare_rate: 0.009
       expect: 225

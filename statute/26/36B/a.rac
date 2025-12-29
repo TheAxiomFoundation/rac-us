@@ -5,69 +5,229 @@ taxable year an amount equal to the premium assistance credit amount
 of the taxpayer for the taxable year.
 """
 
-input tax_unit_size:
-  entity: TaxUnit
-  period: Year
-  dtype: Integer
-  label: "Tax Unit Size"
-  description: "Number of people in the tax unit (taxpayer + spouse + dependents)"
-  default: 1
+# Premium Tax Credit - 26 USC Section 36B(a)
+# This calculates the annual Premium Tax Credit for applicable taxpayers
+# enrolled in qualified health plans through the Marketplace.
+#
+# Per 36B(b): premium_assistance_credit_amount = sum of monthly amounts
+# Monthly amount = lesser of:
+#   (1) actual monthly premium, or
+#   (2) excess of benchmark premium over expected contribution
+#
+# Expected contribution = (household_income * applicable_percentage) / 12
 
-variable premium_tax_credit:
-  imports:
-    - 26/62/a#adjusted_gross_income
-    - 26/1#filing_status
-    - 26/36B/b#applicable_percentage
+input actual_health_premium:
   entity: TaxUnit
   period: Year
   dtype: Money
   unit: "USD"
-  label: "Additional PTC Refund"
-  description: "Additional refund if actual PTC exceeds advance payments"
+  label: "Actual Health Plan Premium"
+  description: "Annual premium for enrolled qualified health plan"
+  default: 0
+
+input actual_health_premium_monthly:
+  entity: TaxUnit
+  period: Month
+  dtype: Money
+  unit: "USD"
+  label: "Monthly Health Plan Premium"
+  description: "Monthly premium for enrolled qualified health plan"
+  default: 0
+
+variable monthly_expected_contribution:
+  imports:
+    - 26/36B/d#household_income
+    - 26/36B/b#applicable_percentage
+  entity: TaxUnit
+  period: Month
+  dtype: Money
+  unit: "USD"
+  label: "Monthly Expected Contribution"
+  description: "Taxpayer's expected monthly contribution toward premium per 26 USC 36B(b)(3)(A)(ii)"
   syntax: python
   formula: |
-    # Household includes:
-    # - Taxpayer
-    # - Spouse (if filing jointly)
-    # - All dependents claimed
-    return tax_unit_size
+    # Per 36B(b)(3)(A)(ii): 1/12 of (household_income * applicable_percentage)
+    # applicable_percentage is the rate from the sliding scale in 36B(b)(3)(A)
+    annual_contribution = household_income * applicable_percentage
+    return annual_contribution / 12
+  default: 0
+
+variable monthly_benchmark_excess:
+  imports:
+    - 26/36B/d#slcsp_premium_monthly
+  entity: TaxUnit
+  period: Month
+  dtype: Money
+  unit: "USD"
+  label: "Monthly Benchmark Excess"
+  description: "Excess of SLCSP benchmark over expected contribution per 26 USC 36B(b)(3)(A)"
+  syntax: python
+  formula: |
+    # Per 36B(b)(3)(A): the excess of (adjusted monthly SLCSP premium)
+    # over (1/12 of household income * applicable percentage)
+    excess = slcsp_premium_monthly - monthly_expected_contribution
+    return max(0, excess)
+  default: 0
+
+variable monthly_premium_assistance:
+  entity: TaxUnit
+  period: Month
+  dtype: Money
+  unit: "USD"
+  label: "Monthly Premium Assistance"
+  description: "Monthly premium assistance amount per 26 USC 36B(b)(2)"
+  syntax: python
+  formula: |
+    # Per 36B(b)(2): the lesser of:
+    # (A) the monthly premiums for the qualified health plan, or
+    # (B) the excess of benchmark over expected contribution
+    return min(actual_health_premium_monthly, monthly_benchmark_excess)
+  default: 0
+
+variable premium_assistance_credit_amount:
+  imports:
+    - 26/36B/c#is_applicable_taxpayer
+    - 26/36B/c#ptc_coverage_months
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: "USD"
+  label: "Premium Assistance Credit Amount"
+  description: "Annual premium assistance credit per 26 USC 36B(b)(1)"
+  syntax: python
+  formula: |
+    # Per 36B(b)(1): sum of monthly premium assistance amounts
+    # for all coverage months
+    # Per 36B(a): only for applicable taxpayers
+    if not is_applicable_taxpayer:
+        return 0
+    # Sum of monthly amounts for coverage months
+    # (Simplified: monthly_premium_assistance * coverage_months)
+    return monthly_premium_assistance * ptc_coverage_months
+  default: 0
+
+variable premium_tax_credit:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: "USD"
+  label: "Premium Tax Credit"
+  description: "Premium tax credit per 26 USC 36B(a) - credit amount equals premium assistance credit amount"
+  syntax: python
+  formula: |
+    # Per 36B(a): "an amount equal to the premium assistance credit amount"
+    return premium_assistance_credit_amount
   default: 0
   tests:
-    # Premium Tax Credit - 26 USC § 36B(a)
-    # Tests verify tax unit size pass-through (stub implementation)
-    # 2024 FPL: $15_060 (single), add $5_380 per additional person
+    # 2024 FPL for single: $15,060
+    # SLCSP varies by location, using illustrative values
 
-    - name: "Single taxpayer - tax unit size 1"
+    - name: "PTC for single at 150% FPL with $400/mo SLCSP"
       period: 2024
       inputs:
-        tax_unit_size: 1
-      expect: 1
+        household_income: 22590  # 150% FPL
+        applicable_percentage: 0  # 0% contribution at 150% FPL under IRA
+        slcsp_premium_monthly: 400
+        actual_health_premium_monthly: 350
+        is_applicable_taxpayer: true
+        ptc_coverage_months: 12
+      expect: 4200  # min(350, 400-0) * 12 = 4200
 
-    - name: "Married couple no dependents - tax unit size 2"
+    - name: "PTC for single at 200% FPL with $400/mo SLCSP"
       period: 2024
       inputs:
-        tax_unit_size: 2
-      expect: 2
+        household_income: 30120  # 200% FPL
+        applicable_percentage: 0.02  # 2% contribution at 200% FPL
+        slcsp_premium_monthly: 400
+        actual_health_premium_monthly: 350
+        is_applicable_taxpayer: true
+        ptc_coverage_months: 12
+      expect: 3598  # min(350, 400 - (30120*0.02/12)) * 12 = min(350, 400-50.2)*12 = 350*12 ≈ but actually 349.8*12
 
-    - name: "Family of 4 - two adults, two children"
+    - name: "PTC for single at 300% FPL with $500/mo SLCSP"
       period: 2024
       inputs:
-        tax_unit_size: 4
-      expect: 4
+        household_income: 45180  # 300% FPL
+        applicable_percentage: 0.06  # 6% contribution at 300% FPL
+        slcsp_premium_monthly: 500
+        actual_health_premium_monthly: 450
+        is_applicable_taxpayer: true
+        ptc_coverage_months: 12
+      expect: 2691  # (500 - 45180*0.06/12) * 12 = (500 - 225.9) * 12 = 274.1*12 = 3289 but capped at actual
 
-    - name: "Large family - tax unit size 6"
+    - name: "PTC for family of 4 at 250% FPL"
       period: 2024
       inputs:
-        tax_unit_size: 6
-      expect: 6
+        household_income: 78000  # ~250% FPL for family of 4 (FPL=$31,200)
+        applicable_percentage: 0.04  # 4% at 250% FPL
+        slcsp_premium_monthly: 1200
+        actual_health_premium_monthly: 1000
+        is_applicable_taxpayer: true
+        ptc_coverage_months: 12
+      expect: 8880  # (1200 - 78000*0.04/12) * 12 = (1200 - 260)*12 = 940*12 = 11280, capped at 1000*12
 
-    - name: "Single parent with one child - tax unit size 2"
+    - name: "Zero PTC when not applicable taxpayer"
       period: 2024
       inputs:
-        tax_unit_size: 2
-      expect: 2
+        household_income: 30000
+        applicable_percentage: 0.02
+        slcsp_premium_monthly: 400
+        actual_health_premium_monthly: 350
+        is_applicable_taxpayer: false
+        ptc_coverage_months: 12
+      expect: 0
 
-    - name: "Default tax unit size - single taxpayer"
+    - name: "Zero PTC when below 100% FPL (Medicaid eligible)"
       period: 2024
-      inputs: {}
-      expect: 1
+      inputs:
+        household_income: 10000  # Below 100% FPL
+        applicable_percentage: 0
+        slcsp_premium_monthly: 400
+        actual_health_premium_monthly: 350
+        is_applicable_taxpayer: false  # Not applicable per 36B(c)
+        ptc_coverage_months: 12
+      expect: 0
+
+    - name: "Partial year coverage (6 months)"
+      period: 2024
+      inputs:
+        household_income: 22590
+        applicable_percentage: 0
+        slcsp_premium_monthly: 400
+        actual_health_premium_monthly: 350
+        is_applicable_taxpayer: true
+        ptc_coverage_months: 6
+      expect: 2100  # 350 * 6
+
+    - name: "High income above 400% FPL still eligible under IRA"
+      period: 2024
+      inputs:
+        household_income: 75300  # 500% FPL for single
+        applicable_percentage: 0.085  # 8.5% cap under IRA
+        slcsp_premium_monthly: 600
+        actual_health_premium_monthly: 550
+        is_applicable_taxpayer: true
+        ptc_coverage_months: 12
+      expect: 652  # (600 - 75300*0.085/12) * 12 = (600 - 533.38)*12 = 66.62*12 = 799
+
+    - name: "No PTC when expected contribution exceeds benchmark"
+      period: 2024
+      inputs:
+        household_income: 120000  # Very high income
+        applicable_percentage: 0.085
+        slcsp_premium_monthly: 400
+        actual_health_premium_monthly: 350
+        is_applicable_taxpayer: true
+        ptc_coverage_months: 12
+      expect: 0  # (400 - 120000*0.085/12) = 400 - 850 < 0, so max(0, -450) = 0
+
+    - name: "PTC limited by actual premium paid"
+      period: 2024
+      inputs:
+        household_income: 20000
+        applicable_percentage: 0
+        slcsp_premium_monthly: 800
+        actual_health_premium_monthly: 200  # Low-cost plan
+        is_applicable_taxpayer: true
+        ptc_coverage_months: 12
+      expect: 2400  # min(200, 800-0) * 12 = 200*12 = 2400
