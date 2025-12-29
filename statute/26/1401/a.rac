@@ -28,36 +28,6 @@ input taxable_self_employment_income:
         taxable_self_employment_income: 200_000
       expect: 200000
 
-variable self_employment_tax:
-  imports:
-    - 26/1401/b/2#self_employment_additional_medicare_tax
-  entity: Person
-  period: Year
-  dtype: Money
-  unit: "USD"
-  label: "Self-Employment Medicare Tax"
-  description: "Hospital Insurance tax on self-employment earnings per 1_401(b)"
-  syntax: python
-  formula: |
-    # taxable_self_employment_income from PE is already gross * 0.9235
-    return max(0, taxable_self_employment_income)
-  tests:
-    - name: "Positive self-employment income"
-      period: 2024
-      inputs:
-        taxable_self_employment_income: 75_000
-      expect: 75000
-    - name: "Negative income returns zero"
-      period: 2024
-      inputs:
-        taxable_self_employment_income: -10_000
-      expect: 0
-    - name: "Zero income"
-      period: 2024
-      inputs:
-        taxable_self_employment_income: 0
-      expect: 0
-
 variable base_self_employment_tax:
   entity: Person
   period: Year

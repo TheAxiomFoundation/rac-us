@@ -4,65 +4,6 @@ text: """
 (i) to all individuals receiving...supplemental security income...
 (ii) to all qualified pregnant women and children...
 """
-variable eligibility:
-  entity: Person
-  period: Month
-  dtype: Boolean
-  syntax: python
-  formula: |
-    # FPL = base for 1 person + additional per person beyond 1
-    base = fpl_by_household_size[1]
-    additional = fpl_by_household_size["additional_per_person"]
-    # Pregnant women count expected children in household size
-    extra_for_pregnancy = sum(members.is_pregnant)
-    effective_size = household_size + extra_for_pregnancy
-    extra_members = max(0, effective_size - 1)
-    return base + (additional * extra_members)
-  default: 0
-
-
-
-# ---- Merged from medicaid.rac ----
-
-# Title 42 USC 1396 - Medicaid (Grants to States for Medical Assistance Programs)
-#
-variable medicaid:
-  entity: Person
-  period: Month
-  dtype: Boolean
-  label: "Medicaid Eligible"
-  description: "Eligible for Medicaid coverage under any pathway"
-  formula: return medicaid_eligible
-  default: False
-
-variable chip:
-  entity: Person
-  period: Month
-  dtype: Boolean
-  label: "CHIP Eligible"
-  description: "Eligible for Children's Health Insurance Program"
-  formula: return chip_eligible
-  default: False
-
-variable public_health_coverage_eligible:
-  entity: Person
-  period: Month
-  dtype: Boolean
-  label: "Public Health Coverage Eligible"
-  description: "Eligible for Medicaid or CHIP"
-  formula: return medicaid_eligible or chip_eligible
-  default: False
-
-variable household_magi:
-  entity: Household
-  period: Month
-  dtype: Money
-  unit: "USD"
-  label: "Household MAGI"
-  description: "Household Modified Adjusted Gross Income for Medicaid/ACA eligibility"
-  formula: return magi_income
-  default: 0
-
 variable household_magi_pct_fpl:
   entity: Household
   period: Month

@@ -1,62 +1,5 @@
 # 24 CFR 5.609 & 5.611 - Annual Income and Deductions
 #
-variable hcv_annual_income:
-  entity: Household
-  period: Year
-  dtype: Money
-  unit: "USD"
-  label: "HCV Annual Income"
-  description: "Total annual gross income from all counted sources per 24 CFR 5.609(b)"
-  syntax: python
-  formula: |
-    # Sum of all counted income sources for all family members
-    # Major categories per 24 CFR 5.609(b)
-    total = employment_income + self_employment_income
-    total = total + social_security_benefits + ssi_benefits
-    total = total + pension_income + annuity_income
-    total = total + alimony_received + child_support_received
-    total = total + regular_gifts_received + unemployment_benefits
-    total = total + disability_benefits + workers_compensation
-    total = total + welfare_assistance + interest_income
-    total = total + dividend_income + net_rental_income
-    return total
-  default: 0
-
-variable hcv_dependent_deduction:
-  entity: Household
-  period: Year
-  dtype: Money
-  unit: "USD"
-  label: "HCV Dependent Deduction"
-  description: "Deduction of $480 per dependent family member"
-  syntax: python
-  formula: |
-    # Dependent = family member (other than head, spouse, or co-head) who is:
-    # - Under 18 years old, OR
-    # - A person with a disability, OR
-    # - A full-time student
-    deduction_per_dependent = parameter(gov.hud.hcv.deductions.dependent)
-    return num_dependents * deduction_per_dependent
-  default: 0
-
-variable hcv_elderly_disabled_deduction:
-  entity: Household
-  period: Year
-  dtype: Money
-  unit: "USD"
-  label: "HCV Elderly/Disabled Deduction"
-  description: "Deduction of $400 for elderly (62+) or disabled head/spouse"
-  syntax: python
-  formula: |
-    # Elderly family: head, spouse, or sole member is 62 years or older
-    # Disabled family: head, spouse, or sole member has a disability
-    deduction_amount = parameter(gov.hud.hcv.deductions.elderly_disabled)
-    if has_elderly_disabled:
-        return deduction_amount
-    else:
-        return 0
-  default: 0
-
 variable hcv_childcare_deduction:
   entity: Household
   period: Year
@@ -113,34 +56,6 @@ variable hcv_disability_assistance_deduction:
         return 0
     # Deduction limited to income earned
     return min(disability_assistance_expense, employment_income)
-  default: 0
-
-variable hcv_total_deductions:
-  entity: Household
-  period: Year
-  dtype: Money
-  unit: "USD"
-  label: "HCV Total Deductions"
-  description: "Sum of all allowable deductions from annual income"
-  syntax: python
-  formula: |
-    total = hcv_dependent_deduction + hcv_elderly_disabled_deduction
-    total = total + hcv_childcare_deduction + hcv_medical_deduction
-    total = total + hcv_disability_assistance_deduction
-    return total
-  default: 0
-
-variable hcv_annual_adjusted_income:
-  entity: Household
-  period: Year
-  dtype: Money
-  unit: "USD"
-  label: "HCV Annual Adjusted Income"
-  description: "Annual income minus all allowable deductions"
-  syntax: python
-  formula: |
-    adjusted = hcv_annual_income - hcv_total_deductions
-    return max(0, adjusted)
   default: 0
 
 variable hcv_monthly_adjusted_income:

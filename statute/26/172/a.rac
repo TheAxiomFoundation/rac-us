@@ -9,14 +9,6 @@ of taxable income (determined without regard to the deduction
 allowed under this section).
 """
 variable nol_deduction:
-  imports:
-    - 26/63/a#taxable_income
-    - 26/172/b#nol_deduction_pre_2018
-    - 26/172/b#nol_deduction_post_2017
-    - 26/172/b#total_nol_carryforward
-    - 26/172#farming_loss_carryback
-
-variable nol_deduction:
   entity: TaxUnit
   period: Year
   dtype: Money

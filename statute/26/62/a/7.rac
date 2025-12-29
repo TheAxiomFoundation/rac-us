@@ -2,26 +2,6 @@ text: """
 (7) Retirement savings.—The deduction allowed by section 219 (relating
 to deduction for retirement savings).
 """
-variable ira_deduction:
-  imports: [26/1#filing_status]
-  entity: TaxUnit
-  period: Year
-  dtype: Money
-  unit: "USD"
-  label: "Total IRA Deduction"
-  description: "Combined IRA deduction for tax unit"
-  syntax: python
-  formula: |
-    base_limit = contribution_limit
-    # Add catch-up contribution if age 50 or older
-    if age >= catch_up_age:
-      return base_limit + catch_up_amount
-    return base_limit
-
-
-# Base TCJA values (2018) - contribution limit indexed annually
-# Current indexed values in IRS guidance files
-
 parameter contribution_limit:
   description: "IRA regular contribution limit"
   unit: "USD"

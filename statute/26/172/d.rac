@@ -12,14 +12,6 @@ under section 151 (relating to personal exemptions).
 (4) Nonbusiness deductions of taxpayers other than corporations.--
 [Detailed modifications for nonbusiness deductions]
 """
-variable nol_modifications:
-  imports:
-    - 26/165#capital_losses
-    - 26/151#personal_exemption
-    - 26/63/c#standard_deduction
-    - 26/63/d#itemized_deductions
-    - 26/172#prior_nol_deduction_claimed
-
 variable nol_modification_prior_nol:
   entity: TaxUnit
   period: Year
