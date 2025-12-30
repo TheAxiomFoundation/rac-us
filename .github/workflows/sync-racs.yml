@@ -1,0 +1,19 @@
+# Sync RAC files to database on push to main
+# Uses centralized workflow from cosilico-db
+name: Sync RACs
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'statute/**/*.rac'
+  workflow_dispatch:
+
+jobs:
+  sync:
+    uses: CosilicoAI/cosilico-engine/.github/workflows/sync-racs.yml@main
+    secrets:
+      SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+    with:
+      repo_name: cosilico-us
+      jurisdiction: us
