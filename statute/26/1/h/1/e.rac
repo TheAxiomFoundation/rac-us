@@ -38,10 +38,10 @@ input net_capital_gain:
 # === PARAMETERS ===
 
 parameter unrecaptured_1250_rate:
-  description: "Rate for unrecaptured section 1250 gain"
+  description: "Rate for unrecaptured section 1250 gain per P.L. 105-34 § 311(a)"
   unit: /1
   values:
-    2018-01-01: 0.25
+    1997-05-07: 0.25  # Taxpayer Relief Act of 1997 - effective for sales after 5/6/97
 
 # === VARIABLES ===
 
@@ -128,11 +128,18 @@ variable subparagraph_e_amount:
       # (ii) = max(0, 50000 + 40000 - 80000) = max(0, 10000) = 10000
       # Result: 25000 - 10000 = 15000
       expect: 15000
+    - name: "Zero net capital gain - should be zero"
+      period: 2024
+      inputs:
+        unrecaptured_section_1250_gain: 20000
+        net_capital_gain: 0
+        taxable_income: 100000
+        subparagraph_a_amount: 100000
+      # (i) = min(20000, 0) = 0
+      # Result: 0 - anything = 0 (floored)
+      expect: 0
 
 variable subparagraph_e_tax:
-  imports:
-    - 26/63/a#taxable_income
-    - 26/1/h/1#subparagraph_a_amount
   entity: TaxUnit
   period: Year
   dtype: Money
@@ -140,31 +147,24 @@ variable subparagraph_e_tax:
   label: "Tax Under Subparagraph (E)"
   description: "Tax on unrecaptured section 1250 gain at 25% per 26 USC 1(h)(1)(E)"
   formula: |
-    # Compute e_amount inline
-    amount_i = min(unrecaptured_section_1250_gain, net_capital_gain)
-    sum_a_plus_ncg = subparagraph_a_amount + net_capital_gain
-    amount_ii = max(0, sum_a_plus_ncg - taxable_income)
-    e_amount = max(0, amount_i - amount_ii)
-
-    # Apply 25% rate
-    return e_amount * unrecaptured_1250_rate
+    # Apply 25% rate to already-computed subparagraph_e_amount
+    return subparagraph_e_amount * unrecaptured_1250_rate
   default: 0
   tests:
     - name: "25% tax on 1250 gain"
       period: 2024
       inputs:
-        unrecaptured_section_1250_gain: 20000
-        net_capital_gain: 50000
-        taxable_income: 100000
-        subparagraph_a_amount: 50000
-      # e_amount = 20000
+        subparagraph_e_amount: 20000
       # Tax: 20000 * 0.25 = 5000
       expect: 5000
-    - name: "No 1250 gain - no tax"
+    - name: "No e_amount - no tax"
       period: 2024
       inputs:
-        unrecaptured_section_1250_gain: 0
-        net_capital_gain: 50000
-        taxable_income: 100000
-        subparagraph_a_amount: 50000
+        subparagraph_e_amount: 0
       expect: 0
+    - name: "Large e_amount"
+      period: 2024
+      inputs:
+        subparagraph_e_amount: 40000
+      # Tax: 40000 * 0.25 = 10000
+      expect: 10000
