@@ -9,7 +9,14 @@ text: """
 on which tax is determined under the preceding subparagraphs of this paragraph.
 """
 
-# === IMPORTS ===
+# === PARAMETERS ===
+
+parameter twentyeight_rate:
+  description: "Rate for 28-percent rate gain (collectibles and section 1202 gain) per P.L. 105-34"
+  unit: /1
+  reference: "26 USC 1(h)(1)(F), P.L. 105-34"
+  values:
+    1997-05-07: 0.28  # Taxpayer Relief Act of 1997 - effective for sales after 5/6/97
 
 # === INPUTS ===
 
@@ -21,14 +28,6 @@ input twentyeight_percent_rate_gain:
   label: "28-Percent Rate Gain"
   description: "Collectibles gain + section 1202 gain minus offsets per 26 USC 1(h)(4)"
   default: 0
-
-# === PARAMETERS ===
-
-parameter twentyeight_rate:
-  description: "Rate for 28-percent rate gain (collectibles and section 1202 gain) per P.L. 105-34"
-  unit: /1
-  values:
-    1997-05-07: 0.28  # Taxpayer Relief Act of 1997 - effective for sales after 5/6/97
 
 # === VARIABLES ===
 

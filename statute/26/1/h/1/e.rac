@@ -13,8 +13,6 @@ text: """
     (II) taxable income.
 """
 
-# === IMPORTS ===
-
 # === INPUTS ===
 
 input unrecaptured_section_1250_gain:
@@ -34,14 +32,6 @@ input net_capital_gain:
   label: "Net Capital Gain"
   description: "Net capital gain per 26 USC 1222(11)"
   default: 0
-
-# === PARAMETERS ===
-
-parameter unrecaptured_1250_rate:
-  description: "Rate for unrecaptured section 1250 gain per P.L. 105-34 § 311(a)"
-  unit: /1
-  values:
-    1997-05-07: 0.25  # Taxpayer Relief Act of 1997 - effective for sales after 5/6/97
 
 # === VARIABLES ===
 
@@ -138,8 +128,32 @@ variable subparagraph_e_amount:
       # (i) = min(20000, 0) = 0
       # Result: 0 - anything = 0 (floored)
       expect: 0
+    - name: "NCG equals unrecaptured 1250"
+      period: 2024
+      inputs:
+        unrecaptured_section_1250_gain: 30000
+        net_capital_gain: 30000
+        taxable_income: 150000
+        subparagraph_a_amount: 120000
+      # (i) = min(30000, 30000) = 30000
+      # (ii) = max(0, 120000 + 30000 - 150000) = 0
+      # Result: 30000
+      expect: 30000
+    - name: "Large excess - zeroes out e_amount"
+      period: 2024
+      inputs:
+        unrecaptured_section_1250_gain: 10000
+        net_capital_gain: 10000
+        taxable_income: 50000
+        subparagraph_a_amount: 60000
+      # (i) = min(10000, 10000) = 10000
+      # (ii) = max(0, 60000 + 10000 - 50000) = 20000
+      # Result: max(0, 10000 - 20000) = 0
+      expect: 0
 
 variable subparagraph_e_tax:
+  imports:
+    - 26/1/h/1#unrecaptured_1250_rate
   entity: TaxUnit
   period: Year
   dtype: Money
@@ -155,16 +169,26 @@ variable subparagraph_e_tax:
       period: 2024
       inputs:
         subparagraph_e_amount: 20000
+        unrecaptured_1250_rate: 0.25
       # Tax: 20000 * 0.25 = 5000
       expect: 5000
     - name: "No e_amount - no tax"
       period: 2024
       inputs:
         subparagraph_e_amount: 0
+        unrecaptured_1250_rate: 0.25
       expect: 0
     - name: "Large e_amount"
       period: 2024
       inputs:
         subparagraph_e_amount: 40000
+        unrecaptured_1250_rate: 0.25
       # Tax: 40000 * 0.25 = 10000
       expect: 10000
+    - name: "Verify 25% rate"
+      period: 2024
+      inputs:
+        subparagraph_e_amount: 100000
+        unrecaptured_1250_rate: 0.25
+      # Tax: 100000 * 0.25 = 25000
+      expect: 25000
