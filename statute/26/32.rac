@@ -32,15 +32,15 @@ text: |
       Subject to subparagraph (B), the earned income amount and the phaseout
       amount shall be determined as follows:
         In the case of an eligible individual with:  Earned income  Phaseout
-        1 qualifying child                             $6,330       $11,610
-        2 or more qualifying children                  $8,890       $11,610
-        No qualifying children                         $4,220        $5,280
+        1 qualifying child                             6,330       11,610
+        2 or more qualifying children                  8,890       11,610
+        No qualifying children                         4,220        5,280
       [Note: Amounts shown are base amounts; actual amounts adjusted for inflation per (j)]
 
       (B) Joint returns
       In the case of a joint return filed by an eligible individual and such
       individual's spouse, the phaseout amount determined under subparagraph (A)
-      shall be increased by $5,000. [Note: Amount adjusted for inflation per (j)]
+      shall be increased by 5,000. [Note: Amount adjusted for inflation per (j)]
 
   (c) Definitions and special rules
     For purposes of this section—
@@ -84,7 +84,7 @@ text: |
     (1) In general
     No credit shall be allowed under subsection (a) for the taxable year if the
     aggregate amount of disqualified income of the taxpayer for the taxable year
-    exceeds $10,000. [Note: Amount adjusted for inflation per (j)]
+    exceeds 10,000. [Note: Amount adjusted for inflation per (j)]
 
     (2) Disqualified income
     For purposes of paragraph (1), the term "disqualified income" means—
@@ -302,7 +302,7 @@ variable eitc_standalone:
     # PHASE-IN REGION TESTS (Income below cap, increasing credit)
     # Tests use parameters from definitions above (credit_rate_0 = 0.0765, etc.)
     # ============================================================================
-    - name: "Single, no children, low income phase-in: $5_000"
+    - name: "Single, no children, low income phase-in: 5_000"
       period: 2024-01
       inputs:
         num_qualifying_children: 0
@@ -312,7 +312,7 @@ variable eitc_standalone:
         is_eligible_individual: true
       expect: 382.5  # 0.0765 * 5000 = 382.50
 
-    - name: "Single, 1 child, low income phase-in: $5_000"
+    - name: "Single, 1 child, low income phase-in: 5_000"
       period: 2024-01
       inputs:
         num_qualifying_children: 1
@@ -322,7 +322,7 @@ variable eitc_standalone:
         is_eligible_individual: true
       expect: 1700  # 0.34 * 5000 = 1700
 
-    - name: "Single, 2 children, low income phase-in: $8_000"
+    - name: "Single, 2 children, low income phase-in: 8_000"
       period: 2024-01
       inputs:
         num_qualifying_children: 2
@@ -332,7 +332,7 @@ variable eitc_standalone:
         is_eligible_individual: true
       expect: 3200  # 0.40 * 8000 = 3200
 
-    - name: "Single, 3+ children, low income phase-in: $8_000"
+    - name: "Single, 3+ children, low income phase-in: 8_000"
       period: 2024-01
       inputs:
         num_qualifying_children: 3
@@ -345,7 +345,7 @@ variable eitc_standalone:
     # ============================================================================
     # PLATEAU REGION TESTS (Income at or above cap, maximum credit)
     # ============================================================================
-    - name: "Single, no children, at cap: $8_260"
+    - name: "Single, no children, at cap: 8_260"
       period: 2024-01
       inputs:
         num_qualifying_children: 0
@@ -355,7 +355,7 @@ variable eitc_standalone:
         is_eligible_individual: true
       expect: 631.89  # 0.0765 * 8260 = 631.89
 
-    - name: "Single, 1 child, at cap: $12_390"
+    - name: "Single, 1 child, at cap: 12_390"
       period: 2024-01
       inputs:
         num_qualifying_children: 1
@@ -365,7 +365,7 @@ variable eitc_standalone:
         is_eligible_individual: true
       expect: 4212.6  # 0.34 * 12390 = 4212.6
 
-    - name: "Single, 2 children, at cap: $17_400"
+    - name: "Single, 2 children, at cap: 17_400"
       period: 2024-01
       inputs:
         num_qualifying_children: 2
@@ -375,7 +375,7 @@ variable eitc_standalone:
         is_eligible_individual: true
       expect: 6960  # 0.40 * 17400 = 6960
 
-    - name: "Single, 3+ children, at cap: $17_400"
+    - name: "Single, 3+ children, at cap: 17_400"
       period: 2024-01
       inputs:
         num_qualifying_children: 3
@@ -385,7 +385,7 @@ variable eitc_standalone:
         is_eligible_individual: true
       expect: 7830  # 0.45 * 17400 = 7830
 
-    - name: "Single, 1 child, above cap: $20_000"
+    - name: "Single, 1 child, above cap: 20_000"
       period: 2024-01
       inputs:
         num_qualifying_children: 1
@@ -398,7 +398,7 @@ variable eitc_standalone:
     # ============================================================================
     # PHASE-OUT REGION TESTS (Income above threshold, credit reducing)
     # ============================================================================
-    - name: "Single, no children, phaseout begins: $10_330"
+    - name: "Single, no children, phaseout begins: 10_330"
       period: 2024-01
       inputs:
         num_qualifying_children: 0
@@ -408,7 +408,7 @@ variable eitc_standalone:
         is_eligible_individual: true
       expect: 631.89  # Max 631.89, phaseout starts but income = threshold, so 0 reduction
 
-    - name: "Single, no children, partial phaseout: $15_000"
+    - name: "Single, no children, partial phaseout: 15_000"
       period: 2024-01
       inputs:
         num_qualifying_children: 0
@@ -418,7 +418,7 @@ variable eitc_standalone:
         is_eligible_individual: true
       expect: 274.635  # Phase-in: 0.0765 * 8260 = 631.89; Reduction: 0.0765 * (15000 - 10330) = 357.255; Credit: 631.89 - 357.255 = 274.635
 
-    - name: "Single, 1 child, phaseout begins: $22_720"
+    - name: "Single, 1 child, phaseout begins: 22_720"
       period: 2024-01
       inputs:
         num_qualifying_children: 1
@@ -428,7 +428,7 @@ variable eitc_standalone:
         is_eligible_individual: true
       expect: 4212.6  # Max 4212.6, income = threshold, no reduction yet
 
-    - name: "Single, 1 child, partial phaseout: $35_000"
+    - name: "Single, 1 child, partial phaseout: 35_000"
       period: 2024-01
       inputs:
         num_qualifying_children: 1
@@ -438,7 +438,7 @@ variable eitc_standalone:
         is_eligible_individual: true
       expect: 2251.464  # Phase-in: 4212.6; Reduction: 0.1598 * (35000 - 22720) = 1961.136; Credit: 4212.6 - 1961.136 = 2251.464
 
-    - name: "Single, 2 children, partial phaseout: $40_000"
+    - name: "Single, 2 children, partial phaseout: 40_000"
       period: 2024-01
       inputs:
         num_qualifying_children: 2
@@ -451,7 +451,7 @@ variable eitc_standalone:
     # ============================================================================
     # JOINT FILER TESTS (higher phaseout thresholds)
     # ============================================================================
-    - name: "Joint, 1 child, phaseout with adjustment: $35_000"
+    - name: "Joint, 1 child, phaseout with adjustment: 35_000"
       period: 2024-01
       inputs:
         num_qualifying_children: 1
@@ -461,7 +461,7 @@ variable eitc_standalone:
         is_eligible_individual: true
       expect: 3356.072  # Phase-in: 4212.6; Threshold: 22720 + 6920 = 29640; Reduction: 0.1598 * (35000 - 29640) = 856.528; Credit: 4212.6 - 856.528 = 3356.072
 
-    - name: "Joint, 2 children, at higher phaseout threshold: $29_640"
+    - name: "Joint, 2 children, at higher phaseout threshold: 29_640"
       period: 2024-01
       inputs:
         num_qualifying_children: 2
@@ -471,7 +471,7 @@ variable eitc_standalone:
         is_eligible_individual: true
       expect: 6960  # At threshold, no phaseout yet
 
-    - name: "Joint, 2 children, partial phaseout: $45_000"
+    - name: "Joint, 2 children, partial phaseout: 45_000"
       period: 2024-01
       inputs:
         num_qualifying_children: 2
@@ -484,7 +484,7 @@ variable eitc_standalone:
     # ============================================================================
     # HEAD OF HOUSEHOLD TESTS
     # ============================================================================
-    - name: "Head of household, 1 child, phaseout: $35_000"
+    - name: "Head of household, 1 child, phaseout: 35_000"
       period: 2024-01
       inputs:
         num_qualifying_children: 1
@@ -507,7 +507,7 @@ variable eitc_standalone:
         is_eligible_individual: true
       expect: 0
 
-    - name: "Single, 1 child, completely phased out: $50_000"
+    - name: "Single, 1 child, completely phased out: 50_000"
       period: 2024-01
       inputs:
         num_qualifying_children: 1
@@ -517,7 +517,7 @@ variable eitc_standalone:
         is_eligible_individual: true
       expect: 0  # max(0, 4212.6 - 0.1598*(50000-22720)) = 4212.6 - 4360.944 = 0
 
-    - name: "Single, no children, completely phased out: $20_000"
+    - name: "Single, no children, completely phased out: 20_000"
       period: 2024-01
       inputs:
         num_qualifying_children: 0
@@ -530,7 +530,7 @@ variable eitc_standalone:
     # ============================================================================
     # INVESTMENT INCOME LIMIT TESTS
     # ============================================================================
-    - name: "Single, 1 child, just below investment income limit: $11_599"
+    - name: "Single, 1 child, just below investment income limit: 11_599"
       period: 2024-01
       inputs:
         num_qualifying_children: 1
@@ -540,7 +540,7 @@ variable eitc_standalone:
         is_eligible_individual: true
       expect: 4212.6  # At cap
 
-    - name: "Single, 1 child, just at investment income limit: $11_600"
+    - name: "Single, 1 child, just at investment income limit: 11_600"
       period: 2024-01
       inputs:
         num_qualifying_children: 1
@@ -576,7 +576,7 @@ variable eitc_standalone:
     # ============================================================================
     # MORE THAN 3 CHILDREN TESTS (should cap at 3)
     # ============================================================================
-    - name: "Single, 4 children, capped at 3-child rate: $10_000"
+    - name: "Single, 4 children, capped at 3-child rate: 10_000"
       period: 2024-01
       inputs:
         num_qualifying_children: 4
@@ -586,7 +586,7 @@ variable eitc_standalone:
         is_eligible_individual: true
       expect: 4500  # 0.45 * 10000 = 4500 (uses 3+ child rate)
 
-    - name: "Single, 5 children, capped at 3-child rate: $17_400"
+    - name: "Single, 5 children, capped at 3-child rate: 17_400"
       period: 2024-01
       inputs:
         num_qualifying_children: 5
@@ -599,7 +599,7 @@ variable eitc_standalone:
     # ============================================================================
     # EDGE CASES AND BOUNDARY TESTS
     # ============================================================================
-    - name: "Single, 1 child, just before phaseout: $22_719"
+    - name: "Single, 1 child, just before phaseout: 22_719"
       period: 2024-01
       inputs:
         num_qualifying_children: 1
@@ -609,7 +609,7 @@ variable eitc_standalone:
         is_eligible_individual: true
       expect: 4212.6  # Still at max
 
-    - name: "Single, 1 child, just after phaseout begins: $22_721"
+    - name: "Single, 1 child, just after phaseout begins: 22_721"
       period: 2024-01
       inputs:
         num_qualifying_children: 1
@@ -619,7 +619,7 @@ variable eitc_standalone:
         is_eligible_individual: true
       expect: 4212.4402  # 4212.6 - 0.1598 * 1 = 4212.4402
 
-    - name: "Joint, 2 children, above AGI threshold: $62_688"
+    - name: "Joint, 2 children, above AGI threshold: 62_688"
       period: 2024-01
       inputs:
         num_qualifying_children: 2
@@ -632,7 +632,7 @@ variable eitc_standalone:
     # ============================================================================
     # ORIGINAL TESTS (preserved for backward compatibility)
     # ============================================================================
-    - name: "Single, no children, $8_000 earned income"
+    - name: "Single, no children, 8_000 earned income"
       period: 2024-01
       inputs:
         num_qualifying_children: 0
@@ -642,7 +642,7 @@ variable eitc_standalone:
         is_eligible_individual: true
       expect: 612  # 0.0765 * 8000 = 612
 
-    - name: "Single, 1 child, $15_000 earned income"
+    - name: "Single, 1 child, 15_000 earned income"
       period: 2024-01
       inputs:
         num_qualifying_children: 1
@@ -652,7 +652,7 @@ variable eitc_standalone:
         is_eligible_individual: true
       expect: 4212.6  # 0.34 * 12390 = 4212.6 (at cap, no phaseout yet)
 
-    - name: "Joint, 2 children, $30_000 earned income"
+    - name: "Joint, 2 children, 30_000 earned income"
       period: 2024-01
       inputs:
         num_qualifying_children: 2
@@ -737,7 +737,7 @@ variable eitc_validation:
     return 0
   default: 0
   tests:
-    - name: "Single, 1 child, $15_000 earned income"
+    - name: "Single, 1 child, 15_000 earned income"
       period: 2024
       inputs:
         num_qualifying_children: 1
@@ -747,7 +747,7 @@ variable eitc_validation:
         is_eligible_individual: true
       expect: 4212.6
 
-    - name: "Joint, 2 children, $30_000 earned income"
+    - name: "Joint, 2 children, 30_000 earned income"
       period: 2024
       inputs:
         num_qualifying_children: 2
