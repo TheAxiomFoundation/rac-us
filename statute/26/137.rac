@@ -1,0 +1,286 @@
+# 26 USC Section 137 - Adoption Assistance Programs
+
+text: """
+(a) Exclusion.--
+Gross income of an employee does not include amounts paid or expenses incurred
+by the employer for qualified adoption expenses in connection with the adoption
+of a child by an employee if such amounts are furnished pursuant to an adoption
+assistance program.
+
+(b) Limitations.--
+(1) Dollar limitation.-- The aggregate of the amounts paid or expenses incurred
+which may be taken into account under subsection (a) for all taxable years with
+respect to the adoption of a child by the taxpayer shall not exceed $10,000.
+
+(2) Income limitation.-- The amount excludable from gross income under subsection (a)
+for any taxable year shall be reduced (but not below zero) by an amount which bears
+the same ratio to the amount so excludable (determined without regard to this paragraph
+but with regard to paragraph (1)) as--
+(A) the amount (if any) by which the taxpayer's adjusted gross income exceeds $150,000,
+bears to
+(B) $40,000.
+
+(3) Determination of adjusted gross income.-- For purposes of paragraph (2), adjusted
+gross income shall be determined--
+(A) without regard to this section and sections 85(c), 221, 911, 931, and 933, and
+(B) after the application of sections 86, 135, 219, and 469.
+"""
+
+# Base statutory dollar limitation per 137(b)(1) - indexed per 137(f)
+parameter exclusion_dollar_limit:
+  description: "Maximum adoption assistance exclusion per child per 137(b)(1)"
+  unit: USD
+  indexed_by: statute/26/137/f
+  values:
+    2024: 16_810
+    2025: 17_280
+    2002: 10_000
+
+# Base statutory AGI phaseout threshold per 137(b)(2)(A) - indexed per 137(f)
+parameter phaseout_agi_threshold:
+  description: "AGI threshold where adoption exclusion phaseout begins per 137(b)(2)(A)"
+  unit: USD
+  indexed_by: statute/26/137/f
+  values:
+    2024: 252_150
+    2025: 259_190
+    2002: 150_000
+
+# Statutory phaseout range per 137(b)(2)(B) - indexed per 137(f)
+parameter phaseout_range:
+  description: "AGI range over which exclusion phases out per 137(b)(2)(B)"
+  unit: USD
+  indexed_by: statute/26/137/f
+  values:
+    2024: 40_000
+    2025: 40_000
+    2002: 40_000
+
+# Input for employer-provided adoption assistance benefits
+input adoption_assistance_received:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Adoption Assistance Benefits"
+  description: "Employer-provided adoption assistance benefits received during the year"
+  default: 0
+
+# Input for qualified adoption expenses incurred
+input qualified_adoption_expenses:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Qualified Adoption Expenses"
+  description: "Qualified adoption expenses per 26 USC 23(d)"
+  default: 0
+
+# Input for AGI used in 137 calculation (determined per 137(b)(3))
+input adoption_exclusion_agi:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Modified AGI for Adoption Exclusion"
+  description: "AGI for 137 phaseout, determined per 137(b)(3) - without regard to 137, 85(c), 221, 911, 931, 933, after 86, 135, 219, 469"
+  default: 0
+
+# 137(b)(1): Dollar limitation - amount that could be excluded before phaseout
+variable adoption_exclusion_before_phaseout:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Adoption Exclusion Before Phaseout"
+  description: "Adoption assistance exclusion before AGI phaseout per 137(b)(1)"
+  formula: |
+    # Cannot exclude more than the dollar limit
+    # Cannot exclude more than qualified expenses incurred
+    # Cannot exclude more than benefits received
+    amount = min(adoption_assistance_received, exclusion_dollar_limit)
+    return min(amount, qualified_adoption_expenses)
+  tests:
+    - name: "Benefits below limit"
+      period: 2024
+      inputs:
+        adoption_assistance_received: 10_000
+        qualified_adoption_expenses: 12_000
+      expect: 10_000
+
+    - name: "Benefits exceed dollar limit"
+      period: 2024
+      inputs:
+        adoption_assistance_received: 20_000
+        qualified_adoption_expenses: 25_000
+      expect: 16_810
+
+    - name: "Expenses limit the exclusion"
+      period: 2024
+      inputs:
+        adoption_assistance_received: 15_000
+        qualified_adoption_expenses: 8_000
+      expect: 8_000
+
+    - name: "No benefits received"
+      period: 2024
+      inputs:
+        adoption_assistance_received: 0
+        qualified_adoption_expenses: 10_000
+      expect: 0
+
+# 137(b)(2): AGI phaseout calculation
+variable adoption_exclusion_phaseout_rate:
+  entity: TaxUnit
+  period: Year
+  dtype: Rate
+  unit: rate
+  label: "Adoption Exclusion Phaseout Rate"
+  description: "Rate at which exclusion is reduced based on AGI per 137(b)(2)"
+  formula: |
+    excess_agi = max(0, adoption_exclusion_agi - phaseout_agi_threshold)
+    # Phaseout rate = excess AGI / phaseout range, capped at 1 (100% phaseout)
+    rate = excess_agi / phaseout_range
+    return min(1, rate)
+  tests:
+    - name: "AGI below threshold - no phaseout"
+      period: 2024
+      inputs:
+        adoption_exclusion_agi: 200_000
+      expect: 0
+
+    - name: "AGI at threshold - no phaseout"
+      period: 2024
+      inputs:
+        adoption_exclusion_agi: 252_150
+      expect: 0
+
+    - name: "AGI $10k over threshold - 25% phaseout"
+      period: 2024
+      inputs:
+        adoption_exclusion_agi: 262_150
+      expect: 0.25
+
+    - name: "AGI $20k over threshold - 50% phaseout"
+      period: 2024
+      inputs:
+        adoption_exclusion_agi: 272_150
+      expect: 0.5
+
+    - name: "AGI at full phaseout - 100%"
+      period: 2024
+      inputs:
+        adoption_exclusion_agi: 292_150
+      expect: 1
+
+    - name: "AGI above full phaseout - still 100%"
+      period: 2024
+      inputs:
+        adoption_exclusion_agi: 350_000
+      expect: 1
+
+# 137(a): Final adoption assistance exclusion amount
+variable adoption_assistance_exclusion:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Adoption Assistance Exclusion"
+  description: "Amount of employer adoption assistance excludable from gross income per 137(a) and (b)"
+  formula: |
+    # Start with pre-phaseout amount
+    pre_phaseout = adoption_exclusion_before_phaseout
+    # Reduce by phaseout rate per 137(b)(2)
+    reduction = pre_phaseout * adoption_exclusion_phaseout_rate
+    return max(0, pre_phaseout - reduction)
+  tests:
+    # Tests provide pre-computed intermediate values as inputs since test runner
+    # doesn't support cross-variable dependencies
+    - name: "Low income - full exclusion"
+      period: 2024
+      inputs:
+        adoption_exclusion_before_phaseout: 15_000
+        adoption_exclusion_phaseout_rate: 0
+      expect: 15_000
+
+    - name: "Income at threshold - full exclusion"
+      period: 2024
+      inputs:
+        adoption_exclusion_before_phaseout: 16_810
+        adoption_exclusion_phaseout_rate: 0
+      expect: 16_810
+
+    - name: "Income $20k over threshold - 50% reduction"
+      period: 2024
+      inputs:
+        adoption_exclusion_before_phaseout: 16_810
+        adoption_exclusion_phaseout_rate: 0.5
+      expect: 8_405
+
+    - name: "Income at full phaseout - no exclusion"
+      period: 2024
+      inputs:
+        adoption_exclusion_before_phaseout: 16_810
+        adoption_exclusion_phaseout_rate: 1
+      expect: 0
+
+    - name: "Income above full phaseout - no exclusion"
+      period: 2024
+      inputs:
+        adoption_exclusion_before_phaseout: 15_000
+        adoption_exclusion_phaseout_rate: 1
+      expect: 0
+
+    - name: "Partial benefit with partial phaseout"
+      period: 2024
+      inputs:
+        adoption_exclusion_before_phaseout: 8_000
+        adoption_exclusion_phaseout_rate: 0.25
+      expect: 6_000
+
+    - name: "No benefits - zero exclusion"
+      period: 2024
+      inputs:
+        adoption_exclusion_before_phaseout: 0
+        adoption_exclusion_phaseout_rate: 0
+      expect: 0
+
+# Amount of adoption assistance that is taxable (included in gross income)
+variable adoption_assistance_taxable:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Taxable Adoption Assistance"
+  description: "Amount of employer adoption assistance included in gross income (not excluded)"
+  formula: return max(0, adoption_assistance_received - adoption_assistance_exclusion)
+  tests:
+    # Tests provide pre-computed exclusion values as inputs since test runner
+    # doesn't support cross-variable dependencies
+    - name: "Low income - nothing taxable"
+      period: 2024
+      inputs:
+        adoption_assistance_received: 12_000
+        adoption_assistance_exclusion: 12_000
+      expect: 0
+
+    - name: "High income - full amount taxable"
+      period: 2024
+      inputs:
+        adoption_assistance_received: 12_000
+        adoption_assistance_exclusion: 0
+      expect: 12_000
+
+    - name: "Benefits exceed limit - excess is taxable"
+      period: 2024
+      inputs:
+        adoption_assistance_received: 20_000
+        adoption_assistance_exclusion: 16_810
+      expect: 3_190
+
+    - name: "Partial phaseout - partial amount taxable"
+      period: 2024
+      inputs:
+        adoption_assistance_received: 16_810
+        adoption_assistance_exclusion: 8_405
+      expect: 8_405
