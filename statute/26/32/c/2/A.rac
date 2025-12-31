@@ -1,90 +1,187 @@
+# 26 USC 32(c)(2)(A) - Earned Income (EITC Definition)
+
 text: """
-The term 'earned income' means—
-(i) wages, salaries, tips, and other employee compensation, but only
-if such amounts are includible in gross income for the taxable year, plus
-(ii) the amount of the taxpayer's net earnings from self-employment for
-the taxable year (within the meaning of section 1402(a)), but such
-net earnings shall be determined with regard to the deduction allowed
-to the taxpayer by section 164(f).
+(2) Earned income
+(A) The term "earned income" means-
+  (i) wages, salaries, tips, and other employee compensation, but only
+      if such amounts are includible in gross income for the taxable year, plus
+  (ii) the amount of the taxpayer's net earnings from self-employment for
+      the taxable year (within the meaning of section 1402(a)), but such net
+      earnings shall be determined with regard to the deduction allowed to
+      the taxpayer by section 164(f).
 """
-variable earned_income:
-  imports:
-    - 26/1402/a#net_earnings_self_employment
-    - 26/164/f#se_tax_deduction
-  entity: TaxUnit
+
+# Inputs for employee compensation (from 26/61/a/1)
+input wages:
+  entity: Person
   period: Year
   dtype: Money
   unit: USD
-  label: "Earned Income"
-  description: "Wages, salaries, tips, and net self-employment income per 26 USC §32(c)(2)(A)"
-  syntax: python
+  label: "Wages"
+  description: "Wages includible in gross income for the taxable year"
+  default: 0
+
+input salaries:
+  entity: Person
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Salaries"
+  description: "Salaries includible in gross income for the taxable year"
+  default: 0
+
+input tips:
+  entity: Person
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Tips"
+  description: "Tips includible in gross income for the taxable year"
+  default: 0
+
+input other_employee_compensation:
+  entity: Person
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Other Employee Compensation"
+  description: "Other employee compensation includible in gross income"
+  default: 0
+
+# Clause (i): Total employee compensation
+variable employee_compensation:
+  entity: Person
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Employee Compensation"
+  description: "Total wages, salaries, tips, and other employee compensation per 32(c)(2)(A)(i)"
   formula: |
-    # Employee compensation
-    employee_compensation = wages + salaries + tips
-    # Self-employment income (with §164(f) deduction applied)
-    self_employment = net_earnings_self_employment - se_tax_deduction
-    return employee_compensation + max(0, self_employment)
+    return wages + salaries + tips + other_employee_compensation
   tests:
     - name: "Wages only"
-      period: 2024-01
+      period: 2024
+      inputs:
+        wages: 50_000
+        salaries: 0
+        tips: 0
+        other_employee_compensation: 0
+      expect: 50_000
+    - name: "All components"
+      period: 2024
       inputs:
         wages: 30_000
-        salaries: 0
-        tips: 0
-        net_earnings_self_employment: 0
-        se_tax_deduction: 0
-      expect: 30000
-    - name: "Wages, salaries, and tips"
-      period: 2024-01
-      inputs:
-        wages: 20_000
-        salaries: 5_000
-        tips: 3_000
-        net_earnings_self_employment: 0
-        se_tax_deduction: 0
-      expect: 28000
-    - name: "Self-employment only"
-      period: 2024-01
+        salaries: 10_000
+        tips: 5_000
+        other_employee_compensation: 2_000
+      expect: 47_000
+    - name: "Zero compensation"
+      period: 2024
       inputs:
         wages: 0
         salaries: 0
         tips: 0
+        other_employee_compensation: 0
+      expect: 0
+
+# Clause (ii): Net SE earnings adjusted for 164(f) deduction
+variable adjusted_se_earnings:
+  imports:
+    - 26/1402/a#net_earnings_self_employment
+    - 26/164/f#se_tax_deduction
+  entity: Person
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Adjusted Self-Employment Earnings"
+  description: "Net SE earnings determined with regard to 164(f) deduction per 32(c)(2)(A)(ii)"
+  formula: |
+    # Per statute: "with regard to" 164(f) means we subtract the deduction
+    # Net SE earnings minus the 164(f) self-employment tax deduction
+    return max(0, net_earnings_self_employment - se_tax_deduction)
+  tests:
+    - name: "SE income with deduction"
+      period: 2024
+      inputs:
         net_earnings_self_employment: 50_000
-        se_tax_deduction: 3532.50
-      expect: 46467.50  # 50000 - 3532.50
-    - name: "Combined wages and self-employment"
-      period: 2024-01
+        se_tax_deduction: 3_825
+      expect: 46_175
+    - name: "Zero SE income"
+      period: 2024
       inputs:
-        wages: 25_000
-        salaries: 0
-        tips: 2000
-        net_earnings_self_employment: 20_000
-        se_tax_deduction: 1_413
-      expect: 45587  # 25000 + 2000 + (20000 - 1413)
-    - name: "Self-employment loss (capped at 0)"
-      period: 2024-01
-      inputs:
-        wages: 15_000
-        salaries: 0
-        tips: 0
-        net_earnings_self_employment: -5_000
-        se_tax_deduction: 0
-      expect: 15000  # SE loss doesn't reduce wages for EITC
-    - name: "Zero income"
-      period: 2024-01
-      inputs:
-        wages: 0
-        salaries: 0
-        tips: 0
         net_earnings_self_employment: 0
         se_tax_deduction: 0
       expect: 0
-    - name: "SE deduction exceeds SE income"
-      period: 2024-01
+    - name: "SE income exceeding deduction"
+      period: 2024
       inputs:
-        wages: 10_000
-        salaries: 0
-        tips: 0
-        net_earnings_self_employment: 5_000
-        se_tax_deduction: 6_000
-      expect: 10000  # SE portion is max(0, 5000-6000) = 0
+        net_earnings_self_employment: 100_000
+        se_tax_deduction: 7_650
+      expect: 92_350
+    - name: "Deduction exceeds SE income (edge case)"
+      period: 2024
+      inputs:
+        net_earnings_self_employment: 1_000
+        se_tax_deduction: 1_500
+      expect: 0
+
+# Main variable: Total EITC earned income combining (i) and (ii)
+variable eitc_earned_income:
+  entity: Person
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "EITC Earned Income"
+  description: "Earned income for EITC purposes per 26 USC 32(c)(2)(A)"
+  formula: |
+    # Sum of (i) employee compensation and (ii) adjusted SE earnings
+    return employee_compensation + adjusted_se_earnings
+  tests:
+    - name: "Wages only - typical W2 worker"
+      period: 2024
+      inputs:
+        employee_compensation: 45_000
+        adjusted_se_earnings: 0
+      expect: 45_000
+    - name: "SE only - self-employed individual"
+      period: 2024
+      inputs:
+        employee_compensation: 0
+        adjusted_se_earnings: 55_410
+      expect: 55_410
+    - name: "Combined wages and SE income"
+      period: 2024
+      inputs:
+        employee_compensation: 25_000
+        adjusted_se_earnings: 18_470
+      expect: 43_470
+    - name: "All income types"
+      period: 2024
+      inputs:
+        employee_compensation: 30_000
+        adjusted_se_earnings: 13_852
+      expect: 43_852
+    - name: "Zero earned income"
+      period: 2024
+      inputs:
+        employee_compensation: 0
+        adjusted_se_earnings: 0
+      expect: 0
+    - name: "Low income worker - minimum wage"
+      period: 2024
+      inputs:
+        employee_compensation: 15_080
+        adjusted_se_earnings: 0
+      expect: 15_080
+    - name: "Gig worker with tips and SE"
+      period: 2024
+      inputs:
+        employee_compensation: 13_000
+        adjusted_se_earnings: 11_082
+      expect: 24_082
+    - name: "High earner near EITC phaseout"
+      period: 2024
+      inputs:
+        employee_compensation: 55_000
+        adjusted_se_earnings: 0
+      expect: 55_000
