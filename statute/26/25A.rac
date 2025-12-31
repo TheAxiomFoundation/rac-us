@@ -1,46 +1,151 @@
+# 26 USC Section 25A - American Opportunity and Lifetime Learning Credits
+
 text: """
-(i) American opportunity tax credit.--In the case of any taxable year
-beginning after 2008--
-(1) In general.--In the case of an eligible student for whom an
-election is made under this subsection, the Hope Scholarship Credit
-shall be an amount equal to the sum of--
-(A) 100 percent of so much of the qualified tuition and related
-expenses paid by the taxpayer during the taxable year (for education
-furnished to the eligible student during any academic period beginning
-in such taxable year) as does not exceed $2,000, plus
-(B) 25 percent of such expenses so paid as exceeds $2,000 but does
-not exceed $4,000.
+(a) Allowance of credit.--
+In the case of an individual, there shall be allowed as a credit against the tax
+imposed by this chapter for the taxable year the amount equal to the sum of--
+(1) the American Opportunity Tax Credit, plus
+(2) the Lifetime Learning Credit.
+
+(b) American Opportunity Tax Credit.--
+(1) Per student credit.-- In the case of any eligible student for whom an election
+is made under this section, the American Opportunity Tax Credit is an amount equal
+to the sum of--
+(A) 100 percent of so much of the qualified tuition and related expenses paid by
+the taxpayer during the taxable year (for education furnished to the eligible
+student during any academic period beginning in such taxable year) as does not
+exceed $2,000, plus
+(B) 25 percent of such expenses so paid as exceeds $2,000 but does not exceed $4,000.
+
+(c) Lifetime Learning Credit.--
+(1) Per taxpayer credit.-- The Lifetime Learning Credit for any taxable year is an
+amount equal to 20 percent of so much of the qualified tuition and related expenses
+paid by the taxpayer during the taxable year (for education furnished during any
+academic period beginning in such taxable year) as does not exceed $10,000.
+
+(d) Limitation based on modified adjusted gross income.--
+(1) In general.-- The amount which would (but for this subsection) be taken into
+account under this section for the taxable year shall be reduced (but not below zero)
+by the amount determined under paragraph (2).
+(2) Amount of reduction.-- The amount determined under this paragraph is the amount
+which bears the same ratio to the amount which would be so taken into account as--
+(A) the excess of--
+(i) the taxpayer's modified adjusted gross income for such taxable year, over
+(ii) $80,000 ($160,000 in the case of a joint return), bears to
+(B) $10,000 ($20,000 in the case of a joint return).
+
+(i) Portion of American opportunity tax credit made refundable.--
+Forty percent of so much of the credit allowed under subsection (a) as is
+attributable to the American Opportunity Tax Credit (determined after application
+of subsection (d) and without regard to this paragraph and section 26(a)) shall
+be treated as a credit allowable under subpart C (and not allowed under this
+subpart). The preceding sentence shall not apply to any taxpayer for any taxable
+year if such taxpayer is a child to whom subsection (g) of section 1 applies for
+such taxable year.
 """
 
-# 26 USC 25A(i)(1)(A) - First tier limit for AOC
+# =============================================================================
+# PARAMETERS - American Opportunity Tax Credit per 25A(b)
+# =============================================================================
+
+# 25A(b)(1)(A) - First tier limit for AOC
 parameter aoc_first_tier_limit:
-  description: "Maximum expenses at 100% rate for American Opportunity Credit"
-  indexed_by: statute/26/25A/h
+  description: "Maximum expenses at 100% rate for American Opportunity Credit per 25A(b)(1)(A)"
   unit: USD
   values:
     2009-01-01: 2_000
 
-# 26 USC 25A(i)(1)(A) - First tier rate for AOC
+# 25A(b)(1)(A) - First tier rate for AOC
 parameter aoc_first_tier_rate:
-  description: "Credit rate for first tier of qualified expenses per 26 USC 25A(i)(1)(A)"
-  unit: /1
+  description: "Credit rate for first tier of qualified expenses per 25A(b)(1)(A)"
+  unit: rate
   values:
     2009-01-01: 1.0
 
-# 26 USC 25A(i)(1)(B) - Second tier limit for AOC
+# 25A(b)(1)(B) - Second tier limit for AOC
 parameter aoc_second_tier_limit:
-  description: "Maximum total expenses eligible for American Opportunity Credit"
-  indexed_by: statute/26/25A/h
+  description: "Maximum total expenses eligible for American Opportunity Credit per 25A(b)(1)(B)"
   unit: USD
   values:
     2009-01-01: 4_000
 
-# 26 USC 25A(i)(1)(B) - Second tier rate for AOC
+# 25A(b)(1)(B) - Second tier rate for AOC
 parameter aoc_second_tier_rate:
-  description: "Credit rate for second tier of qualified expenses per 26 USC 25A(i)(1)(B)"
-  unit: /1
+  description: "Credit rate for second tier of qualified expenses per 25A(b)(1)(B)"
+  unit: rate
   values:
     2009-01-01: 0.25
+
+# =============================================================================
+# PARAMETERS - Lifetime Learning Credit per 25A(c)
+# =============================================================================
+
+# 25A(c)(1) - Maximum expenses for LLC
+parameter llc_expense_limit:
+  description: "Maximum qualified expenses for Lifetime Learning Credit per 25A(c)(1)"
+  unit: USD
+  values:
+    1998-01-01: 10_000
+
+# 25A(c)(1) - LLC rate
+parameter llc_rate:
+  description: "Credit rate for Lifetime Learning Credit per 25A(c)(1)"
+  unit: rate
+  values:
+    1998-01-01: 0.20
+
+# =============================================================================
+# PARAMETERS - Income Phaseout per 25A(d)
+# =============================================================================
+
+# 25A(d)(2)(A)(ii) - Phaseout threshold for single filers
+parameter phaseout_threshold_single:
+  description: "MAGI threshold where phaseout begins for single filers per 25A(d)(2)(A)(ii)"
+  unit: USD
+  indexed_by: statute/26/25A/h
+  values:
+    2024-01-01: 80_000
+    2009-01-01: 80_000
+
+# 25A(d)(2)(A)(ii) - Phaseout threshold for joint filers
+parameter phaseout_threshold_joint:
+  description: "MAGI threshold where phaseout begins for joint filers per 25A(d)(2)(A)(ii)"
+  unit: USD
+  indexed_by: statute/26/25A/h
+  values:
+    2024-01-01: 160_000
+    2009-01-01: 160_000
+
+# 25A(d)(2)(B) - Phaseout range for single filers
+parameter phaseout_range_single:
+  description: "Income range over which credit phases out for single filers per 25A(d)(2)(B)"
+  unit: USD
+  values:
+    2024-01-01: 10_000
+    2009-01-01: 10_000
+
+# 25A(d)(2)(B) - Phaseout range for joint filers
+parameter phaseout_range_joint:
+  description: "Income range over which credit phases out for joint filers per 25A(d)(2)(B)"
+  unit: USD
+  values:
+    2024-01-01: 20_000
+    2009-01-01: 20_000
+
+# =============================================================================
+# PARAMETERS - Refundable Portion per 25A(i)
+# =============================================================================
+
+# 25A(i) - Refundable portion rate
+parameter aoc_refundable_rate:
+  description: "Portion of AOC that is refundable per 25A(i)"
+  unit: rate
+  values:
+    2009-01-01: 0.40
+
+# =============================================================================
+# INPUTS
+# =============================================================================
 
 input aoc_qualified_expenses:
   entity: TaxUnit
@@ -48,65 +153,562 @@ input aoc_qualified_expenses:
   dtype: Money
   unit: USD
   label: "AOC Qualified Expenses"
-  description: "Qualified tuition and related expenses for American Opportunity Credit"
+  description: "Qualified tuition and related expenses for American Opportunity Credit per student"
   default: 0
 
-variable education_credits_validation:
+input llc_qualified_expenses:
   entity: TaxUnit
   period: Year
   dtype: Money
   unit: USD
-  label: "Education Credit"
-  description: "Total education credit claimed per 26 USC § 25A"
-  syntax: python
+  label: "LLC Qualified Expenses"
+  description: "Qualified tuition and related expenses for Lifetime Learning Credit (all students combined)"
+  default: 0
+
+input education_credit_magi:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Modified AGI for Education Credits"
+  description: "Modified adjusted gross income for 25A(d) phaseout calculation"
+  default: 0
+
+input is_joint_return:
+  entity: TaxUnit
+  period: Year
+  dtype: Boolean
+  label: "Joint Return"
+  description: "Whether filing a joint return for 25A(d) phaseout thresholds"
+  default: false
+
+input claims_aoc:
+  entity: TaxUnit
+  period: Year
+  dtype: Boolean
+  label: "Claims AOC"
+  description: "Whether taxpayer elects American Opportunity Credit (cannot claim both for same student)"
+  default: true
+
+input is_kiddie_tax_child:
+  entity: TaxUnit
+  period: Year
+  dtype: Boolean
+  label: "Subject to Kiddie Tax"
+  description: "Whether taxpayer is a child subject to section 1(g) kiddie tax per 25A(i)"
+  default: false
+
+input num_aoc_eligible_students:
+  entity: TaxUnit
+  period: Year
+  dtype: Integer
+  label: "Number of AOC Eligible Students"
+  description: "Number of eligible students for AOC (first 4 years of postsecondary education)"
+  default: 1
+
+# =============================================================================
+# VARIABLES - American Opportunity Tax Credit Calculation
+# =============================================================================
+
+# 25A(b)(1) - AOC before phaseout (per student)
+variable aoc_per_student_before_phaseout:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "AOC Per Student Before Phaseout"
+  description: "American Opportunity Credit per student before income phaseout per 25A(b)(1)"
   formula: |
-    # 100% of first $2,000 + 25% of next $2,000 = max $2,500
-    expenses = aoc_qualified_expenses
-    first_tier = min(expenses, aoc_first_tier_limit) * aoc_first_tier_rate
-    second_tier_expenses = max(0, min(expenses, aoc_second_tier_limit) - aoc_first_tier_limit)
+    # 100% of first $2,000 + 25% of next $2,000 = max $2,500 per student
+    first_tier = min(aoc_qualified_expenses, aoc_first_tier_limit) * aoc_first_tier_rate
+    second_tier_expenses = max(0, min(aoc_qualified_expenses, aoc_second_tier_limit) - aoc_first_tier_limit)
     second_tier = second_tier_expenses * aoc_second_tier_rate
     return first_tier + second_tier
-  default: 0
   tests:
-    - name: "No qualified expenses results in zero credit"
+    - name: "Zero expenses"
       period: 2024
       inputs:
         aoc_qualified_expenses: 0
       expect: 0
-    - name: "Expenses below first tier limit - full 100% credit"
+
+    - name: "Expenses below first tier"
       period: 2024
       inputs:
         aoc_qualified_expenses: 1_500
-      # $1,500 * 100% = $1,500
       expect: 1_500
-    - name: "Expenses at first tier limit exactly"
+
+    - name: "Expenses at first tier limit"
       period: 2024
       inputs:
         aoc_qualified_expenses: 2_000
-      # $2,000 * 100% = $2,000 (at parameter limit)
       expect: 2_000
-    - name: "Expenses in second tier - partial 25% credit"
+
+    - name: "Expenses in second tier"
       period: 2024
       inputs:
         aoc_qualified_expenses: 3_000
-      # First tier: $2,000 * 100% = $2,000
-      # Second tier: ($3,000 - $2,000) * 25% = $250
-      # Total: $2,250
       expect: 2_250
-    - name: "Maximum credit at second tier limit"
+
+    - name: "Maximum credit at expense cap"
       period: 2024
       inputs:
         aoc_qualified_expenses: 4_000
-      # First tier: $2,000 * 100% = $2,000
-      # Second tier: ($4,000 - $2,000) * 25% = $500
-      # Total: $2,500 (maximum AOTC)
       expect: 2_500
-    - name: "Expenses exceed limit - credit capped at maximum"
+
+    - name: "Expenses exceed cap"
       period: 2024
       inputs:
         aoc_qualified_expenses: 10_000
-      # Expenses capped at $4,000 for credit calculation
-      # First tier: $2,000 * 100% = $2,000
-      # Second tier: ($4,000 - $2,000) * 25% = $500
-      # Total: $2,500 (maximum AOTC)
+      expect: 2_500
+
+# =============================================================================
+# VARIABLES - Lifetime Learning Credit Calculation
+# =============================================================================
+
+# 25A(c)(1) - LLC before phaseout
+variable llc_before_phaseout:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "LLC Before Phaseout"
+  description: "Lifetime Learning Credit before income phaseout per 25A(c)(1)"
+  formula: |
+    # 20% of up to $10,000 = max $2,000 per taxpayer
+    eligible_expenses = min(llc_qualified_expenses, llc_expense_limit)
+    return eligible_expenses * llc_rate
+  tests:
+    - name: "Zero expenses"
+      period: 2024
+      inputs:
+        llc_qualified_expenses: 0
+      expect: 0
+
+    - name: "Low expenses"
+      period: 2024
+      inputs:
+        llc_qualified_expenses: 5_000
+      expect: 1_000
+
+    - name: "Maximum credit"
+      period: 2024
+      inputs:
+        llc_qualified_expenses: 10_000
+      expect: 2_000
+
+    - name: "Expenses exceed limit"
+      period: 2024
+      inputs:
+        llc_qualified_expenses: 15_000
+      expect: 2_000
+
+# =============================================================================
+# VARIABLES - Income Phaseout per 25A(d)
+# =============================================================================
+
+# 25A(d) - Phaseout threshold based on filing status
+variable education_credit_phaseout_threshold:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Education Credit Phaseout Threshold"
+  description: "MAGI threshold where phaseout begins per 25A(d)(2)(A)(ii)"
+  formula: |
+    if is_joint_return:
+      return phaseout_threshold_joint
+    return phaseout_threshold_single
+  tests:
+    - name: "Single filer"
+      period: 2024
+      inputs:
+        is_joint_return: false
+      expect: 80_000
+
+    - name: "Joint filer"
+      period: 2024
+      inputs:
+        is_joint_return: true
+      expect: 160_000
+
+# 25A(d) - Phaseout range based on filing status
+variable education_credit_phaseout_range:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Education Credit Phaseout Range"
+  description: "Income range over which credit phases out per 25A(d)(2)(B)"
+  formula: |
+    if is_joint_return:
+      return phaseout_range_joint
+    return phaseout_range_single
+  tests:
+    - name: "Single filer"
+      period: 2024
+      inputs:
+        is_joint_return: false
+      expect: 10_000
+
+    - name: "Joint filer"
+      period: 2024
+      inputs:
+        is_joint_return: true
+      expect: 20_000
+
+# 25A(d)(2) - Phaseout rate calculation
+variable education_credit_phaseout_rate:
+  entity: TaxUnit
+  period: Year
+  dtype: Rate
+  unit: rate
+  label: "Education Credit Phaseout Rate"
+  description: "Rate at which education credits are reduced based on MAGI per 25A(d)(2)"
+  formula: |
+    excess_magi = max(0, education_credit_magi - education_credit_phaseout_threshold)
+    rate = excess_magi / education_credit_phaseout_range
+    return min(1, rate)
+  tests:
+    - name: "Single - below threshold"
+      period: 2024
+      inputs:
+        education_credit_magi: 70_000
+        education_credit_phaseout_threshold: 80_000
+        education_credit_phaseout_range: 10_000
+      expect: 0
+
+    - name: "Single - at threshold"
+      period: 2024
+      inputs:
+        education_credit_magi: 80_000
+        education_credit_phaseout_threshold: 80_000
+        education_credit_phaseout_range: 10_000
+      expect: 0
+
+    - name: "Single - 50% phaseout"
+      period: 2024
+      inputs:
+        education_credit_magi: 85_000
+        education_credit_phaseout_threshold: 80_000
+        education_credit_phaseout_range: 10_000
+      expect: 0.5
+
+    - name: "Single - full phaseout"
+      period: 2024
+      inputs:
+        education_credit_magi: 90_000
+        education_credit_phaseout_threshold: 80_000
+        education_credit_phaseout_range: 10_000
+      expect: 1
+
+    - name: "Single - above full phaseout"
+      period: 2024
+      inputs:
+        education_credit_magi: 100_000
+        education_credit_phaseout_threshold: 80_000
+        education_credit_phaseout_range: 10_000
+      expect: 1
+
+    - name: "Joint - 50% phaseout"
+      period: 2024
+      inputs:
+        education_credit_magi: 170_000
+        education_credit_phaseout_threshold: 160_000
+        education_credit_phaseout_range: 20_000
+      expect: 0.5
+
+# =============================================================================
+# VARIABLES - Total AOC before phaseout (all students)
+# =============================================================================
+
+variable aoc_total_before_phaseout:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Total AOC Before Phaseout"
+  description: "Total American Opportunity Credit for all eligible students before phaseout"
+  formula: |
+    if not claims_aoc:
+      return 0
+    return aoc_per_student_before_phaseout * num_aoc_eligible_students
+  tests:
+    - name: "One student"
+      period: 2024
+      inputs:
+        claims_aoc: true
+        aoc_per_student_before_phaseout: 2_500
+        num_aoc_eligible_students: 1
+      expect: 2_500
+
+    - name: "Two students"
+      period: 2024
+      inputs:
+        claims_aoc: true
+        aoc_per_student_before_phaseout: 2_500
+        num_aoc_eligible_students: 2
+      expect: 5_000
+
+    - name: "Claims LLC instead"
+      period: 2024
+      inputs:
+        claims_aoc: false
+        aoc_per_student_before_phaseout: 2_500
+        num_aoc_eligible_students: 1
+      expect: 0
+
+# =============================================================================
+# VARIABLES - Credits after phaseout
+# =============================================================================
+
+# 25A(d) - AOC after phaseout
+variable american_opportunity_credit:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "American Opportunity Credit"
+  description: "American Opportunity Credit after income phaseout per 25A(a)(1) and 25A(d)"
+  formula: |
+    pre_phaseout = aoc_total_before_phaseout
+    reduction = pre_phaseout * education_credit_phaseout_rate
+    return max(0, pre_phaseout - reduction)
+  tests:
+    - name: "Low income - full credit"
+      period: 2024
+      inputs:
+        aoc_total_before_phaseout: 2_500
+        education_credit_phaseout_rate: 0
+      expect: 2_500
+
+    - name: "50% phaseout"
+      period: 2024
+      inputs:
+        aoc_total_before_phaseout: 2_500
+        education_credit_phaseout_rate: 0.5
+      expect: 1_250
+
+    - name: "Full phaseout"
+      period: 2024
+      inputs:
+        aoc_total_before_phaseout: 2_500
+        education_credit_phaseout_rate: 1
+      expect: 0
+
+    - name: "Two students with partial phaseout"
+      period: 2024
+      inputs:
+        aoc_total_before_phaseout: 5_000
+        education_credit_phaseout_rate: 0.3
+      expect: 3_500
+
+# 25A(d) - LLC after phaseout
+variable lifetime_learning_credit:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Lifetime Learning Credit"
+  description: "Lifetime Learning Credit after income phaseout per 25A(a)(2) and 25A(d)"
+  formula: |
+    # Cannot claim LLC if claiming AOC
+    if claims_aoc:
+      return 0
+    pre_phaseout = llc_before_phaseout
+    reduction = pre_phaseout * education_credit_phaseout_rate
+    return max(0, pre_phaseout - reduction)
+  tests:
+    - name: "Claims AOC - no LLC"
+      period: 2024
+      inputs:
+        claims_aoc: true
+        llc_before_phaseout: 2_000
+        education_credit_phaseout_rate: 0
+      expect: 0
+
+    - name: "Claims LLC - full credit"
+      period: 2024
+      inputs:
+        claims_aoc: false
+        llc_before_phaseout: 2_000
+        education_credit_phaseout_rate: 0
+      expect: 2_000
+
+    - name: "Claims LLC - 50% phaseout"
+      period: 2024
+      inputs:
+        claims_aoc: false
+        llc_before_phaseout: 2_000
+        education_credit_phaseout_rate: 0.5
+      expect: 1_000
+
+    - name: "Claims LLC - full phaseout"
+      period: 2024
+      inputs:
+        claims_aoc: false
+        llc_before_phaseout: 2_000
+        education_credit_phaseout_rate: 1
+      expect: 0
+
+# =============================================================================
+# VARIABLES - Refundable and Nonrefundable Portions per 25A(i)
+# =============================================================================
+
+# 25A(i) - Refundable portion of AOC
+variable aoc_refundable:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Refundable AOC"
+  description: "Refundable portion of American Opportunity Credit (40%) per 25A(i)"
+  formula: |
+    # 40% of AOC is refundable, but not for kiddie tax children
+    if is_kiddie_tax_child:
+      return 0
+    return american_opportunity_credit * aoc_refundable_rate
+  tests:
+    - name: "Full AOC - 40% refundable"
+      period: 2024
+      inputs:
+        american_opportunity_credit: 2_500
+        is_kiddie_tax_child: false
+      expect: 1_000
+
+    - name: "Partial AOC"
+      period: 2024
+      inputs:
+        american_opportunity_credit: 1_250
+        is_kiddie_tax_child: false
+      expect: 500
+
+    - name: "Kiddie tax - no refundable portion"
+      period: 2024
+      inputs:
+        american_opportunity_credit: 2_500
+        is_kiddie_tax_child: true
+      expect: 0
+
+    - name: "Zero credit"
+      period: 2024
+      inputs:
+        american_opportunity_credit: 0
+        is_kiddie_tax_child: false
+      expect: 0
+
+# Nonrefundable portion of AOC
+variable aoc_nonrefundable:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Nonrefundable AOC"
+  description: "Nonrefundable portion of American Opportunity Credit (60% or 100% if kiddie tax)"
+  formula: |
+    return american_opportunity_credit - aoc_refundable
+  tests:
+    - name: "Full AOC - 60% nonrefundable"
+      period: 2024
+      inputs:
+        american_opportunity_credit: 2_500
+        aoc_refundable: 1_000
+      expect: 1_500
+
+    - name: "Kiddie tax - 100% nonrefundable"
+      period: 2024
+      inputs:
+        american_opportunity_credit: 2_500
+        aoc_refundable: 0
+      expect: 2_500
+
+# =============================================================================
+# VARIABLES - Total Education Credit per 25A(a)
+# =============================================================================
+
+# 25A(a) - Total education credit
+variable education_credit:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Total Education Credit"
+  description: "Total education credit (AOC + LLC) per 25A(a)"
+  formula: |
+    return american_opportunity_credit + lifetime_learning_credit
+  tests:
+    - name: "AOC only"
+      period: 2024
+      inputs:
+        american_opportunity_credit: 2_500
+        lifetime_learning_credit: 0
+      expect: 2_500
+
+    - name: "LLC only"
+      period: 2024
+      inputs:
+        american_opportunity_credit: 0
+        lifetime_learning_credit: 2_000
+      expect: 2_000
+
+    - name: "Zero credit"
+      period: 2024
+      inputs:
+        american_opportunity_credit: 0
+        lifetime_learning_credit: 0
+      expect: 0
+
+# Refundable portion of total education credit
+variable education_credit_refundable:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Refundable Education Credit"
+  description: "Refundable portion of education credit (only AOC has refundable portion)"
+  formula: |
+    # Only AOC has a refundable portion; LLC is fully nonrefundable
+    return aoc_refundable
+  tests:
+    - name: "AOC with refundable"
+      period: 2024
+      inputs:
+        aoc_refundable: 1_000
+      expect: 1_000
+
+    - name: "Zero refundable"
+      period: 2024
+      inputs:
+        aoc_refundable: 0
+      expect: 0
+
+# Nonrefundable portion of total education credit
+variable education_credit_nonrefundable:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Nonrefundable Education Credit"
+  description: "Nonrefundable portion of education credit (AOC nonrefundable + LLC)"
+  formula: |
+    return aoc_nonrefundable + lifetime_learning_credit
+  tests:
+    - name: "AOC nonrefundable + LLC"
+      period: 2024
+      inputs:
+        aoc_nonrefundable: 1_500
+        lifetime_learning_credit: 0
+      expect: 1_500
+
+    - name: "LLC only"
+      period: 2024
+      inputs:
+        aoc_nonrefundable: 0
+        lifetime_learning_credit: 2_000
+      expect: 2_000
+
+    - name: "Both credits"
+      period: 2024
+      inputs:
+        aoc_nonrefundable: 1_500
+        lifetime_learning_credit: 1_000
       expect: 2_500
