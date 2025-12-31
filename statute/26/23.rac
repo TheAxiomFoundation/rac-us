@@ -1,0 +1,614 @@
+# 26 USC Section 23 - Adoption Credit
+
+text: """
+(a) Allowance of credit.--
+(1) In general.-- In the case of an individual, there shall be allowed as a credit
+against the tax imposed by this chapter the amount of the qualified adoption expenses
+paid or incurred by the taxpayer.
+
+(2) Year credit allowed.-- The credit under paragraph (1) with respect to any expense
+shall be allowed--
+(A) in the case of any expense paid or incurred before the taxable year in which such
+adoption becomes final, for the taxable year following the taxable year during which
+such expense is paid or incurred, and
+(B) in the case of an expense paid or incurred during or after the taxable year in
+which such adoption becomes final, for the taxable year in which such expense is
+paid or incurred.
+
+(3) $10,000 credit for adoption of child with special needs.-- In the case of an
+adoption of a child with special needs which becomes final during a taxable year, the
+taxpayer shall be treated as having paid during such year qualified adoption expenses
+with respect to such adoption in an amount equal to the excess (if any) of $10,000 over
+the aggregate qualified adoption expenses actually paid or incurred by the taxpayer
+with respect to such adoption during such taxable year and all prior taxable years.
+
+(4) Portion of credit refundable.-- So much of the credit allowed under paragraph (1)
+as does not exceed $5,000 shall be treated as a credit allowed under subpart C and not
+as a credit allowed under this subpart.
+
+(b) Limitations.--
+(1) Dollar limitation.-- The aggregate amount of qualified adoption expenses which may
+be taken into account under subsection (a) for all taxable years with respect to the
+adoption of a child by the taxpayer shall not exceed $10,000.
+
+(2) Income limitation.--
+(A) In general.-- The amount allowable as a credit under subsection (a) for any taxable
+year (determined without regard to subsection (c)) shall be reduced (but not below zero)
+by an amount which bears the same ratio to the amount so allowable (determined without
+regard to this paragraph but with regard to paragraph (1)) as--
+(i) the amount (if any) by which the taxpayer's adjusted gross income exceeds $150,000,
+bears to
+(ii) $40,000.
+
+(B) Determination of adjusted gross income.-- For purposes of subparagraph (A), adjusted
+gross income shall be determined without regard to sections 911, 931, and 933.
+
+(3) Denial of double benefit.--
+(A) In general.-- No credit shall be allowed under subsection (a) for any expense for
+which a deduction or credit is allowed under any other provision of this chapter.
+(B) Grants.-- No credit shall be allowed under subsection (a) for any expense to the
+extent that funds for such expense are received under any Federal, State, or local program.
+
+(c) Carryforwards of unused credit.--
+(1) In general.-- If the portion of the credit allowable under subsection (a) which is
+allowed under this subpart for any taxable year exceeds the limitation imposed by section
+26(a) for such taxable year reduced by the sum of the credits allowable under this subpart
+(other than this section and section 25D), such excess shall be carried to the succeeding
+taxable year and added to the portion of the credit allowable under subsection (a) which
+is allowed under this subpart for such taxable year.
+
+(2) Limitation.-- No credit may be carried forward under this subsection to any taxable
+year following the fifth taxable year after the taxable year in which the credit arose.
+For purposes of the preceding sentence, credits shall be treated as used on a first-in
+first-out basis.
+
+(d) Definitions.--
+(1) Qualified adoption expenses.-- The term 'qualified adoption expenses' means reasonable
+and necessary adoption fees, court costs, attorney fees, and other expenses--
+(A) which are directly related to, and the principal purpose of which is for, the legal
+adoption of an eligible child by the taxpayer,
+(B) which are not incurred in violation of State or Federal law or in carrying out any
+surrogate parenting arrangement,
+(C) which are not expenses in connection with the adoption by an individual of a child
+who is the child of such individual's spouse, and
+(D) which are not reimbursed under an employer program or otherwise.
+
+(2) Eligible child.-- The term 'eligible child' means any individual who--
+(A) has not attained age 18, or
+(B) is physically or mentally incapable of caring for himself.
+
+(3) Child with special needs.-- The term 'child with special needs' means any child if--
+(A) a State or Indian tribal government has determined that the child cannot or should
+not be returned to the home of his parents,
+(B) such State or Indian tribal government has determined that there exists with respect
+to the child a specific factor or condition (such as his ethnic background, age, or
+membership in a minority or sibling group, or the presence of factors such as medical
+conditions or physical, mental, or emotional handicaps) because of which it is reasonable
+to conclude that such child cannot be placed with adoptive parents without providing
+adoption assistance, and
+(C) such child is a citizen or resident of the United States (as defined in section
+217(h)(3)).
+
+(h) Adjustments for inflation.--
+(1) In general.-- In the case of a taxable year beginning after December 31, 2002, each
+of the dollar amounts in paragraphs (3) and (4) of subsection (a) and paragraphs (1) and
+(2)(A)(i) of subsection (b) shall be increased by an amount equal to--
+(A) such dollar amount, multiplied by
+(B) the cost-of-living adjustment determined under section 1(f)(3) for the calendar year
+in which the taxable year begins, determined by substituting 'calendar year 2001' for
+'calendar year 2016' in subparagraph (A)(ii) thereof.
+
+(2) Rounding.-- If any amount as increased under paragraph (1) is not a multiple of $10,
+such amount shall be rounded to the nearest multiple of $10.
+"""
+
+# =============================================================================
+# PARAMETERS - per 23(b)(1), 23(b)(2), 23(a)(3), 23(a)(4), indexed per 23(h)
+# =============================================================================
+
+# Maximum credit per child per 23(b)(1) - indexed per 23(h)
+parameter credit_dollar_limit:
+  description: "Maximum qualified adoption expenses per child per 23(b)(1)"
+  unit: USD
+  indexed_by: statute/26/23/h
+  values:
+    2024: 16_810
+    2025: 17_280
+    2002: 10_000
+
+# Special needs deemed expenses per 23(a)(3) - indexed per 23(h)
+parameter special_needs_deemed_expenses:
+  description: "Deemed adoption expenses for special needs adoption per 23(a)(3)"
+  unit: USD
+  indexed_by: statute/26/23/h
+  values:
+    2024: 16_810
+    2025: 17_280
+    2002: 10_000
+
+# Refundable portion limit per 23(a)(4) - indexed per 23(h)(3)
+parameter refundable_credit_limit:
+  description: "Maximum refundable portion of adoption credit per 23(a)(4)"
+  unit: USD
+  indexed_by: statute/26/23/h
+  values:
+    2024: 5_000
+    2025: 5_000
+
+# AGI phaseout threshold per 23(b)(2)(A)(i) - indexed per 23(h)
+parameter phaseout_agi_threshold:
+  description: "AGI threshold where adoption credit phaseout begins per 23(b)(2)(A)(i)"
+  unit: USD
+  indexed_by: statute/26/23/h
+  values:
+    2024: 252_150
+    2025: 259_190
+    2002: 150_000
+
+# Phaseout range per 23(b)(2)(A)(ii) - indexed per 23(h)
+parameter phaseout_range:
+  description: "AGI range over which credit phases out per 23(b)(2)(A)(ii)"
+  unit: USD
+  indexed_by: statute/26/23/h
+  values:
+    2024: 40_000
+    2025: 40_000
+    2002: 40_000
+
+# Carryforward limit per 23(c)(2)
+parameter carryforward_years:
+  description: "Maximum years unused credit may be carried forward per 23(c)(2)"
+  unit: years
+  values:
+    2002: 5
+
+# =============================================================================
+# INPUTS
+# =============================================================================
+
+input qualified_adoption_expenses:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Qualified Adoption Expenses"
+  description: "Qualified adoption expenses per 26 USC 23(d)(1)"
+  default: 0
+
+input is_special_needs_adoption:
+  entity: TaxUnit
+  period: Year
+  dtype: Boolean
+  label: "Special Needs Adoption"
+  description: "Whether the adoption is of a child with special needs per 23(d)(3)"
+  default: false
+
+input adoption_is_final:
+  entity: TaxUnit
+  period: Year
+  dtype: Boolean
+  label: "Adoption Finalized"
+  description: "Whether the adoption became final during the tax year"
+  default: true
+
+input adoption_credit_agi:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Modified AGI for Adoption Credit"
+  description: "AGI for 23(b)(2) phaseout, determined per 23(b)(2)(B) - without regard to 911, 931, 933"
+  default: 0
+
+input adoption_credit_carryforward:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Adoption Credit Carryforward"
+  description: "Unused adoption credit carried forward from prior years per 23(c)"
+  default: 0
+
+input regular_tax_liability:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Regular Tax Liability"
+  description: "Tax liability before credits for carryforward calculation"
+  default: 0
+
+input other_nonrefundable_credits:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Other Nonrefundable Credits"
+  description: "Sum of other nonrefundable credits (excluding adoption credit)"
+  default: 0
+
+# =============================================================================
+# VARIABLES
+# =============================================================================
+
+# 23(a)(3): Deemed expenses for special needs adoption
+variable adoption_expenses_for_credit:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Adoption Expenses for Credit Calculation"
+  description: "Qualified expenses including special needs deemed amount per 23(a)(3)"
+  formula: |
+    # For special needs adoption, treat as if expenses equal the full limit
+    # even if actual expenses were less per 23(a)(3)
+    if is_special_needs_adoption and adoption_is_final:
+      # Deemed expenses = max(actual expenses, dollar limit)
+      return max(qualified_adoption_expenses, special_needs_deemed_expenses)
+    return qualified_adoption_expenses
+  tests:
+    - name: "Special needs - full deemed expenses"
+      period: 2024
+      inputs:
+        is_special_needs_adoption: true
+        adoption_is_final: true
+        qualified_adoption_expenses: 5_000
+      expect: 16_810
+
+    - name: "Special needs - actual expenses exceed limit"
+      period: 2024
+      inputs:
+        is_special_needs_adoption: true
+        adoption_is_final: true
+        qualified_adoption_expenses: 20_000
+      expect: 20_000
+
+    - name: "Special needs - not final"
+      period: 2024
+      inputs:
+        is_special_needs_adoption: true
+        adoption_is_final: false
+        qualified_adoption_expenses: 5_000
+      expect: 5_000
+
+    - name: "Non-special needs adoption"
+      period: 2024
+      inputs:
+        is_special_needs_adoption: false
+        adoption_is_final: true
+        qualified_adoption_expenses: 12_000
+      expect: 12_000
+
+    - name: "Zero expenses"
+      period: 2024
+      inputs:
+        is_special_needs_adoption: false
+        adoption_is_final: true
+        qualified_adoption_expenses: 0
+      expect: 0
+
+# 23(b)(1): Credit before phaseout - limited by dollar cap
+variable adoption_credit_before_phaseout:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Adoption Credit Before Phaseout"
+  description: "Adoption credit before AGI phaseout per 23(b)(1)"
+  formula: |
+    # Cannot exceed dollar limitation per 23(b)(1)
+    return min(adoption_expenses_for_credit, credit_dollar_limit)
+  tests:
+    - name: "Expenses below limit"
+      period: 2024
+      inputs:
+        adoption_expenses_for_credit: 10_000
+      expect: 10_000
+
+    - name: "Expenses exceed dollar limit"
+      period: 2024
+      inputs:
+        adoption_expenses_for_credit: 25_000
+      expect: 16_810
+
+    - name: "Expenses at limit"
+      period: 2024
+      inputs:
+        adoption_expenses_for_credit: 16_810
+      expect: 16_810
+
+    - name: "Zero expenses"
+      period: 2024
+      inputs:
+        adoption_expenses_for_credit: 0
+      expect: 0
+
+# 23(b)(2): AGI phaseout rate calculation
+variable adoption_credit_phaseout_rate:
+  entity: TaxUnit
+  period: Year
+  dtype: Rate
+  unit: rate
+  label: "Adoption Credit Phaseout Rate"
+  description: "Rate at which credit is reduced based on AGI per 23(b)(2)"
+  formula: |
+    excess_agi = max(0, adoption_credit_agi - phaseout_agi_threshold)
+    # Phaseout rate = excess AGI / phaseout range, capped at 1 (100% phaseout)
+    rate = excess_agi / phaseout_range
+    return min(1, rate)
+  tests:
+    - name: "AGI below threshold - no phaseout"
+      period: 2024
+      inputs:
+        adoption_credit_agi: 200_000
+      expect: 0
+
+    - name: "AGI at threshold - no phaseout"
+      period: 2024
+      inputs:
+        adoption_credit_agi: 252_150
+      expect: 0
+
+    - name: "AGI $10k over threshold - 25% phaseout"
+      period: 2024
+      inputs:
+        adoption_credit_agi: 262_150
+      expect: 0.25
+
+    - name: "AGI $20k over threshold - 50% phaseout"
+      period: 2024
+      inputs:
+        adoption_credit_agi: 272_150
+      expect: 0.5
+
+    - name: "AGI at full phaseout - 100%"
+      period: 2024
+      inputs:
+        adoption_credit_agi: 292_150
+      expect: 1
+
+    - name: "AGI above full phaseout - still 100%"
+      period: 2024
+      inputs:
+        adoption_credit_agi: 350_000
+      expect: 1
+
+# 23(a)(1) and 23(b)(2): Credit after phaseout (current year)
+variable adoption_credit_current_year:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Current Year Adoption Credit"
+  description: "Adoption credit for current year after AGI phaseout per 23(a)(1) and 23(b)(2)"
+  formula: |
+    pre_phaseout = adoption_credit_before_phaseout
+    reduction = pre_phaseout * adoption_credit_phaseout_rate
+    return max(0, pre_phaseout - reduction)
+  tests:
+    - name: "Low income - full credit"
+      period: 2024
+      inputs:
+        adoption_credit_before_phaseout: 15_000
+        adoption_credit_phaseout_rate: 0
+      expect: 15_000
+
+    - name: "Income at threshold - full credit"
+      period: 2024
+      inputs:
+        adoption_credit_before_phaseout: 16_810
+        adoption_credit_phaseout_rate: 0
+      expect: 16_810
+
+    - name: "Income $20k over threshold - 50% reduction"
+      period: 2024
+      inputs:
+        adoption_credit_before_phaseout: 16_810
+        adoption_credit_phaseout_rate: 0.5
+      expect: 8_405
+
+    - name: "Income at full phaseout - no credit"
+      period: 2024
+      inputs:
+        adoption_credit_before_phaseout: 16_810
+        adoption_credit_phaseout_rate: 1
+      expect: 0
+
+    - name: "Partial expenses with partial phaseout"
+      period: 2024
+      inputs:
+        adoption_credit_before_phaseout: 8_000
+        adoption_credit_phaseout_rate: 0.25
+      expect: 6_000
+
+# 23(c)(1): Total available credit including carryforward
+variable adoption_credit_available:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Available Adoption Credit"
+  description: "Total adoption credit available including carryforward per 23(c)(1)"
+  formula: |
+    return adoption_credit_current_year + adoption_credit_carryforward
+  tests:
+    - name: "Current year only"
+      period: 2024
+      inputs:
+        adoption_credit_current_year: 10_000
+        adoption_credit_carryforward: 0
+      expect: 10_000
+
+    - name: "With carryforward"
+      period: 2024
+      inputs:
+        adoption_credit_current_year: 8_000
+        adoption_credit_carryforward: 5_000
+      expect: 13_000
+
+    - name: "Carryforward only"
+      period: 2024
+      inputs:
+        adoption_credit_current_year: 0
+        adoption_credit_carryforward: 3_000
+      expect: 3_000
+
+# 23(a)(4): Refundable portion of adoption credit
+variable adoption_credit_refundable:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Refundable Adoption Credit"
+  description: "Refundable portion of adoption credit per 23(a)(4)"
+  formula: |
+    # Up to $5,000 of the credit is refundable
+    return min(adoption_credit_available, refundable_credit_limit)
+  tests:
+    - name: "Credit below refundable limit"
+      period: 2024
+      inputs:
+        adoption_credit_available: 3_000
+      expect: 3_000
+
+    - name: "Credit at refundable limit"
+      period: 2024
+      inputs:
+        adoption_credit_available: 5_000
+      expect: 5_000
+
+    - name: "Credit exceeds refundable limit"
+      period: 2024
+      inputs:
+        adoption_credit_available: 16_810
+      expect: 5_000
+
+    - name: "Zero credit"
+      period: 2024
+      inputs:
+        adoption_credit_available: 0
+      expect: 0
+
+# Nonrefundable portion (the rest of the credit)
+variable adoption_credit_nonrefundable:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Nonrefundable Adoption Credit"
+  description: "Nonrefundable portion of adoption credit (total minus refundable)"
+  formula: |
+    return max(0, adoption_credit_available - adoption_credit_refundable)
+  tests:
+    - name: "Credit fully refundable"
+      period: 2024
+      inputs:
+        adoption_credit_available: 3_000
+        adoption_credit_refundable: 3_000
+      expect: 0
+
+    - name: "Credit exceeds refundable limit"
+      period: 2024
+      inputs:
+        adoption_credit_available: 16_810
+        adoption_credit_refundable: 5_000
+      expect: 11_810
+
+    - name: "Credit at refundable limit"
+      period: 2024
+      inputs:
+        adoption_credit_available: 5_000
+        adoption_credit_refundable: 5_000
+      expect: 0
+
+# 23(c): Credit actually used (limited by tax liability for nonrefundable portion)
+variable adoption_credit_used:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Adoption Credit Used"
+  description: "Adoption credit actually used against tax liability"
+  formula: |
+    # Refundable portion always available
+    refundable = adoption_credit_refundable
+    # Nonrefundable portion limited by tax liability after other credits
+    tax_remaining = max(0, regular_tax_liability - other_nonrefundable_credits)
+    nonrefundable_usable = min(adoption_credit_nonrefundable, tax_remaining)
+    return refundable + nonrefundable_usable
+  tests:
+    - name: "Full credit usable - sufficient tax liability"
+      period: 2024
+      inputs:
+        adoption_credit_refundable: 5_000
+        adoption_credit_nonrefundable: 11_810
+        regular_tax_liability: 20_000
+        other_nonrefundable_credits: 0
+      expect: 16_810
+
+    - name: "Low tax liability - partial nonrefundable"
+      period: 2024
+      inputs:
+        adoption_credit_refundable: 5_000
+        adoption_credit_nonrefundable: 11_810
+        regular_tax_liability: 8_000
+        other_nonrefundable_credits: 0
+      expect: 13_000
+
+    - name: "Zero tax liability - refundable only"
+      period: 2024
+      inputs:
+        adoption_credit_refundable: 5_000
+        adoption_credit_nonrefundable: 11_810
+        regular_tax_liability: 0
+        other_nonrefundable_credits: 0
+      expect: 5_000
+
+    - name: "Tax liability consumed by other credits"
+      period: 2024
+      inputs:
+        adoption_credit_refundable: 5_000
+        adoption_credit_nonrefundable: 11_810
+        regular_tax_liability: 15_000
+        other_nonrefundable_credits: 15_000
+      expect: 5_000
+
+# 23(c): Credit to carry forward to next year
+variable adoption_credit_carryforward_next:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Adoption Credit Carryforward to Next Year"
+  description: "Unused nonrefundable adoption credit to carry forward per 23(c)"
+  formula: |
+    # Only nonrefundable portion can be carried forward
+    # Refundable portion is always received as refund
+    tax_remaining = max(0, regular_tax_liability - other_nonrefundable_credits)
+    nonrefundable_used = min(adoption_credit_nonrefundable, tax_remaining)
+    unused_nonrefundable = adoption_credit_nonrefundable - nonrefundable_used
+    return unused_nonrefundable
+  tests:
+    - name: "Full credit used - no carryforward"
+      period: 2024
+      inputs:
+        adoption_credit_nonrefundable: 11_810
+        regular_tax_liability: 20_000
+        other_nonrefundable_credits: 0
+      expect: 0
+
+    - name: "Partial credit used - carryforward remaining"
+      period: 2024
+      inputs:
+        adoption_credit_nonrefundable: 11_810
+        regular_tax_liability: 8_000
+        other_nonrefundable_credits: 0
+      expect: 3_810
+
+    - name: "Zero tax liability - full nonrefundable carries forward"
+      period: 2024
+      inputs:
+        adoption_credit_nonrefundable: 11_810
+        regular_tax_liability: 0
+        other_nonrefundable_credits: 0
+      expect: 11_810
