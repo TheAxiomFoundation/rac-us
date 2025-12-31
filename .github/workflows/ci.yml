@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout cosilico-us
+      - name: Checkout rac-us
         uses: actions/checkout@v4
 
       - name: Set up Python
@@ -33,10 +33,10 @@ jobs:
           pip install pytest
           STATUTE_DIR=$GITHUB_WORKSPACE/statute pytest tests/ -v --ignore=tests/test_amt_e2e.py --ignore=tests/test_ctc_e2e.py --ignore=tests/test_salt_e2e.py
 
-      - name: Checkout cosilico-validators
+      - name: Checkout rac-validators
         uses: actions/checkout@v4
         with:
-          repository: CosilicoAI/cosilico-validators
+          repository: CosilicoAI/rac-validators
           path: validators
           token: ${{ secrets.GITHUB_TOKEN }}
 

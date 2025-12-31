@@ -15,5 +15,5 @@ jobs:
     secrets:
       SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
     with:
-      repo_name: cosilico-us
+      repo_name: rac-us
       jurisdiction: us

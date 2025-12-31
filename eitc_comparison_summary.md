@@ -95,8 +95,8 @@ PolicyEngine US correctly implements the 2024 EITC parameters. The comparison re
 
 ## Files Created
 
-1. `/Users/maxghenis/CosilicoAI/cosilico-us/compare_eitc.py` - Initial comparison script with original test values
-2. `/Users/maxghenis/CosilicoAI/cosilico-us/analyze_eitc_discrepancy.py` - Detailed analysis of Test Case 2
-3. `/Users/maxghenis/CosilicoAI/cosilico-us/inspect_eitc_calculation.py` - Parameter inspection and verification
-4. `/Users/maxghenis/CosilicoAI/cosilico-us/final_eitc_comparison.py` - Final comparison with corrected expected values (all pass)
-5. `/Users/maxghenis/CosilicoAI/cosilico-us/eitc_comparison_summary.md` - This summary report
+1. `/Users/maxghenis/CosilicoAI/rac-us/compare_eitc.py` - Initial comparison script with original test values
+2. `/Users/maxghenis/CosilicoAI/rac-us/analyze_eitc_discrepancy.py` - Detailed analysis of Test Case 2
+3. `/Users/maxghenis/CosilicoAI/rac-us/inspect_eitc_calculation.py` - Parameter inspection and verification
+4. `/Users/maxghenis/CosilicoAI/rac-us/final_eitc_comparison.py` - Final comparison with corrected expected values (all pass)
+5. `/Users/maxghenis/CosilicoAI/rac-us/eitc_comparison_summary.md` - This summary report
