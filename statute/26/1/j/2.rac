@@ -1,0 +1,541 @@
+# 26 USC Section 1(j)(2) - TCJA Tax Rate Tables
+#
+# Tax bracket thresholds and rates for taxable years beginning after December 31, 2017.
+# Base values from Pub. L. 115-97 (Tax Cuts and Jobs Act of 2017).
+# These are the 2018 statutory values; indexed values come from IRS Rev. Proc. guidance.
+
+text: """
+(j) Modifications for taxable years 2018 through 2025.--
+(2) Rate tables.--
+(A) Married individuals filing joint returns and surviving spouses.--The following table
+shall be applied in lieu of the table contained in subsection (a):
+
+If taxable income is:               The tax is:
+Not over $19,050                    10% of taxable income
+Over $19,050 but not over $77,400   $1,905, plus 12% of the excess over $19,050
+Over $77,400 but not over $165,000  $8,907, plus 22% of the excess over $77,400
+Over $165,000 but not over $315,000 $28,179, plus 24% of the excess over $165,000
+Over $315,000 but not over $400,000 $64,179, plus 32% of the excess over $315,000
+Over $400,000 but not over $600,000 $91,379, plus 35% of the excess over $400,000
+Over $600,000                       $161,379, plus 37% of the excess over $600,000
+
+(B) Heads of households.--The following table shall be applied in lieu of the table
+contained in subsection (b):
+
+If taxable income is:               The tax is:
+Not over $13,600                    10% of taxable income
+Over $13,600 but not over $51,800   $1,360, plus 12% of the excess over $13,600
+Over $51,800 but not over $82,500   $5,944, plus 22% of the excess over $51,800
+Over $82,500 but not over $157,500  $12,698, plus 24% of the excess over $82,500
+Over $157,500 but not over $200,000 $30,698, plus 32% of the excess over $157,500
+Over $200,000 but not over $500,000 $44,298, plus 35% of the excess over $200,000
+Over $500,000                       $149,298, plus 37% of the excess over $500,000
+
+(C) Unmarried individuals (other than surviving spouses and heads of households).--
+The following table shall be applied in lieu of the table contained in subsection (c):
+
+If taxable income is:               The tax is:
+Not over $9,525                     10% of taxable income
+Over $9,525 but not over $38,700    $952.50, plus 12% of the excess over $9,525
+Over $38,700 but not over $82,500   $4,453.50, plus 22% of the excess over $38,700
+Over $82,500 but not over $157,500  $14,089.50, plus 24% of the excess over $82,500
+Over $157,500 but not over $200,000 $32,089.50, plus 32% of the excess over $157,500
+Over $200,000 but not over $500,000 $45,689.50, plus 35% of the excess over $200,000
+Over $500,000                       $150,689.50, plus 37% of the excess over $500,000
+
+(D) Married individuals filing separate returns.--The following table shall be applied
+in lieu of the table contained in subsection (d):
+
+If taxable income is:               The tax is:
+Not over $9,525                     10% of taxable income
+Over $9,525 but not over $38,700    $952.50, plus 12% of the excess over $9,525
+Over $38,700 but not over $82,500   $4,453.50, plus 22% of the excess over $38,700
+Over $82,500 but not over $157,500  $14,089.50, plus 24% of the excess over $82,500
+Over $157,500 but not over $200,000 $32,089.50, plus 32% of the excess over $157,500
+Over $200,000 but not over $300,000 $45,689.50, plus 35% of the excess over $200,000
+Over $300,000                       $80,689.50, plus 37% of the excess over $300,000
+"""
+
+# === MARGINAL RATES ===
+# TCJA rates are fixed in statute (not indexed)
+
+parameter rate_1:
+  description: "First marginal rate (10%)"
+  unit: rate
+  values:
+    2018-01-01: 0.10
+
+parameter rate_2:
+  description: "Second marginal rate (12%)"
+  unit: rate
+  values:
+    2018-01-01: 0.12
+
+parameter rate_3:
+  description: "Third marginal rate (22%)"
+  unit: rate
+  values:
+    2018-01-01: 0.22
+
+parameter rate_4:
+  description: "Fourth marginal rate (24%)"
+  unit: rate
+  values:
+    2018-01-01: 0.24
+
+parameter rate_5:
+  description: "Fifth marginal rate (32%)"
+  unit: rate
+  values:
+    2018-01-01: 0.32
+
+parameter rate_6:
+  description: "Sixth marginal rate (35%)"
+  unit: rate
+  values:
+    2018-01-01: 0.35
+
+parameter rate_7:
+  description: "Seventh marginal rate (37%)"
+  unit: rate
+  values:
+    2018-01-01: 0.37
+
+# === SINGLE FILER THRESHOLDS ===
+# Base 2018 TCJA values from statute 1(j)(2)(C)
+
+parameter threshold_single_1:
+  description: "Single: end of 10% bracket"
+  unit: USD
+  indexed_by: statute/26/1/f
+  values:
+    2018-01-01: 9525
+
+parameter threshold_single_2:
+  description: "Single: end of 12% bracket"
+  unit: USD
+  indexed_by: statute/26/1/f
+  values:
+    2018-01-01: 38700
+
+parameter threshold_single_3:
+  description: "Single: end of 22% bracket"
+  unit: USD
+  indexed_by: statute/26/1/f
+  values:
+    2018-01-01: 82500
+
+parameter threshold_single_4:
+  description: "Single: end of 24% bracket"
+  unit: USD
+  indexed_by: statute/26/1/f
+  values:
+    2018-01-01: 157500
+
+parameter threshold_single_5:
+  description: "Single: end of 32% bracket"
+  unit: USD
+  indexed_by: statute/26/1/f
+  values:
+    2018-01-01: 200000
+
+parameter threshold_single_6:
+  description: "Single: end of 35% bracket"
+  unit: USD
+  indexed_by: statute/26/1/f
+  values:
+    2018-01-01: 500000
+
+# === JOINT FILER THRESHOLDS ===
+# Base 2018 TCJA values from statute 1(j)(2)(A)
+
+parameter threshold_joint_1:
+  description: "Joint: end of 10% bracket"
+  unit: USD
+  indexed_by: statute/26/1/f
+  values:
+    2018-01-01: 19050
+
+parameter threshold_joint_2:
+  description: "Joint: end of 12% bracket"
+  unit: USD
+  indexed_by: statute/26/1/f
+  values:
+    2018-01-01: 77400
+
+parameter threshold_joint_3:
+  description: "Joint: end of 22% bracket"
+  unit: USD
+  indexed_by: statute/26/1/f
+  values:
+    2018-01-01: 165000
+
+parameter threshold_joint_4:
+  description: "Joint: end of 24% bracket"
+  unit: USD
+  indexed_by: statute/26/1/f
+  values:
+    2018-01-01: 315000
+
+parameter threshold_joint_5:
+  description: "Joint: end of 32% bracket"
+  unit: USD
+  indexed_by: statute/26/1/f
+  values:
+    2018-01-01: 400000
+
+parameter threshold_joint_6:
+  description: "Joint: end of 35% bracket"
+  unit: USD
+  indexed_by: statute/26/1/f
+  values:
+    2018-01-01: 600000
+
+# === HEAD OF HOUSEHOLD THRESHOLDS ===
+# Base 2018 TCJA values from statute 1(j)(2)(B)
+
+parameter threshold_hoh_1:
+  description: "HOH: end of 10% bracket"
+  unit: USD
+  indexed_by: statute/26/1/f
+  values:
+    2018-01-01: 13600
+
+parameter threshold_hoh_2:
+  description: "HOH: end of 12% bracket"
+  unit: USD
+  indexed_by: statute/26/1/f
+  values:
+    2018-01-01: 51800
+
+parameter threshold_hoh_3:
+  description: "HOH: end of 22% bracket"
+  unit: USD
+  indexed_by: statute/26/1/f
+  values:
+    2018-01-01: 82500
+
+parameter threshold_hoh_4:
+  description: "HOH: end of 24% bracket"
+  unit: USD
+  indexed_by: statute/26/1/f
+  values:
+    2018-01-01: 157500
+
+parameter threshold_hoh_5:
+  description: "HOH: end of 32% bracket"
+  unit: USD
+  indexed_by: statute/26/1/f
+  values:
+    2018-01-01: 200000
+
+parameter threshold_hoh_6:
+  description: "HOH: end of 35% bracket"
+  unit: USD
+  indexed_by: statute/26/1/f
+  values:
+    2018-01-01: 500000
+
+# === MARRIED FILING SEPARATELY THRESHOLDS ===
+# Base 2018 TCJA values from statute 1(j)(2)(D)
+
+parameter threshold_separate_1:
+  description: "MFS: end of 10% bracket"
+  unit: USD
+  indexed_by: statute/26/1/f
+  values:
+    2018-01-01: 9525
+
+parameter threshold_separate_2:
+  description: "MFS: end of 12% bracket"
+  unit: USD
+  indexed_by: statute/26/1/f
+  values:
+    2018-01-01: 38700
+
+parameter threshold_separate_3:
+  description: "MFS: end of 22% bracket"
+  unit: USD
+  indexed_by: statute/26/1/f
+  values:
+    2018-01-01: 82500
+
+parameter threshold_separate_4:
+  description: "MFS: end of 24% bracket"
+  unit: USD
+  indexed_by: statute/26/1/f
+  values:
+    2018-01-01: 157500
+
+parameter threshold_separate_5:
+  description: "MFS: end of 32% bracket"
+  unit: USD
+  indexed_by: statute/26/1/f
+  values:
+    2018-01-01: 200000
+
+parameter threshold_separate_6:
+  description: "MFS: end of 35% bracket"
+  unit: USD
+  indexed_by: statute/26/1/f
+  values:
+    2018-01-01: 300000
+
+# === INPUTS ===
+
+input taxable_income:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Taxable Income"
+  description: "Taxable income per 26 USC 63"
+  default: 0
+
+input filing_status:
+  entity: TaxUnit
+  period: Year
+  dtype: Enum[FilingStatus]
+  label: "Filing Status"
+  description: "Tax filing status determining applicable bracket thresholds"
+  default: SINGLE
+
+# === HELPER VARIABLES ===
+# Select thresholds based on filing status using ternary expressions
+
+variable t1:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Threshold 1"
+  description: "End of 10% bracket for filing status"
+  formula: |
+    if filing_status == SINGLE: threshold_single_1 elif filing_status == JOINT: threshold_joint_1 elif filing_status == SURVIVING_SPOUSE: threshold_joint_1 elif filing_status == SEPARATE: threshold_separate_1 else threshold_hoh_1
+  default: 0
+
+variable t2:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Threshold 2"
+  description: "End of 12% bracket for filing status"
+  formula: |
+    if filing_status == SINGLE: threshold_single_2 elif filing_status == JOINT: threshold_joint_2 elif filing_status == SURVIVING_SPOUSE: threshold_joint_2 elif filing_status == SEPARATE: threshold_separate_2 else threshold_hoh_2
+  default: 0
+
+variable t3:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Threshold 3"
+  description: "End of 22% bracket for filing status"
+  formula: |
+    if filing_status == SINGLE: threshold_single_3 elif filing_status == JOINT: threshold_joint_3 elif filing_status == SURVIVING_SPOUSE: threshold_joint_3 elif filing_status == SEPARATE: threshold_separate_3 else threshold_hoh_3
+  default: 0
+
+variable t4:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Threshold 4"
+  description: "End of 24% bracket for filing status"
+  formula: |
+    if filing_status == SINGLE: threshold_single_4 elif filing_status == JOINT: threshold_joint_4 elif filing_status == SURVIVING_SPOUSE: threshold_joint_4 elif filing_status == SEPARATE: threshold_separate_4 else threshold_hoh_4
+  default: 0
+
+variable t5:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Threshold 5"
+  description: "End of 32% bracket for filing status"
+  formula: |
+    if filing_status == SINGLE: threshold_single_5 elif filing_status == JOINT: threshold_joint_5 elif filing_status == SURVIVING_SPOUSE: threshold_joint_5 elif filing_status == SEPARATE: threshold_separate_5 else threshold_hoh_5
+  default: 0
+
+variable t6:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Threshold 6"
+  description: "End of 35% bracket for filing status"
+  formula: |
+    if filing_status == SINGLE: threshold_single_6 elif filing_status == JOINT: threshold_joint_6 elif filing_status == SURVIVING_SPOUSE: threshold_joint_6 elif filing_status == SEPARATE: threshold_separate_6 else threshold_hoh_6
+  default: 0
+
+# === BRACKET TAX AMOUNTS ===
+# Calculate tax for each bracket segment
+
+variable tax_bracket_1:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Tax from Bracket 1"
+  description: "Tax on income in 10% bracket"
+  formula: |
+    min(taxable_income, t1) * rate_1
+  default: 0
+
+variable tax_bracket_2:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Tax from Bracket 2"
+  description: "Tax on income in 12% bracket"
+  formula: |
+    if taxable_income > t1: (min(taxable_income, t2) - t1) * rate_2 else 0
+  default: 0
+
+variable tax_bracket_3:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Tax from Bracket 3"
+  description: "Tax on income in 22% bracket"
+  formula: |
+    if taxable_income > t2: (min(taxable_income, t3) - t2) * rate_3 else 0
+  default: 0
+
+variable tax_bracket_4:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Tax from Bracket 4"
+  description: "Tax on income in 24% bracket"
+  formula: |
+    if taxable_income > t3: (min(taxable_income, t4) - t3) * rate_4 else 0
+  default: 0
+
+variable tax_bracket_5:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Tax from Bracket 5"
+  description: "Tax on income in 32% bracket"
+  formula: |
+    if taxable_income > t4: (min(taxable_income, t5) - t4) * rate_5 else 0
+  default: 0
+
+variable tax_bracket_6:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Tax from Bracket 6"
+  description: "Tax on income in 35% bracket"
+  formula: |
+    if taxable_income > t5: (min(taxable_income, t6) - t5) * rate_6 else 0
+  default: 0
+
+variable tax_bracket_7:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Tax from Bracket 7"
+  description: "Tax on income in 37% bracket"
+  formula: |
+    if taxable_income > t6: (taxable_income - t6) * rate_7 else 0
+  default: 0
+
+# === MAIN VARIABLE ===
+
+variable income_tax_before_credits:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Income Tax Before Credits"
+  description: "Federal income tax from marginal brackets per 26 USC 1(j)(2)"
+  formula: |
+    if taxable_income <= 0: return 0
+    return tax_bracket_1 + tax_bracket_2 + tax_bracket_3 + tax_bracket_4 + tax_bracket_5 + tax_bracket_6 + tax_bracket_7
+  default: 0
+  tests:
+    - name: "Single filer, $50k taxable income"
+      period: 2018-01
+      inputs:
+        taxable_income: 50000
+        filing_status: SINGLE
+        t1: 9525
+        t2: 38700
+        t3: 82500
+        t4: 157500
+        t5: 200000
+        t6: 500000
+        tax_bracket_1: 952.50
+        tax_bracket_2: 3501
+        tax_bracket_3: 2486
+        tax_bracket_4: 0
+        tax_bracket_5: 0
+        tax_bracket_6: 0
+        tax_bracket_7: 0
+      expect: 6939.50
+    - name: "Joint filers, $100k taxable income"
+      period: 2018-01
+      inputs:
+        taxable_income: 100000
+        filing_status: JOINT
+        t1: 19050
+        t2: 77400
+        t3: 165000
+        t4: 315000
+        t5: 400000
+        t6: 600000
+        tax_bracket_1: 1905
+        tax_bracket_2: 7002
+        tax_bracket_3: 4972
+        tax_bracket_4: 0
+        tax_bracket_5: 0
+        tax_bracket_6: 0
+        tax_bracket_7: 0
+      expect: 13879
+    - name: "Head of household, $75k taxable income"
+      period: 2018-01
+      inputs:
+        taxable_income: 75000
+        filing_status: HEAD_OF_HOUSEHOLD
+        t1: 13600
+        t2: 51800
+        t3: 82500
+        t4: 157500
+        t5: 200000
+        t6: 500000
+        tax_bracket_1: 1360
+        tax_bracket_2: 4584
+        tax_bracket_3: 5104
+        tax_bracket_4: 0
+        tax_bracket_5: 0
+        tax_bracket_6: 0
+        tax_bracket_7: 0
+      expect: 11048
+    - name: "Zero income"
+      period: 2018-01
+      inputs:
+        taxable_income: 0
+        filing_status: SINGLE
+        t1: 9525
+        t2: 38700
+        t3: 82500
+        t4: 157500
+        t5: 200000
+        t6: 500000
+        tax_bracket_1: 0
+        tax_bracket_2: 0
+        tax_bracket_3: 0
+        tax_bracket_4: 0
+        tax_bracket_5: 0
+        tax_bracket_6: 0
+        tax_bracket_7: 0
+      expect: 0

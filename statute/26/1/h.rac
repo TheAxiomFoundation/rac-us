@@ -321,6 +321,12 @@ variable capital_gains_tax:
         long_term_capital_gains: 10000
         qualified_dividends: 0
         filing_status: SINGLE
+        zero_rate: 0.0
+        fifteen_rate: 0.15
+        twenty_rate: 0.20
+        capital_gains_zero_rate_amount: 10000
+        capital_gains_fifteen_rate_amount: 0
+        capital_gains_twenty_rate_amount: 0
       # Ordinary = $30k - $10k = $20k. Room in 0% = $38,600 - $20,000 = $18,600
       # All $10k fits in 0% bracket. Tax = $0
       expect: 0
@@ -331,6 +337,12 @@ variable capital_gains_tax:
         long_term_capital_gains: 20000
         qualified_dividends: 0
         filing_status: SINGLE
+        zero_rate: 0.0
+        fifteen_rate: 0.15
+        twenty_rate: 0.20
+        capital_gains_zero_rate_amount: 8600
+        capital_gains_fifteen_rate_amount: 11400
+        capital_gains_twenty_rate_amount: 0
       # Ordinary = $50k - $20k = $30k. Room in 0% = $38,600 - $30,000 = $8,600
       # At 0%: $8,600. At 15%: $20,000 - $8,600 = $11,400
       # Tax = $0 + $11,400 * 0.15 = $1,710
@@ -342,6 +354,12 @@ variable capital_gains_tax:
         long_term_capital_gains: 30000
         qualified_dividends: 20000
         filing_status: JOINT
+        zero_rate: 0.0
+        fifteen_rate: 0.15
+        twenty_rate: 0.20
+        capital_gains_zero_rate_amount: 0
+        capital_gains_fifteen_rate_amount: 29000
+        capital_gains_twenty_rate_amount: 21000
       # Ordinary = $500k - $50k = $450k. 0% threshold joint = $77,200
       # 15% threshold joint = $479,000
       # Room at 0%: max(0, $77,200 - $450,000) = $0
@@ -356,6 +374,12 @@ variable capital_gains_tax:
         long_term_capital_gains: 15000
         qualified_dividends: 5000
         filing_status: HEAD_OF_HOUSEHOLD
+        zero_rate: 0.0
+        fifteen_rate: 0.15
+        twenty_rate: 0.20
+        capital_gains_zero_rate_amount: 11700
+        capital_gains_fifteen_rate_amount: 8300
+        capital_gains_twenty_rate_amount: 0
       # Ordinary = $60k - $20k = $40k. 0% threshold HOH = $51,700
       # Room in 0% = $51,700 - $40,000 = $11,700
       # At 0%: $11,700. At 15%: $20,000 - $11,700 = $8,300
@@ -368,6 +392,12 @@ variable capital_gains_tax:
         long_term_capital_gains: 20000
         qualified_dividends: 0
         filing_status: SEPARATE
+        zero_rate: 0.0
+        fifteen_rate: 0.15
+        twenty_rate: 0.20
+        capital_gains_zero_rate_amount: 0
+        capital_gains_fifteen_rate_amount: 9500
+        capital_gains_twenty_rate_amount: 10500
       # Ordinary = $250k - $20k = $230k. 15% threshold MFS = $239,500
       # Room at 15%: $239,500 - $230,000 = $9,500
       # At 15%: $9,500. At 20%: $20,000 - $9,500 = $10,500
