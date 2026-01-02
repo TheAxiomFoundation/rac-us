@@ -1,0 +1,18 @@
+# 26 USC 32(c)(1)(A) - Eligible Individual Definition
+#
+# Container file - imports from i (with children) and ii (without children)
+
+text: """
+(A) In general
+The term 'eligible individual' means—
+(i) in the case of an eligible individual who has 1 or more qualifying
+children, an individual who has a qualifying child for such taxable year, or
+(ii) in the case of an individual who has no qualifying children, an
+individual who—
+(I) has attained age 25 but not attained age 65 before the close of the
+taxable year,
+(II) was not a dependent of another taxpayer for any taxable year beginning
+in the same calendar year, and
+(III) has a principal place of abode in the United States for more than
+one-half of such taxable year.
+"""

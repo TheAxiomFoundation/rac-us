@@ -1,0 +1,38 @@
+# 26 USC 32(n) - Special Rules for Individuals Without Qualifying Children
+#
+status: obsolete
+notes: "Temporary ARPA provisions for 2021-2022 only - now expired"
+
+text: """
+(n) Special rules for individuals without qualifying children
+In the case of any taxable year beginning after December 31, 2020, and before
+January 1, 2022—
+(1) Decrease in minimum age for credit
+(A) In general
+Subsection (c)(1)(A)(ii)(I) shall be applied by substituting 'the applicable
+minimum age' for 'age 25'.
+(B) Applicable minimum age
+For purposes of this paragraph, the term 'applicable minimum age' means—
+(i) except as otherwise provided in this subparagraph, age 19,
+(ii) in the case of a specified student (other than a qualified former
+foster youth or a qualified homeless youth), age 24, and
+(iii) in the case of a qualified former foster youth or a qualified
+homeless youth, age 18.
+
+(2) Elimination of maximum age for credit
+Subsection (c)(1)(A)(ii)(I) shall be applied without regard to the phrase
+'but not attained age 65'.
+
+(3) Increase in credit and phaseout percentages
+The table contained in subsection (b)(1) shall be applied by substituting
+'15.3' for '7.65' each place it appears therein.
+
+(4) Increase in earned income and phaseout amounts
+(A) In general
+The table contained in subsection (b)(2)(A) shall be applied—
+(i) by substituting '$9,820' for '$4,220', and
+(ii) by substituting '$11,610' for '$5,280'.
+(B) Coordination with inflation adjustment
+Subsection (j) shall not apply to any dollar amount specified in this
+paragraph.
+"""

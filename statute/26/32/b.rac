@@ -1,0 +1,34 @@
+# 26 USC 32(b) - Percentages and Amounts
+#
+# Container file - imports from child files
+
+text: """
+(b) Percentages and amounts
+(1) Percentages
+The credit percentage and the phaseout percentage shall be determined
+as follows:
+
+In the case of an eligible individual with:
+1 qualifying child          34%/15.98%
+2 qualifying children       40%/21.06%
+3 or more qualifying children 45%/21.06%
+No qualifying children      7.65%/7.65%
+
+(2) Amounts
+(A) In general
+Subject to subparagraph (B), the earned income amount and the phaseout
+amount shall be determined as follows:
+
+In the case of an eligible individual with:
+1 qualifying child          $6,330/$11,610
+2 or more qualifying children $8,890/$11,610
+No qualifying children      $4,220/$5,280
+
+(B) Joint return
+In the case of a joint return filed by an eligible individual and such
+individual's spouse, the phaseout amount determined under subparagraph
+(A) shall be increased by $5,000.
+"""
+
+# Note: Specific indexed values are loaded from parameters.yaml
+# These are the statutory base amounts from 26 USC 32(b)

@@ -1,0 +1,31 @@
+# 26 USC 32(c)(3) - Qualifying Child
+#
+# Container file - imports from A, B, C, D
+
+text: """
+(3) Qualifying child
+(A) In general
+The term 'qualifying child' means a qualifying child of the taxpayer (as
+defined in section 152(c), determined without regard to paragraph (1)(D)
+thereof and section 152(e)).
+
+(B) Married child ineligible
+Such term shall not include an individual who is married as of the close
+of the taxpayer's taxable year unless the taxpayer is entitled to a
+deduction under section 151 for such taxable year with respect to such
+individual (or would be so entitled but for section 152(e)).
+
+(C) Place of abode
+Subparagraph (A) shall not apply to any child who does not have the same
+principal place of abode as the taxpayer for more than one-half of the
+taxable year.
+
+(D) Identification requirements
+(i) In general
+A child shall not be treated as a qualifying child unless the taxpayer
+includes the name, age, and TIN of such child on the return of tax for
+the taxable year.
+(ii) Other methods
+The Secretary may prescribe other methods for providing the information
+described in clause (i).
+"""

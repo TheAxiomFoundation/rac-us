@@ -17,7 +17,6 @@ variable num_qualifying_children:
   dtype: Count
   label: "Number of Qualifying Children (uncapped)"
   description: "Actual count of qualifying children, not capped at 3"
-  syntax: python
   formula: |
     # Count children who meet all EITC-specific requirements
     count = person.count(

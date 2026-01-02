@@ -1,0 +1,13 @@
+# 26 USC 32(a)(2) - Credit Limitation
+#
+# Container file - imports from A (initial amount) and B (reduction)
+
+text: """
+(2) Limitation
+The amount of the credit allowable to a taxpayer under paragraph (1) for
+any taxable year shall not exceed the excess (if any) of—
+(A) the credit percentage of the earned income amount, over
+(B) the phaseout percentage of so much of the adjusted gross income
+(or, if greater, the earned income) of the taxpayer for the taxable year
+as exceeds the phaseout amount.
+"""

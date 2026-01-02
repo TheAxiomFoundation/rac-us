@@ -1,0 +1,48 @@
+# 26 USC 32(c) - Definitions and Special Rules
+#
+# Container file - imports from child files
+
+text: """
+(c) Definitions and special rules
+For purposes of this section—
+
+(1) Eligible individual
+(A) In general
+The term 'eligible individual' means—
+(i) in the case of an eligible individual who has 1 or more qualifying
+children, an individual who has a qualifying child for such taxable year, or
+(ii) in the case of an individual who has no qualifying children, an
+individual who—
+(I) has attained age 25 but not attained age 65 before the close of the
+taxable year,
+(II) was not a dependent of another taxpayer for any taxable year beginning
+in the same calendar year, and
+(III) has a principal place of abode in the United States for more than
+one-half of such taxable year.
+
+(B) Qualifying child ineligible
+An individual shall not be treated as an eligible individual for a taxable
+year if such individual is a qualifying child of another taxpayer for such
+taxable year.
+
+(C) Exception for foreign earned income
+No credit shall be allowed under this section to an individual who has
+elected to exclude any amount from gross income under section 911.
+
+(D) Limitation on eligibility of nonresident aliens
+No credit shall be allowed under this section to— (i) any nonresident
+alien individual...
+
+(E) Identification numbers
+No credit shall be allowed under this section unless the taxpayer (and,
+if the taxpayer is married, the taxpayer's spouse) includes a valid
+identification number on the return of tax for the taxable year.
+
+(2) Earned income
+(A) The term 'earned income' means wages, salaries, tips, and other
+employee compensation plus net earnings from self-employment...
+
+(3) Qualifying child
+The term 'qualifying child' means a qualifying child of the taxpayer (as
+defined in section 152(c))...
+"""

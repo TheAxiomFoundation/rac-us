@@ -1,0 +1,14 @@
+# 26 USC 32(c)(3)(D) - Identification Requirements for Qualifying Child
+#
+# Container file - imports from i (TIN requirement)
+
+text: """
+(D) Identification requirements
+(i) In general
+A child shall not be treated as a qualifying child unless the taxpayer
+includes the name, age, and TIN of such child on the return of tax for
+the taxable year.
+(ii) Other methods
+The Secretary may prescribe other methods for providing the information
+described in clause (i).
+"""

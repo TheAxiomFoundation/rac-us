@@ -1,0 +1,10 @@
+# 26 USC 32(c)(1)(E) - Identification Numbers
+#
+# Container file - imports from i (taxpayer) and ii (spouse)
+
+text: """
+(E) Identification numbers
+No credit shall be allowed under this section unless the taxpayer (and,
+if the taxpayer is married, the taxpayer's spouse) includes a valid
+identification number on the return of tax for the taxable year.
+"""
