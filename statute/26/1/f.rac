@@ -1,0 +1,137 @@
+# 26 USC Section 1(f) - Adjustments in Tax Tables
+#
+# This subsection provides for annual inflation adjustments to the bracket thresholds
+# and certain other dollar amounts in the tax code. Under TCJA, the index is changed
+# from CPI-U to Chained CPI (C-CPI-U) with a 2016 base year.
+
+text: """
+(f) Adjustments in tax tables so that inflation will not result in tax increases.--
+(1) In general.--Not later than December 15 of 1993, and each subsequent calendar year,
+the Secretary shall prescribe tables which shall apply in lieu of the tables contained
+in subsections (a), (b), (c), (d), and (e) with respect to taxable years beginning in
+the succeeding calendar year.
+
+(2) Method of prescribing tables.--The table which under paragraph (1) is to apply
+in lieu of the table contained in subsection (a), (b), (c), (d), or (e), as the case
+may be, with respect to taxable years beginning in any calendar year shall be prescribed--
+(A) by increasing the minimum and maximum dollar amounts for each rate bracket for
+which a tax is imposed under such table, and
+(B) by increasing the amounts setting forth the amounts of tax imposed by such table,
+by the cost-of-living adjustment for such calendar year...
+
+(3) Cost-of-living adjustment.--For purposes of this subsection--
+(A) In general.--The cost-of-living adjustment for any calendar year is the percentage
+(if any) by which--
+(i) the C-CPI-U for the preceding calendar year, exceeds
+(ii) the CPI for calendar year 2016, multiplied by the amount determined under
+subparagraph (B).
+
+(B) Amount determined.--The amount determined under this clause is the amount obtained
+by dividing--
+(i) the C-CPI-U for calendar year 2016, by
+(ii) the CPI for calendar year 2016.
+
+(6) C-CPI-U.--For purposes of this subsection--
+(A) In general.--The term 'C-CPI-U' means the Chained Consumer Price Index for All
+Urban Consumers (as published by the Bureau of Labor Statistics of the Department
+of Labor).
+"""
+
+# === PARAMETERS ===
+# Inflation adjustment factors
+# Note: C-CPI-U values need annual updating from BLS data
+
+parameter base_year_cpi_u:
+  description: "CPI-U for 2016 (base year for TCJA adjustments)"
+  unit: index
+  values:
+    2016-01-01: 240.007
+
+parameter base_year_c_cpi_u:
+  description: "C-CPI-U for 2016 (base year for TCJA adjustments)"
+  unit: index
+  values:
+    2016-01-01: 229.474
+
+# C-CPI-U annual values - needs updating each year from BLS
+parameter c_cpi_u_annual:
+  description: "Annual C-CPI-U values for inflation adjustment computation"
+  unit: index
+  values:
+    2016-01-01: 229.474
+    2017-01-01: 233.436
+    2018-01-01: 239.181
+    2019-01-01: 243.499
+    2020-01-01: 247.213
+    2021-01-01: 252.725
+    2022-01-01: 272.276
+    2023-01-01: 287.504
+
+parameter rounding_increment:
+  description: "Bracket thresholds rounded to nearest multiple of this amount"
+  unit: USD
+  values:
+    1993-01-01: 50
+
+# === INPUTS ===
+
+input c_cpi_u_prior_year:
+  entity: TaxUnit
+  period: Year
+  dtype: Rate
+  unit: index
+  label: "Prior Year C-CPI-U"
+  description: "Chained CPI-U for the preceding calendar year"
+  default: 229.474
+
+input base_cpi_u:
+  entity: TaxUnit
+  period: Year
+  dtype: Rate
+  unit: index
+  label: "Base Year CPI-U"
+  description: "CPI-U for calendar year 2016"
+  default: 240.007
+
+# === VARIABLES ===
+
+variable cola_factor:
+  entity: TaxUnit
+  period: Year
+  dtype: Rate
+  unit: /1
+  label: "Cost-of-Living Adjustment Factor"
+  description: "COLA multiplier for inflation adjustments per 26 USC 1(f)(3)"
+  formula: |
+    c_cpi_u_prior_year / base_cpi_u
+  default: 1
+  tests:
+    - name: "COLA factor for 2018 (first TCJA year)"
+      period: 2018-01
+      inputs:
+        c_cpi_u_prior_year: 233.436
+        base_cpi_u: 240.007
+      expect: 0.9726
+    - name: "COLA factor for 2023"
+      period: 2023-01
+      inputs:
+        c_cpi_u_prior_year: 287.504
+        base_cpi_u: 240.007
+      expect: 1.1979
+
+variable cola_percentage:
+  entity: TaxUnit
+  period: Year
+  dtype: Rate
+  unit: /1
+  label: "Cost-of-Living Adjustment Percentage"
+  description: "Percentage increase from base year for inflation adjustment"
+  formula: |
+    if cola_factor > 1: cola_factor - 1 else 0
+  default: 0
+  tests:
+    - name: "COLA percentage for 2023"
+      period: 2023-01
+      inputs:
+        cola_factor: 1.1979
+      expect: 0.1979

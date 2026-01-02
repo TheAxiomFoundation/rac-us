@@ -1,0 +1,233 @@
+# 26 USC Section 1(b) - Heads of Households
+#
+# Pre-TCJA rate table for heads of households.
+# These rates applied before 2018 and will apply again after 2025 when TCJA sunsets.
+
+text: """
+(b) Heads of households.--
+There is hereby imposed on the taxable income of every head of a household
+(as defined in section 2(b)) a tax determined in accordance with the following table:
+
+If taxable income is:               The tax is:
+Not over $13,350                    10% of taxable income
+Over $13,350 but not over $50,800   $1,335, plus 15% of the excess over $13,350
+Over $50,800 but not over $131,200  $6,952.50, plus 25% of the excess over $50,800
+Over $131,200 but not over $212,500 $27,052.50, plus 28% of the excess over $131,200
+Over $212,500 but not over $416,700 $49,816.50, plus 33% of the excess over $212,500
+Over $416,700 but not over $444,550 $117,202.50, plus 35% of the excess over $416,700
+Over $444,550                       $126,950, plus 39.6% of the excess over $444,550
+"""
+
+# === PARAMETERS ===
+# Pre-TCJA brackets for Head of Household (2017 indexed values)
+
+parameter hoh_rate_1:
+  description: "First marginal rate (10%)"
+  unit: rate
+  values:
+    2001-01-01: 0.10
+
+parameter hoh_rate_2:
+  description: "Second marginal rate (15%)"
+  unit: rate
+  _uncertain: [effective_date]
+  _notes:
+    effective_date: "Rate history from ERTA 1981 through present needs research"
+  values:
+    1993-01-01: 0.15
+
+parameter hoh_rate_3:
+  description: "Third marginal rate (25%)"
+  unit: rate
+  values:
+    2001-01-01: 0.25
+
+parameter hoh_rate_4:
+  description: "Fourth marginal rate (28%)"
+  unit: rate
+  values:
+    1993-01-01: 0.28
+
+parameter hoh_rate_5:
+  description: "Fifth marginal rate (33%)"
+  unit: rate
+  values:
+    1993-01-01: 0.33
+
+parameter hoh_rate_6:
+  description: "Sixth marginal rate (35%)"
+  unit: rate
+  values:
+    2003-01-01: 0.35
+
+parameter hoh_rate_7:
+  description: "Seventh marginal rate (39.6%)"
+  unit: rate
+  values:
+    2013-01-01: 0.396
+
+# HOH thresholds (2017 values)
+parameter hoh_threshold_1:
+  description: "HOH: end of 10% bracket"
+  unit: USD
+  indexed_by: statute/26/1/f
+  _uncertain: [effective_date]
+  _notes:
+    effective_date: "2017 indexed values - base year history needs research"
+  values:
+    2017-01-01: 13350
+
+parameter hoh_threshold_2:
+  description: "HOH: end of 15% bracket"
+  unit: USD
+  indexed_by: statute/26/1/f
+  values:
+    2017-01-01: 50800
+
+parameter hoh_threshold_3:
+  description: "HOH: end of 25% bracket"
+  unit: USD
+  indexed_by: statute/26/1/f
+  values:
+    2017-01-01: 131200
+
+parameter hoh_threshold_4:
+  description: "HOH: end of 28% bracket"
+  unit: USD
+  indexed_by: statute/26/1/f
+  values:
+    2017-01-01: 212500
+
+parameter hoh_threshold_5:
+  description: "HOH: end of 33% bracket"
+  unit: USD
+  indexed_by: statute/26/1/f
+  values:
+    2017-01-01: 416700
+
+parameter hoh_threshold_6:
+  description: "HOH: end of 35% bracket"
+  unit: USD
+  indexed_by: statute/26/1/f
+  values:
+    2017-01-01: 444550
+
+# === INPUTS ===
+
+input taxable_income:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Taxable Income"
+  description: "Taxable income per 26 USC 63"
+  default: 0
+
+# === BRACKET VARIABLES ===
+
+variable hoh_bracket_1:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "HOH Bracket 1 Tax"
+  description: "Tax on income in 10% bracket"
+  formula: |
+    min(taxable_income, hoh_threshold_1) * hoh_rate_1
+  default: 0
+
+variable hoh_bracket_2:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "HOH Bracket 2 Tax"
+  description: "Tax on income in 15% bracket"
+  formula: |
+    if taxable_income > hoh_threshold_1: (min(taxable_income, hoh_threshold_2) - hoh_threshold_1) * hoh_rate_2 else 0
+  default: 0
+
+variable hoh_bracket_3:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "HOH Bracket 3 Tax"
+  description: "Tax on income in 25% bracket"
+  formula: |
+    if taxable_income > hoh_threshold_2: (min(taxable_income, hoh_threshold_3) - hoh_threshold_2) * hoh_rate_3 else 0
+  default: 0
+
+variable hoh_bracket_4:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "HOH Bracket 4 Tax"
+  description: "Tax on income in 28% bracket"
+  formula: |
+    if taxable_income > hoh_threshold_3: (min(taxable_income, hoh_threshold_4) - hoh_threshold_3) * hoh_rate_4 else 0
+  default: 0
+
+variable hoh_bracket_5:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "HOH Bracket 5 Tax"
+  description: "Tax on income in 33% bracket"
+  formula: |
+    if taxable_income > hoh_threshold_4: (min(taxable_income, hoh_threshold_5) - hoh_threshold_4) * hoh_rate_5 else 0
+  default: 0
+
+variable hoh_bracket_6:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "HOH Bracket 6 Tax"
+  description: "Tax on income in 35% bracket"
+  formula: |
+    if taxable_income > hoh_threshold_5: (min(taxable_income, hoh_threshold_6) - hoh_threshold_5) * hoh_rate_6 else 0
+  default: 0
+
+variable hoh_bracket_7:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "HOH Bracket 7 Tax"
+  description: "Tax on income in 39.6% bracket"
+  formula: |
+    if taxable_income > hoh_threshold_6: (taxable_income - hoh_threshold_6) * hoh_rate_7 else 0
+  default: 0
+
+# === MAIN VARIABLE ===
+
+variable hoh_tax_pre_tcja:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "HOH Tax (Pre-TCJA)"
+  description: "Federal income tax for head of household under pre-TCJA rates"
+  formula: |
+    hoh_bracket_1 + hoh_bracket_2 + hoh_bracket_3 + hoh_bracket_4 + hoh_bracket_5 + hoh_bracket_6 + hoh_bracket_7
+  default: 0
+  tests:
+    - name: "HOH $75k taxable income (2017 pre-TCJA)"
+      period: 2017-01
+      inputs:
+        taxable_income: 75000
+        hoh_bracket_1: 1335
+        hoh_bracket_2: 5617.50
+        hoh_bracket_3: 6050
+        hoh_bracket_4: 0
+        hoh_bracket_5: 0
+        hoh_bracket_6: 0
+        hoh_bracket_7: 0
+      # 10% on $13,350 = $1,335
+      # 15% on ($50,800 - $13,350) = $5,617.50
+      # 25% on ($75,000 - $50,800) = $6,050
+      # Total = $13,002.50
+      expect: 13002.50

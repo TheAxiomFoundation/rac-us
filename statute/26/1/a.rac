@@ -1,0 +1,236 @@
+# 26 USC Section 1(a) - Married Filing Jointly and Surviving Spouses
+#
+# Pre-TCJA rate table for married couples filing jointly and surviving spouses.
+# These rates applied before 2018 and will apply again after 2025 when TCJA sunsets.
+
+text: """
+(a) Married individuals filing joint returns and surviving spouses.--
+There is hereby imposed on the taxable income of--
+(1) every married individual (as defined in section 7703) who makes a single
+return jointly with his spouse under section 6013, and
+(2) every surviving spouse (as defined in section 2(a)),
+a tax determined in accordance with the following table:
+
+If taxable income is:               The tax is:
+Not over $18,650                    10% of taxable income
+Over $18,650 but not over $75,900   $1,865, plus 15% of the excess over $18,650
+Over $75,900 but not over $153,100  $10,452.50, plus 25% of the excess over $75,900
+Over $153,100 but not over $233,350 $29,752.50, plus 28% of the excess over $153,100
+Over $233,350 but not over $416,700 $52,222.50, plus 33% of the excess over $233,350
+Over $416,700 but not over $470,700 $112,728, plus 35% of the excess over $416,700
+Over $470,700                       $131,628, plus 39.6% of the excess over $470,700
+"""
+
+# === PARAMETERS ===
+# Pre-TCJA (2017) brackets for MFJ - 7 brackets
+
+parameter mfj_rate_1:
+  description: "First marginal rate (10%)"
+  unit: rate
+  values:
+    2001-01-01: 0.10
+
+parameter mfj_rate_2:
+  description: "Second marginal rate (15%)"
+  unit: rate
+  _uncertain: [effective_date]
+  _notes:
+    effective_date: "Rate history from ERTA 1981 through present needs research"
+  values:
+    1993-01-01: 0.15
+
+parameter mfj_rate_3:
+  description: "Third marginal rate (25%)"
+  unit: rate
+  values:
+    2001-01-01: 0.25
+
+parameter mfj_rate_4:
+  description: "Fourth marginal rate (28%)"
+  unit: rate
+  values:
+    1993-01-01: 0.28
+
+parameter mfj_rate_5:
+  description: "Fifth marginal rate (33%)"
+  unit: rate
+  values:
+    1993-01-01: 0.33
+
+parameter mfj_rate_6:
+  description: "Sixth marginal rate (35%)"
+  unit: rate
+  values:
+    2003-01-01: 0.35
+
+parameter mfj_rate_7:
+  description: "Seventh marginal rate (39.6%)"
+  unit: rate
+  values:
+    2013-01-01: 0.396
+
+# Pre-TCJA thresholds (2017 values)
+parameter mfj_threshold_1:
+  description: "MFJ: end of 10% bracket"
+  unit: USD
+  indexed_by: statute/26/1/f
+  _uncertain: [effective_date]
+  _notes:
+    effective_date: "2017 indexed values - base year history needs research"
+  values:
+    2017-01-01: 18650
+
+parameter mfj_threshold_2:
+  description: "MFJ: end of 15% bracket"
+  unit: USD
+  indexed_by: statute/26/1/f
+  values:
+    2017-01-01: 75900
+
+parameter mfj_threshold_3:
+  description: "MFJ: end of 25% bracket"
+  unit: USD
+  indexed_by: statute/26/1/f
+  values:
+    2017-01-01: 153100
+
+parameter mfj_threshold_4:
+  description: "MFJ: end of 28% bracket"
+  unit: USD
+  indexed_by: statute/26/1/f
+  values:
+    2017-01-01: 233350
+
+parameter mfj_threshold_5:
+  description: "MFJ: end of 33% bracket"
+  unit: USD
+  indexed_by: statute/26/1/f
+  values:
+    2017-01-01: 416700
+
+parameter mfj_threshold_6:
+  description: "MFJ: end of 35% bracket"
+  unit: USD
+  indexed_by: statute/26/1/f
+  values:
+    2017-01-01: 470700
+
+# === INPUTS ===
+
+input taxable_income:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Taxable Income"
+  description: "Taxable income per 26 USC 63"
+  default: 0
+
+# === BRACKET VARIABLES ===
+
+variable mfj_bracket_1:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "MFJ Bracket 1 Tax"
+  description: "Tax on income in 10% bracket"
+  formula: |
+    min(taxable_income, mfj_threshold_1) * mfj_rate_1
+  default: 0
+
+variable mfj_bracket_2:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "MFJ Bracket 2 Tax"
+  description: "Tax on income in 15% bracket"
+  formula: |
+    if taxable_income > mfj_threshold_1: (min(taxable_income, mfj_threshold_2) - mfj_threshold_1) * mfj_rate_2 else 0
+  default: 0
+
+variable mfj_bracket_3:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "MFJ Bracket 3 Tax"
+  description: "Tax on income in 25% bracket"
+  formula: |
+    if taxable_income > mfj_threshold_2: (min(taxable_income, mfj_threshold_3) - mfj_threshold_2) * mfj_rate_3 else 0
+  default: 0
+
+variable mfj_bracket_4:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "MFJ Bracket 4 Tax"
+  description: "Tax on income in 28% bracket"
+  formula: |
+    if taxable_income > mfj_threshold_3: (min(taxable_income, mfj_threshold_4) - mfj_threshold_3) * mfj_rate_4 else 0
+  default: 0
+
+variable mfj_bracket_5:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "MFJ Bracket 5 Tax"
+  description: "Tax on income in 33% bracket"
+  formula: |
+    if taxable_income > mfj_threshold_4: (min(taxable_income, mfj_threshold_5) - mfj_threshold_4) * mfj_rate_5 else 0
+  default: 0
+
+variable mfj_bracket_6:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "MFJ Bracket 6 Tax"
+  description: "Tax on income in 35% bracket"
+  formula: |
+    if taxable_income > mfj_threshold_5: (min(taxable_income, mfj_threshold_6) - mfj_threshold_5) * mfj_rate_6 else 0
+  default: 0
+
+variable mfj_bracket_7:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "MFJ Bracket 7 Tax"
+  description: "Tax on income in 39.6% bracket"
+  formula: |
+    if taxable_income > mfj_threshold_6: (taxable_income - mfj_threshold_6) * mfj_rate_7 else 0
+  default: 0
+
+# === MAIN VARIABLE ===
+
+variable mfj_tax_pre_tcja:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "MFJ Tax (Pre-TCJA)"
+  description: "Federal income tax for married filing jointly under pre-TCJA rates"
+  formula: |
+    mfj_bracket_1 + mfj_bracket_2 + mfj_bracket_3 + mfj_bracket_4 + mfj_bracket_5 + mfj_bracket_6 + mfj_bracket_7
+  default: 0
+  tests:
+    - name: "MFJ $100k taxable income (2017 pre-TCJA)"
+      period: 2017-01
+      inputs:
+        taxable_income: 100000
+        mfj_bracket_1: 1865
+        mfj_bracket_2: 8587.50
+        mfj_bracket_3: 6025
+        mfj_bracket_4: 0
+        mfj_bracket_5: 0
+        mfj_bracket_6: 0
+        mfj_bracket_7: 0
+      # 10% on $18,650 = $1,865
+      # 15% on ($75,900 - $18,650) = $8,587.50
+      # 25% on ($100,000 - $75,900) = $6,025
+      # Total = $16,477.50
+      expect: 16477.50
