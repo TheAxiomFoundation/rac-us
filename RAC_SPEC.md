@@ -245,7 +245,6 @@ variable additional_ctc:
 
   versions:
     2018-01-01:
-      enacted_by: "P.L. 115-97 § 11022"
       parameters:
         threshold: 2500
         cap: 1400
@@ -253,9 +252,53 @@ variable additional_ctc:
         ...TCJA formula...
 
     2026-01-01:
-      enacted_by: "P.L. 115-97 sunset"
       reverts_to: 2001-01-01
 ```
+
+Effective dates should come from statute text conditions (e.g., "for taxable years beginning after December 31, 2017"). P.L. references are tracked separately in arch, not required in .rac files.
+
+## Uncertainty Metadata
+
+Use `_uncertain` to flag fields that need verification. This enables encoding to proceed without blocking on missing research.
+
+```yaml
+parameter brackets:
+  values:
+    2018-01-01:
+      # Date from statute: "after December 31, 2017"
+      thresholds: [0, 19050, 77400, 165000, 315000, 400000, 600000]
+      rates: [0.10, 0.12, 0.22, 0.24, 0.32, 0.35, 0.37]
+
+    2017-01-01:
+      _uncertain: [effective_date]
+      _notes:
+        effective_date: "Pre-TCJA, actual date from P.L. amendment history"
+      thresholds: [0, 36900, 89150, 140000, 250000]
+      rates: [0.15, 0.28, 0.31, 0.36, 0.396]
+
+    1980-01-01:
+      _uncertain: [effective_date, thresholds]
+      _notes:
+        effective_date: "Approximate, needs P.L. research"
+        thresholds: "Values from secondary source"
+      thresholds: [0, 20000, 40000]
+      rates: [0.14, 0.16, 0.18]
+```
+
+### `_uncertain` Syntax
+
+| Value | Meaning |
+|-------|---------|
+| `_uncertain: [field1, field2]` | Listed fields need verification |
+| `_uncertain: all` | Entire entry needs verification |
+| `_notes: {field: "reason"}` | Why field is uncertain |
+
+Works at any level:
+- Parameter values (as shown above)
+- Variable attributes
+- File-level metadata
+
+To find all uncertainties: `grep -r "_uncertain" statute/`
 
 ## File Naming
 
