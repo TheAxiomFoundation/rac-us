@@ -1,0 +1,34 @@
+# 26 USC Section 1(e) - Estates and trusts
+
+text: """
+(e) Estates and trusts.—
+There is hereby imposed on the taxable income of—
+(1) every estate, and
+(2) every trust,
+taxable under this subtitle a tax determined in accordance with the following table:
+
+[Note: The actual table referenced here is replaced by 26 USC 1(j) for taxable years beginning after December 31, 2017]
+"""
+
+variable estate_trust_tax:
+  imports:
+    - 26/1/j#tcja_income_tax
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: "USD"
+  label: "Estate and Trust Tax"
+  description: "Tax for estates and trusts per 26 USC 1(e)"
+  formula: |
+    # For current tax years (2018+), use TCJA rates from subsection (j)
+    if filing_status == "estate_trust" and tax_year >= 2018:
+        return tcja_income_tax
+    else:
+        return 0
+  tests:
+    - name: "Estate with TCJA rates"
+      inputs:
+        filing_status: "estate_trust"
+        taxable_income: 15000
+        tax_year: 2018
+      expect: 3936.50  # Computed using TCJA estate/trust brackets

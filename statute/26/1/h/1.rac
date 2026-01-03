@@ -1,0 +1,20 @@
+# 26 USC Section 1(h)(1) - In general (Maximum capital gains calculation)
+
+status: stub
+
+text: """
+(h)(1) In general.—If a taxpayer has a net capital gain for any taxable year, the tax imposed by this section for such taxable year shall not exceed the sum of—
+(A) a tax computed at the rates and in the same manner as if this subsection had not been enacted on the taxable income reduced by the net capital gain,
+(B) [0% rate calculation],
+(C) [15% rate calculation],
+(D) [20% rate calculation],
+(E) [25% rate for unrecaptured section 1250 gain],
+(F) [28% rate for collectibles and other specified gains].
+"""
+
+variable maximum_capital_gains_calculation:
+  stub_for: 26/1/h#capital_gains_tax
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  default: 0

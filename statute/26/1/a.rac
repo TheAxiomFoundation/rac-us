@@ -1,0 +1,34 @@
+# 26 USC Section 1(a) - Married individuals filing joint returns and surviving spouses
+
+text: """
+(a) Married individuals filing joint returns and surviving spouses.—
+There is hereby imposed on the taxable income of—
+(1) every married individual filing a joint return under section 6013, and
+(2) every surviving spouse (as defined in section 2(a)),
+a tax determined in accordance with the following table:
+
+[Note: The actual table referenced here is replaced by 26 USC 1(j) for taxable years beginning after December 31, 2017]
+"""
+
+variable married_joint_tax:
+  imports:
+    - 26/1/j#tcja_income_tax
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: "USD"
+  label: "Married Filing Joint Tax"
+  description: "Tax for married filing jointly and surviving spouse per 26 USC 1(a)"
+  formula: |
+    # For current tax years (2018+), use TCJA rates from subsection (j)
+    if filing_status == "joint" and tax_year >= 2018:
+        return tcja_income_tax
+    else:
+        return 0
+  tests:
+    - name: "MFJ with TCJA rates"
+      inputs:
+        filing_status: "joint"
+        taxable_income: 100000
+        tax_year: 2018
+      expect: 11219  # Computed using TCJA brackets

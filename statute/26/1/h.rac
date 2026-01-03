@@ -1,93 +1,99 @@
-# 26 USC Section 1(h) - Maximum Capital Gains Rate
-#
-# status: stub
-# notes: "Full capital gains implementation pending. This stub provides
-#         the interface needed by 26/1#income_tax."
-#
-# This subsection provides preferential rates for net capital gain:
-# - 0% rate for adjusted net capital gain up to certain thresholds
-# - 15% rate for middle income brackets
-# - 20% rate for highest income brackets
-# - 25% rate for unrecaptured section 1250 gain
-# - 28% rate for collectibles gain and section 1202 gain
+# 26 USC Section 1(h) - Maximum capital gains rate
 
 text: """
-(h) MAXIMUM CAPITAL GAINS RATE.--
+(h) Maximum capital gains rate.—
+(1) In general.—If a taxpayer has a net capital gain for any taxable year, the tax imposed by this section for such taxable year shall not exceed the sum of—
+(A) a tax computed at the rates and in the same manner as if this subsection had not been enacted on the taxable income reduced by the net capital gain,
+(B) a tax of 0 percent of so much of the adjusted net capital gain (or, if less, taxable income) as does not exceed the excess (if any) of—
+(i) the amount of taxable income which would (without regard to this paragraph) be taxed at a rate below 25 percent, over
+(ii) the taxable income reduced by the adjusted net capital gain,
+(C) a tax of 15 percent of the lesser of—
+(i) so much of the adjusted net capital gain (or, if less, taxable income) as exceeds the amount on which a tax is determined under subparagraph (B), or
+(ii) the excess (if any) of—
+(I) the amount of taxable income which would (without regard to this paragraph) be taxed at a rate below 39.6 percent, over
+(II) the sum of the amounts on which a tax is determined under subparagraphs (A) and (B),
+(D) a tax of 20 percent of the adjusted net capital gain (or, if less, taxable income) in excess of the sum of the amounts on which a tax is determined under subparagraphs (B) and (C),
+(E) a tax of 25 percent of the excess (if any) of—
+(i) the unrecaptured section 1250 gain (or, if less, the net capital gain (determined without regard to paragraph (11))), over
+(ii) the excess (if any) of—
+(I) the sum of the amounts on which tax is determined under subparagraphs (A) and (D), over
+(II) the taxable income reduced by the adjusted net capital gain, and
+(F) a tax of 28 percent of the amount of taxable income which—
+(i) is net capital gain which is not adjusted net capital gain,
+(ii) is net capital gain from the sale or exchange of collectibles (within the meaning of section 408(m)) held for more than 1 year but only to the extent such gain is taken into account in computing gross income, and
+(iii) is qualified 5-year gain.
 
-(1) IN GENERAL.-- If a taxpayer has a net capital gain for any taxable year,
-the tax imposed by this section for such taxable year shall not exceed the
-sum of--
-(A) a tax computed at the rates and in the same manner as if this
-subsection had not been enacted on the greater of--
-(i) taxable income reduced by the net capital gain; or
-(ii) the lesser of--
-(I) the amount of taxable income taxed at a rate below 25 percent, or
-(II) taxable income reduced by the adjusted net capital gain;
-(B) 0 percent of so much of the adjusted net capital gain (or, if less,
-taxable income) as does not exceed the excess (if any) of...
-(C) 15 percent of the lesser of...
-(D) 20 percent of the adjusted net capital gain... in excess of...
-(E) 25 percent of the excess (if any) of the unrecaptured section 1250
-gain over the 28-percent rate gain,
-(F) 28 percent of the excess (if any) of the net capital gain...
+(2) [Repealed.]
+
+(3) Adjusted net capital gain.—For purposes of this subsection, the term "adjusted net capital gain" means net capital gain reduced by the sum of—
+(A) unrecaptured section 1250 gain, and
+(B) 28-percent rate gain.
+
+[Additional paragraphs (4) through (11) define various terms and special rules]
 """
 
-# Input: net capital gain (from schedule D)
+parameter capital_gains_rates:
+  description: "Capital gains tax rates per 26 USC 1(h)"
+  unit: rate
+  values:
+    1997-05-07:
+      preferential_0_percent: 0.00
+      preferential_15_percent: 0.15
+      preferential_20_percent: 0.20
+      unrecaptured_1250_rate: 0.25
+      collectibles_rate: 0.28
+
+variable capital_gains_tax:
+  imports:
+    - 26/1/h/1#maximum_capital_gains_calculation
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: "USD"
+  label: "Capital Gains Tax"
+  description: "Tax on capital gains under preferential rates per 26 USC 1(h)"
+  formula: |
+    # If there's no net capital gain, no capital gains tax applies
+    if net_capital_gain <= 0:
+        return 0
+
+    # Apply the complex tiered calculation from paragraph (1)
+    return maximum_capital_gains_calculation
+  default: 0
+
+# Create stub for the detailed calculation that will be implemented in h/1.rac
 input net_capital_gain:
   entity: TaxUnit
   period: Year
   dtype: Money
   unit: "USD"
   label: "Net Capital Gain"
-  description: "Net capital gain per 26 USC 1222(11)"
+  description: "Net capital gain per section 1222"
   default: 0
 
-# Capital gains rate parameters
-parameter zero_pct_rate:
-  description: "0% capital gains rate"
-  unit: rate
-  values:
-    2018-01-01: 0.00
-
-parameter fifteen_pct_rate:
-  description: "15% capital gains rate"
-  unit: rate
-  values:
-    2018-01-01: 0.15
-
-parameter twenty_pct_rate:
-  description: "20% capital gains rate"
-  unit: rate
-  values:
-    2018-01-01: 0.20
-
-# Stub variable: capital gains tax adjustment
-# This represents the reduction in tax from preferential capital gains rates
-variable capital_gains_tax_adjustment:
-  imports:
-    - 26/1#filing_status
-    - 26/1#taxable_income
-    - 26/1/j#ordinary_income_tax
+input adjusted_net_capital_gain:
   entity: TaxUnit
   period: Year
   dtype: Money
   unit: "USD"
-  label: "Capital Gains Tax Adjustment"
-  description: "Reduction in tax due to preferential capital gains rates per 26 USC 1(h)"
+  label: "Adjusted Net Capital Gain"
+  description: "Adjusted net capital gain per 26 USC 1(h)(3)"
   default: 0
-  formula: |
-    # Stub: returns 0 (no adjustment) when no capital gains
-    # Full implementation would compute tax savings from preferential rates
-    if net_capital_gain <= 0:
-      return 0
-    # TODO: Implement full 1(h) calculation
-    # For now, return 0 to allow ordinary_income_tax to be the full tax
-    return 0
-  tests:
-    - name: "No capital gains - no adjustment"
-      period: 2024-01
-      inputs:
-        filing_status: SINGLE
-        taxable_income: 50000
-        net_capital_gain: 0
-      expect: 0
+
+input unrecaptured_section_1250_gain:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: "USD"
+  label: "Unrecaptured Section 1250 Gain"
+  description: "Unrecaptured section 1250 gain per 26 USC 1(h)(6)"
+  default: 0
+
+input collectibles_gain:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: "USD"
+  label: "Collectibles Gain"
+  description: "Net capital gain from collectibles per 26 USC 1(h)(1)(F)"
+  default: 0

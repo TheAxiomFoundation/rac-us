@@ -1,0 +1,35 @@
+# 26 USC Section 1(i) - Rate reductions after 2000
+
+status: obsolete
+
+text: """
+(i) Rate reductions after 2000.—
+This subsection contained provisions for gradual rate reductions and the introduction of the 10% bracket effective for taxable years beginning after December 31, 2000.
+
+SUPERSEDED: The provisions of this subsection were superseded by subsection (j) for taxable years beginning after December 31, 2017.
+
+Historical note: This subsection provided for:
+- 10% rate bracket introduction
+- Gradual reduction of rates over several years
+- Temporary provisions that were later made permanent and then modified by the Tax Cuts and Jobs Act
+"""
+
+# This subsection is no longer effective for current tax years
+# All current rate calculations should use subsection (j) instead
+
+variable historical_rate_reductions:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  label: "Historical Rate Reductions (Obsolete)"
+  description: "OBSOLETE - Rate reductions under 26 USC 1(i) - superseded by 1(j)"
+  formula: |
+    # This subsection is superseded for taxable years beginning after 2017
+    if tax_year >= 2018:
+        return 0  # Use subsection (j) rates instead
+
+    # For historical calculations (2001-2017), would implement the
+    # rate reduction schedule that was in effect during that period
+    # This is preserved for historical tax calculations only
+    return 0
+  default: 0

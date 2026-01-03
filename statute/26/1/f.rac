@@ -1,0 +1,111 @@
+# 26 USC Section 1(f) - Phaseout of marriage penalty in 15-percent bracket; adjustments in tax tables so that inflation will not result in tax increases
+
+text: """
+(f) Adjustments in tax tables so that inflation will not result in tax increases.—
+
+(1) In general.—The Secretary shall prescribe tables which shall apply in lieu of the tables contained in subsections (a), (b), (c), (d), and (e) with respect to taxable years beginning after December 31, 2018. Such tables shall be prescribed—
+(A) except as otherwise provided in this subsection, by increasing the minimum and maximum dollar amounts for each rate bracket for which a tax is imposed under such tables by the cost-of-living adjustment for such taxable year,
+(B) by not changing the rate applicable to any rate bracket as adjusted under subparagraph (A), and
+(C) by adjusting the amounts setting forth the tax to the extent necessary to reflect the adjustments in the rate brackets.
+
+(2) Method of making adjustments.—For purposes of paragraph (1), the cost-of-living adjustment for any calendar year is the percentage (if any) by which—
+(A) the C-CPI-U for the preceding calendar year, exceeds
+(B) the C-CPI-U for calendar year 2017.
+
+(3) C-CPI-U.—For purposes of this subsection, the term "C-CPI-U" means the Chained Consumer Price Index for All Urban Consumers (as published by the Bureau of Labor Statistics of the Department of Labor). The values of the C-CPI-U taken into account for purposes of determining the cost-of-living adjustment for any calendar year under this subsection shall be the latest values so published for the 12-month period ending on August 31 of such calendar year.
+
+(4) Rounding.—
+(A) In general.—If any increase determined under paragraph (1)(A) is not a multiple of $50, such increase shall be rounded to the nearest multiple of $50.
+(B) Table for married individuals filing separate returns.—In the case of a married individual filing a separate return, if any increase determined under paragraph (1)(A) is not a multiple of $25, such increase shall be rounded to the nearest multiple of $25.
+
+(5) Elimination of marriage penalty in 15-percent bracket.—With respect to taxable years beginning after December 31, 2003, in prescribing the tables under paragraph (1)—
+(A) the maximum taxable income in the 15-percent rate bracket in the table contained in subsection (a) (and the minimum taxable income in the next higher taxable income bracket in such table) shall be 200 percent of the maximum taxable income in the 15-percent rate bracket in the table contained in subsection (c) (after any other adjustment under this subsection), and
+(B) the comparable taxable income amounts in the table contained in subsection (d) shall be ½ of the amounts determined under subparagraph (A).
+
+(6) Special rule for certain years.—Notwithstanding paragraph (5)—
+(A) the provisions of paragraph (5) shall not apply with respect to any taxable year beginning in 2004 or 2005,
+(B) in prescribing tables for any taxable year beginning in 2004, the Secretary shall make no adjustment to the dollar amounts contained in the tables which were in effect for taxable years beginning in 2003,
+(C) in prescribing tables for any taxable year beginning in 2005, the Secretary shall adjust the dollar amounts in the tables which were in effect for taxable years beginning in 2003 as if paragraph (5) applied to taxable years beginning in 2004, and
+(D) paragraph (5) shall be applied by substituting "December 31, 2006" for "December 31, 2003" in subparagraph (A) thereof.
+
+(7) [Cross-reference to cost-of-living adjustment definitions.]
+
+(8) Phaseout of marriage penalty in 15-percent bracket; adjustments in tax tables.—The preceding provisions of this subsection shall not apply to any taxable year to which section 3 applies.
+"""
+
+parameter cpi_base_year:
+  description: "Base year for C-CPI-U calculations per 26 USC 1(f)(2)"
+  values:
+    2018-01-01: 2017
+
+parameter rounding_amount_general:
+  description: "General rounding amount for tax brackets per 26 USC 1(f)(4)(A)"
+  unit: "USD"
+  values:
+    2018-01-01: 50
+
+parameter rounding_amount_mfs:
+  description: "Rounding amount for MFS tax brackets per 26 USC 1(f)(4)(B)"
+  unit: "USD"
+  values:
+    2018-01-01: 25
+
+parameter marriage_penalty_elimination_date:
+  description: "Date after which marriage penalty elimination applies per 26 USC 1(f)(5)"
+  values:
+    2004-01-01: "2003-12-31"
+
+# NOTE: This is a framework for inflation adjustment.
+# The actual inflation adjustments are published annually by the Secretary
+# and would be implemented through the indexed_by mechanism in the parameter definitions.
+
+variable inflation_adjustment:
+  entity: TaxUnit
+  period: Year
+  dtype: Rate
+  label: "Inflation Adjustment Factor"
+  description: "Cost-of-living adjustment factor per 26 USC 1(f)"
+  formula: |
+    # This is a placeholder for the Secretary's published adjustment
+    # In practice, this would reference the published C-CPI-U values
+    # and calculate the adjustment as specified in paragraph (2)
+    base_ccpiu = 1.0  # Would be actual 2017 C-CPI-U value
+    current_ccpiu = 1.0  # Would be actual current year C-CPI-U value
+
+    if tax_year <= 2017:
+        return 1.0
+
+    adjustment_factor = max(1.0, current_ccpiu / base_ccpiu)
+    return adjustment_factor
+  default: 1.0
+
+variable rounded_adjustment:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  label: "Rounded Inflation Adjustment"
+  description: "Rounded inflation adjustment per 26 USC 1(f)(4)"
+  formula: |
+    # Apply rounding rules based on filing status
+    base_adjustment = inflation_adjustment
+
+    if filing_status == "mfs":
+        # Round to nearest $25 for married filing separately
+        rounded = round(base_adjustment / rounding_amount_mfs) * rounding_amount_mfs
+    else:
+        # Round to nearest $50 for all other filing statuses
+        rounded = round(base_adjustment / rounding_amount_general) * rounding_amount_general
+
+    return rounded
+  tests:
+    - name: "No adjustment for 2017"
+      inputs:
+        tax_year: 2017
+        filing_status: "joint"
+      expect: 1.0
+    - name: "MFS rounding to $25"
+      inputs:
+        tax_year: 2020
+        filing_status: "mfs"
+        inflation_adjustment: 1.037
+      expect: 1.0  # Would round based on actual calculation

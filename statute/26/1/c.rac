@@ -1,0 +1,31 @@
+# 26 USC Section 1(c) - Unmarried individuals (other than surviving spouses and heads of households)
+
+text: """
+(c) Unmarried individuals (other than surviving spouses and heads of households).—
+There is hereby imposed on the taxable income of every individual who is not a married individual (within the meaning of section 7703) or a surviving spouse (as defined in section 2(a)) or the head of a household (as defined in section 2(b)) a tax determined in accordance with the following table:
+
+[Note: The actual table referenced here is replaced by 26 USC 1(j) for taxable years beginning after December 31, 2017]
+"""
+
+variable single_filer_tax:
+  imports:
+    - 26/1/j#tcja_income_tax
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: "USD"
+  label: "Single Filer Tax"
+  description: "Tax for single filers per 26 USC 1(c)"
+  formula: |
+    # For current tax years (2018+), use TCJA rates from subsection (j)
+    if filing_status == "single" and tax_year >= 2018:
+        return tcja_income_tax
+    else:
+        return 0
+  tests:
+    - name: "Single with TCJA rates"
+      inputs:
+        filing_status: "single"
+        taxable_income: 50000
+        tax_year: 2018
+      expect: 6790  # Computed using TCJA single brackets

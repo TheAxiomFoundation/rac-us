@@ -1,0 +1,120 @@
+# 26 USC Section 1(g) - Certain unearned income of children taxed as if parent's income
+
+text: """
+(g) Certain unearned income of children taxed as if parent's income.—
+
+(1) In general.—In the case of any child to whom this subsection applies, the tax imposed by this section shall be the greater of—
+(A) the tax imposed by this section without regard to this subsection, or
+(B) the sum of—
+(i) the tax which would be imposed by this section if the taxable income of such child for the taxable year were reduced by the net unearned income of such child, plus
+(ii) such child's share of the allocable parental tax.
+
+(2) Child to whom subsection applies.—This subsection shall apply to any child for any taxable year if—
+(A) such child—
+(i) has not attained age 18 before the close of the taxable year, or
+(ii) has attained age 18 before the close of the taxable year and is a full-time student (within the meaning of section 152(f)(2)) who has not attained age 24 before the close of the taxable year, and whose earned income (within the meaning of section 911(d)(2)) for such taxable year does not exceed one-half of the amount of the individual's support for such taxable year,
+(B) either parent of such child is alive at the close of the taxable year, and
+(C) such child does not file a joint return for the taxable year.
+
+(3) Allocable parental tax.—For purposes of this subsection—
+(A) In general.—The term "allocable parental tax" means the excess (if any) of—
+(i) the tax which would be imposed by this section on the parent's taxable income if such income were increased by the net unearned income of all children of the parent to whom this subsection applies, over
+(ii) the tax imposed by this section on the parent without regard to this subsection.
+(B) Child's share.—A child's share of any allocable parental tax of a parent shall be equal to an amount which bears the same ratio to the total allocable parental tax as the child's net unearned income bears to the aggregate net unearned income of all children of such parent to whom this subsection applies.
+
+(4) Net unearned income.—For purposes of this subsection—
+(A) In general.—The term "net unearned income" means the excess (if any) of—
+(i) the portion of the adjusted gross income for the taxable year which is not earned income (within the meaning of section 911(d)(2)), over
+(ii) the sum of—
+(I) the amount in effect for the taxable year under section 63(c)(5)(A) (relating to the standard deduction for dependents), plus
+(II) the greater of the amount described in subclause (I) or, if the child itemizes deductions for the taxable year, the amount of the itemized deductions allowed by this chapter for the taxable year which are directly connected with the production of the portion of adjusted gross income referred to in clause (i).
+
+[Additional paragraphs (5)-(7) continue with definitions and special rules]
+"""
+
+parameter kiddie_tax_age_threshold:
+  description: "Age threshold for kiddie tax applicability per 26 USC 1(g)(2)(A)"
+  values:
+    1987-01-01: 18
+
+parameter kiddie_tax_student_age_threshold:
+  description: "Age threshold for full-time students under kiddie tax per 26 USC 1(g)(2)(A)(ii)"
+  values:
+    2008-01-01: 24
+
+variable kiddie_tax_adjustment:
+  imports:
+    - 26/1/g/1#kiddie_tax_calculation
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: "USD"
+  label: "Kiddie Tax Adjustment"
+  description: "Additional tax under kiddie tax rules per 26 USC 1(g)"
+  formula: |
+    # Check if kiddie tax applies based on age and other criteria
+    if not kiddie_tax_applies:
+        return 0
+
+    # Calculate the kiddie tax adjustment
+    return kiddie_tax_calculation
+  default: 0
+
+# Create stub for detailed kiddie tax calculation
+variable kiddie_tax_applies:
+  entity: TaxUnit
+  period: Year
+  dtype: Bool
+  label: "Kiddie Tax Applies"
+  description: "Whether kiddie tax rules apply per 26 USC 1(g)(2)"
+  formula: |
+    # Child must be under 18, or under 24 and a full-time student with limited earned income
+    # At least one parent must be alive
+    # Child cannot file joint return
+    # This is simplified - full implementation would check all criteria
+
+    if age >= 18:
+        return False
+
+    if not parent_alive:
+        return False
+
+    if files_joint_return:
+        return False
+
+    return net_unearned_income > 0
+  default: False
+
+# Input variables needed for kiddie tax calculation
+input age:
+  entity: TaxUnit
+  period: Year
+  dtype: Int
+  label: "Child's Age"
+  description: "Age of the child for kiddie tax purposes"
+  default: 18
+
+input parent_alive:
+  entity: TaxUnit
+  period: Year
+  dtype: Bool
+  label: "Parent Alive"
+  description: "Whether at least one parent is alive per 26 USC 1(g)(2)(B)"
+  default: True
+
+input files_joint_return:
+  entity: TaxUnit
+  period: Year
+  dtype: Bool
+  label: "Files Joint Return"
+  description: "Whether child files joint return per 26 USC 1(g)(2)(C)"
+  default: False
+
+input net_unearned_income:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: "USD"
+  label: "Net Unearned Income"
+  description: "Child's net unearned income per 26 USC 1(g)(4)"
+  default: 0

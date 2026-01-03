@@ -1,0 +1,18 @@
+# 26 USC Section 1(g)(1) - In general (Kiddie tax calculation)
+
+status: stub
+
+text: """
+(g)(1) In general.—In the case of any child to whom this subsection applies, the tax imposed by this section shall be the greater of—
+(A) the tax imposed by this section without regard to this subsection, or
+(B) the sum of—
+(i) the tax which would be imposed by this section if the taxable income of such child for the taxable year were reduced by the net unearned income of such child, plus
+(ii) such child's share of the allocable parental tax.
+"""
+
+variable kiddie_tax_calculation:
+  stub_for: 26/1/g#kiddie_tax_adjustment
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  default: 0

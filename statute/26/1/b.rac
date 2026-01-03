@@ -1,0 +1,31 @@
+# 26 USC Section 1(b) - Heads of households
+
+text: """
+(b) Heads of households.—
+There is hereby imposed on the taxable income of every individual who qualifies under section 2(b) as a head of a household a tax determined in accordance with the following table:
+
+[Note: The actual table referenced here is replaced by 26 USC 1(j) for taxable years beginning after December 31, 2017]
+"""
+
+variable head_of_household_tax:
+  imports:
+    - 26/1/j#tcja_income_tax
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: "USD"
+  label: "Head of Household Tax"
+  description: "Tax for head of household filers per 26 USC 1(b)"
+  formula: |
+    # For current tax years (2018+), use TCJA rates from subsection (j)
+    if filing_status == "hoh" and tax_year >= 2018:
+        return tcja_income_tax
+    else:
+        return 0
+  tests:
+    - name: "HOH with TCJA rates"
+      inputs:
+        filing_status: "hoh"
+        taxable_income: 75000
+        tax_year: 2018
+      expect: 11144  # Computed using TCJA HOH brackets

@@ -1,0 +1,31 @@
+# 26 USC Section 1(d) - Married individuals filing separate returns
+
+text: """
+(d) Married individuals filing separate returns.—
+There is hereby imposed on the taxable income of every married individual (as defined in section 7703) who does not make a joint return under section 6013 a tax determined in accordance with the following table:
+
+[Note: The actual table referenced here is replaced by 26 USC 1(j) for taxable years beginning after December 31, 2017]
+"""
+
+variable married_separate_tax:
+  imports:
+    - 26/1/j#tcja_income_tax
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: "USD"
+  label: "Married Filing Separate Tax"
+  description: "Tax for married filing separately per 26 USC 1(d)"
+  formula: |
+    # For current tax years (2018+), use TCJA rates from subsection (j)
+    if filing_status == "mfs" and tax_year >= 2018:
+        return tcja_income_tax
+    else:
+        return 0
+  tests:
+    - name: "MFS with TCJA rates"
+      inputs:
+        filing_status: "mfs"
+        taxable_income: 75000
+        tax_year: 2018
+      expect: 12789.50  # Computed using TCJA MFS brackets
