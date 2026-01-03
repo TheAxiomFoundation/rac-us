@@ -216,7 +216,7 @@ Path format: `title/section/subsection#variable_name`
 Python-like with restrictions:
 - Keywords: `if`, `else`, `return`, `for`, `break`, `and`, `or`, `not`, `in`
 - Built-ins: `max`, `min`, `abs`, `round`, `sum`, `len`
-- **No numeric literals** except -1, 0, 1, 2, 3 (use parameters)
+- **No numeric literals** except -1, 0, 1 (use parameters for everything else)
 
 ```yaml
 formula: |
@@ -231,7 +231,7 @@ These rules are enforced by CI (automated pytest checks):
 
 | Rule | Description |
 |------|-------------|
-| No magic numbers | Only -1, 0, 1, 2, 3 allowed in formulas |
+| No magic numbers | Only -1, 0, 1 allowed in formulas |
 | Param values in text | Every parameter value must appear in the `text:` field |
 | Imports resolve | All `imports:` paths must reference existing files/variables |
 | Large number separators | Numbers ≥1000 must use `_` separator (e.g., `10_000`) |
