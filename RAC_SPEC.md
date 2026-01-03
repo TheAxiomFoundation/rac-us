@@ -1,6 +1,6 @@
 # .rac File Specification v2
 
-Self-contained statute encoding format for tax and benefit rules.
+Self-contained rule encoding format for tax statutes, regulations, and guidance.
 
 ## Core Principle
 
@@ -9,7 +9,7 @@ Self-contained statute encoding format for tax and benefit rules.
 What IS encoded must be faithful to the text. What ISN'T encoded should be explicitly marked with a status.
 
 This means:
-- Values in the statute text → parameters in the .rac
+- Values in the rule text → parameters in the .rac
 - Values from IRS guidance, indexing, etc. → separate data layer (not in .rac)
 - The `indexed_by:` field is a pointer, not a command to include indexed values
 
@@ -28,6 +28,7 @@ notes: "optional context"
 | `encoded` | Fully implemented | Yes |
 | `partial` | Some provisions in text encoded, others pending | Yes (incomplete) |
 | `draft` | Work in progress | Partial |
+| `stub` | Interface-only placeholder for import resolution | No |
 | `consolidated` | Captured in parent/sibling file | No |
 | `deferred` | Too complex, return later | No |
 | `boilerplate` | Definitions, cross-refs, no computational content | No |
@@ -61,6 +62,56 @@ parameter credit_percentage: ...
 variable eitc_credit_pct: ...
 # investment_income_test not yet encoded
 ```
+
+### Stub Format (STRICT)
+
+**Stubs exist ONLY to resolve imports.** When encoding file A requires importing from file B that doesn't exist, create B as a minimal stub.
+
+⚠️ **Stubs contain:**
+- `status: stub`
+- `text:` block with the rule text (for reviewer verification)
+- Variable declarations with `stub_for:` field
+- Entity, period, dtype, default
+
+⚠️ **Stubs do NOT contain:**
+- Parameters (no values researched)
+- Formulas (no logic implemented)
+- Tests (nothing to test)
+- Analysis notes or complexity assessments
+
+```yaml
+# 26 USC Section 1(h) - Maximum Capital Gains Rate
+# Stub for import resolution from 26/1
+
+status: stub
+
+text: """
+(h) Maximum capital gains rate.—
+(1) In general.— If a taxpayer has a net capital gain for any taxable year,
+the tax imposed by this section for such taxable year shall not exceed the sum of—
+...
+"""
+
+variable adjusted_net_capital_gain:
+  stub_for: 26/1#income_tax
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  default: 0
+
+variable capital_gains_tax:
+  stub_for: 26/1#income_tax
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  default: 0
+```
+
+The `stub_for:` field indicates which importing variable triggered stub creation. Remove it when encoding the stub into a full implementation.
+
+**Stub vs Deferred:**
+- `stub`: Interface placeholder - text included for reviewer verification, but no implementation
+- `deferred`: Reviewed and intentionally skipped - includes notes explaining why
 
 ## File Structure
 
@@ -181,7 +232,7 @@ When you see these statutory patterns, use the corresponding RAC construct.
 
 ### Progressive Tax Brackets → `marginal_agg()`
 
-When statute has a rate table like:
+When rule has a rate table like:
 ```
 If taxable income is:          The tax is:
 Not over $X                    A% of taxable income
@@ -235,7 +286,7 @@ variable income_tax:
 
 ### Step Function Lookup → `cut()`
 
-When statute says "if X is at least Y, the amount is Z":
+When rule says "if X is at least Y, the amount is Z":
 
 ```yaml
 parameter benefit_schedule:
@@ -295,7 +346,7 @@ tests:
 
 ## Versioning (Temporal)
 
-For statutes with formula changes over time:
+For rules with formula changes over time:
 
 ```yaml
 variable additional_ctc:
@@ -315,7 +366,7 @@ variable additional_ctc:
       reverts_to: 2001-01-01
 ```
 
-Effective dates should come from statute text conditions (e.g., "for taxable years beginning after December 31, 2017"). P.L. references are tracked separately in arch, not required in .rac files.
+Effective dates should come from rule text conditions (e.g., "for taxable years beginning after December 31, 2017"). P.L. references are tracked separately in arch, not required in .rac files.
 
 ## Uncertainty Metadata
 

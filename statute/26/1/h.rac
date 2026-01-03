@@ -1,0 +1,93 @@
+# 26 USC Section 1(h) - Maximum Capital Gains Rate
+#
+# status: stub
+# notes: "Full capital gains implementation pending. This stub provides
+#         the interface needed by 26/1#income_tax."
+#
+# This subsection provides preferential rates for net capital gain:
+# - 0% rate for adjusted net capital gain up to certain thresholds
+# - 15% rate for middle income brackets
+# - 20% rate for highest income brackets
+# - 25% rate for unrecaptured section 1250 gain
+# - 28% rate for collectibles gain and section 1202 gain
+
+text: """
+(h) MAXIMUM CAPITAL GAINS RATE.--
+
+(1) IN GENERAL.-- If a taxpayer has a net capital gain for any taxable year,
+the tax imposed by this section for such taxable year shall not exceed the
+sum of--
+(A) a tax computed at the rates and in the same manner as if this
+subsection had not been enacted on the greater of--
+(i) taxable income reduced by the net capital gain; or
+(ii) the lesser of--
+(I) the amount of taxable income taxed at a rate below 25 percent, or
+(II) taxable income reduced by the adjusted net capital gain;
+(B) 0 percent of so much of the adjusted net capital gain (or, if less,
+taxable income) as does not exceed the excess (if any) of...
+(C) 15 percent of the lesser of...
+(D) 20 percent of the adjusted net capital gain... in excess of...
+(E) 25 percent of the excess (if any) of the unrecaptured section 1250
+gain over the 28-percent rate gain,
+(F) 28 percent of the excess (if any) of the net capital gain...
+"""
+
+# Input: net capital gain (from schedule D)
+input net_capital_gain:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: "USD"
+  label: "Net Capital Gain"
+  description: "Net capital gain per 26 USC 1222(11)"
+  default: 0
+
+# Capital gains rate parameters
+parameter zero_pct_rate:
+  description: "0% capital gains rate"
+  unit: rate
+  values:
+    2018-01-01: 0.00
+
+parameter fifteen_pct_rate:
+  description: "15% capital gains rate"
+  unit: rate
+  values:
+    2018-01-01: 0.15
+
+parameter twenty_pct_rate:
+  description: "20% capital gains rate"
+  unit: rate
+  values:
+    2018-01-01: 0.20
+
+# Stub variable: capital gains tax adjustment
+# This represents the reduction in tax from preferential capital gains rates
+variable capital_gains_tax_adjustment:
+  imports:
+    - 26/1#filing_status
+    - 26/1#taxable_income
+    - 26/1/j#ordinary_income_tax
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: "USD"
+  label: "Capital Gains Tax Adjustment"
+  description: "Reduction in tax due to preferential capital gains rates per 26 USC 1(h)"
+  default: 0
+  formula: |
+    # Stub: returns 0 (no adjustment) when no capital gains
+    # Full implementation would compute tax savings from preferential rates
+    if net_capital_gain <= 0:
+      return 0
+    # TODO: Implement full 1(h) calculation
+    # For now, return 0 to allow ordinary_income_tax to be the full tax
+    return 0
+  tests:
+    - name: "No capital gains - no adjustment"
+      period: 2024-01
+      inputs:
+        filing_status: SINGLE
+        taxable_income: 50000
+        net_capital_gain: 0
+      expect: 0
