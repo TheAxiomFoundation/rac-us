@@ -1,0 +1,115 @@
+# 26 USC 1(j)(2)(E) - Estates and trusts
+
+text: """
+(E) Estates and trusts
+The following table shall be applied in lieu of the table contained in subsection (e):
+
+If taxable income is:                    The tax is:
+Not over $2,550                          10% of taxable income.
+Over $2,550 but not over $9,150          $255, plus 24% of the excess over $2,550.
+Over $9,150 but not over $12,500         $1,839, plus 35% of the excess over $9,150.
+Over $12,500                             $3,011.50, plus 37% of the excess over $12,500.
+"""
+
+parameter trust_bracket_1_threshold:
+  description: "First bracket threshold for estates and trusts per 26 USC 1(j)(2)(E)"
+  indexed_by: cpi_adjustment
+  values:
+    2018-01-01: 0
+
+parameter trust_bracket_2_threshold:
+  description: "Second bracket threshold for estates and trusts per 26 USC 1(j)(2)(E)"
+  indexed_by: cpi_adjustment
+  values:
+    2018-01-01: 2550
+
+parameter trust_bracket_3_threshold:
+  description: "Third bracket threshold for estates and trusts per 26 USC 1(j)(2)(E)"
+  indexed_by: cpi_adjustment
+  values:
+    2018-01-01: 9150
+
+parameter trust_bracket_4_threshold:
+  description: "Fourth bracket threshold for estates and trusts per 26 USC 1(j)(2)(E)"
+  indexed_by: cpi_adjustment
+  values:
+    2018-01-01: 12500
+
+parameter trust_rate_1:
+  description: "First marginal rate for estates and trusts per 26 USC 1(j)(2)(E)"
+  values:
+    2018-01-01: 0.10
+
+parameter trust_rate_2:
+  description: "Second marginal rate for estates and trusts per 26 USC 1(j)(2)(E)"
+  values:
+    2018-01-01: 0.24
+
+parameter trust_rate_3:
+  description: "Third marginal rate for estates and trusts per 26 USC 1(j)(2)(E)"
+  values:
+    2018-01-01: 0.35
+
+parameter trust_rate_4:
+  description: "Fourth marginal rate for estates and trusts per 26 USC 1(j)(2)(E)"
+  values:
+    2018-01-01: 0.37
+
+input taxable_income:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  label: "Taxable Income"
+  description: "Taxable income as determined under 26 USC 63"
+
+variable trust_income_tax:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: "USD"
+  label: "Income Tax (Estates/Trusts)"
+  description: "Income tax for estates and trusts per 26 USC 1(j)(2)(E)"
+  formula: |
+    # Bracket 1: 10% of income up to threshold 2
+    bracket_1_income = min(taxable_income, trust_bracket_2_threshold)
+    tax_1 = bracket_1_income * trust_rate_1
+
+    # Bracket 2: 24% of income between thresholds 2 and 3
+    bracket_2_income = max(0, min(taxable_income, trust_bracket_3_threshold) - trust_bracket_2_threshold)
+    tax_2 = bracket_2_income * trust_rate_2
+
+    # Bracket 3: 35% of income between thresholds 3 and 4
+    bracket_3_income = max(0, min(taxable_income, trust_bracket_4_threshold) - trust_bracket_3_threshold)
+    tax_3 = bracket_3_income * trust_rate_3
+
+    # Bracket 4: 37% of income above threshold 4
+    bracket_4_income = max(0, taxable_income - trust_bracket_4_threshold)
+    tax_4 = bracket_4_income * trust_rate_4
+
+    return tax_1 + tax_2 + tax_3 + tax_4
+  tests:
+    - name: "First bracket only"
+      period: 2018-01
+      inputs:
+        taxable_income: 2000
+      expect: 200
+    - name: "Second bracket"
+      period: 2018-01
+      inputs:
+        taxable_income: 5000
+      expect: 843
+    - name: "Third bracket"
+      period: 2018-01
+      inputs:
+        taxable_income: 10000
+      expect: 2136.5
+    - name: "Top bracket"
+      period: 2018-01
+      inputs:
+        taxable_income: 20000
+      expect: 5786.5
+    - name: "Zero income"
+      period: 2018-01
+      inputs:
+        taxable_income: 0
+      expect: 0
