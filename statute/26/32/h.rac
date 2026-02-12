@@ -1,0 +1,18 @@
+# 26 USC 32(h) - Repealed
+
+status: obsolete
+
+text: """
+[(h) Repealed. Pub. L. 107-16, title III, § 303(c), June 7, 2001, 115 Stat. 55]
+"""
+
+# Subsection (h) of 26 USC 32 was repealed by the Economic Growth and Tax Relief
+# Reconciliation Act of 2001 (EGTRRA), Pub. L. 107-16, § 303(c).
+#
+# Prior to repeal, subsection (h) related to supplemental young child credit.
+# This provision was eliminated as part of EGTRRA's expansion of the child tax credit.
+#
+# The "investment income restriction" commonly associated with EITC is located in
+# subsection (i), not subsection (h). See statute/26/32/i.rac for that encoding.
+#
+# No computational content - this is a placeholder documenting the repealed status.

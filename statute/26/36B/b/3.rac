@@ -1,0 +1,643 @@
+# 26 USC 36B(b)(3) - Other terms and rules relating to premium assistance amounts
+
+text: """
+(3) Other terms and rules relating to premium assistance amounts
+For purposes of paragraph (2)—
+(A) Applicable percentage
+(i) In general
+Except as provided in clause (ii), the applicable percentage for any taxable year
+shall be the percentage such that the applicable percentage for any taxpayer whose
+household income is within an income tier specified in the following table shall
+increase, on a sliding scale in a linear manner, from the initial premium percentage
+to the final premium percentage specified in such table for such income tier:
+
+In the case of household income (expressed as a percent of poverty line)
+within the following income tier:
+  Up to 133%           Initial: 2.0%    Final: 2.0%
+  133% up to 150%      Initial: 3.0%    Final: 4.0%
+  150% up to 200%      Initial: 4.0%    Final: 6.3%
+  200% up to 250%      Initial: 6.3%    Final: 8.05%
+  250% up to 300%      Initial: 8.05%   Final: 9.5%
+  300% up to 400%      Initial: 9.5%    Final: 9.5%
+
+(ii) Indexing
+(I) In general
+Subject to subclause (II), in the case of taxable years beginning in any calendar
+year after 2014, the initial and final applicable percentages under clause (i) (as in
+effect for the preceding calendar year after application of this clause) shall be
+adjusted to reflect the excess of the rate of premium growth for the preceding
+calendar year over the rate of income growth for the preceding calendar year.
+
+(II) Additional adjustment
+Except as provided in subclause (III), in the case of any calendar year after 2018,
+the percentages described in subclause (I) shall, in addition to the adjustment under
+subclause (I), be adjusted to reflect the excess (if any) of the rate of premium
+growth estimated under subclause (I) for the preceding calendar year over the rate of
+growth in the consumer price index for the preceding calendar year.
+
+(III) Failsafe
+Subclause (II) shall apply for any calendar year only if the aggregate amount of
+premium tax credits under this section and cost-sharing reductions under section 1402
+of the Patient Protection and Affordable Care Act for the preceding calendar year
+exceeds an amount equal to 0.504 percent of the gross domestic product for the
+preceding calendar year.
+
+(iii) Temporary percentages for 2021 through 2025
+In the case of a taxable year beginning after December 31, 2020, and before
+January 1, 2026—
+(I) clause (ii) shall not apply for purposes of adjusting premium percentages under
+this subparagraph, and
+(II) the following table shall be applied in lieu of the table contained in clause (i):
+
+In the case of household income (expressed as a percent of poverty line)
+within the following income tier:
+  Up to 150.0 percent          Initial: 0.0    Final: 0.0
+  150.0 percent up to 200.0 percent   Initial: 0.0    Final: 2.0
+  200.0 percent up to 250.0 percent   Initial: 2.0    Final: 4.0
+  250.0 percent up to 300.0 percent   Initial: 4.0    Final: 6.0
+  300.0 percent up to 400.0 percent   Initial: 6.0    Final: 8.5
+  400.0 percent and higher            Initial: 8.5    Final: 8.5
+"""
+
+# =============================================================================
+# Parameters: Clause (i) base table (ACA original, effective 2014)
+# =============================================================================
+
+# Tier thresholds (expressed as percent of poverty line, in /1 units)
+
+parameter base_tier_1_threshold:
+  description: "Lower bound of first income tier per 26 USC 36B(b)(3)(A)(i)"
+  unit: /1
+  values:
+    2014-01-01: 0
+
+parameter base_tier_2_threshold:
+  description: "Lower bound of second income tier (133% FPL) per 26 USC 36B(b)(3)(A)(i)"
+  unit: /1
+  values:
+    2014-01-01: 1.33
+
+parameter base_tier_3_threshold:
+  description: "Lower bound of third income tier (150% FPL) per 26 USC 36B(b)(3)(A)(i)"
+  unit: /1
+  values:
+    2014-01-01: 1.50
+
+parameter base_tier_4_threshold:
+  description: "Lower bound of fourth income tier (200% FPL) per 26 USC 36B(b)(3)(A)(i)"
+  unit: /1
+  values:
+    2014-01-01: 2.00
+
+parameter base_tier_5_threshold:
+  description: "Lower bound of fifth income tier (250% FPL) per 26 USC 36B(b)(3)(A)(i)"
+  unit: /1
+  values:
+    2014-01-01: 2.50
+
+parameter base_tier_6_threshold:
+  description: "Lower bound of sixth income tier (300% FPL) per 26 USC 36B(b)(3)(A)(i)"
+  unit: /1
+  values:
+    2014-01-01: 3.00
+
+parameter base_tier_upper:
+  description: "Upper bound of last income tier (400% FPL) per 26 USC 36B(b)(3)(A)(i)"
+  unit: /1
+  values:
+    2014-01-01: 4.00
+
+# Initial premium percentages per tier (clause (i) table)
+
+parameter base_initial_1:
+  description: "Initial premium percentage for up-to-133% tier per 26 USC 36B(b)(3)(A)(i)"
+  unit: /1
+  indexed_by: premium_income_growth_adjustment
+  values:
+    2014-01-01: 0.02
+
+parameter base_initial_2:
+  description: "Initial premium percentage for 133-150% tier per 26 USC 36B(b)(3)(A)(i)"
+  unit: /1
+  indexed_by: premium_income_growth_adjustment
+  values:
+    2014-01-01: 0.03
+
+parameter base_initial_3:
+  description: "Initial premium percentage for 150-200% tier per 26 USC 36B(b)(3)(A)(i)"
+  unit: /1
+  indexed_by: premium_income_growth_adjustment
+  values:
+    2014-01-01: 0.04
+
+parameter base_initial_4:
+  description: "Initial premium percentage for 200-250% tier per 26 USC 36B(b)(3)(A)(i)"
+  unit: /1
+  indexed_by: premium_income_growth_adjustment
+  values:
+    2014-01-01: 0.063
+
+parameter base_initial_5:
+  description: "Initial premium percentage for 250-300% tier per 26 USC 36B(b)(3)(A)(i)"
+  unit: /1
+  indexed_by: premium_income_growth_adjustment
+  values:
+    2014-01-01: 0.0805
+
+parameter base_initial_6:
+  description: "Initial premium percentage for 300-400% tier per 26 USC 36B(b)(3)(A)(i)"
+  unit: /1
+  indexed_by: premium_income_growth_adjustment
+  values:
+    2014-01-01: 0.095
+
+# Final premium percentages per tier (clause (i) table)
+
+parameter base_final_1:
+  description: "Final premium percentage for up-to-133% tier per 26 USC 36B(b)(3)(A)(i)"
+  unit: /1
+  indexed_by: premium_income_growth_adjustment
+  values:
+    2014-01-01: 0.02
+
+parameter base_final_2:
+  description: "Final premium percentage for 133-150% tier per 26 USC 36B(b)(3)(A)(i)"
+  unit: /1
+  indexed_by: premium_income_growth_adjustment
+  values:
+    2014-01-01: 0.04
+
+parameter base_final_3:
+  description: "Final premium percentage for 150-200% tier per 26 USC 36B(b)(3)(A)(i)"
+  unit: /1
+  indexed_by: premium_income_growth_adjustment
+  values:
+    2014-01-01: 0.063
+
+parameter base_final_4:
+  description: "Final premium percentage for 200-250% tier per 26 USC 36B(b)(3)(A)(i)"
+  unit: /1
+  indexed_by: premium_income_growth_adjustment
+  values:
+    2014-01-01: 0.0805
+
+parameter base_final_5:
+  description: "Final premium percentage for 250-300% tier per 26 USC 36B(b)(3)(A)(i)"
+  unit: /1
+  indexed_by: premium_income_growth_adjustment
+  values:
+    2014-01-01: 0.095
+
+parameter base_final_6:
+  description: "Final premium percentage for 300-400% tier per 26 USC 36B(b)(3)(A)(i)"
+  unit: /1
+  indexed_by: premium_income_growth_adjustment
+  values:
+    2014-01-01: 0.095
+
+# =============================================================================
+# Parameters: Clause (iii) temporary IRA table (2021-2025)
+# =============================================================================
+
+# Tier thresholds for temporary table
+
+parameter ira_tier_1_threshold:
+  description: "Lower bound of first IRA income tier per 26 USC 36B(b)(3)(A)(iii)(II)"
+  unit: /1
+  values:
+    2021-01-01: 0
+
+parameter ira_tier_2_threshold:
+  description: "Lower bound of second IRA income tier (150% FPL) per 26 USC 36B(b)(3)(A)(iii)(II)"
+  unit: /1
+  values:
+    2021-01-01: 1.50
+
+parameter ira_tier_3_threshold:
+  description: "Lower bound of third IRA income tier (200% FPL) per 26 USC 36B(b)(3)(A)(iii)(II)"
+  unit: /1
+  values:
+    2021-01-01: 2.00
+
+parameter ira_tier_4_threshold:
+  description: "Lower bound of fourth IRA income tier (250% FPL) per 26 USC 36B(b)(3)(A)(iii)(II)"
+  unit: /1
+  values:
+    2021-01-01: 2.50
+
+parameter ira_tier_5_threshold:
+  description: "Lower bound of fifth IRA income tier (300% FPL) per 26 USC 36B(b)(3)(A)(iii)(II)"
+  unit: /1
+  values:
+    2021-01-01: 3.00
+
+parameter ira_tier_6_threshold:
+  description: "Lower bound of sixth IRA income tier (400% FPL) per 26 USC 36B(b)(3)(A)(iii)(II)"
+  unit: /1
+  values:
+    2021-01-01: 4.00
+
+# Initial premium percentages for IRA temporary table
+
+parameter ira_initial_1:
+  description: "Initial premium percentage for up-to-150% IRA tier per 26 USC 36B(b)(3)(A)(iii)(II)"
+  unit: /1
+  values:
+    2021-01-01: 0.0
+
+parameter ira_initial_2:
+  description: "Initial premium percentage for 150-200% IRA tier per 26 USC 36B(b)(3)(A)(iii)(II)"
+  unit: /1
+  values:
+    2021-01-01: 0.0
+
+parameter ira_initial_3:
+  description: "Initial premium percentage for 200-250% IRA tier per 26 USC 36B(b)(3)(A)(iii)(II)"
+  unit: /1
+  values:
+    2021-01-01: 0.02
+
+parameter ira_initial_4:
+  description: "Initial premium percentage for 250-300% IRA tier per 26 USC 36B(b)(3)(A)(iii)(II)"
+  unit: /1
+  values:
+    2021-01-01: 0.04
+
+parameter ira_initial_5:
+  description: "Initial premium percentage for 300-400% IRA tier per 26 USC 36B(b)(3)(A)(iii)(II)"
+  unit: /1
+  values:
+    2021-01-01: 0.06
+
+parameter ira_initial_6:
+  description: "Initial premium percentage for 400%+ IRA tier per 26 USC 36B(b)(3)(A)(iii)(II)"
+  unit: /1
+  values:
+    2021-01-01: 0.085
+
+# Final premium percentages for IRA temporary table
+
+parameter ira_final_1:
+  description: "Final premium percentage for up-to-150% IRA tier per 26 USC 36B(b)(3)(A)(iii)(II)"
+  unit: /1
+  values:
+    2021-01-01: 0.0
+
+parameter ira_final_2:
+  description: "Final premium percentage for 150-200% IRA tier per 26 USC 36B(b)(3)(A)(iii)(II)"
+  unit: /1
+  values:
+    2021-01-01: 0.02
+
+parameter ira_final_3:
+  description: "Final premium percentage for 200-250% IRA tier per 26 USC 36B(b)(3)(A)(iii)(II)"
+  unit: /1
+  values:
+    2021-01-01: 0.04
+
+parameter ira_final_4:
+  description: "Final premium percentage for 250-300% IRA tier per 26 USC 36B(b)(3)(A)(iii)(II)"
+  unit: /1
+  values:
+    2021-01-01: 0.06
+
+parameter ira_final_5:
+  description: "Final premium percentage for 300-400% IRA tier per 26 USC 36B(b)(3)(A)(iii)(II)"
+  unit: /1
+  values:
+    2021-01-01: 0.085
+
+parameter ira_final_6:
+  description: "Final premium percentage for 400%+ IRA tier per 26 USC 36B(b)(3)(A)(iii)(II)"
+  unit: /1
+  values:
+    2021-01-01: 0.085
+
+# =============================================================================
+# Parameters: Clause (ii)(III) failsafe threshold
+# =============================================================================
+
+parameter failsafe_gdp_pct:
+  description: "PTC + CSR spending as pct of GDP threshold for additional CPI adjustment per 26 USC 36B(b)(3)(A)(ii)(III)"
+  unit: /1
+  values:
+    2014-01-01: 0.00504
+
+# =============================================================================
+# Parameters: Temporal boundaries
+# =============================================================================
+
+parameter ira_start_year:
+  description: "First taxable year for IRA temporary percentages per 26 USC 36B(b)(3)(A)(iii)"
+  values:
+    2021-01-01: 2021
+
+parameter ira_end_year:
+  description: "Last taxable year for IRA temporary percentages per 26 USC 36B(b)(3)(A)(iii)"
+  values:
+    2021-01-01: 2025
+
+# =============================================================================
+# Inputs
+# =============================================================================
+
+input household_income:
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  label: "Household Income"
+  description: "Household income per 26 USC 36B(d)(2)"
+  default: 0
+
+input tax_year:
+  entity: TaxUnit
+  period: Year
+  dtype: Integer
+  label: "Tax Year"
+  description: "Taxable year for determining which applicable percentage table applies"
+  default: 2024
+
+# =============================================================================
+# Variable: Household income as percent of poverty line
+# =============================================================================
+
+variable household_income_pct_fpl:
+  imports:
+    - 26/36B/d/3#poverty_line
+  entity: TaxUnit
+  period: Year
+  dtype: Rate
+  label: "Household Income as Percent of FPL"
+  description: "Household income expressed as a ratio of the federal poverty line per 26 USC 36B(b)(3)(A)"
+  formula: |
+    if poverty_line == 0:
+      return 0
+    return household_income / poverty_line
+  tests:
+    - name: "200% FPL"
+      period: 2024-01
+      inputs:
+        household_income: 60000
+        poverty_line: 30000
+      expect: 2.0
+    - name: "150% FPL"
+      period: 2024-01
+      inputs:
+        household_income: 45000
+        poverty_line: 30000
+      expect: 1.5
+    - name: "Zero poverty line (edge case)"
+      period: 2024-01
+      inputs:
+        household_income: 50000
+        poverty_line: 0
+      expect: 0
+    - name: "Zero income"
+      period: 2024-01
+      inputs:
+        household_income: 0
+        poverty_line: 30000
+      expect: 0
+
+# =============================================================================
+# Variable: Applicable percentage under clause (i) base table
+# =============================================================================
+
+variable applicable_percentage_base:
+  entity: TaxUnit
+  period: Year
+  dtype: Rate
+  label: "Applicable Percentage (Base Table)"
+  description: "Applicable percentage under clause (i) base table per 26 USC 36B(b)(3)(A)(i), with linear interpolation within each income tier"
+  formula: |
+    # Linear interpolation within each tier:
+    # pct = initial + (final - initial) * (income_ratio - tier_lower) / (tier_upper - tier_lower)
+    income_ratio = household_income_pct_fpl
+
+    # Tier 1: Up to 133% FPL
+    if income_ratio <= base_tier_2_threshold:
+      return base_initial_1
+
+    # Tier 2: 133% up to 150% FPL
+    if income_ratio <= base_tier_3_threshold:
+      fraction = (income_ratio - base_tier_2_threshold) / (base_tier_3_threshold - base_tier_2_threshold)
+      return base_initial_2 + (base_final_2 - base_initial_2) * fraction
+
+    # Tier 3: 150% up to 200% FPL
+    if income_ratio <= base_tier_4_threshold:
+      fraction = (income_ratio - base_tier_3_threshold) / (base_tier_4_threshold - base_tier_3_threshold)
+      return base_initial_3 + (base_final_3 - base_initial_3) * fraction
+
+    # Tier 4: 200% up to 250% FPL
+    if income_ratio <= base_tier_5_threshold:
+      fraction = (income_ratio - base_tier_4_threshold) / (base_tier_5_threshold - base_tier_4_threshold)
+      return base_initial_4 + (base_final_4 - base_initial_4) * fraction
+
+    # Tier 5: 250% up to 300% FPL
+    if income_ratio <= base_tier_6_threshold:
+      fraction = (income_ratio - base_tier_5_threshold) / (base_tier_6_threshold - base_tier_5_threshold)
+      return base_initial_5 + (base_final_5 - base_initial_5) * fraction
+
+    # Tier 6: 300% up to 400% FPL
+    if income_ratio <= base_tier_upper:
+      fraction = (income_ratio - base_tier_6_threshold) / (base_tier_upper - base_tier_6_threshold)
+      return base_initial_6 + (base_final_6 - base_initial_6) * fraction
+
+    # Above 400% FPL: not an applicable taxpayer under base table (no subsidy)
+    return base_final_6
+  tests:
+    - name: "At 100% FPL - first tier flat"
+      period: 2014-01
+      inputs:
+        household_income_pct_fpl: 1.0
+      expect: 0.02
+    - name: "At 133% FPL - top of tier 1"
+      period: 2014-01
+      inputs:
+        household_income_pct_fpl: 1.33
+      expect: 0.02
+    - name: "At 150% FPL - end of tier 2 (final = 4%)"
+      period: 2014-01
+      inputs:
+        household_income_pct_fpl: 1.50
+      expect: 0.04
+    - name: "At 200% FPL - end of tier 3 (final = 6.3%)"
+      period: 2014-01
+      inputs:
+        household_income_pct_fpl: 2.00
+      expect: 0.063
+    - name: "At 250% FPL - end of tier 4 (final = 8.05%)"
+      period: 2014-01
+      inputs:
+        household_income_pct_fpl: 2.50
+      expect: 0.0805
+    - name: "At 300% FPL - end of tier 5 (final = 9.5%)"
+      period: 2014-01
+      inputs:
+        household_income_pct_fpl: 3.00
+      expect: 0.095
+    - name: "At 400% FPL - end of tier 6 (final = 9.5%)"
+      period: 2014-01
+      inputs:
+        household_income_pct_fpl: 4.00
+      expect: 0.095
+    - name: "Midpoint of tier 3 (175% FPL) - linear interpolation"
+      period: 2014-01
+      inputs:
+        household_income_pct_fpl: 1.75
+      expect: 0.0515
+    - name: "Zero income"
+      period: 2014-01
+      inputs:
+        household_income_pct_fpl: 0
+      expect: 0.02
+
+# =============================================================================
+# Variable: Applicable percentage under clause (iii) IRA temporary table
+# =============================================================================
+
+variable applicable_percentage_ira:
+  entity: TaxUnit
+  period: Year
+  dtype: Rate
+  label: "Applicable Percentage (IRA Temporary Table)"
+  description: "Applicable percentage under IRA temporary table per 26 USC 36B(b)(3)(A)(iii)(II), with linear interpolation within each income tier"
+  formula: |
+    # Linear interpolation within each tier per clause (iii)(II) table
+    income_ratio = household_income_pct_fpl
+
+    # Tier 1: Up to 150% FPL
+    if income_ratio <= ira_tier_2_threshold:
+      return ira_initial_1
+
+    # Tier 2: 150% up to 200% FPL
+    if income_ratio <= ira_tier_3_threshold:
+      fraction = (income_ratio - ira_tier_2_threshold) / (ira_tier_3_threshold - ira_tier_2_threshold)
+      return ira_initial_2 + (ira_final_2 - ira_initial_2) * fraction
+
+    # Tier 3: 200% up to 250% FPL
+    if income_ratio <= ira_tier_4_threshold:
+      fraction = (income_ratio - ira_tier_3_threshold) / (ira_tier_4_threshold - ira_tier_3_threshold)
+      return ira_initial_3 + (ira_final_3 - ira_initial_3) * fraction
+
+    # Tier 4: 250% up to 300% FPL
+    if income_ratio <= ira_tier_5_threshold:
+      fraction = (income_ratio - ira_tier_4_threshold) / (ira_tier_5_threshold - ira_tier_4_threshold)
+      return ira_initial_4 + (ira_final_4 - ira_initial_4) * fraction
+
+    # Tier 5: 300% up to 400% FPL
+    if income_ratio <= ira_tier_6_threshold:
+      fraction = (income_ratio - ira_tier_5_threshold) / (ira_tier_6_threshold - ira_tier_5_threshold)
+      return ira_initial_5 + (ira_final_5 - ira_initial_5) * fraction
+
+    # Tier 6: 400% and higher - flat rate
+    return ira_final_6
+  tests:
+    - name: "At 100% FPL - zero premium (IRA)"
+      period: 2024-01
+      inputs:
+        household_income_pct_fpl: 1.0
+      expect: 0.0
+    - name: "At 150% FPL - top of tier 1 (zero)"
+      period: 2024-01
+      inputs:
+        household_income_pct_fpl: 1.50
+      expect: 0.0
+    - name: "At 200% FPL - end of tier 2 (final = 2%)"
+      period: 2024-01
+      inputs:
+        household_income_pct_fpl: 2.00
+      expect: 0.02
+    - name: "At 250% FPL - end of tier 3 (final = 4%)"
+      period: 2024-01
+      inputs:
+        household_income_pct_fpl: 2.50
+      expect: 0.04
+    - name: "At 300% FPL - end of tier 4 (final = 6%)"
+      period: 2024-01
+      inputs:
+        household_income_pct_fpl: 3.00
+      expect: 0.06
+    - name: "At 400% FPL - end of tier 5 (final = 8.5%)"
+      period: 2024-01
+      inputs:
+        household_income_pct_fpl: 4.00
+      expect: 0.085
+    - name: "At 500% FPL - above 400%, flat 8.5%"
+      period: 2024-01
+      inputs:
+        household_income_pct_fpl: 5.00
+      expect: 0.085
+    - name: "Midpoint of tier 5 (350% FPL) - linear interpolation"
+      period: 2024-01
+      inputs:
+        household_income_pct_fpl: 3.50
+      expect: 0.0725
+    - name: "Zero income"
+      period: 2024-01
+      inputs:
+        household_income_pct_fpl: 0
+      expect: 0.0
+
+# =============================================================================
+# Variable: Applicable percentage (combined, selecting correct table by year)
+# =============================================================================
+
+variable applicable_percentage:
+  entity: TaxUnit
+  period: Year
+  dtype: Rate
+  label: "Applicable Percentage"
+  description: "Applicable percentage for premium assistance per 26 USC 36B(b)(3)(A), selecting IRA temporary table for 2021-2025 or base table otherwise"
+  formula: |
+    # Clause (iii): For taxable years 2021-2025, use IRA temporary table
+    # and clause (ii) indexing does not apply
+    if tax_year >= ira_start_year and tax_year <= ira_end_year:
+      return applicable_percentage_ira
+
+    # Otherwise, use base table from clause (i)
+    # (clause (ii) indexing is handled via indexed_by on the base parameters)
+    return applicable_percentage_base
+  tests:
+    - name: "2024 (IRA period) - uses IRA table at 200% FPL"
+      period: 2024-01
+      inputs:
+        tax_year: 2024
+        applicable_percentage_ira: 0.02
+        applicable_percentage_base: 0.063
+      expect: 0.02
+    - name: "2024 (IRA period) - uses IRA table at 350% FPL"
+      period: 2024-01
+      inputs:
+        tax_year: 2024
+        applicable_percentage_ira: 0.0725
+        applicable_percentage_base: 0.095
+      expect: 0.0725
+    - name: "2026 (post-IRA) - reverts to base table"
+      period: 2026-01
+      inputs:
+        tax_year: 2026
+        applicable_percentage_ira: 0.02
+        applicable_percentage_base: 0.063
+      expect: 0.063
+    - name: "2014 (base table) - pre-IRA"
+      period: 2014-01
+      inputs:
+        tax_year: 2014
+        applicable_percentage_ira: 0.0
+        applicable_percentage_base: 0.02
+      expect: 0.02
+    - name: "2021 (first IRA year) - uses IRA table"
+      period: 2021-01
+      inputs:
+        tax_year: 2021
+        applicable_percentage_ira: 0.0
+        applicable_percentage_base: 0.02
+      expect: 0.0
+    - name: "2025 (last IRA year) - uses IRA table"
+      period: 2025-01
+      inputs:
+        tax_year: 2025
+        applicable_percentage_ira: 0.085
+        applicable_percentage_base: 0.095
+      expect: 0.085

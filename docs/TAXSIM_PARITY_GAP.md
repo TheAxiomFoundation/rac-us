@@ -2,11 +2,11 @@
 
 *Last updated: 2025-12-26*
 
-## TaxSim Output Variables vs Cosilico Coverage
+## TaxSim Output Variables vs RAC Coverage
 
 ### Federal Income Tax (Core) ✅ = Encoded, ❌ = Missing, ⚠️ = Partial, 🔄 = In Progress
 
-| TaxSim Variable | Description | Cosilico Status |
+| TaxSim Variable | Description | RAC Status |
 |-----------------|-------------|-----------------|
 | v10 - Federal AGI | Adjusted Gross Income | ✅ `adjusted_gross_income` |
 | v11 - UI in AGI | Unemployment Insurance in AGI | ✅ `unemployment_in_agi` |
@@ -32,7 +32,7 @@
 
 ### FICA/Payroll Taxes
 
-| Component | Cosilico Status |
+| Component | RAC Status |
 |-----------|-----------------|
 | Employee Social Security (6.2%) | ✅ `employee_social_security_tax` |
 | Employer Social Security (6.2%) | ✅ `employer_social_security_tax` |
@@ -45,7 +45,7 @@
 
 ### Credits
 
-| Credit | Cosilico Status |
+| Credit | RAC Status |
 |--------|-----------------|
 | Child Tax Credit | ✅ |
 | Additional CTC (refundable) | ✅ |
@@ -63,7 +63,7 @@
 
 ### Deductions (Above-the-Line)
 
-| Deduction | Cosilico Status |
+| Deduction | RAC Status |
 |-----------|-----------------|
 | Student Loan Interest | ✅ |
 | IRA Deduction | ✅ |
@@ -78,7 +78,7 @@
 
 ### Deductions (Itemized)
 
-| Deduction | Cosilico Status |
+| Deduction | RAC Status |
 |-----------|-----------------|
 | SALT (capped at $10k) | ✅ `salt_deduction` |
 | Mortgage Interest | ✅ `qualified_residence_interest` |
@@ -89,7 +89,7 @@
 
 ### Income Types
 
-| Income | Cosilico Status |
+| Income | RAC Status |
 |--------|-----------------|
 | Wages/Salaries | ✅ |
 | Self-Employment | ✅ |

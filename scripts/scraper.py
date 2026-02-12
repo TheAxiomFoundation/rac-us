@@ -3,7 +3,7 @@
 USC Statute Scraper
 
 Fetches US Code titles from uscode.house.gov in USLM XML format,
-splits by section, and stores using cosilico-lawarchive.
+splits by section, and stores using atlas.
 
 Usage:
     python scraper.py                    # Fetch all configured titles

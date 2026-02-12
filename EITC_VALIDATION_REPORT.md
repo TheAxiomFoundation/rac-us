@@ -188,7 +188,7 @@ Secondary:
 
 ## Recommendations
 
-### For Cosilico Development
+### For Rules Foundation Development
 
 1. **Use PolicyEngine as reference**: PolicyEngine US correctly implements 2024 EITC parameters and can serve as a validation source
 
