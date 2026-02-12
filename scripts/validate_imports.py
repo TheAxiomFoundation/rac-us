@@ -14,9 +14,13 @@ IMPORTS_LIST_PATTERN = re.compile(r"^\s*-\s*(.+)$")
 # Pattern to parse individual import: path#variable [as alias]
 IMPORT_PATTERN = re.compile(r"([^#\s\[\]]+)#(\w+)(?:\s+as\s+\w+)?")
 
-# Pattern to find variable/input definitions
+# Pattern to find variable/input definitions (old syntax: "variable name:" / "input name:")
 VARIABLE_DEF_PATTERN = re.compile(r"^(variable|input)\s+(\w+):")
 PARAMETER_DEF_PATTERN = re.compile(r"^parameter\s+(\w+):")
+# Unified syntax: bare "name:" at column 0 (not a known structural keyword)
+BARE_DEF_PATTERN = re.compile(r"^([a-z_][a-z0-9_]*):")
+# Keywords that appear at column 0 but are NOT definition names
+STRUCTURAL_KEYWORDS = {"imports", "text", "tests", "exports", "parameters", "enum", "function"}
 
 
 def extract_exports(filepath: Path) -> set[str]:
@@ -25,15 +29,22 @@ def extract_exports(filepath: Path) -> set[str]:
     try:
         content = filepath.read_text()
         for line in content.split("\n"):
-            # Check for variable/input definitions
+            # Check for old syntax: variable/input definitions
             match = VARIABLE_DEF_PATTERN.match(line)
             if match:
                 exports.add(match.group(2))
                 continue
-            # Check for parameter definitions
+            # Check for old syntax: parameter definitions
             match = PARAMETER_DEF_PATTERN.match(line)
             if match:
                 exports.add(match.group(1))
+                continue
+            # Check for unified syntax: bare "name:" at column 0
+            match = BARE_DEF_PATTERN.match(line)
+            if match:
+                name = match.group(1)
+                if name not in STRUCTURAL_KEYWORDS:
+                    exports.add(name)
     except Exception as e:
         print(f"Warning: Could not read {filepath}: {e}", file=sys.stderr)
     return exports
