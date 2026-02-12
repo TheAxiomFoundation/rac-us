@@ -6,20 +6,15 @@ import sys
 from pathlib import Path
 from collections import defaultdict
 
-# Pattern to match imports declarations
-# Handles both single imports and list imports
 IMPORTS_BLOCK_PATTERN = re.compile(r"^\s*imports:\s*(.*)$")
 IMPORTS_LIST_PATTERN = re.compile(r"^\s*-\s*(.+)$")
-
-# Pattern to parse individual import: path#variable [as alias]
 IMPORT_PATTERN = re.compile(r"([^#\s\[\]]+)#(\w+)(?:\s+as\s+\w+)?")
 
-# Pattern to find variable/input definitions (old syntax: "variable name:" / "input name:")
+# Old syntax: "variable name:" / "input name:" / "parameter name:"
 VARIABLE_DEF_PATTERN = re.compile(r"^(variable|input)\s+(\w+):")
 PARAMETER_DEF_PATTERN = re.compile(r"^parameter\s+(\w+):")
-# Unified syntax: bare "name:" at column 0 (not a known structural keyword)
+# Unified syntax: bare "name:" at column 0
 BARE_DEF_PATTERN = re.compile(r"^([a-z_][a-z0-9_]*):")
-# Keywords that appear at column 0 but are NOT definition names
 STRUCTURAL_KEYWORDS = {"imports", "text", "tests", "exports", "parameters", "enum", "function"}
 
 
@@ -29,17 +24,14 @@ def extract_exports(filepath: Path) -> set[str]:
     try:
         content = filepath.read_text()
         for line in content.split("\n"):
-            # Check for old syntax: variable/input definitions
             match = VARIABLE_DEF_PATTERN.match(line)
             if match:
                 exports.add(match.group(2))
                 continue
-            # Check for old syntax: parameter definitions
             match = PARAMETER_DEF_PATTERN.match(line)
             if match:
                 exports.add(match.group(1))
                 continue
-            # Check for unified syntax: bare "name:" at column 0
             match = BARE_DEF_PATTERN.match(line)
             if match:
                 name = match.group(1)
@@ -58,19 +50,15 @@ def resolve_import_path(import_path: str, statute_dir: Path) -> Path | None:
     - statute/26/1/j/2.rac (file)
     - statute/26/1/j/2/index.rac (directory with index)
     """
-    # Try direct file first
     direct_file = statute_dir / f"{import_path}.rac"
     if direct_file.exists():
         return direct_file
 
-    # Try directory (check for any .rac file that might export the variable)
     dir_path = statute_dir / import_path
     if dir_path.is_dir():
-        # Look for main file in directory
         for candidate in [dir_path / "index.rac", dir_path.parent / f"{dir_path.name}.rac"]:
             if candidate.exists():
                 return candidate
-        # Return directory path - caller will search all files in it
         return dir_path
 
     return None
@@ -118,23 +106,18 @@ def extract_imports(filepath: Path) -> list[tuple[int, str, str]]:
     in_imports_block = False
 
     for lineno, line in enumerate(lines, 1):
-        # Check for imports: declaration
         block_match = IMPORTS_BLOCK_PATTERN.match(line)
         if block_match:
             rest = block_match.group(1).strip()
 
-            # Inline list format: imports: [path#var, path#var]
             if rest.startswith("["):
                 in_imports_block = False
-                # Extract all imports from the line
                 for match in IMPORT_PATTERN.finditer(rest):
                     imports.append((lineno, match.group(1), match.group(2)))
-            # Block format starting
             elif not rest or rest == "|":
                 in_imports_block = True
             continue
 
-        # Inside imports block - look for list items
         if in_imports_block:
             list_match = IMPORTS_LIST_PATTERN.match(line)
             if list_match:
@@ -143,8 +126,7 @@ def extract_imports(filepath: Path) -> list[tuple[int, str, str]]:
                 if import_match:
                     imports.append((lineno, import_match.group(1), import_match.group(2)))
             elif line.strip() and not line.strip().startswith("#"):
-                # Non-empty, non-comment line that's not a list item = end of block
-                if not line.startswith(" ") and not line.startswith("\t"):
+                if not line[0].isspace():
                     in_imports_block = False
 
     return imports
@@ -172,9 +154,8 @@ def build_dependency_graph(statute_dir: Path) -> dict[str, list[str]]:
     graph = defaultdict(list)
 
     for rac_file in statute_dir.rglob("*.rac"):
-        # Get relative path as node ID
         rel_path = rac_file.relative_to(statute_dir)
-        node = str(rel_path.with_suffix("")).replace("/", "/")
+        node = str(rel_path.with_suffix(""))
 
         imports = extract_imports(rac_file)
         for _, import_path, _ in imports:
@@ -199,7 +180,6 @@ def find_cycles(graph: dict[str, list[str]]) -> list[list[str]]:
             if neighbor not in visited:
                 dfs(neighbor)
             elif neighbor in rec_stack:
-                # Found cycle
                 cycle_start = path.index(neighbor)
                 cycles.append(path[cycle_start:] + [neighbor])
 
@@ -224,7 +204,6 @@ def main():
     files_checked = 0
     imports_checked = 0
 
-    # Validate all imports resolve
     for rac_file in statute_dir.rglob("*.rac"):
         files_checked += 1
         imports = extract_imports(rac_file)
@@ -232,7 +211,6 @@ def main():
         errors = validate_file(rac_file, statute_dir)
         all_errors.extend(errors)
 
-    # Check for circular dependencies
     print(f"Building dependency graph...")
     graph = build_dependency_graph(statute_dir)
     cycles = find_cycles(graph)
