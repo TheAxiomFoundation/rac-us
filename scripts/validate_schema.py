@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate .rac files only use whitelisted attributes and valid values."""
+"""Validate .rac files use valid attributes, definition names, and values."""
 
 import re
 import sys
@@ -15,7 +15,7 @@ VALID_ENTITIES = {
     "Corporation", "Business", "Asset",
 }
 VALID_PERIODS = {"Year", "Month", "Week", "Day"}
-VALID_DTYPES = {"Money", "Rate", "Boolean", "Integer", "Count", "String", "Decimal"}  # Enum[...] handled specially
+VALID_DTYPES = {"Money", "Rate", "Boolean", "Integer", "Count", "String", "Decimal", "Float"}  # Enum[...] handled specially
 
 # WHITELIST: Only these top-level attributes are allowed
 ALLOWED_ATTRIBUTES = {
@@ -74,6 +74,13 @@ LEGISLATION_ANTIPATTERNS = [
 ]
 FORMULA_START = re.compile(r"^\s*formula:\s*\|")
 FORMULA_LINE = re.compile(r"^\s{4,}")  # Indented lines in formula
+
+# Temporal entry pattern: "from yyyy-mm-dd:" (indented, under a definition)
+TEMPORAL_ENTRY_PATTERN = re.compile(r"^\s+from\s+\d{4}-\d{2}-\d{2}:")
+
+# Bare definition name: lowercase identifier at column 0, followed by colon,
+# NOT followed by a pipe (which would indicate a block scalar)
+BARE_DEFINITION_PATTERN = re.compile(r"^([a-z_][a-z0-9_]*):\s*(?!\|)")
 
 # Hardcoded literals - only -1, 0, 1, 2, 3 allowed in formulas
 ALLOWED_INTEGERS = {-1, 0, 1, 2, 3}
@@ -144,6 +151,10 @@ def validate_file(filepath: Path) -> list[str]:
         # Skip comment lines
         stripped = line.strip()
         if stripped.startswith('#'):
+            continue
+
+        # Allow indented "from yyyy-mm-dd:" temporal entries
+        if TEMPORAL_ENTRY_PATTERN.match(line):
             continue
 
         # Check parameter names for legislation-specific anti-patterns
@@ -228,12 +239,18 @@ def validate_file(filepath: Path) -> list[str]:
             in_code_section = False
             continue
 
+        # Check if this is a bare definition name in unified syntax:
+        # A lowercase identifier followed by colon at column 0, e.g. "snap_allotment:"
+        if BARE_DEFINITION_PATTERN.match(line):
+            in_code_section = False
+            continue
+
         # Unknown attribute - check if we're in code section (might be a variable name)
         if in_code_section:
             # Inside code, unknown words are likely variable assignments
             continue
 
-        # Not in code, not a known attribute - this is a violation
+        # Not in code, not a known attribute, not a definition name - this is a violation
         errors.append(f"{filepath}:{lineno}: forbidden attribute '{attr}'")
 
     return errors
