@@ -1,0 +1,74 @@
+# 26 USC 36B(b)(1) - Premium assistance credit amount — In general
+
+text: """
+(b) Premium assistance credit amount
+For purposes of this section—
+(1) In general
+The term "premium assistance credit amount" means, with respect to any
+taxable year, the sum of the premium assistance amounts determined under
+paragraph (2) with respect to all coverage months of the taxpayer occurring
+during the taxable year.
+"""
+
+# This subsection defines the annual premium assistance credit amount as the
+# sum of monthly premium assistance amounts (determined under paragraph (2))
+# across all coverage months in the taxable year. Each coverage month may
+# have a different premium assistance amount, so the formula sums them.
+#
+# In the simplified annual model, we take the monthly premium assistance
+# amount (from b/2) and multiply by the number of coverage months. This is
+# equivalent to summing identical monthly amounts. If monthly amounts vary,
+# this would need a monthly-level computation.
+
+input ptc_coverage_months:
+  entity: TaxUnit
+  period: Year
+  dtype: Integer
+  label: "PTC Coverage Months"
+  description: "Number of coverage months of the taxpayer occurring during the taxable year per 26 USC 36B(b)(1)"
+  default: 0
+
+variable ptc_premium_assistance_credit_amount:
+  imports:
+    - 26/36B/b/2#ptc_premium_assistance_amount
+  entity: TaxUnit
+  period: Year
+  dtype: Money
+  unit: USD
+  label: "Premium Assistance Credit Amount"
+  description: "Sum of premium assistance amounts for all coverage months per 26 USC 36B(b)(1)"
+  formula: |
+    # (b)(1): "the sum of the premium assistance amounts determined under
+    # paragraph (2) with respect to all coverage months"
+    return ptc_premium_assistance_amount * ptc_coverage_months
+  tests:
+    - name: "Full year coverage (12 months)"
+      period: 2024-01
+      inputs:
+        ptc_premium_assistance_amount: 450
+        ptc_coverage_months: 12
+      expect: 5400
+    - name: "Partial year coverage (6 months)"
+      period: 2024-01
+      inputs:
+        ptc_premium_assistance_amount: 450
+        ptc_coverage_months: 6
+      expect: 2700
+    - name: "Single month of coverage"
+      period: 2024-01
+      inputs:
+        ptc_premium_assistance_amount: 300
+        ptc_coverage_months: 1
+      expect: 300
+    - name: "No coverage months"
+      period: 2024-01
+      inputs:
+        ptc_premium_assistance_amount: 450
+        ptc_coverage_months: 0
+      expect: 0
+    - name: "Zero premium assistance amount"
+      period: 2024-01
+      inputs:
+        ptc_premium_assistance_amount: 0
+        ptc_coverage_months: 12
+      expect: 0

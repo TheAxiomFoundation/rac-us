@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout cosilico-us
+      - name: Checkout rac-us
         uses: actions/checkout@v4
 
       - name: Set up Python
@@ -25,10 +25,10 @@ jobs:
       - name: Validate imports resolve
         run: python3 scripts/validate_imports.py
 
-      - name: Checkout cosilico-validators
+      - name: Checkout rac-validators
         uses: actions/checkout@v4
         with:
-          repository: CosilicoAI/cosilico-validators
+          repository: RulesFoundation/rac-validators
           path: validators
           token: ${{ secrets.GITHUB_TOKEN }}
 
@@ -40,19 +40,19 @@ jobs:
       - name: Run CTC validation
         id: ctc
         run: |
-          python -m cosilico_validators.cli validate 26/24/a/tests.yaml -v ctc -y 2024 -o results-ctc.json
+          python -m rac_validators.cli validate 26/24/a/tests.yaml -v ctc -y 2024 -o results-ctc.json
         continue-on-error: true
 
       - name: Run Standard Deduction validation
         id: std_ded
         run: |
-          python -m cosilico_validators.cli validate 26/63/c/tests.yaml -v standard_deduction -y 2024 -o results-std-ded.json
+          python -m rac_validators.cli validate 26/63/c/tests.yaml -v standard_deduction -y 2024 -o results-std-ded.json
         continue-on-error: true
 
       - name: Run SNAP validation
         id: snap
         run: |
-          python -m cosilico_validators.cli validate 7/2017/a/tests.yaml -v snap_allotment -y 2024 -o results-snap.json --no-taxsim
+          python -m rac_validators.cli validate 7/2017/a/tests.yaml -v snap_allotment -y 2024 -o results-snap.json --no-taxsim
         continue-on-error: true
 
       - name: Combine results
@@ -105,6 +105,6 @@ jobs:
         uses: peter-evans/repository-dispatch@v3
         with:
           token: ${{ secrets.DISPATCH_TOKEN }}
-          repository: CosilicoAI/cosilico-validation
+          repository: RulesFoundation/rac-validation
           event-type: update-results
           client-payload: '{"commit": "${{ github.sha }}"}'

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Cosilico Demo App
+RAC Demo App
 
 Shows the full pipeline from source document to calculation:
 1. Lawarchive: Fetched source document (USC XML)
@@ -198,11 +198,11 @@ def calculate_eitc(
 
 def run_streamlit():
     """Run the Streamlit web app."""
-    st.set_page_config(page_title="Cosilico Demo", layout="wide")
-    st.title("Cosilico: Executable Tax Law")
+    st.set_page_config(page_title="RAC Demo", layout="wide")
+    st.title("Rules Foundation: Executable Tax Law")
 
     st.markdown("""
-    This demo shows how Cosilico connects source documents to calculations:
+    This demo shows how Rules Foundation connects source documents to calculations:
 
     **Lawarchive** → **Encoding** → **Parameters** → **Calculation**
     """)
@@ -294,7 +294,7 @@ def run_streamlit():
             st.subheader("Citation Chain")
             st.markdown(f"""
             1. **Source:** `lawarchive://us/statute/26/32/2025-01-01`
-            2. **Encoding:** `cosilico-us://26/32/eitc.rac`
+            2. **Encoding:** `rac-us://26/32/eitc.rac`
             3. **Parameters:** Rev. Proc. 2024-40 (TY {SAMPLE_PARAMS.tax_year})
             4. **Result:** ${result.result:,}
             """)
@@ -303,7 +303,7 @@ def run_streamlit():
 def run_cli():
     """Run CLI demo."""
     print("=" * 60)
-    print("COSILICO DEMO: Executable Tax Law")
+    print("RAC DEMO: Executable Tax Law")
     print("=" * 60)
 
     print("\n1. SOURCE DOCUMENT (lawarchive)")
@@ -350,7 +350,7 @@ def run_cli():
     print("\n" + "=" * 60)
     print("Citation Chain:")
     print(f"  1. lawarchive://us/statute/26/32/2025-01-01")
-    print(f"  2. cosilico-us://26/32/eitc.rac")
+    print(f"  2. rac-us://26/32/eitc.rac")
     print(f"  3. Rev. Proc. 2024-40 (TY 2025)")
     print(f"  4. Result: ${result.result:,}")
 

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Translate Cosilico DSL v1 files to v2 syntax.
+"""Translate RAC DSL v1 files to v2 syntax.
 
 Changes:
 - imports { } → imports:
@@ -200,7 +200,7 @@ def main():
 
     dry_run = '--dry-run' in sys.argv
 
-    base_dir = Path('/Users/maxghenis/CosilicoAI/cosilico-us/statute')
+    base_dir = Path('/Users/maxghenis/RulesFoundation/rac-us/statute')
 
     files = list(base_dir.rglob('*.rac'))
     print(f"Found {len(files)} .rac files")

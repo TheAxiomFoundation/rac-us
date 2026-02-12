@@ -1,0 +1,306 @@
+# 26 USC 36B(c)(1) - Applicable taxpayer
+
+text: """
+(c) Definition and rules relating to applicable taxpayers, coverage months,
+and qualified health plan
+(1) Applicable taxpayer
+(A) In general
+The term "applicable taxpayer" means, with respect to any taxable year, a
+taxpayer whose household income for the taxable year equals or exceeds 100
+percent but does not exceed 400 percent of an amount equal to the poverty
+line for a family of the size involved.
+(B) Special rule for certain individuals lawfully present in the United
+States
+If—
+(i) a taxpayer has household income which is not greater than 100 percent of
+an amount equal to the poverty line for a family of the size involved, and
+(ii) the taxpayer is an alien lawfully present in the United States, but is
+not eligible for the medicaid program under title XIX of the Social Security
+Act by reason of such alien status,
+the taxpayer shall, for purposes of the credit under this section, be
+treated as an applicable taxpayer with a household income which is equal to
+100 percent of the poverty line for a family of the size involved.
+(C) Married couples must file joint return
+If the taxpayer is married (within the meaning of section 7703) at the close
+of the taxable year, the taxpayer shall be treated as an applicable taxpayer
+only if the taxpayer and the taxpayer's spouse file a joint return for the
+taxable year.
+(D) Denial of credit to dependents
+No credit shall be allowed under this section to any individual with respect
+to whom a deduction under section 151 is allowable to another taxpayer for a
+taxable year beginning in the calendar year in which such individual's
+taxable year begins.
+(E) Temporary rule for 2021 through 2025
+In the case of a taxable year beginning after December 31, 2020, and before
+January 1, 2026, subparagraph (A) shall be applied without regard to "but
+does not exceed 400 percent of".
+"""
+
+# Subsection disposition:
+# (c)(1)(A) - ENCODED: Income range test (100-400% FPL)
+# (c)(1)(B) - ENCODED: Lawfully present alien below 100% FPL treated as applicable
+# (c)(1)(C) - ENCODED: Joint return requirement for married taxpayers
+# (c)(1)(D) - ENCODED: Dependents cannot claim credit
+# (c)(1)(E) - ENCODED: Removes 400% upper cap for 2021-2025
+
+# =============================================================================
+# Parameters
+# =============================================================================
+
+# (A): "equals or exceeds 100 percent"
+parameter min_fpl_pct:
+  description: "Minimum household income as percent of FPL to be an applicable taxpayer per 26 USC 36B(c)(1)(A)"
+  unit: /1
+  values:
+    2014-01-01: 1.0
+
+# (A): "does not exceed 400 percent"
+parameter max_fpl_pct:
+  description: "Maximum household income as percent of FPL to be an applicable taxpayer per 26 USC 36B(c)(1)(A)"
+  unit: /1
+  values:
+    2014-01-01: 4.0
+
+# (E): "taxable year beginning after December 31, 2020"
+parameter temp_rule_start_year:
+  description: "First taxable year for temporary removal of upper FPL cap per 26 USC 36B(c)(1)(E)"
+  values:
+    2021-01-01: 2021
+
+# (E): "before January 1, 2026"
+parameter temp_rule_end_year:
+  description: "Last taxable year for temporary removal of upper FPL cap per 26 USC 36B(c)(1)(E)"
+  values:
+    2021-01-01: 2025
+
+# =============================================================================
+# Inputs
+# =============================================================================
+
+input is_married:
+  entity: TaxUnit
+  period: Year
+  dtype: Boolean
+  label: "Married"
+  description: "Whether the taxpayer is married within the meaning of section 7703 at the close of the taxable year per 26 USC 36B(c)(1)(C)"
+  default: false
+
+input files_joint_return:
+  entity: TaxUnit
+  period: Year
+  dtype: Boolean
+  label: "Files Joint Return"
+  description: "Whether the taxpayer and spouse file a joint return per 26 USC 36B(c)(1)(C)"
+  default: false
+
+input is_dependent:
+  entity: TaxUnit
+  period: Year
+  dtype: Boolean
+  label: "Is Dependent"
+  description: "Whether a deduction under section 151 is allowable to another taxpayer for this individual per 26 USC 36B(c)(1)(D)"
+  default: false
+
+input is_lawfully_present_alien:
+  entity: TaxUnit
+  period: Year
+  dtype: Boolean
+  label: "Lawfully Present Alien"
+  description: "Whether the taxpayer is an alien lawfully present in the United States per 26 USC 36B(c)(1)(B)"
+  default: false
+
+input is_medicaid_ineligible_due_to_alien_status:
+  entity: TaxUnit
+  period: Year
+  dtype: Boolean
+  label: "Medicaid Ineligible Due to Alien Status"
+  description: "Whether the taxpayer is not eligible for Medicaid under title XIX of the Social Security Act by reason of alien status per 26 USC 36B(c)(1)(B)"
+  default: false
+
+input tax_year:
+  entity: TaxUnit
+  period: Year
+  dtype: Integer
+  label: "Tax Year"
+  description: "Taxable year for determining applicable rules"
+  default: 2024
+
+# =============================================================================
+# Variable: Applicable taxpayer determination
+# =============================================================================
+
+variable is_applicable_taxpayer:
+  imports:
+    - 26/36B/b/3#household_income_pct_fpl
+  entity: TaxUnit
+  period: Year
+  dtype: Boolean
+  label: "Applicable Taxpayer"
+  description: "Whether the taxpayer is an applicable taxpayer per 26 USC 36B(c)(1)"
+  formula: |
+    # (D): No credit for dependents
+    if is_dependent: return 0
+
+    # (C): Married taxpayers must file joint return
+    if is_married and not files_joint_return: return 0
+
+    income_pct = household_income_pct_fpl
+
+    # (B): Lawfully present alien below 100% FPL and Medicaid-ineligible
+    # due to alien status → treated as applicable taxpayer
+    if income_pct < min_fpl_pct and is_lawfully_present_alien and is_medicaid_ineligible_due_to_alien_status: return 1
+
+    # Below 100% FPL and not qualifying under (B) → not applicable
+    if income_pct < min_fpl_pct: return 0
+
+    # (E): For 2021-2025, apply (A) without the 400% upper cap
+    if tax_year >= temp_rule_start_year and tax_year <= temp_rule_end_year: return 1
+
+    # (A): Household income >= 100% FPL and <= 400% FPL
+    if income_pct <= max_fpl_pct: return 1
+
+    return 0
+  tests:
+    - name: "Basic applicable taxpayer - 200% FPL"
+      period: 2024-01
+      inputs:
+        household_income_pct_fpl: 2.0
+        is_married: false
+        files_joint_return: false
+        is_dependent: false
+        is_lawfully_present_alien: false
+        is_medicaid_ineligible_due_to_alien_status: false
+        tax_year: 2024
+      expect: true
+    - name: "At minimum threshold - 100% FPL"
+      period: 2024-01
+      inputs:
+        household_income_pct_fpl: 1.0
+        is_married: false
+        files_joint_return: false
+        is_dependent: false
+        is_lawfully_present_alien: false
+        is_medicaid_ineligible_due_to_alien_status: false
+        tax_year: 2024
+      expect: true
+    - name: "Below 100% FPL - not applicable (non-alien)"
+      period: 2024-01
+      inputs:
+        household_income_pct_fpl: 0.8
+        is_married: false
+        files_joint_return: false
+        is_dependent: false
+        is_lawfully_present_alien: false
+        is_medicaid_ineligible_due_to_alien_status: false
+        tax_year: 2024
+      expect: false
+    - name: "(B) Lawfully present alien below 100% FPL and Medicaid-ineligible"
+      period: 2024-01
+      inputs:
+        household_income_pct_fpl: 0.8
+        is_married: false
+        files_joint_return: false
+        is_dependent: false
+        is_lawfully_present_alien: true
+        is_medicaid_ineligible_due_to_alien_status: true
+        tax_year: 2024
+      expect: true
+    - name: "(B) Lawfully present alien below 100% FPL but Medicaid-eligible"
+      period: 2024-01
+      inputs:
+        household_income_pct_fpl: 0.8
+        is_married: false
+        files_joint_return: false
+        is_dependent: false
+        is_lawfully_present_alien: true
+        is_medicaid_ineligible_due_to_alien_status: false
+        tax_year: 2024
+      expect: false
+    - name: "(C) Married filing separately - not applicable"
+      period: 2024-01
+      inputs:
+        household_income_pct_fpl: 2.0
+        is_married: true
+        files_joint_return: false
+        is_dependent: false
+        is_lawfully_present_alien: false
+        is_medicaid_ineligible_due_to_alien_status: false
+        tax_year: 2024
+      expect: false
+    - name: "(C) Married filing jointly - applicable"
+      period: 2024-01
+      inputs:
+        household_income_pct_fpl: 2.0
+        is_married: true
+        files_joint_return: true
+        is_dependent: false
+        is_lawfully_present_alien: false
+        is_medicaid_ineligible_due_to_alien_status: false
+        tax_year: 2024
+      expect: true
+    - name: "(D) Dependent - not applicable"
+      period: 2024-01
+      inputs:
+        household_income_pct_fpl: 2.0
+        is_married: false
+        files_joint_return: false
+        is_dependent: true
+        is_lawfully_present_alien: false
+        is_medicaid_ineligible_due_to_alien_status: false
+        tax_year: 2024
+      expect: false
+    - name: "(E) Above 400% FPL during IRA period (2024) - applicable"
+      period: 2024-01
+      inputs:
+        household_income_pct_fpl: 5.0
+        is_married: false
+        files_joint_return: false
+        is_dependent: false
+        is_lawfully_present_alien: false
+        is_medicaid_ineligible_due_to_alien_status: false
+        tax_year: 2024
+      expect: true
+    - name: "Above 400% FPL post-IRA (2026) - not applicable"
+      period: 2026-01
+      inputs:
+        household_income_pct_fpl: 5.0
+        is_married: false
+        files_joint_return: false
+        is_dependent: false
+        is_lawfully_present_alien: false
+        is_medicaid_ineligible_due_to_alien_status: false
+        tax_year: 2026
+      expect: false
+    - name: "At 400% FPL post-IRA (2026) - applicable"
+      period: 2026-01
+      inputs:
+        household_income_pct_fpl: 4.0
+        is_married: false
+        files_joint_return: false
+        is_dependent: false
+        is_lawfully_present_alien: false
+        is_medicaid_ineligible_due_to_alien_status: false
+        tax_year: 2026
+      expect: true
+    - name: "(E) At exactly 400% FPL during IRA (2021) - applicable"
+      period: 2021-01
+      inputs:
+        household_income_pct_fpl: 4.0
+        is_married: false
+        files_joint_return: false
+        is_dependent: false
+        is_lawfully_present_alien: false
+        is_medicaid_ineligible_due_to_alien_status: false
+        tax_year: 2021
+      expect: true
+    - name: "Unmarried, not dependent, 150% FPL - applicable"
+      period: 2024-01
+      inputs:
+        household_income_pct_fpl: 1.5
+        is_married: false
+        files_joint_return: false
+        is_dependent: false
+        is_lawfully_present_alien: false
+        is_medicaid_ineligible_due_to_alien_status: false
+        tax_year: 2024
+      expect: true

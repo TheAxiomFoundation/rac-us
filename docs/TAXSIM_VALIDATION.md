@@ -149,4 +149,4 @@ Comparison of PolicyEngine-US against NBER TAXSIM 35 API.
 
 - [TAXSIM 35 Documentation](https://taxsim.nber.org/taxsim35/)
 - [PolicyEngine-US Documentation](https://policyengine.org/us/research)
-- [Cosilico US Encodings](https://github.com/CosilicoAI/cosilico-us)
+- [RAC US Encodings](https://github.com/RulesFoundation/rac-us)

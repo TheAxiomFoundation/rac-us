@@ -1,15 +1,15 @@
-# cosilico-us
+# rac-us
 
 **THE home for US federal tax and benefit statute encodings.**
 
-All US-specific .rac files belong here, NOT in cosilico-engine.
+All US-specific .rac files belong here, NOT in rac-compile.
 
 ## Structure
 
 Files organized under `statute/` by title and section:
 
 ```
-cosilico-us/
+rac-us/
 ├── statute/               # All enacted statutes
 │   ├── 26/               # Title 26 (IRC)
 │   │   ├── 24/          # § 24 - Child Tax Credit
@@ -91,6 +91,6 @@ New format exemplars:
 
 ## Related Repos
 
-- **cosilico-engine** - DSL compiler and runtime
-- **cosilico-lawarchive** - Source document archive
-- **cosilico-validators** - Validation against external calculators
+- **rac-compile** - DSL compiler and runtime
+- **atlas** - Source document archive
+- **rac-validators** - Validation against external calculators
