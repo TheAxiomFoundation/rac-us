@@ -1,0 +1,37 @@
+# 26 USC 21(e) - Special rules
+
+# (e) Special rules
+# (2) Married couples must file joint return
+# (3) Marital status - legally separated not considered married
+# (4) Certain married individuals living apart - not considered married
+# (6) Payments to related individuals - no credit for such payments
+
+# =============================================================================
+# Inputs
+# =============================================================================
+
+variable cdcc_files_joint_return:
+    entity: TaxUnit
+    from 2024-01-01: 0
+
+variable cdcc_is_legally_separated:
+    entity: TaxUnit
+    from 2024-01-01: 0
+
+variable cdcc_married_living_apart:
+    entity: TaxUnit
+    from 2024-01-01: 0
+
+# =============================================================================
+# Variables
+# =============================================================================
+
+# Treated-as-married status per 21(e)(3) and (4)
+variable cdcc_treated_as_married:
+    entity: TaxUnit
+    from 1982-01-01: if cdcc_is_legally_separated: 0 else: if cdcc_married_living_apart: 0 else: cdcc_is_married
+
+# Joint return requirement per 21(e)(2)
+variable cdcc_meets_filing_requirement:
+    entity: TaxUnit
+    from 1982-01-01: if cdcc_treated_as_married: cdcc_files_joint_return else: 1

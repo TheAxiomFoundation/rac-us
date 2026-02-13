@@ -1,0 +1,49 @@
+# 26 USC 21(b) - Definitions of qualifying individual and employment-related expenses
+
+# (b) Definitions of qualifying individual and employment-related expenses
+# For purposes of this section--
+# (1) Qualifying individual
+# The term "qualifying individual" means--
+# (A) a dependent of the taxpayer (as defined in section 152(a)(1)) who has
+#     not attained age 13,
+# (B) a dependent of the taxpayer who is physically or mentally incapable of
+#     caring for himself or herself and who has the same principal place of
+#     abode as the taxpayer for more than one-half of such taxable year, or
+# (C) the spouse of the taxpayer, if the spouse is physically or mentally
+#     incapable of caring for himself or herself and has the same principal
+#     place of abode as the taxpayer for more than one-half of such taxable year.
+
+# =============================================================================
+# Parameters
+# =============================================================================
+
+# Maximum age for qualifying child per 21(b)(1)(A)
+# Changed from 15 to 13 by P.L. 100-485 (1988)
+variable cdcc_qualifying_child_max_age:
+    from 1977-01-01: 15
+    from 1989-01-01: 13
+
+# =============================================================================
+# Inputs
+# =============================================================================
+
+variable cdcc_dependents_under_age_limit:
+    entity: TaxUnit
+    from 2024-01-01: 0
+
+variable cdcc_incapable_dependents_sharing_abode:
+    entity: TaxUnit
+    from 2024-01-01: 0
+
+variable cdcc_incapable_spouse_sharing_abode:
+    entity: TaxUnit
+    from 2024-01-01: 0
+
+# =============================================================================
+# Variables
+# =============================================================================
+
+# Total qualifying individuals per 21(b)(1)
+variable cdcc_qualifying_individuals:
+    entity: TaxUnit
+    from 1977-01-01: cdcc_dependents_under_age_limit + cdcc_incapable_dependents_sharing_abode + cdcc_incapable_spouse_sharing_abode

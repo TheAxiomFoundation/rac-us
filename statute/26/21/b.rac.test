@@ -1,0 +1,36 @@
+cdcc_qualifying_individuals:
+  - name: "One child under 13"
+    period: 2024-01
+    inputs:
+      cdcc_dependents_under_age_limit: 1
+      cdcc_incapable_dependents_sharing_abode: 0
+      cdcc_incapable_spouse_sharing_abode: 0
+    expect: 1
+  - name: "Two children under 13"
+    period: 2024-01
+    inputs:
+      cdcc_dependents_under_age_limit: 2
+      cdcc_incapable_dependents_sharing_abode: 0
+      cdcc_incapable_spouse_sharing_abode: 0
+    expect: 2
+  - name: "Child plus incapable dependent"
+    period: 2024-01
+    inputs:
+      cdcc_dependents_under_age_limit: 1
+      cdcc_incapable_dependents_sharing_abode: 1
+      cdcc_incapable_spouse_sharing_abode: 0
+    expect: 2
+  - name: "Incapable spouse only"
+    period: 2024-01
+    inputs:
+      cdcc_dependents_under_age_limit: 0
+      cdcc_incapable_dependents_sharing_abode: 0
+      cdcc_incapable_spouse_sharing_abode: 1
+    expect: 1
+  - name: "No qualifying individuals"
+    period: 2024-01
+    inputs:
+      cdcc_dependents_under_age_limit: 0
+      cdcc_incapable_dependents_sharing_abode: 0
+      cdcc_incapable_spouse_sharing_abode: 0
+    expect: 0

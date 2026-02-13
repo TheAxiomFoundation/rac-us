@@ -1,0 +1,60 @@
+cdcc_deemed_monthly_earned_income:
+  - name: "1 qualifying individual"
+    period: 2024-01
+    inputs:
+      cdcc_qualifying_individual_count: 1
+    expect: 250
+  - name: "2+ qualifying individuals"
+    period: 2024-01
+    inputs:
+      cdcc_qualifying_individual_count: 2
+    expect: 500
+
+cdcc_spouse_effective_earned_income:
+  - name: "Non-student spouse"
+    period: 2024-01
+    inputs:
+      cdcc_spouse_is_student_or_incapable: false
+      cdcc_spouse_earned_income: 30000
+      cdcc_spouse_student_or_incapable_months: 0
+      cdcc_deemed_monthly_earned_income: 250
+    expect: 30000
+  - name: "Student spouse, 12 months, 1 qualifying"
+    period: 2024-01
+    inputs:
+      cdcc_spouse_is_student_or_incapable: true
+      cdcc_spouse_earned_income: 0
+      cdcc_spouse_student_or_incapable_months: 12
+      cdcc_deemed_monthly_earned_income: 250
+    expect: 3000
+  - name: "Student spouse, actual income exceeds deemed"
+    period: 2024-01
+    inputs:
+      cdcc_spouse_is_student_or_incapable: true
+      cdcc_spouse_earned_income: 5000
+      cdcc_spouse_student_or_incapable_months: 12
+      cdcc_deemed_monthly_earned_income: 250
+    expect: 5000
+
+cdcc_earned_income_limit:
+  - name: "Unmarried individual"
+    period: 2024-01
+    inputs:
+      cdcc_is_married: false
+      cdcc_taxpayer_earned_income: 50000
+      cdcc_spouse_effective_earned_income: 0
+    expect: 50000
+  - name: "Married, spouse earns less"
+    period: 2024-01
+    inputs:
+      cdcc_is_married: true
+      cdcc_taxpayer_earned_income: 50000
+      cdcc_spouse_effective_earned_income: 30000
+    expect: 30000
+  - name: "Married, taxpayer earns less"
+    period: 2024-01
+    inputs:
+      cdcc_is_married: true
+      cdcc_taxpayer_earned_income: 20000
+      cdcc_spouse_effective_earned_income: 50000
+    expect: 20000

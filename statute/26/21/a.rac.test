@@ -1,0 +1,84 @@
+cdcc_applicable_pct_pre2026:
+  - name: "AGI at $15,000 - maximum 35%"
+    period: 2024-01
+    inputs:
+      adjusted_gross_income: 15000
+    expect: 0.35
+  - name: "AGI at $15,001 - reduced to 34%"
+    period: 2024-01
+    inputs:
+      adjusted_gross_income: 15001
+    expect: 0.34
+  - name: "AGI at $17,000 - 1 full increment, 34%"
+    period: 2024-01
+    inputs:
+      adjusted_gross_income: 17000
+    expect: 0.34
+  - name: "AGI at $17,001 - 2nd increment starts, 33%"
+    period: 2024-01
+    inputs:
+      adjusted_gross_income: 17001
+    expect: 0.33
+  - name: "AGI at $45,000 - floored at 20%"
+    period: 2024-01
+    inputs:
+      adjusted_gross_income: 45000
+    expect: 0.20
+  - name: "AGI below threshold"
+    period: 2024-01
+    inputs:
+      adjusted_gross_income: 10000
+    expect: 0.35
+
+cdcc_creditable_expenses:
+  - name: "Expenses below all limits"
+    period: 2024-01
+    inputs:
+      cdcc_employment_related_expenses: 2000
+      cdcc_expense_limit: 3000
+      cdcc_earned_income_limit: 50000
+    expect: 2000
+  - name: "Expenses exceed dollar limit"
+    period: 2024-01
+    inputs:
+      cdcc_employment_related_expenses: 5000
+      cdcc_expense_limit: 3000
+      cdcc_earned_income_limit: 50000
+    expect: 3000
+  - name: "Expenses exceed earned income limit"
+    period: 2024-01
+    inputs:
+      cdcc_employment_related_expenses: 5000
+      cdcc_expense_limit: 6000
+      cdcc_earned_income_limit: 3000
+    expect: 3000
+
+cdcc_credit:
+  - name: "Basic - 1 child, $3,000 expenses, 27% rate"
+    period: 2024-01
+    inputs:
+      cdcc_qualifying_individual_count: 1
+      cdcc_applicable_percentage: 0.27
+      cdcc_creditable_expenses: 3000
+    expect: 810
+  - name: "No qualifying individuals"
+    period: 2024-01
+    inputs:
+      cdcc_qualifying_individual_count: 0
+      cdcc_applicable_percentage: 0.35
+      cdcc_creditable_expenses: 3000
+    expect: 0
+  - name: "2 children, max expenses, max rate"
+    period: 2024-01
+    inputs:
+      cdcc_qualifying_individual_count: 2
+      cdcc_applicable_percentage: 0.35
+      cdcc_creditable_expenses: 6000
+    expect: 2100
+  - name: "High AGI - minimum rate"
+    period: 2024-01
+    inputs:
+      cdcc_qualifying_individual_count: 1
+      cdcc_applicable_percentage: 0.20
+      cdcc_creditable_expenses: 3000
+    expect: 600

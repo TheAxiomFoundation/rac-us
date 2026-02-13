@@ -1,0 +1,49 @@
+cdcc_treated_as_married:
+  - name: "Married, not separated"
+    period: 2024-01
+    inputs:
+      cdcc_is_married: true
+      cdcc_is_legally_separated: false
+      cdcc_married_living_apart: false
+    expect: true
+  - name: "Legally separated"
+    period: 2024-01
+    inputs:
+      cdcc_is_married: true
+      cdcc_is_legally_separated: true
+      cdcc_married_living_apart: false
+    expect: false
+  - name: "Married living apart"
+    period: 2024-01
+    inputs:
+      cdcc_is_married: true
+      cdcc_is_legally_separated: false
+      cdcc_married_living_apart: true
+    expect: false
+  - name: "Not married"
+    period: 2024-01
+    inputs:
+      cdcc_is_married: false
+      cdcc_is_legally_separated: false
+      cdcc_married_living_apart: false
+    expect: false
+
+cdcc_meets_filing_requirement:
+  - name: "Married filing jointly - passes"
+    period: 2024-01
+    inputs:
+      cdcc_treated_as_married: true
+      cdcc_files_joint_return: true
+    expect: true
+  - name: "Married filing separately - fails"
+    period: 2024-01
+    inputs:
+      cdcc_treated_as_married: true
+      cdcc_files_joint_return: false
+    expect: false
+  - name: "Not treated as married - always passes"
+    period: 2024-01
+    inputs:
+      cdcc_treated_as_married: false
+      cdcc_files_joint_return: false
+    expect: true

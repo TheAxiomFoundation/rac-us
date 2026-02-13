@@ -1,0 +1,41 @@
+cdcc_expense_limit_before_129:
+  - name: "1 qualifying individual, 2024"
+    period: 2024-01
+    inputs:
+      cdcc_qualifying_individual_count: 1
+    expect: 3000
+  - name: "2 qualifying individuals, 2024"
+    period: 2024-01
+    inputs:
+      cdcc_qualifying_individual_count: 2
+    expect: 6000
+  - name: "3 qualifying individuals, 2024"
+    period: 2024-01
+    inputs:
+      cdcc_qualifying_individual_count: 3
+    expect: 6000
+  - name: "0 qualifying individuals"
+    period: 2024-01
+    inputs:
+      cdcc_qualifying_individual_count: 0
+    expect: 0
+
+cdcc_expense_limit:
+  - name: "No section 129 exclusion"
+    period: 2024-01
+    inputs:
+      cdcc_expense_limit_before_129: 3000
+      section_129_exclusion: 0
+    expect: 3000
+  - name: "Partial section 129 exclusion"
+    period: 2024-01
+    inputs:
+      cdcc_expense_limit_before_129: 6000
+      section_129_exclusion: 2000
+    expect: 4000
+  - name: "Section 129 exclusion exceeds limit"
+    period: 2024-01
+    inputs:
+      cdcc_expense_limit_before_129: 3000
+      section_129_exclusion: 5000
+    expect: 0
