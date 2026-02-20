@@ -52,36 +52,36 @@
 # (ii) before the due date for such return.
 
 # Credit amount for other dependents (non-qualifying children)
-variable odc_credit_amount:
+odc_credit_amount:
     from 2018-01-01: 500
 
 
-variable other_dependent_count:
+other_dependent_count:
     entity: taxunit
     from 2024-01-01: 0
 
 
-variable taxpayer_has_ssn:
+taxpayer_has_ssn:
     entity: taxunit
     from 2024-01-01: 0
 
 
-variable child_has_ssn:
+child_has_ssn:
     entity: person
     from 2024-01-01: 0
 
 
-variable odc_amount:
+odc_amount:
     entity: taxunit
     from 2018-01-01: other_dependent_count * odc_credit_amount
 
 
-variable child_qualifies_for_ctc_ssn:
+child_qualifies_for_ctc_ssn:
     entity: person
     from 2018-01-01: child_has_ssn
 
 
-variable ctc_ssn_requirement_met:
+ctc_ssn_requirement_met:
     entity: taxunit
     from 2018-01-01: taxpayer_has_ssn
 

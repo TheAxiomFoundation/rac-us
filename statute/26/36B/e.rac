@@ -40,27 +40,27 @@
 # operates at the TaxUnit level by adjusting aggregates. The inputs capture
 # the portions attributable to non-lawfully-present individuals.
 
-variable premiums_attributable_to_non_lawfully_present:
+premiums_attributable_to_non_lawfully_present:
     entity: taxunit
     from 2024-01-01: 0
 
 
-variable income_attributable_to_non_lawfully_present:
+income_attributable_to_non_lawfully_present:
     entity: taxunit
     from 2024-01-01: 0
 
 
-variable aggregate_premiums_before_adjustment:
+aggregate_premiums_before_adjustment:
     entity: taxunit
     from 2024-01-01: 0
 
 
-variable household_income_before_adjustment:
+household_income_before_adjustment:
     entity: taxunit
     from 2024-01-01: 0
 
 
-variable is_lawfully_present:
+is_lawfully_present:
     entity: person
     from 2024-01-01: 0
 
@@ -69,7 +69,7 @@ variable is_lawfully_present:
 # (e)(1)(A) - Adjusted premiums
 # =============================================================================
 
-variable ptc_adjusted_premiums:
+ptc_adjusted_premiums:
     entity: taxunit
     from 2013-01-01: max(0, aggregate_premiums_before_adjustment - premiums_attributable_to_non_lawfully_present)
 
@@ -78,6 +78,6 @@ variable ptc_adjusted_premiums:
 # (e)(1)(B) - Adjusted household income
 # =============================================================================
 
-variable ptc_adjusted_household_income:
+ptc_adjusted_household_income:
     entity: taxunit
     from 2013-01-01: max(0, household_income_before_adjustment - income_attributable_to_non_lawfully_present)

@@ -15,16 +15,16 @@
 # (A) Expenses cannot be double-counted - if claimed for AOTC, cannot also claim for LLC
 # (B) LLC expenses can include job skill courses (broader than AOTC)
 
-variable total_qualified_expenses:
+total_qualified_expenses:
     entity: person
     from 2024-01-01: 0
 
 
-variable aotc_election_in_effect:
+aotc_election_in_effect:
     entity: person
     from 2024-01-01: 0
 
 
-variable llc_eligible_expenses:
+llc_eligible_expenses:
     entity: person
     from 2013-01-01: total_qualified_expenses

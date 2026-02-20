@@ -46,22 +46,22 @@
 # =============================================================================
 
 # (A): "equals or exceeds 100 percent"
-variable min_fpl_pct:
+min_fpl_pct:
     from 2014-01-01: 1.0
 
 
 # (A): "does not exceed 400 percent"
-variable max_fpl_pct:
+max_fpl_pct:
     from 2014-01-01: 4.0
 
 
 # (E): "taxable year beginning after December 31, 2020"
-variable temp_rule_start_year:
+temp_rule_start_year:
     from 2021-01-01: 2021
 
 
 # (E): "before January 1, 2026"
-variable temp_rule_end_year:
+temp_rule_end_year:
     from 2021-01-01: 2025
 
 
@@ -69,32 +69,32 @@ variable temp_rule_end_year:
 # Inputs
 # =============================================================================
 
-variable is_married:
+is_married:
     entity: taxunit
     from 2024-01-01: 0
 
 
-variable files_joint_return:
+files_joint_return:
     entity: taxunit
     from 2024-01-01: 0
 
 
-variable is_dependent:
+is_dependent:
     entity: taxunit
     from 2024-01-01: 0
 
 
-variable is_lawfully_present_alien:
+is_lawfully_present_alien:
     entity: taxunit
     from 2024-01-01: 0
 
 
-variable is_medicaid_ineligible_due_to_alien_status:
+is_medicaid_ineligible_due_to_alien_status:
     entity: taxunit
     from 2024-01-01: 0
 
 
-variable tax_year:
+tax_year:
     entity: taxunit
     from 2024-01-01: 0
 
@@ -103,6 +103,6 @@ variable tax_year:
 # Variable: Applicable taxpayer determination
 # =============================================================================
 
-variable is_applicable_taxpayer:
+is_applicable_taxpayer:
     entity: taxunit
     from 2014-01-01: 0

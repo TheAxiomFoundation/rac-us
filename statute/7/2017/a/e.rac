@@ -19,24 +19,24 @@
 #   - Individual receives allotment if they leave the center
 # No rates, dollar amounts, or formulas beyond boolean routing logic.
 
-variable resides_in_treatment_center:
+resides_in_treatment_center:
     entity: person
     from 2024-01-01: 0
 
 
-variable has_left_treatment_center:
+has_left_treatment_center:
     entity: person
     from 2024-01-01: 0
 
 
 # (e)(1)(A): center receives allotment as authorized representative
 # for a period that is less than 1 month
-variable allotment_payable_to_center:
+allotment_payable_to_center:
     entity: person
     from 2013-01-01: false
 
 
 # (e)(1)(B): individual receives allotment if they leave the center
-variable allotment_payable_to_individual:
+allotment_payable_to_individual:
     entity: person
     from 2013-01-01: false

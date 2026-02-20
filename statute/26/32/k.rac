@@ -21,58 +21,58 @@
 
 # Parameters from statute text
 
-variable fraud_disallowance_years:
+fraud_disallowance_years:
     from 1997-01-01: 10
 
 
-variable reckless_disallowance_years:
+reckless_disallowance_years:
     from 1997-01-01: 2
 
 
 # Inputs for tracking prior improper claims
 
-variable eitc_fraud_determination_year:
+eitc_fraud_determination_year:
     entity: taxunit
     from 2024-01-01: 0
 
 
-variable eitc_reckless_determination_year:
+eitc_reckless_determination_year:
     entity: taxunit
     from 2024-01-01: 0
 
 
-variable eitc_denied_via_deficiency_procedures:
+eitc_denied_via_deficiency_procedures:
     entity: taxunit
     from 2024-01-01: 0
 
 
-variable eitc_recertification_info_provided:
+eitc_recertification_info_provided:
     entity: taxunit
     from 2024-01-01: 0
 
 
-variable current_tax_year:
+current_tax_year:
     entity: taxunit
     from 2024-01-01: 0
 
 
 # Variables
 
-variable eitc_in_fraud_disallowance_period:
+eitc_in_fraud_disallowance_period:
     entity: taxunit
     from 1997-01-01: False
 
 
-variable eitc_in_reckless_disallowance_period:
+eitc_in_reckless_disallowance_period:
     entity: taxunit
     from 1997-01-01: False
 
 
-variable eitc_requires_recertification:
+eitc_requires_recertification:
     entity: taxunit
     from 1997-01-01: False
 
 
-variable eitc_disallowed_improper_claim:
+eitc_disallowed_improper_claim:
     entity: taxunit
     from 1997-01-01: False

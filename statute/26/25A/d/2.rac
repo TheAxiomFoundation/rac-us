@@ -8,26 +8,26 @@
 # No parameters needed - this subsection defines a term, not values.
 # The amounts excluded under sections 911/931/933 are inputs from those sections.
 
-variable adjusted_gross_income:
+adjusted_gross_income:
     entity: taxunit
     from 2024-01-01: 0
 
 
-variable section_911_exclusion:
+section_911_exclusion:
     entity: taxunit
     from 2024-01-01: 0
 
 
-variable section_931_exclusion:
+section_931_exclusion:
     entity: taxunit
     from 2024-01-01: 0
 
 
-variable section_933_exclusion:
+section_933_exclusion:
     entity: taxunit
     from 2024-01-01: 0
 
 
-variable magi_for_25A:
+magi_for_25A:
     entity: taxunit
     from 2013-01-01: adjusted_gross_income + section_911_exclusion + section_931_exclusion + section_933_exclusion

@@ -43,48 +43,48 @@
 
 # Inputs for identification information
 
-variable qualifying_child_has_valid_tin:
+qualifying_child_has_valid_tin:
     entity: person
     from 2024-01-01: 0
 
 
-variable eitc_taxpayer_has_tin:
+eitc_taxpayer_has_tin:
     entity: taxunit
     from 2024-01-01: 0
 
 
-variable eitc_taxpayer_has_work_authorized_ssn:
+eitc_taxpayer_has_work_authorized_ssn:
     entity: taxunit
     from 2024-01-01: 0
 
 
-variable eitc_ssn_previously_disqualified:
+eitc_ssn_previously_disqualified:
     entity: taxunit
     from 2024-01-01: 0
 
 
-variable has_qualifying_child_for_eitc:
+has_qualifying_child_for_eitc:
     entity: taxunit
     from 2024-01-01: 0
 
 
 # Variables implementing the identification requirements
 
-variable eitc_ssn_valid_for_work:
+eitc_ssn_valid_for_work:
     entity: taxunit
     from 2013-01-01: eitc_taxpayer_has_work_authorized_ssn
 
 
-variable eitc_child_id_requirement_met:
+eitc_child_id_requirement_met:
     entity: person
     from 2013-01-01: qualifying_child_has_valid_tin
 
 
-variable eitc_childless_id_requirement_met:
+eitc_childless_id_requirement_met:
     entity: taxunit
     from 2013-01-01: True
 
 
-variable eitc_id_requirements_met:
+eitc_id_requirements_met:
     entity: taxunit
     from 2013-01-01: eitc_childless_id_requirement_met

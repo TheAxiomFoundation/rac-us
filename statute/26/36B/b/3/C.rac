@@ -1,0 +1,142 @@
+# 26 USC 36B(b)(3)(C) - Adjusted monthly premium
+
+# (C) Adjusted monthly premium
+# The adjusted monthly premium for an applicable second lowest cost silver plan
+# is the monthly premium which would have been charged (for the rating area
+# with respect to which the determination under paragraph (2)(B) is made) for
+# the plan if each individual covered under a qualified health plan taken into
+# account under paragraph (2)(A) were covered by such silver plan and the
+# premium was adjusted only for the age of each such individual in the manner
+# allowed under section 2701 of the Public Health Service Act. In the case of
+# a State participating in the transitional reinsurance program under section
+# 1341 of the Patient Protection and Affordable Care Act, if the State
+# establishes age rating under section 2701 of the Public Health Service Act
+# that is different from the age rating established under that section by the
+# Secretary of Health and Human Services, the adjusted monthly premium for an
+# applicable second lowest cost silver plan shall be determined using the age
+# rating established by the State.
+
+# Subsection disposition:
+# (b)(3)(C) sentence 1 - ENCODED: Age-only adjusted premium definition
+#   The adjusted monthly premium is the hypothetical premium for the applicable
+#   SLCSP (identified under (B)), in the rating area for paragraph (2)(B),
+#   if covered individuals (per (2)(A)) were enrolled, adjusted only for age
+#   per PHS Act section 2701. Premium amounts are market data inputs; the
+#   coverage type (self-only vs family) from (B) selects the applicable premium.
+# (b)(3)(C) sentence 2 - ENCODED: State transitional reinsurance age rating
+#   override. When a State participates in the PPACA section 1341 transitional
+#   reinsurance program AND establishes different age rating than HHS under
+#   PHS Act section 2701, the State's age rating determines the premium.
+
+# Computational content: This subsection defines the "adjusted monthly premium"
+# for the applicable SLCSP identified under subparagraph (B).
+#
+# The premium is the hypothetical monthly cost for the applicable SLCSP if all
+# individuals covered under the QHP (paragraph (2)(A)) were instead enrolled
+# in the silver plan, with premiums adjusted ONLY for age per PHS Act
+# section 2701.
+#
+# The coverage type (self-only vs family) is determined by (B) and imported
+# here to select the corresponding premium. The premium amounts themselves
+# are market data (age-rated according to PHS Act section 2701).
+#
+# The encodable rule is the State override (sentence 2): if a State
+# participates in transitional reinsurance (PPACA section 1341) AND
+# establishes a different age rating under PHS Act section 2701 than HHS,
+# the adjusted monthly premium uses the State's age rating instead of the
+# HHS age rating.
+
+# =============================================================================
+# Inputs — Sentence 1: Age-adjusted SLCSP premiums (HHS age rating)
+# =============================================================================
+
+# Age-adjusted SLCSP monthly premium for self-only coverage,
+# using the HHS age rating under PHS Act section 2701
+slcsp_self_only_age_adjusted_premium:
+    entity: TaxUnit
+    from 2014-01-01: 0
+
+
+# Age-adjusted SLCSP monthly premium for family coverage,
+# using the HHS age rating under PHS Act section 2701
+slcsp_family_age_adjusted_premium:
+    entity: TaxUnit
+    from 2014-01-01: 0
+
+
+# =============================================================================
+# Inputs — Sentence 2: State transitional reinsurance override
+# =============================================================================
+
+# Whether the State participates in the transitional reinsurance program
+# under PPACA section 1341 (Boolean: 1 = yes, 0 = no)
+state_participates_in_transitional_reinsurance:
+    entity: TaxUnit
+    from 2014-01-01: 0
+
+
+# Whether the State establishes age rating under PHS Act section 2701
+# that is different from the age rating established by HHS
+# (Boolean: 1 = yes, 0 = no)
+state_age_rating_differs_from_hhs:
+    entity: TaxUnit
+    from 2014-01-01: 0
+
+
+# Age-adjusted SLCSP monthly premium for self-only coverage,
+# using the State's age rating (when sentence 2 override applies)
+slcsp_self_only_state_age_rated_premium:
+    entity: TaxUnit
+    from 2014-01-01: 0
+
+
+# Age-adjusted SLCSP monthly premium for family coverage,
+# using the State's age rating (when sentence 2 override applies)
+slcsp_family_state_age_rated_premium:
+    entity: TaxUnit
+    from 2014-01-01: 0
+
+
+# =============================================================================
+# Variable: State override flag (sentence 2)
+# Both conditions must be true for the override to apply
+# =============================================================================
+
+ptc_state_age_rating_override:
+    entity: TaxUnit
+    from 2014-01-01: state_participates_in_transitional_reinsurance * state_age_rating_differs_from_hhs
+
+# =============================================================================
+# Variable: Self-only premium (blended by override flag)
+# =============================================================================
+
+ptc_self_only_premium:
+    entity: TaxUnit
+    from 2014-01-01: ptc_state_age_rating_override * slcsp_self_only_state_age_rated_premium + (1 - ptc_state_age_rating_override) * slcsp_self_only_age_adjusted_premium
+
+# =============================================================================
+# Variable: Family premium (blended by override flag)
+# =============================================================================
+
+ptc_family_premium:
+    entity: TaxUnit
+    from 2014-01-01: ptc_state_age_rating_override * slcsp_family_state_age_rated_premium + (1 - ptc_state_age_rating_override) * slcsp_family_age_adjusted_premium
+
+# =============================================================================
+# Variable: Adjusted monthly premium for the applicable SLCSP
+# =============================================================================
+
+# Selects the correct premium based on:
+#   1. Coverage type from (B) — self-only or family
+#   2. Age rating source — HHS (default) or State (sentence 2 override)
+#
+# Boolean arithmetic:
+#   state_override = participates * differs (both must be true for override)
+#   For each coverage type, blend between state-rated and HHS-rated premium:
+#     premium = override * state_rated + (1 - override) * hhs_rated
+#   Then select coverage type using (B)'s determination:
+#     result = self_only_flag * self_premium + (1 - self_only_flag) * family_premium
+
+ptc_adjusted_monthly_premium:
+    entity: TaxUnit
+    from 2014-01-01: ptc_slcsp_uses_self_only_coverage * ptc_self_only_premium + (1 - ptc_slcsp_uses_self_only_coverage) * ptc_family_premium

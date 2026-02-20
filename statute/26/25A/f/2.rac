@@ -18,16 +18,16 @@
 # characteristics of the institution. The determination is binary - the institution
 # either meets the HEA definition and Title IV eligibility or it does not.
 
-variable institution_described_in_hea_481:
+institution_described_in_hea_481:
     entity: taxunit
     from 2024-01-01: 0
 
 
-variable institution_title_iv_eligible:
+institution_title_iv_eligible:
     entity: taxunit
     from 2024-01-01: 0
 
 
-variable is_eligible_educational_institution:
+is_eligible_educational_institution:
     entity: taxunit
     from 2013-01-01: institution_described_in_hea_481 and institution_title_iv_eligible

@@ -65,7 +65,7 @@
 # Parameters
 # =============================================================================
 
-variable exchange_verification_effective_year:
+exchange_verification_effective_year:
     from 2025-07-04: 2028
 
 
@@ -73,22 +73,22 @@ variable exchange_verification_effective_year:
 # Inputs
 # =============================================================================
 
-variable tax_year:
+tax_year:
     entity: taxunit
     from 2024-01-01: 0
 
 
-variable exchange_has_verified_eligibility:
+exchange_has_verified_eligibility:
     entity: taxunit
     from 2024-01-01: 0
 
 
-variable enrolled_through_exchange:
+enrolled_through_exchange:
     entity: taxunit
     from 2024-01-01: 0
 
 
-variable verification_waived_for_special_enrollment:
+verification_waived_for_special_enrollment:
     entity: taxunit
     from 2024-01-01: 0
 
@@ -97,6 +97,6 @@ variable verification_waived_for_special_enrollment:
 # Variable: Coverage month verification requirement
 # =============================================================================
 
-variable ptc_month_passes_exchange_verification:
+ptc_month_passes_exchange_verification:
     entity: taxunit
     from 2025-07-04: exchange_has_verified_eligibility

@@ -21,31 +21,31 @@
 # Note: Section 151 deductions were suspended by TCJA for 2018-2025, but the dependency
 # relationship still applies for purposes of this section per IRC 152(a).
 
-variable is_dependent_of_another_taxpayer:
+is_dependent_of_another_taxpayer:
     entity: person
     from 2024-01-01: 0
 
 
-variable qualified_expenses_paid_by_dependent:
+qualified_expenses_paid_by_dependent:
     entity: person
     from 2024-01-01: 0
 
 
-variable form_1098t_received_by_dependent:
+form_1098t_received_by_dependent:
     entity: person
     from 2024-01-01: 0
 
 
-variable dependent_disqualified_from_credit:
+dependent_disqualified_from_credit:
     entity: person
     from 2013-01-01: is_dependent_of_another_taxpayer
 
 
-variable expenses_attributed_to_claiming_taxpayer:
+expenses_attributed_to_claiming_taxpayer:
     entity: person
     from 2013-01-01: 0
 
 
-variable form_1098t_attributed_to_claiming_taxpayer:
+form_1098t_attributed_to_claiming_taxpayer:
     entity: person
     from 2013-01-01: False

@@ -23,71 +23,71 @@
 # Parameters - Pre-2026 (single-tier phasedown)
 # =============================================================================
 
-variable cdcc_max_pct_pre2026:
+cdcc_max_pct_pre2026:
     from 1982-01-01: 0.30
     from 2003-01-01: 0.35
 
-variable cdcc_min_pct_pre2026:
+cdcc_min_pct_pre2026:
     from 1982-01-01: 0.20
 
-variable cdcc_agi_threshold_pre2026:
+cdcc_agi_threshold_pre2026:
     from 1982-01-01: 10000
     from 2003-01-01: 15000
 
-variable cdcc_agi_increment_pre2026:
+cdcc_agi_increment_pre2026:
     from 1982-01-01: 2000
 
-variable cdcc_pct_point_per_increment:
+cdcc_pct_point_per_increment:
     from 1982-01-01: 0.01
 
 # Rounding offset for ceiling division: round(x + offset) = ceil(x) for non-integer x
-variable cdcc_ceiling_round_offset:
+cdcc_ceiling_round_offset:
     from 1982-01-01: 0.4999
 
 # =============================================================================
 # Parameters - Post-2025 (two-tier phasedown per P.L. 119-21 sec 70405)
 # =============================================================================
 
-variable cdcc_max_pct_post2025:
+cdcc_max_pct_post2025:
     from 2026-01-01: 0.50
 
-variable cdcc_tier1_floor:
+cdcc_tier1_floor:
     from 2026-01-01: 0.35
 
-variable cdcc_tier2_floor:
+cdcc_tier2_floor:
     from 2026-01-01: 0.20
 
-variable cdcc_tier1_threshold:
+cdcc_tier1_threshold:
     from 2026-01-01: 15000
 
-variable cdcc_tier1_increment:
+cdcc_tier1_increment:
     from 2026-01-01: 2000
 
-variable cdcc_tier2_threshold_single:
+cdcc_tier2_threshold_single:
     from 2026-01-01: 75000
 
-variable cdcc_tier2_threshold_joint:
+cdcc_tier2_threshold_joint:
     from 2026-01-01: 150000
 
-variable cdcc_tier2_increment_single:
+cdcc_tier2_increment_single:
     from 2026-01-01: 2000
 
-variable cdcc_tier2_increment_joint:
+cdcc_tier2_increment_joint:
     from 2026-01-01: 4000
 
 # =============================================================================
 # Inputs
 # =============================================================================
 
-variable adjusted_gross_income:
+adjusted_gross_income:
     entity: TaxUnit
     from 2024-01-01: 0
 
-variable cdcc_is_joint_return:
+cdcc_is_joint_return:
     entity: TaxUnit
     from 2024-01-01: 0
 
-variable cdcc_employment_related_expenses:
+cdcc_employment_related_expenses:
     entity: TaxUnit
     from 2024-01-01: 0
 
@@ -95,17 +95,17 @@ variable cdcc_employment_related_expenses:
 # Pre-2026: excess AGI over threshold
 # =============================================================================
 
-variable cdcc_excess_agi_pre2026:
+cdcc_excess_agi_pre2026:
     entity: TaxUnit
     from 1982-01-01: max(0, adjusted_gross_income - cdcc_agi_threshold_pre2026)
 
 # Pre-2026: number of $2,000 increments (ceiling)
-variable cdcc_increments_pre2026:
+cdcc_increments_pre2026:
     entity: TaxUnit
     from 1982-01-01: if cdcc_excess_agi_pre2026 == 0: 0 else: round(cdcc_excess_agi_pre2026 / cdcc_agi_increment_pre2026 + cdcc_ceiling_round_offset)
 
 # Pre-2026: applicable percentage after phasedown
-variable cdcc_applicable_pct_pre2026:
+cdcc_applicable_pct_pre2026:
     entity: TaxUnit
     from 1982-01-01: max(cdcc_min_pct_pre2026, cdcc_max_pct_pre2026 - cdcc_increments_pre2026 * cdcc_pct_point_per_increment)
 
@@ -113,15 +113,15 @@ variable cdcc_applicable_pct_pre2026:
 # Post-2025 Tier 1 per 21(a)(2)(A): 50% reduced to 35%
 # =============================================================================
 
-variable cdcc_excess_agi_tier1:
+cdcc_excess_agi_tier1:
     entity: TaxUnit
     from 2026-01-01: max(0, adjusted_gross_income - cdcc_tier1_threshold)
 
-variable cdcc_increments_tier1:
+cdcc_increments_tier1:
     entity: TaxUnit
     from 2026-01-01: if cdcc_excess_agi_tier1 == 0: 0 else: round(cdcc_excess_agi_tier1 / cdcc_tier1_increment + cdcc_ceiling_round_offset)
 
-variable cdcc_pct_after_tier1:
+cdcc_pct_after_tier1:
     entity: TaxUnit
     from 2026-01-01: max(cdcc_tier1_floor, cdcc_max_pct_post2025 - cdcc_increments_tier1 * cdcc_pct_point_per_increment)
 
@@ -129,23 +129,23 @@ variable cdcc_pct_after_tier1:
 # Post-2025 Tier 2 per 21(a)(2)(B): further reduced to 20%
 # =============================================================================
 
-variable cdcc_tier2_threshold:
+cdcc_tier2_threshold:
     entity: TaxUnit
     from 2026-01-01: if cdcc_is_joint_return: cdcc_tier2_threshold_joint else: cdcc_tier2_threshold_single
 
-variable cdcc_tier2_increment:
+cdcc_tier2_increment:
     entity: TaxUnit
     from 2026-01-01: if cdcc_is_joint_return: cdcc_tier2_increment_joint else: cdcc_tier2_increment_single
 
-variable cdcc_excess_agi_tier2:
+cdcc_excess_agi_tier2:
     entity: TaxUnit
     from 2026-01-01: max(0, adjusted_gross_income - cdcc_tier2_threshold)
 
-variable cdcc_increments_tier2:
+cdcc_increments_tier2:
     entity: TaxUnit
     from 2026-01-01: if cdcc_excess_agi_tier2 == 0: 0 else: round(cdcc_excess_agi_tier2 / cdcc_tier2_increment + cdcc_ceiling_round_offset)
 
-variable cdcc_pct_after_tier2:
+cdcc_pct_after_tier2:
     entity: TaxUnit
     from 2026-01-01: max(cdcc_tier2_floor, cdcc_pct_after_tier1 - cdcc_increments_tier2 * cdcc_pct_point_per_increment)
 
@@ -153,7 +153,7 @@ variable cdcc_pct_after_tier2:
 # Combined applicable percentage (temporal selection)
 # =============================================================================
 
-variable cdcc_applicable_percentage:
+cdcc_applicable_percentage:
     entity: TaxUnit
     from 1982-01-01: cdcc_applicable_pct_pre2026
     from 2026-01-01: cdcc_pct_after_tier2
@@ -162,7 +162,7 @@ variable cdcc_applicable_percentage:
 # Creditable expenses (lesser of expenses, dollar limit, earned income limit)
 # =============================================================================
 
-variable cdcc_creditable_expenses:
+cdcc_creditable_expenses:
     entity: TaxUnit
     from 1982-01-01: min(cdcc_employment_related_expenses, min(cdcc_expense_limit, cdcc_earned_income_limit))
 
@@ -170,6 +170,6 @@ variable cdcc_creditable_expenses:
 # 21(a)(1) - Final credit amount
 # =============================================================================
 
-variable cdcc_credit:
+cdcc_credit:
     entity: TaxUnit
     from 1982-01-01: if cdcc_qualifying_individual_count == 0: 0 else: cdcc_applicable_percentage * cdcc_creditable_expenses

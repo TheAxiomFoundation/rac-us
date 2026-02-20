@@ -14,15 +14,15 @@
 # academic period beginning in the taxable year.
 
 # Minimum number of academic periods required for AOTC eligibility
-variable min_academic_periods_for_aotc:
+min_academic_periods_for_aotc:
     from 1997-08-05: 1
 
 
-variable eligible_student_academic_periods:
+eligible_student_academic_periods:
     entity: person
     from 2024-01-01: 0
 
 
-variable aotc_half_time_requirement_met:
+aotc_half_time_requirement_met:
     entity: person
     from 1997-08-05: eligible_student_academic_periods >= min_academic_periods_for_aotc

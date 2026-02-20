@@ -16,11 +16,11 @@
 
 # Parent file importing key variables from subsections
 
-variable child_tax_credit:
+child_tax_credit:
     entity: taxunit
     from 2013-01-01: ctc_after_advance_reconciliation + odc_amount
 
 
-variable refundable_ctc:
+refundable_ctc:
     entity: taxunit
     from 2013-01-01: actc_amount

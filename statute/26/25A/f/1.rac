@@ -40,68 +40,68 @@
 # - Various exclusions per (B) and (C)
 
 # Input: Raw tuition paid to eligible educational institution
-variable tuition_paid:
+tuition_paid:
     entity: person
     from 2024-01-01: 0
 
 
 # Input: Academic fees paid (enrollment/attendance related)
-variable academic_fees_paid:
+academic_fees_paid:
     entity: person
     from 2024-01-01: 0
 
 
 # Input: Course materials paid (books, supplies, equipment for AOTC)
-variable course_materials_paid:
+course_materials_paid:
     entity: person
     from 2024-01-01: 0
 
 
 # Input: Sports/games/hobbies expenses (excluded per (B) unless part of degree)
-variable sports_games_hobbies_expenses:
+sports_games_hobbies_expenses:
     entity: person
     from 2024-01-01: 0
 
 
 # Input: Whether sports/games/hobbies course is part of degree program
-variable sports_course_part_of_degree:
+sports_course_part_of_degree:
     entity: person
     from 2024-01-01: 0
 
 
 # Input: Student activity fees (excluded per (C))
-variable student_activity_fees:
+student_activity_fees:
     entity: person
     from 2024-01-01: 0
 
 
 # Input: Athletic fees (excluded per (C))
-variable athletic_fees:
+athletic_fees:
     entity: person
     from 2024-01-01: 0
 
 
 # Input: Insurance expenses (excluded per (C))
-variable education_insurance_expenses:
+education_insurance_expenses:
     entity: person
     from 2024-01-01: 0
 
 
 # Input: Other nonacademic expenses (excluded per (C))
-variable other_nonacademic_expenses:
+other_nonacademic_expenses:
     entity: person
     from 2024-01-01: 0
 
 
 # Variable: Qualified tuition and related expenses for LLC
 # Per (A)-(C): tuition + academic fees, excluding sports/hobbies (unless degree), excluding nonacademic fees
-variable qualified_tuition_and_related_expenses_llc:
+qualified_tuition_and_related_expenses_llc:
     entity: person
     from 2013-01-01: max(0, (tuition_paid + academic_fees_paid) - sports_games_hobbies_expenses - (student_activity_fees + athletic_fees + education_insurance_expenses + other_nonacademic_expenses))
 
 
 # Variable: Qualified tuition and related expenses for AOTC
 # Per (D): Same as LLC but also includes course materials
-variable qualified_tuition_and_related_expenses_aotc:
+qualified_tuition_and_related_expenses_aotc:
     entity: person
     from 2013-01-01: max(0, (tuition_paid + academic_fees_paid + course_materials_paid) - sports_games_hobbies_expenses - (student_activity_fees + athletic_fees + education_insurance_expenses + other_nonacademic_expenses))

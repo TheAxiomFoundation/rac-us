@@ -29,6 +29,6 @@
 # (C) Credit limited to first 4 years of postsecondary education (aotc_first_4_years_eligible)
 # (D) No credit for students with felony drug convictions (eligible_student_drug_conviction_disqualified)
 
-variable hope_scholarship_limitations_satisfied:
+hope_scholarship_limitations_satisfied:
     entity: person
     from 2013-01-01: True

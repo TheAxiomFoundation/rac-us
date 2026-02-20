@@ -6,15 +6,15 @@
 # taxable year if such an election (by the taxpayer or any other individual) is in effect
 # with respect to such student for any 4 prior taxable years.
 
-variable max_aotc_years:
+max_aotc_years:
     from 1997-08-05: 4
 
 
-variable prior_aotc_years_claimed:
+prior_aotc_years_claimed:
     entity: person
     from 2024-01-01: 0
 
 
-variable aotc_4_year_limit_met:
+aotc_4_year_limit_met:
     entity: person
     from 1997-08-05: prior_aotc_years_claimed >= max_aotc_years

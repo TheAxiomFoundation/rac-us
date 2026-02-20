@@ -18,7 +18,7 @@
 # Input: Adjusted gross income (required for phaseout calculation)
 # =============================================================================
 
-variable adjusted_gross_income:
+adjusted_gross_income:
     entity: taxunit
     from 2024-01-01: 0
 
@@ -27,7 +27,7 @@ variable adjusted_gross_income:
 # 32(a)(1) - Credit amount before limitation
 # =============================================================================
 
-variable eitc_credit_before_limitation:
+eitc_credit_before_limitation:
     entity: taxunit
     from 2013-01-01: eitc_credit_percentage * (min(eitc_earned_income, eitc_earned_income_amount))
 
@@ -36,7 +36,7 @@ variable eitc_credit_before_limitation:
 # 32(a)(2)(A) - Maximum credit (credit percentage of earned income amount)
 # =============================================================================
 
-variable eitc_maximum_credit:
+eitc_maximum_credit:
     entity: taxunit
     from 2013-01-01: eitc_credit_percentage * eitc_earned_income_amount
 
@@ -45,7 +45,7 @@ variable eitc_maximum_credit:
 # 32(a)(2)(B) - Phaseout base income
 # =============================================================================
 
-variable eitc_phaseout_base:
+eitc_phaseout_base:
     entity: taxunit
     from 2013-01-01: max(adjusted_gross_income, eitc_earned_income)
 
@@ -54,7 +54,7 @@ variable eitc_phaseout_base:
 # 32(a)(2)(B) - Phaseout reduction amount
 # =============================================================================
 
-variable eitc_phaseout_reduction:
+eitc_phaseout_reduction:
     entity: taxunit
     from 2013-01-01: eitc_phaseout_percentage * (max(0, eitc_phaseout_base - eitc_phaseout_amount))
 
@@ -63,7 +63,7 @@ variable eitc_phaseout_reduction:
 # 32(a)(2) - Credit after limitation
 # =============================================================================
 
-variable eitc_credit_after_limitation:
+eitc_credit_after_limitation:
     entity: taxunit
     from 2013-01-01: max(0, eitc_maximum_credit - eitc_phaseout_reduction)
 
@@ -72,6 +72,6 @@ variable eitc_credit_after_limitation:
 # 32(a) - Final earned income credit
 # =============================================================================
 
-variable earned_income_credit:
+earned_income_credit:
     entity: taxunit
     from 2013-01-01: min(eitc_credit_before_limitation, eitc_credit_after_limitation)

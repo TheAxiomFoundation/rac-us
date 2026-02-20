@@ -30,32 +30,32 @@
 # =============================================================================
 
 # Credit percentages per 32(b)(1)
-variable eitc_credit_percentage_0:
+eitc_credit_percentage_0:
     from 1996-01-01: 0.0765
 
 
-variable eitc_credit_percentage_1:
+eitc_credit_percentage_1:
     from 1996-01-01: 0.34
 
 
-variable eitc_credit_percentage_2:
+eitc_credit_percentage_2:
     from 1996-01-01: 0.40
 
 
-variable eitc_credit_percentage_3plus:
+eitc_credit_percentage_3plus:
     from 2009-01-01: 0.45
 
 
 # Phaseout percentages per 32(b)(1)
-variable eitc_phaseout_percentage_0:
+eitc_phaseout_percentage_0:
     from 1996-01-01: 0.0765
 
 
-variable eitc_phaseout_percentage_1:
+eitc_phaseout_percentage_1:
     from 1996-01-01: 0.1598
 
 
-variable eitc_phaseout_percentage_2plus:
+eitc_phaseout_percentage_2plus:
     from 1996-01-01: 0.2106
 
 
@@ -64,24 +64,24 @@ variable eitc_phaseout_percentage_2plus:
 # =============================================================================
 
 # Earned income amounts per 32(b)(2)(A)
-variable eitc_earned_income_amount_0:
+eitc_earned_income_amount_0:
     from 1996-01-01: 4220
 
 
-variable eitc_earned_income_amount_1:
+eitc_earned_income_amount_1:
     from 1996-01-01: 6330
 
 
-variable eitc_earned_income_amount_2plus:
+eitc_earned_income_amount_2plus:
     from 1996-01-01: 8890
 
 
 # Phaseout amounts per 32(b)(2)(A)
-variable eitc_phaseout_amount_0:
+eitc_phaseout_amount_0:
     from 1996-01-01: 5280
 
 
-variable eitc_phaseout_amount_1plus:
+eitc_phaseout_amount_1plus:
     from 1996-01-01: 11610
 
 
@@ -89,7 +89,7 @@ variable eitc_phaseout_amount_1plus:
 # 32(b)(2)(B) - Joint return phaseout increase
 # =============================================================================
 
-variable eitc_joint_return_phaseout_increase:
+eitc_joint_return_phaseout_increase:
     from 2002-01-01: 5000
 
 
@@ -97,12 +97,12 @@ variable eitc_joint_return_phaseout_increase:
 # Inputs
 # =============================================================================
 
-variable qualifying_children_count:
+qualifying_children_count:
     entity: taxunit
     from 2024-01-01: 0
 
 
-variable is_joint_return:
+is_joint_return:
     entity: taxunit
     from 2024-01-01: 0
 
@@ -111,7 +111,7 @@ variable is_joint_return:
 # Variables - Credit percentage per 32(b)(1)
 # =============================================================================
 
-variable eitc_credit_percentage:
+eitc_credit_percentage:
     entity: taxunit
     from 1996-01-01: eitc_credit_percentage_3plus
 
@@ -120,7 +120,7 @@ variable eitc_credit_percentage:
 # Variables - Phaseout percentage per 32(b)(1)
 # =============================================================================
 
-variable eitc_phaseout_percentage:
+eitc_phaseout_percentage:
     entity: taxunit
     from 1996-01-01: eitc_phaseout_percentage_2plus
 
@@ -129,7 +129,7 @@ variable eitc_phaseout_percentage:
 # Variables - Earned income amount per 32(b)(2)(A)
 # =============================================================================
 
-variable eitc_earned_income_amount:
+eitc_earned_income_amount:
     entity: taxunit
     from 1996-01-01: eitc_earned_income_amount_2plus
 
@@ -138,6 +138,6 @@ variable eitc_earned_income_amount:
 # Variables - Phaseout amount per 32(b)(2)(A) and (B)
 # =============================================================================
 
-variable eitc_phaseout_amount:
+eitc_phaseout_amount:
     entity: taxunit
     from 1996-01-01: eitc_phaseout_amount_1plus

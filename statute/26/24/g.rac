@@ -23,50 +23,50 @@
 # demonstrate eligibility for such credit.
 
 # Disallowance period for fraud
-variable ctc_fraud_disallowance_years:
+ctc_fraud_disallowance_years:
     from 2016-01-01: 10
 
 
 # Disallowance period for reckless/intentional disregard
-variable ctc_reckless_disallowance_years:
+ctc_reckless_disallowance_years:
     from 2016-01-01: 2
 
 
-variable ctc_fraud_determination_year:
+ctc_fraud_determination_year:
     entity: taxunit
     from 2024-01-01: 0
 
 
-variable ctc_reckless_determination_year:
+ctc_reckless_determination_year:
     entity: taxunit
     from 2024-01-01: 0
 
 
-variable ctc_deficiency_requires_documentation:
+ctc_deficiency_requires_documentation:
     entity: taxunit
     from 2024-01-01: 0
 
 
-variable ctc_documentation_provided:
+ctc_documentation_provided:
     entity: taxunit
     from 2024-01-01: 0
 
 
-variable current_tax_year:
+current_tax_year:
     entity: taxunit
     from 2024-01-01: 0
 
 
-variable ctc_in_fraud_disallowance_period:
+ctc_in_fraud_disallowance_period:
     entity: taxunit
     from 2016-01-01: (current_tax_year - ctc_fraud_determination_year) <= ctc_fraud_disallowance_years
 
 
-variable ctc_in_reckless_disallowance_period:
+ctc_in_reckless_disallowance_period:
     entity: taxunit
     from 2016-01-01: (current_tax_year - ctc_reckless_determination_year) <= ctc_reckless_disallowance_years
 
 
-variable ctc_disallowed_prior_claim:
+ctc_disallowed_prior_claim:
     entity: taxunit
     from 2016-01-01: False

@@ -42,7 +42,7 @@
 # Input: Advance payments received under ACA section 1412
 # =============================================================================
 
-variable ptc_advance_payments:
+ptc_advance_payments:
     entity: taxunit
     from 2024-01-01: 0
 
@@ -51,7 +51,7 @@ variable ptc_advance_payments:
 # (f)(1) - Credit after reduction for advance payments
 # =============================================================================
 
-variable ptc_after_advance_reconciliation:
+ptc_after_advance_reconciliation:
     entity: taxunit
     from 2013-01-01: max(0, ptc_premium_tax_credit - ptc_advance_payments)
 
@@ -60,6 +60,6 @@ variable ptc_after_advance_reconciliation:
 # (f)(2) - Tax increase for excess advance payments
 # =============================================================================
 
-variable ptc_excess_advance_repayment:
+ptc_excess_advance_repayment:
     entity: taxunit
     from 2013-01-01: max(0, ptc_advance_payments - ptc_premium_tax_credit)

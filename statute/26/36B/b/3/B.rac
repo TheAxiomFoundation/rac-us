@@ -1,0 +1,82 @@
+# 26 USC 36B(b)(3)(B) - Applicable second lowest cost silver plan
+
+# (B) Applicable second lowest cost silver plan
+# The applicable second lowest cost silver plan with respect to any applicable
+# taxpayer is the second lowest cost silver plan of the individual market in
+# the rating area in which the taxpayer resides which—
+# (i) is offered through the same Exchange through which the qualified health
+# plans taken into account under paragraph (2)(A) were offered, and
+# (ii) provides—
+# (I) self-only coverage in the case of an applicable taxpayer—
+# (aa) whose tax filing status is determined under section 1 to be single and
+# who is not allowed a deduction under section 151 for any dependent for the
+# taxable year, or
+# (bb) who is not described in item (aa) but who purchases only self-only
+# coverage, and
+# (II) family coverage in all other cases.
+
+# Subsection disposition:
+# (b)(3)(B)(i)         - ENCODED: Same-Exchange requirement (Boolean input)
+# (b)(3)(B)(ii)(I)(aa) - ENCODED: Self-only for single filers with no dependents
+# (b)(3)(B)(ii)(I)(bb) - ENCODED: Self-only for non-(aa) who purchase self-only
+# (b)(3)(B)(ii)(II)    - ENCODED: Family coverage in all other cases (complement)
+
+# Computational content: This subsection defines which silver plan serves as
+# the SLCSP benchmark for computing premium assistance under paragraph (2).
+#
+# The plan selection (second lowest cost in the rating area) is a market data
+# lookup. The encodable rules determine:
+#   1. The plan must be from the same Exchange (clause (i)) — Boolean constraint
+#   2. Whether the benchmark uses self-only or family coverage (clause (ii)):
+#      - Self-only if (aa) single with no dependents, OR (bb) purchases self-only
+#      - Family coverage in all other cases
+#
+# Note: (aa) OR ((NOT aa) AND bb) simplifies to (aa) OR (bb).
+
+# =============================================================================
+# Inputs
+# =============================================================================
+
+# (i): Whether the SLCSP is offered through the same Exchange through which
+# qualified health plans under paragraph (2)(A) were offered
+slcsp_offered_through_same_exchange:
+    entity: TaxUnit
+    from 2024-01-01: 0
+
+
+# (ii)(I)(aa): Whether filing status under section 1 is single
+filing_status_is_single:
+    entity: TaxUnit
+    from 2024-01-01: 0
+
+
+# (ii)(I)(aa): Whether taxpayer is allowed a deduction under section 151
+# for any dependent for the taxable year
+has_section_151_dependents:
+    entity: TaxUnit
+    from 2024-01-01: 0
+
+
+# (ii)(I)(bb): Whether taxpayer purchases only self-only coverage
+purchases_self_only_coverage:
+    entity: TaxUnit
+    from 2024-01-01: 0
+
+
+# =============================================================================
+# Variable: SLCSP benchmark coverage type — self-only determination
+# =============================================================================
+
+# Under clause (ii), the applicable SLCSP provides:
+#   Self-only coverage when:
+#     (I)(aa) filing status is single AND no section 151 dependents, OR
+#     (I)(bb) not described in (aa) but purchases only self-only coverage
+#   Family coverage in all other cases (II).
+#
+# Boolean arithmetic: max(aa, bb) where
+#   aa = single AND (NOT has_dependents)
+#   (aa OR bb) simplifies to (aa OR purchases_self_only)
+
+ptc_slcsp_uses_self_only_coverage:
+    entity: TaxUnit
+    from 2014-01-01: max(filing_status_is_single * (1 - has_section_151_dependents), purchases_self_only_coverage)

@@ -7,11 +7,11 @@
 # substance before the end of the taxable year with respect to which this
 # section is being applied.
 
-variable has_felony_drug_conviction:
+has_felony_drug_conviction:
     entity: person
     from 2024-01-01: 0
 
 
-variable eligible_student_drug_conviction_disqualified:
+eligible_student_drug_conviction_disqualified:
     entity: person
     from 2013-01-01: has_felony_drug_conviction

@@ -6,20 +6,20 @@
 # covering a period of less than 12 months.
 
 # Minimum months for full taxable year
-variable ctc_min_tax_year_months:
+ctc_min_tax_year_months:
     from 1998-01-01: 12
 
 
-variable tax_year_months:
+tax_year_months:
     entity: taxunit
     from 2024-01-01: 0
 
 
-variable taxpayer_deceased:
+taxpayer_deceased:
     entity: taxunit
     from 2024-01-01: 0
 
 
-variable ctc_meets_full_year_requirement:
+ctc_meets_full_year_requirement:
     entity: taxunit
     from 1998-01-01: tax_year_months >= ctc_min_tax_year_months

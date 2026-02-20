@@ -33,13 +33,13 @@ statute/7/2017/a.rac     →  7 USC § 2017(a)
 
 See `RAC_SPEC.md` for full specification. Key features:
 
-**Named declarations** (not blocks):
+**Unified syntax** (no keyword prefix — type inferred from fields):
 ```yaml
-parameter contribution_rate:
+contribution_rate:
   values:
     1977-01-01: 0.30
 
-variable snap_allotment:
+snap_allotment:
   imports: [7/2014#household_size]
   entity: Household
   period: Month
@@ -50,7 +50,7 @@ variable snap_allotment:
       expect: 823
 ```
 
-**Self-contained**: text, parameters, variables, tests in one file.
+**Self-contained**: text, parameters, computed values, tests in one file.
 
 **Import syntax**: `path#variable` or `path#variable as alias`
 

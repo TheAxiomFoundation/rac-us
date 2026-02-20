@@ -19,12 +19,12 @@
 # =============================================================================
 
 # Deemed monthly earned income for student/incapable spouse per 21(d)(2)
-variable cdcc_deemed_earned_income_1_qualifying:
+cdcc_deemed_earned_income_1_qualifying:
     from 1982-01-01: 166
     from 2002-01-01: 200
     from 2003-01-01: 250
 
-variable cdcc_deemed_earned_income_2plus_qualifying:
+cdcc_deemed_earned_income_2plus_qualifying:
     from 1982-01-01: 333
     from 2002-01-01: 400
     from 2003-01-01: 500
@@ -33,23 +33,23 @@ variable cdcc_deemed_earned_income_2plus_qualifying:
 # Inputs
 # =============================================================================
 
-variable cdcc_taxpayer_earned_income:
+cdcc_taxpayer_earned_income:
     entity: TaxUnit
     from 2024-01-01: 0
 
-variable cdcc_spouse_earned_income:
+cdcc_spouse_earned_income:
     entity: TaxUnit
     from 2024-01-01: 0
 
-variable cdcc_is_married:
+cdcc_is_married:
     entity: TaxUnit
     from 2024-01-01: 0
 
-variable cdcc_spouse_is_student_or_incapable:
+cdcc_spouse_is_student_or_incapable:
     entity: TaxUnit
     from 2024-01-01: 0
 
-variable cdcc_spouse_student_or_incapable_months:
+cdcc_spouse_student_or_incapable_months:
     entity: TaxUnit
     from 2024-01-01: 0
 
@@ -58,16 +58,16 @@ variable cdcc_spouse_student_or_incapable_months:
 # =============================================================================
 
 # Deemed monthly earned income for student/incapable spouse per 21(d)(2)
-variable cdcc_deemed_monthly_earned_income:
+cdcc_deemed_monthly_earned_income:
     entity: TaxUnit
     from 1982-01-01: if cdcc_qualifying_individual_count >= 2: cdcc_deemed_earned_income_2plus_qualifying else: cdcc_deemed_earned_income_1_qualifying
 
 # Spouse effective earned income after applying student/incapable rule
-variable cdcc_spouse_effective_earned_income:
+cdcc_spouse_effective_earned_income:
     entity: TaxUnit
     from 1982-01-01: if cdcc_spouse_is_student_or_incapable: max(cdcc_spouse_earned_income, cdcc_spouse_student_or_incapable_months * cdcc_deemed_monthly_earned_income) else: cdcc_spouse_earned_income
 
 # Earned income limit per 21(d)(1)
-variable cdcc_earned_income_limit:
+cdcc_earned_income_limit:
     entity: TaxUnit
     from 1982-01-01: if cdcc_is_married: min(cdcc_taxpayer_earned_income, cdcc_spouse_effective_earned_income) else: cdcc_taxpayer_earned_income

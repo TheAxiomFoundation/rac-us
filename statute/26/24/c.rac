@@ -12,25 +12,25 @@
 # all that follows "resident of the United States".
 
 # Age threshold for qualifying child
-variable ctc_qualifying_age:
+ctc_qualifying_age:
     from 1998-01-01: 17
 
 
-variable child_age:
+child_age:
     entity: person
     from 2024-01-01: 0
 
 
-variable is_qualifying_child_152c:
+is_qualifying_child_152c:
     entity: person
     from 2024-01-01: 0
 
 
-variable is_us_citizen_or_resident:
+is_us_citizen_or_resident:
     entity: person
     from 2024-01-01: 0
 
 
-variable is_ctc_qualifying_child:
+is_ctc_qualifying_child:
     entity: person
     from 1998-01-01: True

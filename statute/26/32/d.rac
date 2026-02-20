@@ -8,16 +8,16 @@
 # This subsection establishes a bright-line rule: married individuals must file
 # a joint return to claim EITC. Married filing separately (MFS) is disqualified.
 
-variable is_married:
+is_married:
     entity: taxunit
     from 2024-01-01: 0
 
 
-variable files_joint_return:
+files_joint_return:
     entity: taxunit
     from 2024-01-01: 0
 
 
-variable eitc_eligible_under_32d:
+eitc_eligible_under_32d:
     entity: taxunit
     from 2013-01-01: files_joint_return

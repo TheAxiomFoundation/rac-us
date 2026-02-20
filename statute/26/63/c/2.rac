@@ -14,16 +14,16 @@
 
 # Parent file that dispatches to appropriate basic standard deduction based on filing status
 
-variable basic_standard_deduction:
+basic_standard_deduction:
     entity: taxunit
     from 2013-01-01: basic_std_ded_other
 
 
-variable tax_year:
+tax_year:
     entity: taxunit
     from 2024-01-01: 0
 
 
-variable filing_status:
+filing_status:
     entity: taxunit
     from 2024-01-01: 0

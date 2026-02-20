@@ -1,0 +1,138 @@
+# 26 USC 36B(b)(3)(D) - Additional benefits
+# 26 USC 36B(b)(3)(E) - Special rule for pediatric dental coverage
+
+# (3) Other terms and rules relating to premium assistance amounts
+# For purposes of paragraph (2)—
+
+# (D) Additional benefits
+# If—
+# (i) a qualified health plan under section 1311 of the Patient Protection
+# and Affordable Care Act offers benefits in addition to the essential health
+# benefits required to be provided by the plan, or
+# (ii) a State requires a qualified health plan under section 1311 of such
+# Act to cover benefits in addition to the essential health benefits required
+# to be provided by the plan,
+# the portion of the premium for the plan properly allocable to such
+# additional benefits shall not be taken into account in determining either
+# the monthly premium or the adjusted monthly premium under paragraph (2).
+
+# Subsection disposition:
+# (b)(3)(D) - ENCODED: Premium exclusion for benefits beyond essential health
+#   benefits. When a qualified health plan includes benefits beyond the EHBs
+#   (either offered voluntarily or mandated by a State), the premium portion
+#   allocable to those additional benefits is excluded from both the monthly
+#   premium (paragraph (2)(A)) and the adjusted monthly premium for the SLCSP
+#   (paragraph (2)(B)(i)).
+#
+#   The conditions (i) and (ii) define when additional benefits exist; whenever
+#   neither applies, the premium allocable to additional benefits is zero by
+#   definition.
+
+# =============================================================================
+# Inputs — (D) Additional benefits exclusion
+# =============================================================================
+
+# Enrolled plan gross monthly premium before excluding additional benefits
+ptc_monthly_premium_before_ab_exclusion:
+    entity: TaxUnit
+    from 2014-01-01: 0
+
+
+# SLCSP gross adjusted monthly premium before excluding additional benefits
+ptc_slcsp_monthly_premium_before_ab_exclusion:
+    entity: TaxUnit
+    from 2014-01-01: 0
+
+
+# Portion of the enrolled plan's monthly premium properly allocable to
+# benefits in addition to the essential health benefits
+ptc_premium_allocable_to_additional_benefits:
+    entity: TaxUnit
+    from 2014-01-01: 0
+
+
+# Portion of the SLCSP's monthly premium properly allocable to benefits
+# in addition to the essential health benefits
+ptc_slcsp_premium_allocable_to_additional_benefits:
+    entity: TaxUnit
+    from 2014-01-01: 0
+
+
+# =============================================================================
+# (D) - Monthly premium after additional benefits exclusion
+# =============================================================================
+
+ptc_monthly_premium_after_ab_exclusion:
+    entity: TaxUnit
+    from 2014-01-01: max(0, ptc_monthly_premium_before_ab_exclusion - ptc_premium_allocable_to_additional_benefits)
+
+
+# =============================================================================
+# (D) - Adjusted monthly premium (SLCSP) after additional benefits exclusion
+# =============================================================================
+
+ptc_slcsp_monthly_premium_after_ab_exclusion:
+    entity: TaxUnit
+    from 2014-01-01: max(0, ptc_slcsp_monthly_premium_before_ab_exclusion - ptc_slcsp_premium_allocable_to_additional_benefits)
+
+
+# =============================================================================
+# =============================================================================
+# (E) Special rule for pediatric dental coverage
+# =============================================================================
+# =============================================================================
+
+# (E) Special rule for pediatric dental coverage
+# For purposes of determining the amount of any monthly premium, if an
+# individual enrolls in both a qualified health plan and a plan described
+# in section 1311(d)(2)(B)(ii)(I) of the Patient Protection and Affordable
+# Care Act for any plan year, the portion of the monthly premiums for the
+# plan year that is allocable to pediatric dental benefits that are included
+# in the essential health benefits required to be provided by a qualified
+# health plan under section 1302(b)(1)(J) of such Act shall be treated as
+# a monthly premium of a qualified health plan.
+
+# Subsection disposition:
+# (b)(3)(E) - ENCODED: Premium adjustment for stand-alone pediatric dental plans
+#   If enrolled in both a QHP and a stand-alone dental plan (PPACA
+#   1311(d)(2)(B)(ii)(I)), the portion of monthly premiums allocable to
+#   pediatric dental benefits (EHBs per PPACA 1302(b)(1)(J)) shall be
+#   treated as a qualified health plan monthly premium.
+
+# =============================================================================
+# Inputs — (E) Pediatric dental coverage
+# =============================================================================
+
+# Whether the individual is enrolled in a qualified health plan for the
+# plan year (Boolean: 1 = yes, 0 = no)
+enrolled_in_qhp:
+    entity: TaxUnit
+    from 2024-01-01: 0
+
+
+# Whether the individual is also enrolled in a stand-alone dental plan
+# described in PPACA 1311(d)(2)(B)(ii)(I) for the plan year
+# (Boolean: 1 = yes, 0 = no)
+enrolled_in_standalone_dental_plan:
+    entity: TaxUnit
+    from 2024-01-01: 0
+
+
+# The portion of the stand-alone dental plan monthly premium allocable to
+# pediatric dental benefits included in EHBs under PPACA 1302(b)(1)(J)
+pediatric_dental_premium_portion:
+    entity: TaxUnit
+    from 2024-01-01: 0
+
+
+# =============================================================================
+# Variable: Pediatric dental premium treated as QHP monthly premium
+# =============================================================================
+
+# Under (b)(3)(E), when both enrollment conditions are met, the pediatric
+# dental premium portion is treated as a qualified health plan premium for
+# purposes of computing the monthly premium assistance amount under (b)(2).
+
+ptc_pediatric_dental_premium_adjustment:
+    entity: TaxUnit
+    from 2014-01-01: enrolled_in_qhp * enrolled_in_standalone_dental_plan * pediatric_dental_premium_portion

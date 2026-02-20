@@ -17,30 +17,30 @@
 # Per (g)(4), expenses are treated as if academic period began in 2024,
 # so taxpayer may claim credit on 2024 return.
 
-variable prepayment_months_allowed:
+prepayment_months_allowed:
     from 1997-08-05: 3
 
 
-variable qualified_expenses_paid_current_year:
+qualified_expenses_paid_current_year:
     entity: taxunit
     from 2024-01-01: 0
 
 
-variable academic_period_begins_following_year:
+academic_period_begins_following_year:
     entity: taxunit
     from 2024-01-01: 0
 
 
-variable academic_period_begins_month:
+academic_period_begins_month:
     entity: taxunit
     from 2024-01-01: 0
 
 
-variable prepaid_expenses_eligible_current_year:
+prepaid_expenses_eligible_current_year:
     entity: taxunit
     from 1997-08-05: academic_period_begins_month <= prepayment_months_allowed
 
 
-variable qualified_expenses_treated_as_current_year:
+qualified_expenses_treated_as_current_year:
     entity: taxunit
     from 1997-08-05: 0

@@ -27,11 +27,11 @@
 # The subsection is split into: g/1/A.rac, g/1/B.rac, g/1/C.rac for detailed encoding.
 # This file provides the aggregate eligibility determination.
 
-variable claiming_aotc:
+claiming_aotc:
     entity: taxunit
     from 2024-01-01: 0
 
 
-variable sec_25A_identification_requirement_met:
+sec_25A_identification_requirement_met:
     entity: taxunit
     from 2013-01-01: True

@@ -1,0 +1,118 @@
+# 26 USC 36B(b)(3)(A)(ii) — Applicable percentage — Indexing
+#
+# (ii) Indexing
+# (I) In general
+# Subject to subclause (II), in the case of taxable years beginning in any calendar
+# year after 2014, the initial and final applicable percentages under clause (i) (as
+# in effect for the preceding calendar year after application of this clause) shall be
+# adjusted to reflect the excess of the rate of premium growth for the preceding
+# calendar year over the rate of income growth for the preceding calendar year.
+#
+# (II) Additional adjustment
+# Except as provided in subclause (III), in the case of any calendar year after 2018,
+# the percentages described in subclause (I) shall, in addition to the adjustment
+# under subclause (I), be adjusted to reflect the excess (if any) of the rate of
+# premium growth estimated under subclause (I) for the preceding calendar year over
+# the rate of growth in the consumer price index for the preceding calendar year.
+#
+# (III) Failsafe
+# Subclause (II) shall apply for any calendar year only if the aggregate amount of
+# premium tax credits under this section and cost-sharing reductions under section
+# 1402 of the Patient Protection and Affordable Care Act for the preceding calendar
+# year exceeds an amount equal to 0.504 percent of the gross domestic product for the
+# preceding calendar year.
+
+# Subsection disposition:
+# (ii)(I)   - ENCODED: Primary indexing (premium growth vs income growth)
+# (ii)(II)  - ENCODED: Additional adjustment (premium growth vs CPI growth)
+# (ii)(III) - ENCODED: Failsafe threshold (PTC+CSR vs 0.504% GDP)
+
+# =============================================================================
+# Parameters
+# =============================================================================
+
+# (I): "taxable years beginning in any calendar year after 2014"
+indexing_start_year:
+    from 2014-01-01: 2014
+
+# (II): "in the case of any calendar year after 2018"
+additional_adjustment_start_year:
+    from 2014-01-01: 2018
+
+# (III): "0.504 percent of the gross domestic product"
+failsafe_gdp_pct:
+    from 2014-01-01: 0.00504
+
+# =============================================================================
+# Inputs
+# =============================================================================
+
+# Current tax year
+tax_year:
+    entity: TaxUnit
+    from 2014-01-01: 0
+
+# (I): "rate of premium growth for the preceding calendar year"
+rate_of_premium_growth:
+    entity: TaxUnit
+    from 2014-01-01: 0
+
+# (I): "rate of income growth for the preceding calendar year"
+rate_of_income_growth:
+    entity: TaxUnit
+    from 2014-01-01: 0
+
+# (II): "rate of growth in the consumer price index for the preceding calendar year"
+rate_of_cpi_growth:
+    entity: TaxUnit
+    from 2014-01-01: 0
+
+# (III): "aggregate amount of premium tax credits...and cost-sharing reductions"
+aggregate_ptc_and_csr:
+    entity: TaxUnit
+    from 2014-01-01: 0
+
+# (III): "gross domestic product for the preceding calendar year"
+gross_domestic_product:
+    entity: TaxUnit
+    from 2014-01-01: 0
+
+# Applicable percentage as in effect for the preceding calendar year
+# (after application of this clause)
+prior_year_applicable_pct:
+    entity: TaxUnit
+    from 2014-01-01: 0
+
+# =============================================================================
+# (I): Excess of premium growth over income growth
+# =============================================================================
+
+premium_income_growth_excess:
+    entity: TaxUnit
+    from 2014-01-01: rate_of_premium_growth - rate_of_income_growth
+
+# =============================================================================
+# (III): Failsafe threshold amount (0.504% of GDP)
+# =============================================================================
+
+failsafe_threshold_amount:
+    entity: TaxUnit
+    from 2014-01-01: gross_domestic_product * failsafe_gdp_pct
+
+# =============================================================================
+# (II): Excess (if any) of premium growth over CPI growth
+# =============================================================================
+
+premium_cpi_growth_excess:
+    entity: TaxUnit
+    from 2014-01-01: max(0, rate_of_premium_growth - rate_of_cpi_growth)
+
+# =============================================================================
+# Indexed applicable percentage
+# Combines (I) primary adjustment, (II) additional adjustment, and
+# (III) failsafe
+# =============================================================================
+
+indexed_applicable_pct:
+    entity: TaxUnit
+    from 2014-01-01: if tax_year <= indexing_start_year: prior_year_applicable_pct else: if tax_year > additional_adjustment_start_year and aggregate_ptc_and_csr > failsafe_threshold_amount: (prior_year_applicable_pct * (1 + premium_income_growth_excess)) * (1 + premium_cpi_growth_excess) else: prior_year_applicable_pct * (1 + premium_income_growth_excess)

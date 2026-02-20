@@ -5,15 +5,15 @@
 # only for 4 taxable years with respect to any eligible student.
 
 # Maximum years the American Opportunity Credit can be claimed per student
-variable aotc_max_years:
+aotc_max_years:
     from 2009-01-01: 4
 
 
-variable aotc_years_claimed:
+aotc_years_claimed:
     entity: person
     from 2024-01-01: 0
 
 
-variable aotc_first_4_years_eligible:
+aotc_first_4_years_eligible:
     entity: person
     from 2009-01-01: aotc_years_claimed < aotc_max_years

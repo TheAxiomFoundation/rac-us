@@ -6,7 +6,7 @@
 # the taxpayer is allowed a deduction under section 151 an amount equal to $1,000.
 
 # Base credit amount per qualifying child (pre-TCJA/pre-2018)
-variable ctc_base_amount:
+ctc_base_amount:
     from 1998-01-01: 400
     from 1999-01-01: 500
     from 2001-01-01: 600
@@ -15,11 +15,11 @@ variable ctc_base_amount:
     from 2025-01-01: 2200   # P.L. 119-21
 
 
-variable qualifying_child_count:
+qualifying_child_count:
     entity: taxunit
     from 2024-01-01: 0
 
 
-variable ctc_maximum:
+ctc_maximum:
     entity: taxunit
     from 1998-01-01: qualifying_child_count * ctc_base_amount

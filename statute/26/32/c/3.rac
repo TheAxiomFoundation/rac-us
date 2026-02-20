@@ -34,33 +34,33 @@
 
 # Inputs for qualifying child determination
 
-variable is_qualifying_child_152c:
+is_qualifying_child_152c:
     entity: person
     from 2024-01-01: 0
 
 
-variable child_is_married:
+child_is_married:
     entity: person
     from 2024-01-01: 0
 
 
-variable taxpayer_claims_151_deduction_for_child:
+taxpayer_claims_151_deduction_for_child:
     entity: person
     from 2024-01-01: 0
 
 
-variable child_principal_abode_in_us:
+child_principal_abode_in_us:
     entity: person
     from 2024-01-01: 0
 
 
-variable child_tin_included_on_return:
+child_tin_included_on_return:
     entity: person
     from 2024-01-01: 0
 
 
 # Variable implementing the qualifying child definition for EITC
 
-variable is_eitc_qualifying_child:
+is_eitc_qualifying_child:
     entity: person
     from 2013-01-01: True

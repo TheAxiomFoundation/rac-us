@@ -12,21 +12,21 @@
 # No credit shall be allowed under this section if the taxpayer identification number
 # of the taxpayer was issued after the due date for filing the return for the taxable year.
 
-variable child_has_valid_tin:
+child_has_valid_tin:
     entity: person
     from 2024-01-01: 0
 
 
-variable taxpayer_has_valid_tin:
+taxpayer_has_valid_tin:
     entity: taxunit
     from 2024-01-01: 0
 
 
-variable ctc_meets_id_requirements:
+ctc_meets_id_requirements:
     entity: taxunit
     from 2013-01-01: True
 
 
-variable child_meets_ctc_id_requirement:
+child_meets_ctc_id_requirement:
     entity: person
     from 2013-01-01: child_has_valid_tin

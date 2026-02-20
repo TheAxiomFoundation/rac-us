@@ -20,50 +20,50 @@
 # any other case).
 
 # Pre-TCJA phaseout thresholds (subsection (b)(2))
-variable ctc_threshold_joint:
+ctc_threshold_joint:
     from 1998-01-01: 110000
     from 2018-01-01: 400000  # Modified by (h)(3)
 
 
-variable ctc_threshold_single:
+ctc_threshold_single:
     from 1998-01-01: 75000
     from 2018-01-01: 200000  # Modified by (h)(3)
 
 
-variable ctc_threshold_separate:
+ctc_threshold_separate:
     from 1998-01-01: 55000
     from 2018-01-01: 200000  # Modified by (h)(3)
 
 
 # Phaseout rate
-variable ctc_phaseout_reduction:
+ctc_phaseout_reduction:
     from 1998-01-01: 50
 
 
-variable ctc_phaseout_increment:
+ctc_phaseout_increment:
     from 1998-01-01: 1000
 
 
-variable modified_agi:
+modified_agi:
     entity: taxunit
     from 2024-01-01: 0
 
 
-variable filing_status:
+filing_status:
     entity: taxunit
     from 2024-01-01: 0
 
 
-variable ctc_threshold:
+ctc_threshold:
     entity: taxunit
     from 1998-01-01: ctc_threshold_single
 
 
-variable ctc_phaseout_amount:
+ctc_phaseout_amount:
     entity: taxunit
     from 1998-01-01: min(single_excess * joint_rate, ctc_maximum)
 
 
-variable ctc_after_phaseout:
+ctc_after_phaseout:
     entity: taxunit
     from 1998-01-01: max(0, ctc_maximum - ctc_phaseout_amount)

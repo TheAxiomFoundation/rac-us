@@ -36,68 +36,68 @@
 # after 2024). Per (h)(6), the earned income threshold is $2,500 instead of $3,000.
 
 # Earned income threshold for refundable portion
-variable actc_earned_income_threshold:
+actc_earned_income_threshold:
     from 1998-01-01: 10000
     from 2009-01-01: 3000
     from 2018-01-01: 2500  # Modified by (h)(6)
 
 
 # ACTC phase-in rate
-variable actc_phasein_rate:
+actc_phasein_rate:
     from 1998-01-01: 0.10
     from 2005-01-01: 0.15
 
 
 # Maximum refundable amount per child (post-TCJA)
-variable actc_max_per_child:
+actc_max_per_child:
     from 2018-01-01: 1400
 
 
 # Minimum qualifying children for SS tax calculation
-variable actc_ss_min_children:
+actc_ss_min_children:
     from 1998-01-01: 3
 
 
-variable earned_income:
+earned_income:
     entity: taxunit
     from 2024-01-01: 0
 
 
-variable social_security_taxes:
+social_security_taxes:
     entity: taxunit
     from 2024-01-01: 0
 
 
-variable eitc_amount:
+eitc_amount:
     entity: taxunit
     from 2024-01-01: 0
 
 
-variable excludes_foreign_income:
+excludes_foreign_income:
     entity: taxunit
     from 2024-01-01: 0
 
 
-variable qualifying_child_count:
+qualifying_child_count:
     entity: taxunit
     from 2024-01-01: 0
 
 
-variable actc_earned_income_amount:
+actc_earned_income_amount:
     entity: taxunit
     from 1998-01-01: (max(0, earned_income - actc_earned_income_threshold)) * actc_phasein_rate
 
 
-variable actc_ss_excess_amount:
+actc_ss_excess_amount:
     entity: taxunit
     from 1998-01-01: max(0, social_security_taxes - eitc_amount)
 
 
-variable actc_limitation_increase:
+actc_limitation_increase:
     entity: taxunit
     from 1998-01-01: max(actc_earned_income_amount, actc_ss_excess_amount)
 
 
-variable actc_amount:
+actc_amount:
     entity: taxunit
     from 1998-01-01: min((min(ctc_after_phaseout, actc_limitation_increase)), (qualifying_child_count * actc_max_per_child))

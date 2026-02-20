@@ -9,43 +9,43 @@
 # Over $9,150 but not over $12,500         $1,839, plus 35% of the excess over $9,150.
 # Over $12,500                             $3,011.50, plus 37% of the excess over $12,500.
 
-variable trust_bracket_1_threshold:
+trust_bracket_1_threshold:
     from 2018-01-01: 0
 
 
-variable trust_bracket_2_threshold:
+trust_bracket_2_threshold:
     from 2018-01-01: 2550
 
 
-variable trust_bracket_3_threshold:
+trust_bracket_3_threshold:
     from 2018-01-01: 9150
 
 
-variable trust_bracket_4_threshold:
+trust_bracket_4_threshold:
     from 2018-01-01: 12500
 
 
-variable trust_rate_1:
+trust_rate_1:
     from 2018-01-01: 0.10
 
 
-variable trust_rate_2:
+trust_rate_2:
     from 2018-01-01: 0.24
 
 
-variable trust_rate_3:
+trust_rate_3:
     from 2018-01-01: 0.35
 
 
-variable trust_rate_4:
+trust_rate_4:
     from 2018-01-01: 0.37
 
 
-variable taxable_income:
+taxable_income:
     entity: taxunit
     from 2024-01-01: 0
 
 
-variable trust_income_tax:
+trust_income_tax:
     entity: taxunit
     from 2018-01-01: (bracket_1_income * trust_rate_1) + (bracket_2_income * trust_rate_2) + (bracket_3_income * trust_rate_3) + (bracket_4_income * trust_rate_4)

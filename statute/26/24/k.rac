@@ -62,37 +62,37 @@
 # This subsection primarily deals with administrative and coordination provisions
 # for US possessions. The key computational elements are:
 
-variable is_mirror_code_possession_resident:
+is_mirror_code_possession_resident:
     entity: taxunit
     from 2024-01-01: 0
 
 
-variable is_puerto_rico_resident:
+is_puerto_rico_resident:
     entity: taxunit
     from 2024-01-01: 0
 
 
-variable is_american_samoa_resident:
+is_american_samoa_resident:
     entity: taxunit
     from 2024-01-01: 0
 
 
-variable american_samoa_plan_approved:
+american_samoa_plan_approved:
     entity: taxunit
     from 2024-01-01: 0
 
 
-variable claimed_ctc_in_possession:
+claimed_ctc_in_possession:
     entity: taxunit
     from 2024-01-01: 0
 
 
-variable ctc_disallowed_possession_coordination:
+ctc_disallowed_possession_coordination:
     entity: taxunit
     from 2013-01-01: False
 
 
-variable puerto_rico_ctc_eligible:
+puerto_rico_ctc_eligible:
     entity: taxunit
     from 2013-01-01: False
 

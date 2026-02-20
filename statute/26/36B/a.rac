@@ -15,7 +15,7 @@
 # Input: Whether the taxpayer is an applicable taxpayer per 36B(c)(1)
 # =============================================================================
 
-variable is_applicable_taxpayer:
+is_applicable_taxpayer:
     entity: taxunit
     from 2024-01-01: 0
 
@@ -24,6 +24,6 @@ variable is_applicable_taxpayer:
 # 36B(a) - Premium tax credit
 # =============================================================================
 
-variable ptc_premium_tax_credit:
+ptc_premium_tax_credit:
     entity: taxunit
     from 2013-01-01: ptc_premium_assistance_credit_amount

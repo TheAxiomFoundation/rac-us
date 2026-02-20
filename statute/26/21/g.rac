@@ -37,28 +37,28 @@
 # =============================================================================
 
 # Increased dollar limits per 21(g)(2)
-variable cdcc_expense_limit_1_2021:
+cdcc_expense_limit_1_2021:
     from 2021-01-01: 8000
 
-variable cdcc_expense_limit_2plus_2021:
+cdcc_expense_limit_2plus_2021:
     from 2021-01-01: 16000
 
 # Increased applicable percentage per 21(g)(3)
-variable cdcc_max_applicable_pct_2021:
+cdcc_max_applicable_pct_2021:
     from 2021-01-01: 0.50
 
 # Increased AGI threshold per 21(g)(3)
-variable cdcc_agi_threshold_2021:
+cdcc_agi_threshold_2021:
     from 2021-01-01: 125000
 
 # 2021 phaseout floor: zero instead of 20% per 21(g)(4)
-variable cdcc_min_applicable_pct_2021:
+cdcc_min_applicable_pct_2021:
     from 2021-01-01: 0
 
 # 2021 high-income phaseout threshold per 21(g)(4)(B)
-variable cdcc_high_income_phaseout_threshold_2021:
+cdcc_high_income_phaseout_threshold_2021:
     from 2021-01-01: 400000
 
 # Refundability flag per 21(g)(1)
-variable cdcc_is_refundable_2021:
+cdcc_is_refundable_2021:
     from 2021-01-01: 1

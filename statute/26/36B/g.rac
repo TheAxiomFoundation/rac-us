@@ -40,12 +40,12 @@
 # =============================================================================
 
 # (g)(1)(B): "133 percent of the poverty line"
-variable ui_household_income_fpl_cap:
+ui_household_income_fpl_cap:
     from 2021-01-01: 1.33
 
 
 # Temporal boundary: this provision applies only to taxable year 2021
-variable ui_special_rule_year:
+ui_special_rule_year:
     from 2021-01-01: 2021
 
 
@@ -53,12 +53,12 @@ variable ui_special_rule_year:
 # Inputs
 # =============================================================================
 
-variable received_ui_compensation_2021:
+received_ui_compensation_2021:
     entity: taxunit
     from 2024-01-01: 0
 
 
-variable joint_return_requirement_met:
+joint_return_requirement_met:
     entity: taxunit
     from 2024-01-01: 0
 
@@ -67,7 +67,7 @@ variable joint_return_requirement_met:
 # (g)(1)(A) - Applicable taxpayer treatment
 # =============================================================================
 
-variable ptc_ui_is_applicable_taxpayer:
+ptc_ui_is_applicable_taxpayer:
     entity: taxunit
     from 2021-01-01: true
 
@@ -76,7 +76,7 @@ variable ptc_ui_is_applicable_taxpayer:
 # (g)(1)(B) - Household income cap for PTC purposes
 # =============================================================================
 
-variable ptc_ui_capped_household_income:
+ptc_ui_capped_household_income:
     entity: taxunit
     from 2021-01-01: min(household_income, (poverty_line * ui_household_income_fpl_cap))
 
@@ -85,6 +85,6 @@ variable ptc_ui_capped_household_income:
 # (g)(4)(B) - Affordability uses uncapped household income
 # =============================================================================
 
-variable ptc_ui_affordability_household_income:
+ptc_ui_affordability_household_income:
     entity: taxunit
     from 2021-01-01: household_income

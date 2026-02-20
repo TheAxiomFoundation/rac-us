@@ -7,15 +7,15 @@
 # Basic standard deduction for joint filers and surviving spouses
 # Defined as 200% of the subparagraph (C) amount
 
-variable joint_multiplier:
+joint_multiplier:
     from 1988-01-01: 2
 
 
-variable basic_std_ded_joint:
+basic_std_ded_joint:
     entity: taxunit
     from 1988-01-01: basic_std_ded_other * joint_multiplier
 
 
-variable tax_year:
+tax_year:
     entity: taxunit
     from 2024-01-01: 0

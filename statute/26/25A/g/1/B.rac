@@ -9,11 +9,11 @@
 # This requirement applies ONLY to AOTC (American Opportunity Tax Credit)
 # Taxpayer must include EIN of educational institution(s) where expenses were paid
 
-variable institution_ein_provided:
+institution_ein_provided:
     entity: taxunit
     from 2024-01-01: 0
 
 
-variable institution_ein_requirement_met:
+institution_ein_requirement_met:
     entity: taxunit
     from 2013-01-01: institution_ein_provided

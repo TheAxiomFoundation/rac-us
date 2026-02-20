@@ -16,6 +16,6 @@
 # legal protection. Encoded as a Boolean variable that is always true for any
 # individual receiving SNAP benefits.
 
-variable snap_benefits_excluded_from_income:
+snap_benefits_excluded_from_income:
     entity: person
     from 2013-01-01: true

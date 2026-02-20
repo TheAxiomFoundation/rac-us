@@ -17,16 +17,16 @@
 # The rule is a Boolean eligibility gate: if a deduction was allowed for an
 # expense, no section 25A credit is permitted for that same expense.
 
-variable expense_deducted_under_other_chapter_1_provision:
+expense_deducted_under_other_chapter_1_provision:
     entity: person
     from 2024-01-01: 0
 
 
-variable sec_25A_expense_disallowed_for_double_benefit:
+sec_25A_expense_disallowed_for_double_benefit:
     entity: person
     from 2013-01-01: expense_deducted_under_other_chapter_1_provision
 
 
-variable double_benefit_disqualification_applies:
+double_benefit_disqualification_applies:
     entity: person
     from 2013-01-01: expense_deducted_under_other_chapter_1_provision > 0

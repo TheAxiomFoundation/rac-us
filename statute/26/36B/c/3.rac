@@ -46,32 +46,32 @@
 # Inputs: Plan characteristics
 # =============================================================================
 
-variable is_ppaca_1301a_qualified_plan:
+is_ppaca_1301a_qualified_plan:
     entity: taxunit
     from 2024-01-01: 0
 
 
-variable is_catastrophic_plan:
+is_catastrophic_plan:
     entity: taxunit
     from 2024-01-01: 0
 
 
-variable exchange_has_pre_enrollment_verification:
+exchange_has_pre_enrollment_verification:
     entity: taxunit
     from 2024-01-01: 0
 
 
-variable enrolled_through_exchange:
+enrolled_through_exchange:
     entity: taxunit
     from 2024-01-01: 0
 
 
-variable enrolled_during_special_enrollment_period:
+enrolled_during_special_enrollment_period:
     entity: taxunit
     from 2024-01-01: 0
 
 
-variable special_enrollment_is_income_based:
+special_enrollment_is_income_based:
     entity: taxunit
     from 2024-01-01: 0
 
@@ -80,6 +80,6 @@ variable special_enrollment_is_income_based:
 # Variable: Qualified health plan determination
 # =============================================================================
 
-variable ptc_is_qualified_health_plan:
+ptc_is_qualified_health_plan:
     entity: taxunit
     from 2013-01-01: true

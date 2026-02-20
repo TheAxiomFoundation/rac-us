@@ -69,94 +69,94 @@
 # =============================================================================
 
 # Parameters for age thresholds per 32(c)(1)(A)(ii)(II)
-variable eitc_min_age_childless:
+eitc_min_age_childless:
     from 1996-01-01: 25
 
 
-variable eitc_max_age_childless:
+eitc_max_age_childless:
     from 1996-01-01: 65
 
 
 # Inputs for eligible individual determination
 
-variable has_eitc_qualifying_child:
+has_eitc_qualifying_child:
     entity: taxunit
     from 2024-01-01: 0
 
 
-variable principal_abode_in_us_over_half_year:
+principal_abode_in_us_over_half_year:
     entity: taxunit
     from 2024-01-01: 0
 
 
-variable taxpayer_age:
+taxpayer_age:
     entity: person
     from 2024-01-01: 0
 
 
-variable spouse_age:
+spouse_age:
     entity: person
     from 2024-01-01: 0
 
 
-variable is_married_eitc:
+is_married_eitc:
     entity: taxunit
     from 2024-01-01: 0
 
 
-variable is_dependent_of_another:
+is_dependent_of_another:
     entity: taxunit
     from 2024-01-01: 0
 
 
-variable is_qualifying_child_of_another:
+is_qualifying_child_of_another:
     entity: taxunit
     from 2024-01-01: 0
 
 
-variable claims_section_911_benefits:
+claims_section_911_benefits:
     entity: taxunit
     from 2024-01-01: 0
 
 
-variable is_nonresident_alien:
+is_nonresident_alien:
     entity: taxunit
     from 2024-01-01: 0
 
 
-variable elected_resident_treatment_6013:
+elected_resident_treatment_6013:
     entity: taxunit
     from 2024-01-01: 0
 
 
-variable taxpayer_has_tin_on_return:
+taxpayer_has_tin_on_return:
     entity: taxunit
     from 2024-01-01: 0
 
 
-variable spouse_has_tin_on_return:
+spouse_has_tin_on_return:
     entity: taxunit
     from 2024-01-01: 0
 
 
 # Variables for eligible individual determination
 
-variable eitc_meets_age_requirement:
+eitc_meets_age_requirement:
     entity: taxunit
     from 1996-01-01: False
 
 
-variable eitc_meets_id_number_requirement:
+eitc_meets_id_number_requirement:
     entity: taxunit
     from 1996-01-01: True
 
 
-variable eitc_nonresident_alien_eligible:
+eitc_nonresident_alien_eligible:
     entity: taxunit
     from 1996-01-01: True
 
 
-variable is_eitc_eligible_individual:
+is_eitc_eligible_individual:
     entity: taxunit
     from 1996-01-01: True
 
@@ -167,38 +167,38 @@ variable is_eitc_eligible_individual:
 
 # Inputs for earned income computation
 
-variable wages_salaries_tips:
+wages_salaries_tips:
     entity: taxunit
     from 2024-01-01: 0
 
 
-variable net_earnings_self_employment:
+net_earnings_self_employment:
     entity: taxunit
     from 2024-01-01: 0
 
 
-variable pension_annuity_income:
+pension_annuity_income:
     entity: taxunit
     from 2024-01-01: 0
 
 
-variable income_section_871a:
+income_section_871a:
     entity: taxunit
     from 2024-01-01: 0
 
 
-variable penal_institution_wages:
+penal_institution_wages:
     entity: taxunit
     from 2024-01-01: 0
 
 
-variable subsidized_work_activity_income:
+subsidized_work_activity_income:
     entity: taxunit
     from 2024-01-01: 0
 
 
 # Variable for earned income computation
 
-variable eitc_earned_income:
+eitc_earned_income:
     entity: taxunit
     from 1996-01-01: max(0, (earned - subsidized_work_activity_income))

@@ -11,24 +11,24 @@
 # Base standard deduction for single filers and MFS
 # This is the reference amount that (A) doubles for joint/surviving spouse
 
-variable basic_std_ded_other_pre_tcja:
+basic_std_ded_other_pre_tcja:
     from 1988-01-01: 3000
 
 
-variable basic_std_ded_other_tcja:
+basic_std_ded_other_tcja:
     from 2018-01-01: 12000
     from 2026-01-01: 15750
 
 
-variable tcja_effective_year:
+tcja_effective_year:
     from 1988-01-01: 2018
 
 
-variable basic_std_ded_other:
+basic_std_ded_other:
     entity: taxunit
     from 1988-01-01: basic_std_ded_other_pre_tcja
 
 
-variable tax_year:
+tax_year:
     entity: taxunit
     from 2024-01-01: 0

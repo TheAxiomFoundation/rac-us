@@ -1,0 +1,39 @@
+# 26 USC 36B(b)(1) — Premium assistance credit amount — In general
+#
+# (b) Premium assistance credit amount
+# For purposes of this section—
+# (1) In general
+# The term "premium assistance credit amount" means, with respect to any
+# taxable year, the sum of the premium assistance amounts determined under
+# paragraph (2) with respect to all coverage months of the taxpayer occurring
+# during the taxable year.
+
+# Subsection disposition:
+# (b)(1) - ENCODED: Annual credit amount = sum of monthly premium assistance
+#          amounts (determined under paragraph (2)) across all coverage months
+#          of the taxpayer occurring during the taxable year.
+#
+# In the simplified annual model the monthly premium assistance amount (from
+# paragraph (2)) is uniform across coverage months, so the summation reduces
+# to multiplication: amount * coverage_month_count.
+
+# =============================================================================
+# Inputs
+# =============================================================================
+
+# "all coverage months of the taxpayer occurring during the taxable year"
+# Coverage months are defined in subsection (c)(2); the count is an input.
+ptc_coverage_months:
+    entity: TaxUnit
+    from 2014-01-01: 0
+
+# =============================================================================
+# Variable: Premium assistance credit amount — (b)(1)
+# "the sum of the premium assistance amounts determined under paragraph (2)
+#  with respect to all coverage months of the taxpayer occurring during the
+#  taxable year"
+# =============================================================================
+
+ptc_premium_assistance_credit_amount:
+    entity: TaxUnit
+    from 2014-01-01: ptc_premium_assistance_amount * ptc_coverage_months

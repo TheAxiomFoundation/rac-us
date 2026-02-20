@@ -13,21 +13,21 @@
 # For credits claimed on behalf of others (non-spouse students), student's name and SSN also required
 # SSN definition in subparagraph (C) cross-references 26 USC 24(h)(7)
 
-variable taxpayer_has_valid_ssn:
+taxpayer_has_valid_ssn:
     entity: taxunit
     from 2024-01-01: 0
 
 
-variable student_ssn_provided:
+student_ssn_provided:
     entity: taxunit
     from 2024-01-01: 0
 
 
-variable claiming_for_non_spouse_dependent:
+claiming_for_non_spouse_dependent:
     entity: taxunit
     from 2024-01-01: 0
 
 
-variable ssn_requirement_met:
+ssn_requirement_met:
     entity: taxunit
     from 2013-01-01: True

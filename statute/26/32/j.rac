@@ -14,17 +14,17 @@
 # is not a multiple of $10, such dollar amount shall be rounded to the nearest multiple of $10.
 
 # Base year for EITC inflation adjustment per 26 USC 32(j)(1)(B)
-variable eitc_inflation_base_year:
+eitc_inflation_base_year:
     from 2016-01-01: 2015
 
 
 # Year after which inflation adjustments apply per 26 USC 32(j)(1)
-variable eitc_inflation_start_year:
+eitc_inflation_start_year:
     from 1996-01-01: 2015
 
 
 # Rounding increment for inflation-adjusted amounts per 26 USC 32(j)(2)
-variable eitc_inflation_rounding:
+eitc_inflation_rounding:
     from 1996-01-01: 10
 
 
@@ -33,56 +33,56 @@ variable eitc_inflation_rounding:
 # This file encodes the statutory methodology; the runtime handles computation.
 # Rounding is handled by the runtime per 32(j)(2), not in the formula.
 
-variable eitc_cola_adjustment:
+eitc_cola_adjustment:
     entity: taxunit
     from 2024-01-01: 0
 
 
-variable eitc_base_earned_income_amount_0:
+eitc_base_earned_income_amount_0:
     entity: taxunit
     from 2024-01-01: 0
 
 
-variable eitc_base_earned_income_amount_1:
+eitc_base_earned_income_amount_1:
     entity: taxunit
     from 2024-01-01: 0
 
 
-variable eitc_base_earned_income_amount_2:
+eitc_base_earned_income_amount_2:
     entity: taxunit
     from 2024-01-01: 0
 
 
-variable eitc_base_phaseout_amount_0:
+eitc_base_phaseout_amount_0:
     entity: taxunit
     from 2024-01-01: 0
 
 
-variable eitc_base_phaseout_amount_1plus:
+eitc_base_phaseout_amount_1plus:
     entity: taxunit
     from 2024-01-01: 0
 
 
-variable eitc_inflation_adjusted_earned_income_amount_0:
+eitc_inflation_adjusted_earned_income_amount_0:
     entity: taxunit
     from 1996-01-01: eitc_base_earned_income_amount_0 * (1 + eitc_cola_adjustment)
 
 
-variable eitc_inflation_adjusted_earned_income_amount_1:
+eitc_inflation_adjusted_earned_income_amount_1:
     entity: taxunit
     from 1996-01-01: eitc_base_earned_income_amount_1 * (1 + eitc_cola_adjustment)
 
 
-variable eitc_inflation_adjusted_earned_income_amount_2:
+eitc_inflation_adjusted_earned_income_amount_2:
     entity: taxunit
     from 1996-01-01: eitc_base_earned_income_amount_2 * (1 + eitc_cola_adjustment)
 
 
-variable eitc_inflation_adjusted_phaseout_amount_0:
+eitc_inflation_adjusted_phaseout_amount_0:
     entity: taxunit
     from 1996-01-01: eitc_base_phaseout_amount_0 * (1 + eitc_cola_adjustment)
 
 
-variable eitc_inflation_adjusted_phaseout_amount_1plus:
+eitc_inflation_adjusted_phaseout_amount_1plus:
     entity: taxunit
     from 1996-01-01: eitc_base_phaseout_amount_1plus * (1 + eitc_cola_adjustment)

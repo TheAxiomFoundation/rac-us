@@ -24,20 +24,20 @@
 # The half-time threshold (1/2) is explicitly stated in the statute.
 
 # Minimum course load fraction required for eligible student status
-variable min_course_load_fraction:
+min_course_load_fraction:
     from 1997-08-05: 0.5
 
 
-variable meets_hea_484_requirements:
+meets_hea_484_requirements:
     entity: person
     from 2024-01-01: 0
 
 
-variable course_load_fraction:
+course_load_fraction:
     entity: person
     from 2024-01-01: 0
 
 
-variable is_eligible_student:
+is_eligible_student:
     entity: person
     from 1997-08-05: (meets_hea_484_requirements) and (course_load_fraction >= min_course_load_fraction)

@@ -32,76 +32,76 @@
 # Base disqualified income threshold per 32(i)(1)
 # Note: This is the statutory base amount. Inflation-adjusted amounts are computed
 # via 32(j) and published in annual IRS Revenue Procedures.
-variable disqualified_income_limit:
+disqualified_income_limit:
     from 2021-01-01: 10_000
 
 
 # Inputs for disqualified income components
 
-variable taxable_interest_income:
-    entity: taxunit
+taxable_interest_income:
+    entity: TaxUnit
     from 2024-01-01: 0
 
 
-variable dividend_income:
-    entity: taxunit
+dividend_income:
+    entity: TaxUnit
     from 2024-01-01: 0
 
 
-variable tax_exempt_interest_income:
-    entity: taxunit
+tax_exempt_interest_income:
+    entity: TaxUnit
     from 2024-01-01: 0
 
 
-variable gross_rent_royalty_income:
-    entity: taxunit
+gross_rent_royalty_income:
+    entity: TaxUnit
     from 2024-01-01: 0
 
 
-variable rent_royalty_deductions_noninterest:
-    entity: taxunit
+rent_royalty_deductions_noninterest:
+    entity: TaxUnit
     from 2024-01-01: 0
 
 
-variable rent_royalty_interest_deductions:
-    entity: taxunit
+rent_royalty_interest_deductions:
+    entity: TaxUnit
     from 2024-01-01: 0
 
 
-variable capital_gain_net_income:
-    entity: taxunit
+capital_gain_net_income:
+    entity: TaxUnit
     from 2024-01-01: 0
 
 
-variable gross_passive_income:
-    entity: taxunit
+gross_passive_income:
+    entity: TaxUnit
     from 2024-01-01: 0
 
 
-variable passive_activity_losses:
-    entity: taxunit
+passive_activity_losses:
+    entity: TaxUnit
     from 2024-01-01: 0
 
 
 # Variable: Net rent/royalty income per 32(i)(2)(C)
-variable net_rent_royalty_income:
-    entity: taxunit
+net_rent_royalty_income:
+    entity: TaxUnit
     from 2021-01-01: max(0, (gross_rent_royalty_income - total_deductions))
 
 
 # Variable: Net passive income per 32(i)(2)(E)
-variable net_passive_income:
-    entity: taxunit
+net_passive_income:
+    entity: TaxUnit
     from 2021-01-01: max(0, (gross_passive_income - passive_activity_losses))
 
 
 # Variable: Total disqualified income per 32(i)(2)
-variable disqualified_income:
-    entity: taxunit
+disqualified_income:
+    entity: TaxUnit
     from 2021-01-01: (taxable_interest_income + dividend_income) + (tax_exempt_interest_income) + (net_rent_royalty_income) + (capital_gain_net_income) + (net_passive_income)
 
 
 # Variable: EITC denied due to excessive investment income per 32(i)(1)
-variable eitc_denied_excessive_investment_income:
-    entity: taxunit
+eitc_denied_excessive_investment_income:
+    entity: TaxUnit
     from 2021-01-01: disqualified_income > disqualified_income_limit

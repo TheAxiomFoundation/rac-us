@@ -44,73 +44,73 @@
 # such taxable year.
 
 # Safe harbor income thresholds
-variable advance_ctc_safe_harbor_threshold_joint:
+advance_ctc_safe_harbor_threshold_joint:
     from 2021-01-01: 60000
 
 
-variable advance_ctc_safe_harbor_threshold_hoh:
+advance_ctc_safe_harbor_threshold_hoh:
     from 2021-01-01: 50000
 
 
-variable advance_ctc_safe_harbor_threshold_other:
+advance_ctc_safe_harbor_threshold_other:
     from 2021-01-01: 40000
 
 
 # Safe harbor amount per child
-variable advance_ctc_safe_harbor_per_child:
+advance_ctc_safe_harbor_per_child:
     from 2021-01-01: 2000
 
 
 # Safe harbor phase-out multiplier
-variable advance_ctc_safe_harbor_phaseout_multiple:
+advance_ctc_safe_harbor_phaseout_multiple:
     from 2021-01-01: 2
 
 
-variable advance_ctc_payments:
+advance_ctc_payments:
     entity: taxunit
     from 2024-01-01: 0
 
 
-variable advance_ctc_children_count:
+advance_ctc_children_count:
     entity: taxunit
     from 2024-01-01: 0
 
 
-variable actual_ctc_children_count:
+actual_ctc_children_count:
     entity: taxunit
     from 2024-01-01: 0
 
 
-variable filing_status:
+filing_status:
     entity: taxunit
     from 2024-01-01: 0
 
 
-variable modified_agi:
+modified_agi:
     entity: taxunit
     from 2024-01-01: 0
 
 
-variable advance_ctc_safe_harbor_threshold:
+advance_ctc_safe_harbor_threshold:
     entity: taxunit
     from 2021-01-01: advance_ctc_safe_harbor_threshold_other
 
 
-variable advance_ctc_excess_children:
+advance_ctc_excess_children:
     entity: taxunit
     from 2021-01-01: max(0, advance_ctc_children_count - actual_ctc_children_count)
 
 
-variable advance_ctc_safe_harbor_amount:
+advance_ctc_safe_harbor_amount:
     entity: taxunit
     from 2021-01-01: max(0, (base_safe_harbor * (1 - reduction_ratio)))
 
 
-variable ctc_after_advance_reconciliation:
+ctc_after_advance_reconciliation:
     entity: taxunit
     from 2021-01-01: max(0, ctc_after_phaseout - advance_ctc_payments)
 
 
-variable advance_ctc_repayment:
+advance_ctc_repayment:
     entity: taxunit
     from 2021-01-01: max(0, (max(0, advance_ctc_payments - ctc_after_phaseout)) - advance_ctc_safe_harbor_amount)

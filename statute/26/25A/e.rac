@@ -10,11 +10,11 @@
 # when claiming the deduction for higher education expenses (when available)
 # or other tax provisions would result in greater tax savings.
 
-variable section_25a_election_not_to_apply:
+section_25a_election_not_to_apply:
     entity: person
     from 2024-01-01: 0
 
 
-variable education_credit_25a_elected_out:
+education_credit_25a_elected_out:
     entity: person
     from 2013-01-01: section_25a_election_not_to_apply

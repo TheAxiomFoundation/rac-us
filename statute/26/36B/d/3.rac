@@ -20,6 +20,6 @@
 # The poverty line varies by family size. This input represents the poverty
 # line for a family of the applicable size as determined by 36B(d)(1).
 
-variable poverty_line:
+poverty_line:
     entity: taxunit
     from 2024-01-01: 0

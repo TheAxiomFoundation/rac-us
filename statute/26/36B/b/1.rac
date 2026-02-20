@@ -18,11 +18,11 @@
 # equivalent to summing identical monthly amounts. If monthly amounts vary,
 # this would need a monthly-level computation.
 
-variable ptc_coverage_months:
+ptc_coverage_months:
     entity: taxunit
     from 2024-01-01: 0
 
 
-variable ptc_premium_assistance_credit_amount:
+ptc_premium_assistance_credit_amount:
     entity: taxunit
     from 2013-01-01: ptc_premium_assistance_amount * ptc_coverage_months

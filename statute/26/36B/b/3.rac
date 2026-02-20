@@ -63,83 +63,83 @@
 
 # Tier thresholds (expressed as percent of poverty line, in /1 units)
 
-variable base_tier_1_threshold:
+base_tier_1_threshold:
     from 2014-01-01: 0
 
 
-variable base_tier_2_threshold:
+base_tier_2_threshold:
     from 2014-01-01: 1.33
 
 
-variable base_tier_3_threshold:
+base_tier_3_threshold:
     from 2014-01-01: 1.50
 
 
-variable base_tier_4_threshold:
+base_tier_4_threshold:
     from 2014-01-01: 2.00
 
 
-variable base_tier_5_threshold:
+base_tier_5_threshold:
     from 2014-01-01: 2.50
 
 
-variable base_tier_6_threshold:
+base_tier_6_threshold:
     from 2014-01-01: 3.00
 
 
-variable base_tier_upper:
+base_tier_upper:
     from 2014-01-01: 4.00
 
 
 # Initial premium percentages per tier (clause (i) table)
 
-variable base_initial_1:
+base_initial_1:
     from 2014-01-01: 0.02
 
 
-variable base_initial_2:
+base_initial_2:
     from 2014-01-01: 0.03
 
 
-variable base_initial_3:
+base_initial_3:
     from 2014-01-01: 0.04
 
 
-variable base_initial_4:
+base_initial_4:
     from 2014-01-01: 0.063
 
 
-variable base_initial_5:
+base_initial_5:
     from 2014-01-01: 0.0805
 
 
-variable base_initial_6:
+base_initial_6:
     from 2014-01-01: 0.095
 
 
 # Final premium percentages per tier (clause (i) table)
 
-variable base_final_1:
+base_final_1:
     from 2014-01-01: 0.02
 
 
-variable base_final_2:
+base_final_2:
     from 2014-01-01: 0.04
 
 
-variable base_final_3:
+base_final_3:
     from 2014-01-01: 0.063
 
 
-variable base_final_4:
+base_final_4:
     from 2014-01-01: 0.0805
 
 
-variable base_final_5:
+base_final_5:
     from 2014-01-01: 0.095
 
 
-variable base_final_6:
+base_final_6:
     from 2014-01-01: 0.095
 
 
@@ -149,79 +149,79 @@ variable base_final_6:
 
 # Tier thresholds for temporary table
 
-variable ira_tier_1_threshold:
+ira_tier_1_threshold:
     from 2021-01-01: 0
 
 
-variable ira_tier_2_threshold:
+ira_tier_2_threshold:
     from 2021-01-01: 1.50
 
 
-variable ira_tier_3_threshold:
+ira_tier_3_threshold:
     from 2021-01-01: 2.00
 
 
-variable ira_tier_4_threshold:
+ira_tier_4_threshold:
     from 2021-01-01: 2.50
 
 
-variable ira_tier_5_threshold:
+ira_tier_5_threshold:
     from 2021-01-01: 3.00
 
 
-variable ira_tier_6_threshold:
+ira_tier_6_threshold:
     from 2021-01-01: 4.00
 
 
 # Initial premium percentages for IRA temporary table
 
-variable ira_initial_1:
+ira_initial_1:
     from 2021-01-01: 0.0
 
 
-variable ira_initial_2:
+ira_initial_2:
     from 2021-01-01: 0.0
 
 
-variable ira_initial_3:
+ira_initial_3:
     from 2021-01-01: 0.02
 
 
-variable ira_initial_4:
+ira_initial_4:
     from 2021-01-01: 0.04
 
 
-variable ira_initial_5:
+ira_initial_5:
     from 2021-01-01: 0.06
 
 
-variable ira_initial_6:
+ira_initial_6:
     from 2021-01-01: 0.085
 
 
 # Final premium percentages for IRA temporary table
 
-variable ira_final_1:
+ira_final_1:
     from 2021-01-01: 0.0
 
 
-variable ira_final_2:
+ira_final_2:
     from 2021-01-01: 0.02
 
 
-variable ira_final_3:
+ira_final_3:
     from 2021-01-01: 0.04
 
 
-variable ira_final_4:
+ira_final_4:
     from 2021-01-01: 0.06
 
 
-variable ira_final_5:
+ira_final_5:
     from 2021-01-01: 0.085
 
 
-variable ira_final_6:
+ira_final_6:
     from 2021-01-01: 0.085
 
 
@@ -229,7 +229,7 @@ variable ira_final_6:
 # Parameters: Clause (ii)(III) failsafe threshold
 # =============================================================================
 
-variable failsafe_gdp_pct:
+failsafe_gdp_pct:
     from 2014-01-01: 0.00504
 
 
@@ -237,11 +237,11 @@ variable failsafe_gdp_pct:
 # Parameters: Temporal boundaries
 # =============================================================================
 
-variable ira_start_year:
+ira_start_year:
     from 2021-01-01: 2021
 
 
-variable ira_end_year:
+ira_end_year:
     from 2021-01-01: 2025
 
 
@@ -249,12 +249,12 @@ variable ira_end_year:
 # Inputs
 # =============================================================================
 
-variable household_income:
+household_income:
     entity: taxunit
     from 2024-01-01: 0
 
 
-variable tax_year:
+tax_year:
     entity: taxunit
     from 2024-01-01: 0
 
@@ -263,7 +263,7 @@ variable tax_year:
 # Variable: Household income as percent of poverty line
 # =============================================================================
 
-variable household_income_pct_fpl:
+household_income_pct_fpl:
     entity: taxunit
     from 2014-01-01: household_income / poverty_line
 
@@ -272,7 +272,7 @@ variable household_income_pct_fpl:
 # Variable: Applicable percentage under clause (i) base table
 # =============================================================================
 
-variable applicable_percentage_base:
+applicable_percentage_base:
     entity: taxunit
     from 2014-01-01: base_final_6
 
@@ -281,7 +281,7 @@ variable applicable_percentage_base:
 # Variable: Applicable percentage under clause (iii) IRA temporary table
 # =============================================================================
 
-variable applicable_percentage_ira:
+applicable_percentage_ira:
     entity: taxunit
     from 2014-01-01: ira_final_6
 
@@ -290,6 +290,6 @@ variable applicable_percentage_ira:
 # Variable: Applicable percentage (combined, selecting correct table by year)
 # =============================================================================
 
-variable applicable_percentage:
+applicable_percentage:
     entity: taxunit
     from 2014-01-01: applicable_percentage_base

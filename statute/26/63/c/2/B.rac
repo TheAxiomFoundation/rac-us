@@ -10,24 +10,24 @@
 
 # Basic standard deduction for head of household filers
 
-variable basic_std_ded_hoh_pre_tcja:
+basic_std_ded_hoh_pre_tcja:
     from 1988-01-01: 4400
 
 
-variable basic_std_ded_hoh_tcja:
+basic_std_ded_hoh_tcja:
     from 2018-01-01: 18000
     from 2026-01-01: 23625
 
 
-variable tcja_effective_year:
+tcja_effective_year:
     from 1988-01-01: 2018
 
 
-variable basic_std_ded_hoh:
+basic_std_ded_hoh:
     entity: taxunit
     from 1988-01-01: basic_std_ded_hoh_pre_tcja
 
 
-variable tax_year:
+tax_year:
     entity: taxunit
     from 2024-01-01: 0

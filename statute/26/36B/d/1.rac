@@ -14,11 +14,11 @@
 # Section 36B(e)(1)(B) separately modifies family size for individuals not
 # lawfully present; that adjustment is encoded in 26/36B/e.
 
-variable section_151_deduction_count:
+section_151_deduction_count:
     entity: taxunit
     from 2024-01-01: 0
 
 
-variable ptc_family_size:
+ptc_family_size:
     entity: taxunit
     from 2013-01-01: section_151_deduction_count

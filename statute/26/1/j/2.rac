@@ -12,11 +12,11 @@
 # (E) Estates and trusts - see 26/1/j/2/E.rac
 # (F) References to rate tables - see 26/1/j/2/F.rac
 
-variable filing_status:
+filing_status:
     entity: taxunit
     from 2024-01-01: 0
 
 
-variable tcja_income_tax:
+tcja_income_tax:
     entity: taxunit
     from 2013-01-01: single_income_tax
