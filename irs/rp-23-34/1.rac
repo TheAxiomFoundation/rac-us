@@ -4,23 +4,23 @@
 # Rev. Proc. 2023-34 provides inflation-adjusted items for tax year 2024.
 # Section 3 sets forth the tax rate tables under § 1(a)-(d) for 2024.
 
-variable source:
+source:
     from 2024-01-01: 0
 
 
 # Overrides for statute/26/1
 
-variable single:
+single:
     from 2024-01-01: 0
 
 
-variable married_filing_jointly:
+married_filing_jointly:
     from 2024-01-01: 0
 
 
-variable married_filing_separately:
+married_filing_separately:
     from 2024-01-01: 0
 
 
-variable head_of_household:
+head_of_household:
     from 2024-01-01: 0
