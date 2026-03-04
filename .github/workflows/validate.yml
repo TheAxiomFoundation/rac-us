@@ -20,10 +20,16 @@ jobs:
           python-version: '3.12'
 
       - name: Install rac
-        run: pip install git+https://github.com/RulesFoundation/rac.git@feat/unified-syntax
+        run: pip install git+https://github.com/RulesFoundation/rac.git@main
+
+      - name: Install pytest
+        run: pip install pytest
 
       - name: Validate .rac schema and imports
         run: python -m rac.validate all statute/
+
+      - name: Check parameter values appear in statute text
+        run: pytest tests/test_numbers_in_text.py -v
 
       - name: Checkout rac-validators
         uses: actions/checkout@v4
