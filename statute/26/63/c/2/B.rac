@@ -3,11 +3,11 @@
 """
 (B) $4,400 in the case of a head of household (as defined in section 2(b)), or
 
-Note: Per 26 USC 63(c)(7)(A)(i), for taxable years beginning after December 31, 2017,
-paragraph (2) shall be applied by substituting "$23,625" for "$4,400" in subparagraph (B).
-
-Per 26 USC 63(c)(7)(B)(ii), for taxable years beginning after 2025, the $23,625 amount
-shall be increased by inflation adjustment.
+Note: Per 26 USC 63(c)(7)(A)(i) as enacted by P.L. 115-97 (TCJA) § 11021(a),
+effective for taxable years beginning after December 31, 2017 (first applicable
+in 2018), paragraph (2) shall be applied by substituting "$18,000" for "$4,400"
+in subparagraph (B). The $18,000 amount was subsequently adjusted by inflation
+to $23,625 for taxable years beginning after 2025 per 26 USC 63(c)(7)(B)(ii).
 """
 
 # Basic standard deduction for head of household filers
