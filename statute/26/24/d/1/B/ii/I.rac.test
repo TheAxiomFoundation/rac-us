@@ -1,0 +1,42 @@
+# 26 USC 24(d)(1)(B)(ii)(I) tests
+
+social_security_taxes_for_taxable_year:
+    - name: "Basic case - SS taxes with no adjustments"
+      period: 2024-01
+      inputs:
+        social_security_taxes: 10000
+        social_security_taxes_after_special_refund: 10000
+        foreign_affiliate_agreement_taxes: 10000
+      expect: 10000
+
+    - name: "SS taxes reduced by special refund"
+      period: 2024-01
+      inputs:
+        social_security_taxes: 10000
+        social_security_taxes_after_special_refund: 9500
+        foreign_affiliate_agreement_taxes: 10000
+      expect: 9500
+
+    - name: "SS taxes with foreign affiliate amounts added"
+      period: 2024-01
+      inputs:
+        social_security_taxes: 10000
+        social_security_taxes_after_special_refund: 10000
+        foreign_affiliate_agreement_taxes: 11000
+      expect: 11000
+
+    - name: "Both adjustments - refund and foreign affiliate"
+      period: 2024-01
+      inputs:
+        social_security_taxes: 12500
+        social_security_taxes_after_special_refund: 12000
+        foreign_affiliate_agreement_taxes: 13500
+      expect: 13000
+
+    - name: "Zero social security taxes"
+      period: 2024-01
+      inputs:
+        social_security_taxes: 0
+        social_security_taxes_after_special_refund: 0
+        foreign_affiliate_agreement_taxes: 0
+      expect: 0
