@@ -14,4 +14,4 @@ section_32_credit:
     label: "Section 32 credit for the taxable year"
     description: "The credit allowed under section 32 (earned income credit) for the taxable year, per 26 USC 24(d)(1)(B)(ii)(II)"
     from 2001-01-01:
-        return earned_income_credit
+        earned_income_credit

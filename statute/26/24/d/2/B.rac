@@ -1,0 +1,21 @@
+# 26 USC 24(d)(2)(B) - Coordination with special refund of social security taxes
+
+"""
+(B) Coordination with special refund of social security taxes.--
+The term "social security taxes" shall not include any taxes to the
+extent the taxpayer is entitled to a special refund of such taxes
+under section 6413(c).
+"""
+
+social_security_taxes_after_special_refund:
+    imports:
+        - 26/24/d/2/A#social_security_taxes
+        - 26/6413/c#special_refund_of_social_security_taxes
+    entity: TaxUnit
+    period: Year
+    dtype: Money
+    unit: USD
+    label: "Social security taxes net of special refund"
+    description: "Social security taxes reduced by any special refund under section 6413(c), per 26 USC 24(d)(2)(B)"
+    from 1998-01-01:
+        max(0, social_security_taxes - special_refund_of_social_security_taxes)
