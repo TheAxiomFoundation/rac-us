@@ -15,6 +15,8 @@ required_full_time_student_months:
     from 2002-01-01: 5
 
 is_student_for_cdctc:
+    imports:
+        - 26/152/f/2#full_time_student_months
     entity: Person
     period: Year
     dtype: Boolean

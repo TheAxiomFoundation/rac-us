@@ -17,6 +17,8 @@ legally_separated:
     default: false
 
 is_married_for_cdctc:
+    imports:
+        - 26/7703/a#is_married
     entity: Person
     period: Year
     dtype: Boolean

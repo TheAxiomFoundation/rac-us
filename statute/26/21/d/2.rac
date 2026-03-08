@@ -1,0 +1,30 @@
+# 26 USC Section 21(d)(2) - Spouse deemed to be gainfully employed
+
+"""
+(2) Special rule for spouse who is a student or incapable of caring
+for himself.-- In the case of a spouse who is a student or a qualifying
+individual described in subsection (b)(1)(C), for purposes of paragraph
+(1), such spouse shall be deemed for each month during which such spouse
+is a full-time student at an educational organization described in
+section 170(b)(1)(A)(ii) or is such a qualifying individual to be
+gainfully employed and to have earned income of not less than--
+"""
+
+status: stub
+
+spouse_is_student_or_incapable:
+    imports:
+        - 26/152/f/2#is_full_time_student
+        - 26/21/b/1/C#is_spouse_qualifying_individual
+    entity: TaxUnit
+    period: Year
+    dtype: Boolean
+    label: "Spouse is student or incapable of self-care"
+    description: "Whether the spouse qualifies for deemed earned income under 26 USC 21(d)(2) - is a full-time student or incapable of self-care"
+
+months_spouse_student_or_incapable:
+    entity: TaxUnit
+    period: Year
+    dtype: Integer
+    label: "Months spouse is student or incapable"
+    description: "Number of months during the taxable year the spouse was a full-time student or incapable of self-care per 26 USC 21(d)(2)"

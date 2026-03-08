@@ -1,0 +1,26 @@
+# 26 USC Section 21(b) - Employment-related expenses
+
+"""
+(b) Employment-related expenses.-- For purposes of this section--
+(1) In general.-- The term "employment-related expenses" means amounts
+paid for the following expenses, but only if such expenses are incurred
+to enable the taxpayer to be gainfully employed for any period for which
+there are 1 or more qualifying individuals with respect to the taxpayer...
+"""
+
+status: stub
+
+employment_related_expenses:
+    entity: TaxUnit
+    period: Year
+    dtype: Money
+    unit: USD
+    label: "Employment-related expenses"
+    description: "Total employment-related expenses per 26 USC 21(b) - amounts paid for household services and care of qualifying individuals to enable gainful employment"
+
+number_of_qualifying_individuals:
+    entity: TaxUnit
+    period: Year
+    dtype: Integer
+    label: "Number of qualifying individuals"
+    description: "Count of qualifying individuals with respect to the taxpayer per 26 USC 21(b)(1) - dependents under 13, incapable dependents, or incapable spouse"
