@@ -1,0 +1,22 @@
+# 26 USC 24(d)(2)(C) - Special rule
+
+"""
+(C) Special rule.-- Any amounts paid pursuant to an agreement under
+section 3121(l) (relating to agreements entered into by American
+employers with respect to foreign affiliates) which are equivalent to
+the taxes referred to in subparagraph (A)(i) shall be treated as taxes
+referred to in such subparagraph.
+"""
+
+foreign_affiliate_agreement_taxes:
+    imports:
+        - 26/24/d/2/A#social_security_taxes
+        - 26/3121/l#section_3121l_agreement_amounts
+    entity: TaxUnit
+    period: Year
+    dtype: Money
+    unit: USD
+    label: "Social security taxes including foreign affiliate agreement amounts"
+    description: "Social security taxes with amounts paid under section 3121(l) agreements treated as section 3101/3201(a) taxes per 26 USC 24(d)(2)(C)"
+    from 1998-01-01:
+        social_security_taxes + section_3121l_agreement_amounts
