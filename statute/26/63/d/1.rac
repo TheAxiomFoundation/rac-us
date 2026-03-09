@@ -1,0 +1,16 @@
+# 26 USC 63(d)(1) - Above-the-line deductions excluded
+
+"""
+(1) the deductions allowable in arriving at adjusted gross income, and
+"""
+
+status: encoded
+
+above_the_line_deductions:
+    entity: TaxUnit
+    period: Year
+    dtype: Money
+    unit: USD
+    label: "Deductions allowable in arriving at AGI"
+    description: "Total deductions allowable in arriving at adjusted gross income, excluded from itemized deductions per 26 USC 63(d)(1)"
+    default: 0

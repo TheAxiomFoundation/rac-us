@@ -1,0 +1,14 @@
+# 26 USC 63(c)(7)(A)(i) tests
+
+hoh_substitution_amount:
+    - name: "Post-2017 substitution amount is $23,625"
+      period: 2024-01
+      expect: 23625
+
+    - name: "2018 substitution amount is $23,625"
+      period: 2018-01
+      expect: 23625
+
+    - name: "2025 substitution amount is $23,625 (before inflation adjustment)"
+      period: 2025-01
+      expect: 23625

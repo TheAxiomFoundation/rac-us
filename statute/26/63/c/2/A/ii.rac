@@ -1,0 +1,13 @@
+# 26 USC 63(c)(2)(A)(ii) - Surviving spouse
+
+"""
+(ii) a surviving spouse (as defined in section 2(a)),
+"""
+
+is_surviving_spouse:
+    entity: TaxUnit
+    period: Year
+    dtype: Boolean
+    label: "Surviving spouse"
+    description: "Whether the taxpayer is a surviving spouse as defined in section 2(a), per 26 USC 63(c)(2)(A)(ii)"
+    default: false

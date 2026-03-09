@@ -1,0 +1,26 @@
+# 26 USC 63(c)(5)(B) tests
+
+dependent_basic_standard_deduction_earned_income_component:
+    - name: "Zero earned income"
+      period: 2024-01
+      inputs:
+        earned_income: 0
+      expect: 250
+
+    - name: "Earned income of $3000"
+      period: 2024-01
+      inputs:
+        earned_income: 3000
+      expect: 3250
+
+    - name: "Small earned income"
+      period: 2024-01
+      inputs:
+        earned_income: 100
+      expect: 350
+
+    - name: "Large earned income"
+      period: 2024-01
+      inputs:
+        earned_income: 15000
+      expect: 15250

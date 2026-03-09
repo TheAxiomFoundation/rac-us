@@ -1,0 +1,17 @@
+# 26 USC 63(c)(5)(A) tests
+
+dependent_standard_deduction_floor:
+    - name: "Base amount (1988)"
+      period: 1988-01
+      inputs: {}
+      expect: 500
+
+    - name: "Amount in 2000"
+      period: 2000-01
+      inputs: {}
+      expect: 500
+
+    - name: "Amount in 2024"
+      period: 2024-01
+      inputs: {}
+      expect: 500

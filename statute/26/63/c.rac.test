@@ -1,0 +1,108 @@
+# 26 USC 63(c) tests
+
+standard_deduction:
+    - name: "Single filer, not dependent, no additional - post-2017"
+      period: 2024-01
+      inputs:
+          qualifies_as_joint_return: false
+          is_surviving_spouse: false
+          is_head_of_household: false
+          is_dependent: false
+          earned_income: 50000
+          additional_standard_deduction: 0
+          is_married_separate_with_itemizing_spouse: false
+          is_nonresident_alien: false
+          is_short_period_return: false
+          is_estate_trust_or_partnership: false
+      expect: 15750
+
+    - name: "Joint filer - post-2017 (200% of single amount)"
+      period: 2024-01
+      inputs:
+          qualifies_as_joint_return: true
+          is_surviving_spouse: false
+          is_head_of_household: false
+          is_dependent: false
+          earned_income: 80000
+          additional_standard_deduction: 0
+          is_married_separate_with_itemizing_spouse: false
+          is_nonresident_alien: false
+          is_short_period_return: false
+          is_estate_trust_or_partnership: false
+      expect: 31500
+
+    - name: "Head of household - post-2017"
+      period: 2024-01
+      inputs:
+          qualifies_as_joint_return: false
+          is_surviving_spouse: false
+          is_head_of_household: true
+          basic_standard_deduction_hoh: 23625
+          is_dependent: false
+          earned_income: 40000
+          additional_standard_deduction: 0
+          is_married_separate_with_itemizing_spouse: false
+          is_nonresident_alien: false
+          is_short_period_return: false
+          is_estate_trust_or_partnership: false
+      expect: 23625
+
+    - name: "Dependent with low earned income - capped at minimum"
+      period: 2024-01
+      inputs:
+          qualifies_as_joint_return: false
+          is_surviving_spouse: false
+          is_head_of_household: false
+          is_dependent: true
+          earned_income: 100
+          additional_standard_deduction: 0
+          is_married_separate_with_itemizing_spouse: false
+          is_nonresident_alien: false
+          is_short_period_return: false
+          is_estate_trust_or_partnership: false
+      expect: 500
+
+    - name: "Dependent with earned income above minimum but below standard"
+      period: 2024-01
+      inputs:
+          qualifies_as_joint_return: false
+          is_surviving_spouse: false
+          is_head_of_household: false
+          is_dependent: true
+          earned_income: 5000
+          additional_standard_deduction: 0
+          is_married_separate_with_itemizing_spouse: false
+          is_nonresident_alien: false
+          is_short_period_return: false
+          is_estate_trust_or_partnership: false
+      expect: 5250
+
+    - name: "Disqualified - nonresident alien"
+      period: 2024-01
+      inputs:
+          qualifies_as_joint_return: false
+          is_surviving_spouse: false
+          is_head_of_household: false
+          is_dependent: false
+          earned_income: 50000
+          additional_standard_deduction: 0
+          is_married_separate_with_itemizing_spouse: false
+          is_nonresident_alien: true
+          is_short_period_return: false
+          is_estate_trust_or_partnership: false
+      expect: 0
+
+    - name: "Single with additional standard deduction for aged"
+      period: 2024-01
+      inputs:
+          qualifies_as_joint_return: false
+          is_surviving_spouse: false
+          is_head_of_household: false
+          is_dependent: false
+          earned_income: 30000
+          additional_standard_deduction: 1950
+          is_married_separate_with_itemizing_spouse: false
+          is_nonresident_alien: false
+          is_short_period_return: false
+          is_estate_trust_or_partnership: false
+      expect: 17700

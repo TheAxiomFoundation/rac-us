@@ -1,0 +1,14 @@
+# 26 USC 63(c)(7)(B)(ii)(I) tests
+
+hoh_dollar_amount:
+    - name: "HoH dollar amount is $23,625 for 2026"
+      period: 2026-01
+      inputs:
+        hoh_substitution_amount: 23625
+      expect: 23625
+
+    - name: "HoH dollar amount passes through substitution amount"
+      period: 2027-01
+      inputs:
+        hoh_substitution_amount: 23625
+      expect: 23625

@@ -1,0 +1,19 @@
+# 26 USC 63(c)(6)(D) tests - Estate or trust, common trust fund, or partnership
+
+is_estate_trust_or_partnership:
+    - name: "Default - not an estate, trust, or partnership"
+      period: 2024-01
+      inputs: {}
+      expect: false
+
+    - name: "Estate or trust filer"
+      period: 2024-01
+      inputs:
+          is_estate_trust_or_partnership: true
+      expect: true
+
+    - name: "Normal individual filer in 2025"
+      period: 2025-01
+      inputs:
+          is_estate_trust_or_partnership: false
+      expect: false

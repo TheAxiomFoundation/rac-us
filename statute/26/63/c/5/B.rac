@@ -1,0 +1,25 @@
+# 26 USC 63(c)(5)(B) - Earned income plus $250
+
+"""
+(B) the sum of $250 and such individual's earned income.
+"""
+
+# The $250 amount is subject to inflation adjustment per 63(c)(4),
+# with base calendar year 1997 per 63(c)(4)(B)(ii).
+
+status: encoded
+
+dependent_earned_income_addition:
+    description: "Dollar amount added to earned income for dependent standard deduction per 26 USC 63(c)(5)(B)"
+    unit: USD
+    from 1989-01-01: 250
+
+dependent_basic_standard_deduction_earned_income_component:
+    entity: Person
+    period: Year
+    dtype: Money
+    unit: USD
+    label: "Dependent earned income component"
+    description: "Sum of $250 and earned income for dependent basic standard deduction per 26 USC 63(c)(5)(B)"
+    from 1989-01-01:
+        dependent_earned_income_addition + earned_income

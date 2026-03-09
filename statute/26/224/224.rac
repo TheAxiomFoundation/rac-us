@@ -1,0 +1,10 @@
+# 26 USC Section 224 - Cross-reference
+status: stub
+
+section_224_deduction:
+    entity: TaxUnit
+    period: Year
+    dtype: Money
+    unit: USD
+    label: "Section 224 deduction"
+    description: "Deduction provided in section 224"

@@ -1,0 +1,10 @@
+# 26 USC 63(c)(7)(B)(ii)(II) tests
+
+cola_base_year_post_2025_standard_deduction:
+    - name: "Base year is 2024 for post-2025 adjustment"
+      period: 2026-01
+      expect: 2024
+
+    - name: "Base year is 2024 for later year"
+      period: 2030-01
+      expect: 2024

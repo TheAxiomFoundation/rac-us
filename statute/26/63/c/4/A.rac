@@ -1,0 +1,14 @@
+# 26 USC 63(c)(4)(A) - Dollar amount
+
+"""
+(A) such dollar amount, multiplied by
+"""
+
+# This subparagraph identifies the first operand of the inflation
+# adjustment formula in 63(c)(4): the base dollar amounts from
+# paragraphs (2)(B), (2)(C), (5), and subsection (f).
+# Those amounts are defined in their respective files.
+# The parent section 63(c)(4) combines (A) and (B) to compute
+# the inflation-adjusted increase.
+
+status: boilerplate

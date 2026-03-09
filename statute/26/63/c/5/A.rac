@@ -1,0 +1,14 @@
+# 26 USC 63(c)(5)(A) - $500 floor
+
+"""
+(A) $500, or
+"""
+
+# This is the floor amount for the basic standard deduction of
+# dependents under 63(c)(5). Per 63(c)(4), this amount is adjusted
+# for inflation for taxable years beginning after 1988 (base year 1987).
+
+dependent_standard_deduction_floor:
+    description: "Floor amount for dependent basic standard deduction per 26 USC 63(c)(5)(A)"
+    unit: USD
+    from 1988-01-01: 500

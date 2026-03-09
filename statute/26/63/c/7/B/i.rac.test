@@ -1,0 +1,17 @@
+# 26 USC 63(c)(7)(B)(i) tests
+
+para_4_inapplicable_to_2B_2C:
+    - name: "Inapplicable for 2018 (first year after 2017)"
+      period: 2018-01
+      inputs: {}
+      expect: true
+
+    - name: "Inapplicable for 2024"
+      period: 2024-01
+      inputs: {}
+      expect: true
+
+    - name: "Inapplicable for 2026 (post-TCJA extension)"
+      period: 2026-01
+      inputs: {}
+      expect: true
