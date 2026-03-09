@@ -1,0 +1,18 @@
+# 26 USC 63(c)(6)(D) - Estate or trust, common trust fund, or partnership
+
+"""
+(D) an estate or trust, common trust fund, or partnership,
+
+the standard deduction shall be zero.
+"""
+
+# This subparagraph identifies estates, trusts, common trust funds, and
+# partnerships as ineligible for the standard deduction.
+# The parent 63(c)(6) sets the standard deduction to zero for such entities.
+
+is_estate_trust_or_partnership:
+    description: "Whether the filer is an estate, trust, common trust fund, or partnership"
+    entity: TaxUnit
+    period: Year
+    dtype: Boolean
+    default: false

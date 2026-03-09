@@ -1,0 +1,14 @@
+# 26 USC 63(c)(4)(B)(ii) tests
+
+cola_base_year_dependent_earned_income:
+    - name: "Base year is 1997 for taxable year 1989"
+      period: 1989-01
+      expect: 1997
+
+    - name: "Base year is 1997 for taxable year 2000"
+      period: 2000-01
+      expect: 1997
+
+    - name: "Base year is 1997 for taxable year 2024"
+      period: 2024-01
+      expect: 1997

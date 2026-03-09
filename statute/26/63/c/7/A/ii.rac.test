@@ -1,0 +1,14 @@
+# 26 USC 63(c)(7)(A)(ii) tests
+
+other_case_substitution_amount:
+    - name: "Substituted amount for 2018"
+      period: 2018-01
+      expect: 15750
+
+    - name: "Substituted amount for 2024"
+      period: 2024-01
+      expect: 15750
+
+    - name: "Substituted amount for 2025"
+      period: 2025-01
+      expect: 15750

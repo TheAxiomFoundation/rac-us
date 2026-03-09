@@ -1,0 +1,13 @@
+# 26 USC 63(c)(4)(B)(ii) - Calendar year 1997 base
+
+"""
+(ii) "calendar year 1997" in the case of the dollar amount contained
+in paragraph (5)(B).
+"""
+
+status: encoded
+
+cola_base_year_dependent_earned_income:
+    description: "Base calendar year substituted into section 1(f)(3) for the dollar amount in paragraph (5)(B) per 26 USC 63(c)(4)(B)(ii)"
+    unit: Year
+    from 1989-01-01: 1997

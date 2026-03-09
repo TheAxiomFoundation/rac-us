@@ -1,0 +1,20 @@
+# 26 USC Section 63(b)(2) tests
+
+deduction_for_personal_exemptions:
+    - name: "No personal exemption (TCJA era)"
+      period: 2024-01
+      inputs:
+        personal_exemption_deduction: 0
+      expect: 0
+
+    - name: "Pre-TCJA personal exemption amount"
+      period: 2017-01
+      inputs:
+        personal_exemption_deduction: 4050
+      expect: 4050
+
+    - name: "Family with multiple exemptions"
+      period: 2017-01
+      inputs:
+        personal_exemption_deduction: 16200
+      expect: 16200

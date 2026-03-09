@@ -1,0 +1,16 @@
+# 26 USC Section 63(b)(3) - Section 199A deduction
+
+"""
+(3) any deduction provided in section 199A,
+"""
+
+status: encoded
+
+section_199a_deduction:
+    entity: TaxUnit
+    period: Year
+    dtype: Money
+    unit: USD
+    label: "Section 199A deduction"
+    description: "Qualified business income deduction provided in section 199A, allowable as a below-the-line deduction for non-itemizers per 26 USC 63(b)(3)"
+    default: 0

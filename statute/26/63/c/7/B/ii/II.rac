@@ -1,0 +1,28 @@
+# 26 USC 63(c)(7)(B)(ii)(II) - Cost-of-living adjustment
+
+"""
+(II) the cost-of-living adjustment determined under section 1(f)(3)
+for the calendar year in which the taxable year begins, determined
+by substituting "2024" for "2016" in subparagraph (A)(ii) thereof.
+"""
+
+status: encoded
+
+# This subclause specifies that the COLA for the post-2025 standard
+# deduction amounts uses section 1(f)(3) with a base year of 2024
+# instead of the default base year of 2016.
+
+cola_base_year_post_2025_standard_deduction:
+    description: "Base calendar year substituted for '2016' in section 1(f)(3)(A)(ii) for the post-2025 standard deduction inflation adjustment per 26 USC 63(c)(7)(B)(ii)(II)"
+    unit: Year
+    from 2026-01-01: 2024
+
+cola_adjustment:
+    imports:
+        - 26/1/f/3#cost_of_living_adjustment
+    entity: TaxUnit
+    period: Year
+    dtype: Rate
+    description: "Cost-of-living adjustment for the post-2025 standard deduction amounts, determined under section 1(f)(3) with base year 2024 per 26 USC 63(c)(7)(B)(ii)(II)"
+    from 2026-01-01:
+        return cost_of_living_adjustment

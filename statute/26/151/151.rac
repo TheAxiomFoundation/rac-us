@@ -1,0 +1,10 @@
+# 26 USC Section 151 - Allowance of deductions for personal exemptions
+
+status: stub
+
+personal_exemption_deduction:
+    entity: TaxUnit
+    period: Year
+    dtype: Money
+    label: "Personal exemption deduction"
+    description: "Deduction for personal exemptions per 26 USC 151. Note: effectively zero for taxable years 2018-2025 per section 151(d)(5)."

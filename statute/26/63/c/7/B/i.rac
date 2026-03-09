@@ -1,0 +1,18 @@
+# 26 USC 63(c)(7)(B)(i) - In general (paragraph 4 inapplicable)
+
+"""
+(i) In general
+Paragraph (4) shall not apply to the dollar amounts contained in
+paragraphs (2)(B) and (2)(C).
+"""
+
+status: encoded
+
+# This clause suspends the general inflation adjustment of paragraph (4)
+# for the basic standard deduction amounts in (2)(B) and (2)(C) for
+# taxable years beginning after 2017. Paragraph (7)(B)(ii) provides
+# a separate inflation adjustment for those amounts starting after 2025.
+
+para_4_inapplicable_to_2B_2C:
+    description: "Whether paragraph (4) inflation adjustment is inapplicable to the dollar amounts in paragraphs (2)(B) and (2)(C) per 26 USC 63(c)(7)(B)(i)"
+    from 2018-01-01: true

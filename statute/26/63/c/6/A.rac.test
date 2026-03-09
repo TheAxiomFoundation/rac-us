@@ -1,0 +1,30 @@
+# 26 USC 63(c)(6)(A) tests
+
+mfs_spouse_itemizes_no_standard_deduction:
+    - name: "MFS and spouse itemizes - standard deduction is zero"
+      period: 2024-01
+      inputs:
+        is_married_filing_separately: true
+        either_spouse_itemizes: true
+      expect: true
+
+    - name: "MFS but neither spouse itemizes - standard deduction allowed"
+      period: 2024-01
+      inputs:
+        is_married_filing_separately: true
+        either_spouse_itemizes: false
+      expect: false
+
+    - name: "Not MFS even though spouse itemizes - standard deduction allowed"
+      period: 2024-01
+      inputs:
+        is_married_filing_separately: false
+        either_spouse_itemizes: true
+      expect: false
+
+    - name: "Not MFS and no itemizing - standard deduction allowed"
+      period: 2024-01
+      inputs:
+        is_married_filing_separately: false
+        either_spouse_itemizes: false
+      expect: false

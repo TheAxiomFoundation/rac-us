@@ -1,0 +1,16 @@
+# 26 USC Section 63(b)(6) - Section 225 deduction
+
+"""
+(6) the deduction provided in section 225
+"""
+
+status: encoded
+
+section_225_deduction:
+    entity: TaxUnit
+    period: Year
+    dtype: Money
+    unit: USD
+    label: "Section 225 deduction"
+    description: "Deduction provided in section 225, subtracted from AGI for non-itemizers per 26 USC 63(b)(6)"
+    default: 0
