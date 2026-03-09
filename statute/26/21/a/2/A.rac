@@ -29,6 +29,8 @@ first_reduction_floor:
     from 2002-01-01: 0.35
 
 first_reduction:
+    imports:
+        - 26/62#adjusted_gross_income
     entity: TaxUnit
     period: Year
     dtype: Rate

@@ -31,6 +31,8 @@ phaseout_rate_per_increment:
     from 2021-01-01: 0.01
 
 phaseout_percentage:
+    imports:
+        - 26/62#adjusted_gross_income
     entity: TaxUnit
     period: Year
     dtype: Rate

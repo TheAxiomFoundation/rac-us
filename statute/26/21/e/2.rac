@@ -10,6 +10,9 @@ file a joint return for the taxable year.
 status: encoded
 
 joint_return_required:
+    imports:
+        - 26/7703/a#files_joint_return
+        - 26/7703/a#is_married
     entity: TaxUnit
     period: Year
     dtype: Boolean

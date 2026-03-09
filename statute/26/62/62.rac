@@ -1,0 +1,17 @@
+# 26 USC Section 62 - Adjusted gross income defined
+
+"""
+(a) General rule.-- For purposes of this subtitle, the term "adjusted
+gross income" means, in the case of an individual, gross income minus
+the deductions specified in subsection (a).
+"""
+
+status: stub
+
+adjusted_gross_income:
+    entity: TaxUnit
+    period: Year
+    dtype: Money
+    unit: USD
+    label: "Adjusted gross income"
+    description: "AGI as defined by 26 USC 62 - gross income minus specified deductions"

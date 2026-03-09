@@ -40,6 +40,9 @@ further_reduction_floor:
     from 2002-01-01: 0.20
 
 further_reduction:
+    imports:
+        - 26/62#adjusted_gross_income
+        - 26/7703/a#is_joint_return
     entity: TaxUnit
     period: Year
     dtype: Rate
