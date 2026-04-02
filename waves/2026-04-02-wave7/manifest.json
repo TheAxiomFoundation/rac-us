@@ -1,0 +1,90 @@
+{
+  "wave": "2026-04-02-wave7",
+  "provenance_tier": "manual_repo_change",
+  "created_from": {
+    "rac_us_commit": "e54faae",
+    "commit_date": "2026-04-02 19:28:09 -0400",
+    "commit_subject": "Harden US family-policy demo pages"
+  },
+  "seeded_from": {
+    "change_kind": "maintenance",
+    "notes": "Manual demo-safety hardening for high-visibility US family-policy pages (sections 21, 24, 32, 152), plus floor/ceil runtime compatibility via rac commit df280ad on resolve-relative-imports."
+  },
+  "summary": {
+    "rac_file_count": 10,
+    "changed_companion_test_count": 9,
+    "available_companion_test_count": 10
+  },
+  "cases": [
+    {
+      "index": 1,
+      "name": "B",
+      "citation_path": "26/21/a/2/B",
+      "repo_rac_path": "statute/26/21/a/2/B.rac",
+      "repo_test_path": "statute/26/21/a/2/B.rac.test"
+    },
+    {
+      "index": 2,
+      "name": "b",
+      "citation_path": "26/21/b",
+      "repo_rac_path": "statute/26/21/b.rac",
+      "repo_test_path": "statute/26/21/b.rac.test"
+    },
+    {
+      "index": 3,
+      "name": "2",
+      "citation_path": "26/21/d/2",
+      "repo_rac_path": "statute/26/21/d/2.rac",
+      "repo_test_path": "statute/26/21/d/2.rac.test"
+    },
+    {
+      "index": 4,
+      "name": "B",
+      "citation_path": "26/21/g/4/B",
+      "repo_rac_path": "statute/26/21/g/4/B.rac",
+      "repo_test_path": "statute/26/21/g/4/B.rac.test"
+    },
+    {
+      "index": 5,
+      "name": "24",
+      "citation_path": "26/24/24",
+      "repo_rac_path": "statute/26/24/24.rac",
+      "repo_test_path": "statute/26/24/24.rac.test"
+    },
+    {
+      "index": 6,
+      "name": "b",
+      "citation_path": "26/24/b",
+      "repo_rac_path": "statute/26/24/b.rac",
+      "repo_test_path": "statute/26/24/b.rac.test"
+    },
+    {
+      "index": 7,
+      "name": "1",
+      "citation_path": "26/24/b/1",
+      "repo_rac_path": "statute/26/24/b/1.rac",
+      "repo_test_path": "statute/26/24/b/1.rac.test"
+    },
+    {
+      "index": 8,
+      "name": "c",
+      "citation_path": "26/24/c",
+      "repo_rac_path": "statute/26/24/c.rac",
+      "repo_test_path": "statute/26/24/c.rac.test"
+    },
+    {
+      "index": 9,
+      "name": "1",
+      "citation_path": "26/24/d/1",
+      "repo_rac_path": "statute/26/24/d/1.rac",
+      "repo_test_path": "statute/26/24/d/1.rac.test"
+    },
+    {
+      "index": 10,
+      "name": "32",
+      "citation_path": "26/32/32",
+      "repo_rac_path": "statute/26/32/32.rac",
+      "repo_test_path": "statute/26/32/32.rac.test"
+    }
+  ]
+}
