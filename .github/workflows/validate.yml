@@ -31,6 +31,15 @@ jobs:
       - name: Check parameter values appear in statute text
         run: pytest tests/test_numbers_in_text.py -v
 
+      - name: Check companion .rac.test coverage against tracked baseline
+        run: python scripts/check_companion_tests.py
+
+      - name: Check embedded scalar literals against tracked baseline
+        run: python scripts/check_embedded_scalars.py
+
+      - name: Check source-number coverage against tracked baseline
+        run: python scripts/check_numeric_occurrence_coverage.py
+
       - name: Checkout rac-validators
         uses: actions/checkout@v4
         with:

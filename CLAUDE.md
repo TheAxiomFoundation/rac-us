@@ -79,6 +79,9 @@ threshold = income * medical_expense_threshold_rate
 ## Commands
 
 ```bash
+# Run the full repo validation suite (schema/imports + baseline-aware audits)
+python scripts/validate_repo.py
+
 # Validate all .rac files (schema + imports)
 python -m rac.validate all statute/
 
@@ -90,6 +93,11 @@ python -m rac.validate imports statute/
 
 # Run inline tests
 python -m rac.test_runner statute/ -v
+
+# Report tracked backlog for newer audits
+python scripts/report_missing_companion_tests.py
+python scripts/report_embedded_scalars.py
+python scripts/report_numeric_occurrence_coverage.py
 ```
 
 ## Related repos
