@@ -1,0 +1,132 @@
+{
+  "wave": "2026-03-08-wave2",
+  "provenance_tier": "backfilled_git_history",
+  "created_from": {
+    "rac_us_commit": "699ddb1",
+    "commit_date": "2026-03-08 06:46:07 -0400",
+    "commit_subject": "Add stub files for external dependencies and resolve imports"
+  },
+  "seeded_from": {
+    "change_kind": "supporting_stubs",
+    "notes": "Backfilled from rac-us git history; records the external dependency and supporting-definition batch added after the clean-slate re-encode."
+  },
+  "summary": {
+    "rac_file_count": 16,
+    "changed_companion_test_count": 0,
+    "available_companion_test_count": 11
+  },
+  "cases": [
+    {
+      "index": 1,
+      "name": "2",
+      "citation_path": "26/152/f/2",
+      "repo_rac_path": "statute/26/152/f/2.rac",
+      "repo_test_path": null
+    },
+    {
+      "index": 2,
+      "name": "1",
+      "citation_path": "26/21/a/1",
+      "repo_rac_path": "statute/26/21/a/1.rac",
+      "repo_test_path": "statute/26/21/a/1.rac.test"
+    },
+    {
+      "index": 3,
+      "name": "A",
+      "citation_path": "26/21/a/2/A",
+      "repo_rac_path": "statute/26/21/a/2/A.rac",
+      "repo_test_path": "statute/26/21/a/2/A.rac.test"
+    },
+    {
+      "index": 4,
+      "name": "B",
+      "citation_path": "26/21/a/2/B",
+      "repo_rac_path": "statute/26/21/a/2/B.rac",
+      "repo_test_path": "statute/26/21/a/2/B.rac.test"
+    },
+    {
+      "index": 5,
+      "name": "b",
+      "citation_path": "26/21/b",
+      "repo_rac_path": "statute/26/21/b.rac",
+      "repo_test_path": null
+    },
+    {
+      "index": 6,
+      "name": "d",
+      "citation_path": "26/21/d",
+      "repo_rac_path": "statute/26/21/d.rac",
+      "repo_test_path": "statute/26/21/d.rac.test"
+    },
+    {
+      "index": 7,
+      "name": "A",
+      "citation_path": "26/21/d/1/A",
+      "repo_rac_path": "statute/26/21/d/1/A.rac",
+      "repo_test_path": "statute/26/21/d/1/A.rac.test"
+    },
+    {
+      "index": 8,
+      "name": "B",
+      "citation_path": "26/21/d/1/B",
+      "repo_rac_path": "statute/26/21/d/1/B.rac",
+      "repo_test_path": "statute/26/21/d/1/B.rac.test"
+    },
+    {
+      "index": 9,
+      "name": "2",
+      "citation_path": "26/21/d/2",
+      "repo_rac_path": "statute/26/21/d/2.rac",
+      "repo_test_path": null
+    },
+    {
+      "index": 10,
+      "name": "2",
+      "citation_path": "26/21/e/2",
+      "repo_rac_path": "statute/26/21/e/2.rac",
+      "repo_test_path": "statute/26/21/e/2.rac.test"
+    },
+    {
+      "index": 11,
+      "name": "3",
+      "citation_path": "26/21/e/3",
+      "repo_rac_path": "statute/26/21/e/3.rac",
+      "repo_test_path": "statute/26/21/e/3.rac.test"
+    },
+    {
+      "index": 12,
+      "name": "7",
+      "citation_path": "26/21/e/7",
+      "repo_rac_path": "statute/26/21/e/7.rac",
+      "repo_test_path": "statute/26/21/e/7.rac.test"
+    },
+    {
+      "index": 13,
+      "name": "B",
+      "citation_path": "26/21/g/4/B",
+      "repo_rac_path": "statute/26/21/g/4/B.rac",
+      "repo_test_path": "statute/26/21/g/4/B.rac.test"
+    },
+    {
+      "index": 14,
+      "name": "2",
+      "citation_path": "26/32/c/2",
+      "repo_rac_path": "statute/26/32/c/2.rac",
+      "repo_test_path": "statute/26/32/c/2.rac.test"
+    },
+    {
+      "index": 15,
+      "name": "62",
+      "citation_path": "26/62/62",
+      "repo_rac_path": "statute/26/62/62.rac",
+      "repo_test_path": null
+    },
+    {
+      "index": 16,
+      "name": "a",
+      "citation_path": "26/7703/a",
+      "repo_rac_path": "statute/26/7703/a.rac",
+      "repo_test_path": null
+    }
+  ]
+}

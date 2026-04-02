@@ -1,0 +1,832 @@
+{
+  "wave": "2026-03-09-wave3",
+  "provenance_tier": "backfilled_git_history",
+  "created_from": {
+    "rac_us_commit": "cc98d74",
+    "commit_date": "2026-03-09 12:32:35 -0400",
+    "commit_subject": "Encode 26 USC 32 (EITC): 112 .rac files, 109 tests, 3 auto-stubs"
+  },
+  "seeded_from": {
+    "change_kind": "encoding",
+    "notes": "Backfilled from rac-us git history; this was the major 26 USC 32 (EITC) promotion batch."
+  },
+  "summary": {
+    "rac_file_count": 116,
+    "changed_companion_test_count": 110,
+    "available_companion_test_count": 110
+  },
+  "cases": [
+    {
+      "index": 1,
+      "name": "3",
+      "citation_path": "26/1/f/3",
+      "repo_rac_path": "statute/26/1/f/3.rac",
+      "repo_test_path": null
+    },
+    {
+      "index": 2,
+      "name": "c",
+      "citation_path": "26/152/c",
+      "repo_rac_path": "statute/26/152/c.rac",
+      "repo_test_path": null
+    },
+    {
+      "index": 3,
+      "name": "21",
+      "citation_path": "26/21/21",
+      "repo_rac_path": "statute/26/21/21.rac",
+      "repo_test_path": "statute/26/21/21.rac.test"
+    },
+    {
+      "index": 4,
+      "name": "32",
+      "citation_path": "26/32/32",
+      "repo_rac_path": "statute/26/32/32.rac",
+      "repo_test_path": null
+    },
+    {
+      "index": 5,
+      "name": "a",
+      "citation_path": "26/32/a",
+      "repo_rac_path": "statute/26/32/a.rac",
+      "repo_test_path": "statute/26/32/a.rac.test"
+    },
+    {
+      "index": 6,
+      "name": "1",
+      "citation_path": "26/32/a/1",
+      "repo_rac_path": "statute/26/32/a/1.rac",
+      "repo_test_path": "statute/26/32/a/1.rac.test"
+    },
+    {
+      "index": 7,
+      "name": "2",
+      "citation_path": "26/32/a/2",
+      "repo_rac_path": "statute/26/32/a/2.rac",
+      "repo_test_path": "statute/26/32/a/2.rac.test"
+    },
+    {
+      "index": 8,
+      "name": "A",
+      "citation_path": "26/32/a/2/A",
+      "repo_rac_path": "statute/26/32/a/2/A.rac",
+      "repo_test_path": "statute/26/32/a/2/A.rac.test"
+    },
+    {
+      "index": 9,
+      "name": "B",
+      "citation_path": "26/32/a/2/B",
+      "repo_rac_path": "statute/26/32/a/2/B.rac",
+      "repo_test_path": "statute/26/32/a/2/B.rac.test"
+    },
+    {
+      "index": 10,
+      "name": "b",
+      "citation_path": "26/32/b",
+      "repo_rac_path": "statute/26/32/b.rac",
+      "repo_test_path": "statute/26/32/b.rac.test"
+    },
+    {
+      "index": 11,
+      "name": "1",
+      "citation_path": "26/32/b/1",
+      "repo_rac_path": "statute/26/32/b/1.rac",
+      "repo_test_path": "statute/26/32/b/1.rac.test"
+    },
+    {
+      "index": 12,
+      "name": "2",
+      "citation_path": "26/32/b/2",
+      "repo_rac_path": "statute/26/32/b/2.rac",
+      "repo_test_path": "statute/26/32/b/2.rac.test"
+    },
+    {
+      "index": 13,
+      "name": "A",
+      "citation_path": "26/32/b/2/A",
+      "repo_rac_path": "statute/26/32/b/2/A.rac",
+      "repo_test_path": "statute/26/32/b/2/A.rac.test"
+    },
+    {
+      "index": 14,
+      "name": "B",
+      "citation_path": "26/32/b/2/B",
+      "repo_rac_path": "statute/26/32/b/2/B.rac",
+      "repo_test_path": "statute/26/32/b/2/B.rac.test"
+    },
+    {
+      "index": 15,
+      "name": "c",
+      "citation_path": "26/32/c",
+      "repo_rac_path": "statute/26/32/c.rac",
+      "repo_test_path": "statute/26/32/c.rac.test"
+    },
+    {
+      "index": 16,
+      "name": "1",
+      "citation_path": "26/32/c/1",
+      "repo_rac_path": "statute/26/32/c/1.rac",
+      "repo_test_path": "statute/26/32/c/1.rac.test"
+    },
+    {
+      "index": 17,
+      "name": "A",
+      "citation_path": "26/32/c/1/A",
+      "repo_rac_path": "statute/26/32/c/1/A.rac",
+      "repo_test_path": "statute/26/32/c/1/A.rac.test"
+    },
+    {
+      "index": 18,
+      "name": "i",
+      "citation_path": "26/32/c/1/A/i",
+      "repo_rac_path": "statute/26/32/c/1/A/i.rac",
+      "repo_test_path": "statute/26/32/c/1/A/i.rac.test"
+    },
+    {
+      "index": 19,
+      "name": "ii",
+      "citation_path": "26/32/c/1/A/ii",
+      "repo_rac_path": "statute/26/32/c/1/A/ii.rac",
+      "repo_test_path": "statute/26/32/c/1/A/ii.rac.test"
+    },
+    {
+      "index": 20,
+      "name": "I",
+      "citation_path": "26/32/c/1/A/ii/I",
+      "repo_rac_path": "statute/26/32/c/1/A/ii/I.rac",
+      "repo_test_path": "statute/26/32/c/1/A/ii/I.rac.test"
+    },
+    {
+      "index": 21,
+      "name": "II",
+      "citation_path": "26/32/c/1/A/ii/II",
+      "repo_rac_path": "statute/26/32/c/1/A/ii/II.rac",
+      "repo_test_path": "statute/26/32/c/1/A/ii/II.rac.test"
+    },
+    {
+      "index": 22,
+      "name": "III",
+      "citation_path": "26/32/c/1/A/ii/III",
+      "repo_rac_path": "statute/26/32/c/1/A/ii/III.rac",
+      "repo_test_path": "statute/26/32/c/1/A/ii/III.rac.test"
+    },
+    {
+      "index": 23,
+      "name": "B",
+      "citation_path": "26/32/c/1/B",
+      "repo_rac_path": "statute/26/32/c/1/B.rac",
+      "repo_test_path": "statute/26/32/c/1/B.rac.test"
+    },
+    {
+      "index": 24,
+      "name": "C",
+      "citation_path": "26/32/c/1/C",
+      "repo_rac_path": "statute/26/32/c/1/C.rac",
+      "repo_test_path": "statute/26/32/c/1/C.rac.test"
+    },
+    {
+      "index": 25,
+      "name": "D",
+      "citation_path": "26/32/c/1/D",
+      "repo_rac_path": "statute/26/32/c/1/D.rac",
+      "repo_test_path": "statute/26/32/c/1/D.rac.test"
+    },
+    {
+      "index": 26,
+      "name": "E",
+      "citation_path": "26/32/c/1/E",
+      "repo_rac_path": "statute/26/32/c/1/E.rac",
+      "repo_test_path": "statute/26/32/c/1/E.rac.test"
+    },
+    {
+      "index": 27,
+      "name": "i",
+      "citation_path": "26/32/c/1/E/i",
+      "repo_rac_path": "statute/26/32/c/1/E/i.rac",
+      "repo_test_path": "statute/26/32/c/1/E/i.rac.test"
+    },
+    {
+      "index": 28,
+      "name": "ii",
+      "citation_path": "26/32/c/1/E/ii",
+      "repo_rac_path": "statute/26/32/c/1/E/ii.rac",
+      "repo_test_path": "statute/26/32/c/1/E/ii.rac.test"
+    },
+    {
+      "index": 29,
+      "name": "2",
+      "citation_path": "26/32/c/2",
+      "repo_rac_path": "statute/26/32/c/2.rac",
+      "repo_test_path": "statute/26/32/c/2.rac.test"
+    },
+    {
+      "index": 30,
+      "name": "A",
+      "citation_path": "26/32/c/2/A",
+      "repo_rac_path": "statute/26/32/c/2/A.rac",
+      "repo_test_path": "statute/26/32/c/2/A.rac.test"
+    },
+    {
+      "index": 31,
+      "name": "i",
+      "citation_path": "26/32/c/2/A/i",
+      "repo_rac_path": "statute/26/32/c/2/A/i.rac",
+      "repo_test_path": "statute/26/32/c/2/A/i.rac.test"
+    },
+    {
+      "index": 32,
+      "name": "ii",
+      "citation_path": "26/32/c/2/A/ii",
+      "repo_rac_path": "statute/26/32/c/2/A/ii.rac",
+      "repo_test_path": "statute/26/32/c/2/A/ii.rac.test"
+    },
+    {
+      "index": 33,
+      "name": "B",
+      "citation_path": "26/32/c/2/B",
+      "repo_rac_path": "statute/26/32/c/2/B.rac",
+      "repo_test_path": "statute/26/32/c/2/B.rac.test"
+    },
+    {
+      "index": 34,
+      "name": "i",
+      "citation_path": "26/32/c/2/B/i",
+      "repo_rac_path": "statute/26/32/c/2/B/i.rac",
+      "repo_test_path": "statute/26/32/c/2/B/i.rac.test"
+    },
+    {
+      "index": 35,
+      "name": "ii",
+      "citation_path": "26/32/c/2/B/ii",
+      "repo_rac_path": "statute/26/32/c/2/B/ii.rac",
+      "repo_test_path": "statute/26/32/c/2/B/ii.rac.test"
+    },
+    {
+      "index": 36,
+      "name": "iii",
+      "citation_path": "26/32/c/2/B/iii",
+      "repo_rac_path": "statute/26/32/c/2/B/iii.rac",
+      "repo_test_path": "statute/26/32/c/2/B/iii.rac.test"
+    },
+    {
+      "index": 37,
+      "name": "iv",
+      "citation_path": "26/32/c/2/B/iv",
+      "repo_rac_path": "statute/26/32/c/2/B/iv.rac",
+      "repo_test_path": "statute/26/32/c/2/B/iv.rac.test"
+    },
+    {
+      "index": 38,
+      "name": "v",
+      "citation_path": "26/32/c/2/B/v",
+      "repo_rac_path": "statute/26/32/c/2/B/v.rac",
+      "repo_test_path": "statute/26/32/c/2/B/v.rac.test"
+    },
+    {
+      "index": 39,
+      "name": "vi",
+      "citation_path": "26/32/c/2/B/vi",
+      "repo_rac_path": "statute/26/32/c/2/B/vi.rac",
+      "repo_test_path": "statute/26/32/c/2/B/vi.rac.test"
+    },
+    {
+      "index": 40,
+      "name": "3",
+      "citation_path": "26/32/c/3",
+      "repo_rac_path": "statute/26/32/c/3.rac",
+      "repo_test_path": "statute/26/32/c/3.rac.test"
+    },
+    {
+      "index": 41,
+      "name": "A",
+      "citation_path": "26/32/c/3/A",
+      "repo_rac_path": "statute/26/32/c/3/A.rac",
+      "repo_test_path": "statute/26/32/c/3/A.rac.test"
+    },
+    {
+      "index": 42,
+      "name": "B",
+      "citation_path": "26/32/c/3/B",
+      "repo_rac_path": "statute/26/32/c/3/B.rac",
+      "repo_test_path": "statute/26/32/c/3/B.rac.test"
+    },
+    {
+      "index": 43,
+      "name": "C",
+      "citation_path": "26/32/c/3/C",
+      "repo_rac_path": "statute/26/32/c/3/C.rac",
+      "repo_test_path": "statute/26/32/c/3/C.rac.test"
+    },
+    {
+      "index": 44,
+      "name": "D",
+      "citation_path": "26/32/c/3/D",
+      "repo_rac_path": "statute/26/32/c/3/D.rac",
+      "repo_test_path": "statute/26/32/c/3/D.rac.test"
+    },
+    {
+      "index": 45,
+      "name": "i",
+      "citation_path": "26/32/c/3/D/i",
+      "repo_rac_path": "statute/26/32/c/3/D/i.rac",
+      "repo_test_path": "statute/26/32/c/3/D/i.rac.test"
+    },
+    {
+      "index": 46,
+      "name": "ii",
+      "citation_path": "26/32/c/3/D/ii",
+      "repo_rac_path": "statute/26/32/c/3/D/ii.rac",
+      "repo_test_path": null
+    },
+    {
+      "index": 47,
+      "name": "4",
+      "citation_path": "26/32/c/4",
+      "repo_rac_path": "statute/26/32/c/4.rac",
+      "repo_test_path": "statute/26/32/c/4.rac.test"
+    },
+    {
+      "index": 48,
+      "name": "d",
+      "citation_path": "26/32/d",
+      "repo_rac_path": "statute/26/32/d.rac",
+      "repo_test_path": "statute/26/32/d.rac.test"
+    },
+    {
+      "index": 49,
+      "name": "1",
+      "citation_path": "26/32/d/1",
+      "repo_rac_path": "statute/26/32/d/1.rac",
+      "repo_test_path": "statute/26/32/d/1.rac.test"
+    },
+    {
+      "index": 50,
+      "name": "2",
+      "citation_path": "26/32/d/2",
+      "repo_rac_path": "statute/26/32/d/2.rac",
+      "repo_test_path": "statute/26/32/d/2.rac.test"
+    },
+    {
+      "index": 51,
+      "name": "A",
+      "citation_path": "26/32/d/2/A",
+      "repo_rac_path": "statute/26/32/d/2/A.rac",
+      "repo_test_path": "statute/26/32/d/2/A.rac.test"
+    },
+    {
+      "index": 52,
+      "name": "B",
+      "citation_path": "26/32/d/2/B",
+      "repo_rac_path": "statute/26/32/d/2/B.rac",
+      "repo_test_path": "statute/26/32/d/2/B.rac.test"
+    },
+    {
+      "index": 53,
+      "name": "i",
+      "citation_path": "26/32/d/2/B/i",
+      "repo_rac_path": "statute/26/32/d/2/B/i.rac",
+      "repo_test_path": "statute/26/32/d/2/B/i.rac.test"
+    },
+    {
+      "index": 54,
+      "name": "ii",
+      "citation_path": "26/32/d/2/B/ii",
+      "repo_rac_path": "statute/26/32/d/2/B/ii.rac",
+      "repo_test_path": "statute/26/32/d/2/B/ii.rac.test"
+    },
+    {
+      "index": 55,
+      "name": "iii",
+      "citation_path": "26/32/d/2/B/iii",
+      "repo_rac_path": "statute/26/32/d/2/B/iii.rac",
+      "repo_test_path": "statute/26/32/d/2/B/iii.rac.test"
+    },
+    {
+      "index": 56,
+      "name": "I",
+      "citation_path": "26/32/d/2/B/iii/I",
+      "repo_rac_path": "statute/26/32/d/2/B/iii/I.rac",
+      "repo_test_path": "statute/26/32/d/2/B/iii/I.rac.test"
+    },
+    {
+      "index": 57,
+      "name": "II",
+      "citation_path": "26/32/d/2/B/iii/II",
+      "repo_rac_path": "statute/26/32/d/2/B/iii/II.rac",
+      "repo_test_path": "statute/26/32/d/2/B/iii/II.rac.test"
+    },
+    {
+      "index": 58,
+      "name": "e",
+      "citation_path": "26/32/e",
+      "repo_rac_path": "statute/26/32/e.rac",
+      "repo_test_path": "statute/26/32/e.rac.test"
+    },
+    {
+      "index": 59,
+      "name": "f",
+      "citation_path": "26/32/f",
+      "repo_rac_path": "statute/26/32/f.rac",
+      "repo_test_path": "statute/26/32/f.rac.test"
+    },
+    {
+      "index": 60,
+      "name": "1",
+      "citation_path": "26/32/f/1",
+      "repo_rac_path": "statute/26/32/f/1.rac",
+      "repo_test_path": null
+    },
+    {
+      "index": 61,
+      "name": "2",
+      "citation_path": "26/32/f/2",
+      "repo_rac_path": "statute/26/32/f/2.rac",
+      "repo_test_path": "statute/26/32/f/2.rac.test"
+    },
+    {
+      "index": 62,
+      "name": "A",
+      "citation_path": "26/32/f/2/A",
+      "repo_rac_path": "statute/26/32/f/2/A.rac",
+      "repo_test_path": "statute/26/32/f/2/A.rac.test"
+    },
+    {
+      "index": 63,
+      "name": "B",
+      "citation_path": "26/32/f/2/B",
+      "repo_rac_path": "statute/26/32/f/2/B.rac",
+      "repo_test_path": "statute/26/32/f/2/B.rac.test"
+    },
+    {
+      "index": 64,
+      "name": "i",
+      "citation_path": "26/32/i",
+      "repo_rac_path": "statute/26/32/i.rac",
+      "repo_test_path": "statute/26/32/i.rac.test"
+    },
+    {
+      "index": 65,
+      "name": "1",
+      "citation_path": "26/32/i/1",
+      "repo_rac_path": "statute/26/32/i/1.rac",
+      "repo_test_path": "statute/26/32/i/1.rac.test"
+    },
+    {
+      "index": 66,
+      "name": "2",
+      "citation_path": "26/32/i/2",
+      "repo_rac_path": "statute/26/32/i/2.rac",
+      "repo_test_path": "statute/26/32/i/2.rac.test"
+    },
+    {
+      "index": 67,
+      "name": "A",
+      "citation_path": "26/32/i/2/A",
+      "repo_rac_path": "statute/26/32/i/2/A.rac",
+      "repo_test_path": "statute/26/32/i/2/A.rac.test"
+    },
+    {
+      "index": 68,
+      "name": "B",
+      "citation_path": "26/32/i/2/B",
+      "repo_rac_path": "statute/26/32/i/2/B.rac",
+      "repo_test_path": "statute/26/32/i/2/B.rac.test"
+    },
+    {
+      "index": 69,
+      "name": "C",
+      "citation_path": "26/32/i/2/C",
+      "repo_rac_path": "statute/26/32/i/2/C.rac",
+      "repo_test_path": "statute/26/32/i/2/C.rac.test"
+    },
+    {
+      "index": 70,
+      "name": "i",
+      "citation_path": "26/32/i/2/C/i",
+      "repo_rac_path": "statute/26/32/i/2/C/i.rac",
+      "repo_test_path": "statute/26/32/i/2/C/i.rac.test"
+    },
+    {
+      "index": 71,
+      "name": "ii",
+      "citation_path": "26/32/i/2/C/ii",
+      "repo_rac_path": "statute/26/32/i/2/C/ii.rac",
+      "repo_test_path": "statute/26/32/i/2/C/ii.rac.test"
+    },
+    {
+      "index": 72,
+      "name": "I",
+      "citation_path": "26/32/i/2/C/ii/I",
+      "repo_rac_path": "statute/26/32/i/2/C/ii/I.rac",
+      "repo_test_path": "statute/26/32/i/2/C/ii/I.rac.test"
+    },
+    {
+      "index": 73,
+      "name": "II",
+      "citation_path": "26/32/i/2/C/ii/II",
+      "repo_rac_path": "statute/26/32/i/2/C/ii/II.rac",
+      "repo_test_path": "statute/26/32/i/2/C/ii/II.rac.test"
+    },
+    {
+      "index": 74,
+      "name": "D",
+      "citation_path": "26/32/i/2/D",
+      "repo_rac_path": "statute/26/32/i/2/D.rac",
+      "repo_test_path": "statute/26/32/i/2/D.rac.test"
+    },
+    {
+      "index": 75,
+      "name": "E",
+      "citation_path": "26/32/i/2/E",
+      "repo_rac_path": "statute/26/32/i/2/E.rac",
+      "repo_test_path": "statute/26/32/i/2/E.rac.test"
+    },
+    {
+      "index": 76,
+      "name": "i",
+      "citation_path": "26/32/i/2/E/i",
+      "repo_rac_path": "statute/26/32/i/2/E/i.rac",
+      "repo_test_path": "statute/26/32/i/2/E/i.rac.test"
+    },
+    {
+      "index": 77,
+      "name": "ii",
+      "citation_path": "26/32/i/2/E/ii",
+      "repo_rac_path": "statute/26/32/i/2/E/ii.rac",
+      "repo_test_path": "statute/26/32/i/2/E/ii.rac.test"
+    },
+    {
+      "index": 78,
+      "name": "j",
+      "citation_path": "26/32/j",
+      "repo_rac_path": "statute/26/32/j.rac",
+      "repo_test_path": "statute/26/32/j.rac.test"
+    },
+    {
+      "index": 79,
+      "name": "1",
+      "citation_path": "26/32/j/1",
+      "repo_rac_path": "statute/26/32/j/1.rac",
+      "repo_test_path": "statute/26/32/j/1.rac.test"
+    },
+    {
+      "index": 80,
+      "name": "A",
+      "citation_path": "26/32/j/1/A",
+      "repo_rac_path": "statute/26/32/j/1/A.rac",
+      "repo_test_path": "statute/26/32/j/1/A.rac.test"
+    },
+    {
+      "index": 81,
+      "name": "B",
+      "citation_path": "26/32/j/1/B",
+      "repo_rac_path": "statute/26/32/j/1/B.rac",
+      "repo_test_path": "statute/26/32/j/1/B.rac.test"
+    },
+    {
+      "index": 82,
+      "name": "i",
+      "citation_path": "26/32/j/1/B/i",
+      "repo_rac_path": "statute/26/32/j/1/B/i.rac",
+      "repo_test_path": "statute/26/32/j/1/B/i.rac.test"
+    },
+    {
+      "index": 83,
+      "name": "ii",
+      "citation_path": "26/32/j/1/B/ii",
+      "repo_rac_path": "statute/26/32/j/1/B/ii.rac",
+      "repo_test_path": "statute/26/32/j/1/B/ii.rac.test"
+    },
+    {
+      "index": 84,
+      "name": "iii",
+      "citation_path": "26/32/j/1/B/iii",
+      "repo_rac_path": "statute/26/32/j/1/B/iii.rac",
+      "repo_test_path": "statute/26/32/j/1/B/iii.rac.test"
+    },
+    {
+      "index": 85,
+      "name": "2",
+      "citation_path": "26/32/j/2",
+      "repo_rac_path": "statute/26/32/j/2.rac",
+      "repo_test_path": "statute/26/32/j/2.rac.test"
+    },
+    {
+      "index": 86,
+      "name": "A",
+      "citation_path": "26/32/j/2/A",
+      "repo_rac_path": "statute/26/32/j/2/A.rac",
+      "repo_test_path": "statute/26/32/j/2/A.rac.test"
+    },
+    {
+      "index": 87,
+      "name": "B",
+      "citation_path": "26/32/j/2/B",
+      "repo_rac_path": "statute/26/32/j/2/B.rac",
+      "repo_test_path": "statute/26/32/j/2/B.rac.test"
+    },
+    {
+      "index": 88,
+      "name": "k",
+      "citation_path": "26/32/k",
+      "repo_rac_path": "statute/26/32/k.rac",
+      "repo_test_path": "statute/26/32/k.rac.test"
+    },
+    {
+      "index": 89,
+      "name": "1",
+      "citation_path": "26/32/k/1",
+      "repo_rac_path": "statute/26/32/k/1.rac",
+      "repo_test_path": "statute/26/32/k/1.rac.test"
+    },
+    {
+      "index": 90,
+      "name": "A",
+      "citation_path": "26/32/k/1/A",
+      "repo_rac_path": "statute/26/32/k/1/A.rac",
+      "repo_test_path": "statute/26/32/k/1/A.rac.test"
+    },
+    {
+      "index": 91,
+      "name": "B",
+      "citation_path": "26/32/k/1/B",
+      "repo_rac_path": "statute/26/32/k/1/B.rac",
+      "repo_test_path": "statute/26/32/k/1/B.rac.test"
+    },
+    {
+      "index": 92,
+      "name": "i",
+      "citation_path": "26/32/k/1/B/i",
+      "repo_rac_path": "statute/26/32/k/1/B/i.rac",
+      "repo_test_path": "statute/26/32/k/1/B/i.rac.test"
+    },
+    {
+      "index": 93,
+      "name": "ii",
+      "citation_path": "26/32/k/1/B/ii",
+      "repo_rac_path": "statute/26/32/k/1/B/ii.rac",
+      "repo_test_path": "statute/26/32/k/1/B/ii.rac.test"
+    },
+    {
+      "index": 94,
+      "name": "2",
+      "citation_path": "26/32/k/2",
+      "repo_rac_path": "statute/26/32/k/2.rac",
+      "repo_test_path": "statute/26/32/k/2.rac.test"
+    },
+    {
+      "index": 95,
+      "name": "l",
+      "citation_path": "26/32/l",
+      "repo_rac_path": "statute/26/32/l.rac",
+      "repo_test_path": "statute/26/32/l.rac.test"
+    },
+    {
+      "index": 96,
+      "name": "m",
+      "citation_path": "26/32/m",
+      "repo_rac_path": "statute/26/32/m.rac",
+      "repo_test_path": "statute/26/32/m.rac.test"
+    },
+    {
+      "index": 97,
+      "name": "n",
+      "citation_path": "26/32/n",
+      "repo_rac_path": "statute/26/32/n.rac",
+      "repo_test_path": "statute/26/32/n.rac.test"
+    },
+    {
+      "index": 98,
+      "name": "1",
+      "citation_path": "26/32/n/1",
+      "repo_rac_path": "statute/26/32/n/1.rac",
+      "repo_test_path": "statute/26/32/n/1.rac.test"
+    },
+    {
+      "index": 99,
+      "name": "A",
+      "citation_path": "26/32/n/1/A",
+      "repo_rac_path": "statute/26/32/n/1/A.rac",
+      "repo_test_path": "statute/26/32/n/1/A.rac.test"
+    },
+    {
+      "index": 100,
+      "name": "B",
+      "citation_path": "26/32/n/1/B",
+      "repo_rac_path": "statute/26/32/n/1/B.rac",
+      "repo_test_path": "statute/26/32/n/1/B.rac.test"
+    },
+    {
+      "index": 101,
+      "name": "i",
+      "citation_path": "26/32/n/1/B/i",
+      "repo_rac_path": "statute/26/32/n/1/B/i.rac",
+      "repo_test_path": "statute/26/32/n/1/B/i.rac.test"
+    },
+    {
+      "index": 102,
+      "name": "ii",
+      "citation_path": "26/32/n/1/B/ii",
+      "repo_rac_path": "statute/26/32/n/1/B/ii.rac",
+      "repo_test_path": "statute/26/32/n/1/B/ii.rac.test"
+    },
+    {
+      "index": 103,
+      "name": "iii",
+      "citation_path": "26/32/n/1/B/iii",
+      "repo_rac_path": "statute/26/32/n/1/B/iii.rac",
+      "repo_test_path": "statute/26/32/n/1/B/iii.rac.test"
+    },
+    {
+      "index": 104,
+      "name": "C",
+      "citation_path": "26/32/n/1/C",
+      "repo_rac_path": "statute/26/32/n/1/C.rac",
+      "repo_test_path": "statute/26/32/n/1/C.rac.test"
+    },
+    {
+      "index": 105,
+      "name": "D",
+      "citation_path": "26/32/n/1/D",
+      "repo_rac_path": "statute/26/32/n/1/D.rac",
+      "repo_test_path": "statute/26/32/n/1/D.rac.test"
+    },
+    {
+      "index": 106,
+      "name": "i",
+      "citation_path": "26/32/n/1/D/i",
+      "repo_rac_path": "statute/26/32/n/1/D/i.rac",
+      "repo_test_path": "statute/26/32/n/1/D/i.rac.test"
+    },
+    {
+      "index": 107,
+      "name": "ii",
+      "citation_path": "26/32/n/1/D/ii",
+      "repo_rac_path": "statute/26/32/n/1/D/ii.rac",
+      "repo_test_path": "statute/26/32/n/1/D/ii.rac.test"
+    },
+    {
+      "index": 108,
+      "name": "E",
+      "citation_path": "26/32/n/1/E",
+      "repo_rac_path": "statute/26/32/n/1/E.rac",
+      "repo_test_path": "statute/26/32/n/1/E.rac.test"
+    },
+    {
+      "index": 109,
+      "name": "2",
+      "citation_path": "26/32/n/2",
+      "repo_rac_path": "statute/26/32/n/2.rac",
+      "repo_test_path": "statute/26/32/n/2.rac.test"
+    },
+    {
+      "index": 110,
+      "name": "3",
+      "citation_path": "26/32/n/3",
+      "repo_rac_path": "statute/26/32/n/3.rac",
+      "repo_test_path": "statute/26/32/n/3.rac.test"
+    },
+    {
+      "index": 111,
+      "name": "4",
+      "citation_path": "26/32/n/4",
+      "repo_rac_path": "statute/26/32/n/4.rac",
+      "repo_test_path": "statute/26/32/n/4.rac.test"
+    },
+    {
+      "index": 112,
+      "name": "A",
+      "citation_path": "26/32/n/4/A",
+      "repo_rac_path": "statute/26/32/n/4/A.rac",
+      "repo_test_path": "statute/26/32/n/4/A.rac.test"
+    },
+    {
+      "index": 113,
+      "name": "i",
+      "citation_path": "26/32/n/4/A/i",
+      "repo_rac_path": "statute/26/32/n/4/A/i.rac",
+      "repo_test_path": "statute/26/32/n/4/A/i.rac.test"
+    },
+    {
+      "index": 114,
+      "name": "ii",
+      "citation_path": "26/32/n/4/A/ii",
+      "repo_rac_path": "statute/26/32/n/4/A/ii.rac",
+      "repo_test_path": "statute/26/32/n/4/A/ii.rac.test"
+    },
+    {
+      "index": 115,
+      "name": "B",
+      "citation_path": "26/32/n/4/B",
+      "repo_rac_path": "statute/26/32/n/4/B.rac",
+      "repo_test_path": "statute/26/32/n/4/B.rac.test"
+    },
+    {
+      "index": 116,
+      "name": "a",
+      "citation_path": "26/7703/a",
+      "repo_rac_path": "statute/26/7703/a.rac",
+      "repo_test_path": null
+    }
+  ]
+}

@@ -79,6 +79,9 @@ threshold = income * medical_expense_threshold_rate
 ## Commands
 
 ```bash
+# Create a wave provenance manifest from a rac-us commit
+python scripts/create_wave_manifest.py --wave 2026-04-02-wave7 --source-commit HEAD --write
+
 # Run the full repo validation suite (schema/imports + baseline-aware audits)
 python scripts/validate_repo.py
 
@@ -106,3 +109,21 @@ python scripts/report_numeric_occurrence_coverage.py
 - **atlas** - Source document archive
 - **autorac** - AI-assisted statute encoding
 - **rac-validators** - Validation against external calculators
+
+## Wave provenance
+
+Wave-level provenance for `rac-us` lives under [waves](/Users/maxghenis/TheAxiomFoundation/rac-us/waves).
+
+Current tracked waves:
+
+- `2026-03-07-wave1`: clean-slate re-encode touching section 21 and section 24(d), backfilled from git history
+- `2026-03-08-wave2`: external dependency and supporting-definition batch, backfilled from git history
+- `2026-03-09-wave3`: major 26 USC 32 (EITC) batch, backfilled from git history
+- `2026-03-09-wave4`: major 26 USC 63 taxable-income batch, backfilled from git history
+- `2026-03-09-wave5`: major 26 USC 24 (CTC) batch, backfilled from git history
+- `2026-04-02-wave6`: manual demo-facing US tax-credit cleanup and provenance hardening
+
+- Historical US batch commits are backfilled as `backfilled_git_history` manifests.
+- New promotions should record full `autorac` provenance at promotion time.
+- Manual repo cleanups that materially change promoted `.rac` files should use the
+  `manual_repo_change` tier rather than pretending to be fresh generation waves.
