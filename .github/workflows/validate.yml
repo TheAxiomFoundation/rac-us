@@ -13,6 +13,8 @@ jobs:
     steps:
       - name: Checkout rac-us
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -24,6 +26,18 @@ jobs:
 
       - name: Install pytest
         run: pip install pytest
+
+      - name: Check wave provenance for changed .rac files
+        env:
+          BASE_REF: ${{ github.event_name == 'pull_request' && format('origin/{0}', github.base_ref) || github.event.before }}
+          HEAD_REF: ${{ github.sha }}
+        run: |
+          if [ -z "$BASE_REF" ] || [ "$BASE_REF" = "0000000000000000000000000000000000000000" ]; then
+            echo "No comparable base ref available; skipping wave provenance diff check."
+          else
+            git fetch origin "${{ github.base_ref || 'main' }}" --depth=1 || true
+            python scripts/check_wave_provenance.py --base "$BASE_REF" --head "$HEAD_REF"
+          fi
 
       - name: Validate .rac schema and imports
         run: python -m rac.validate all statute/
