@@ -1,0 +1,33 @@
+# 26 USC Section 32 tests
+
+earned_income_credit:
+    - name: "Denial for short taxable year returns zero credit"
+      period: 2024-01
+      inputs:
+        meets_full_taxable_year_requirement: false
+        eitc_denied_for_excess_investment_income: false
+        eitc_amount: 2500
+      expect: 0
+
+    - name: "Excess investment income denial returns zero credit"
+      period: 2024-01
+      inputs:
+        meets_full_taxable_year_requirement: true
+        eitc_denied_for_excess_investment_income: true
+        eitc_amount: 2500
+      expect: 0
+
+    - name: "Eligible full-year taxpayer receives computed EITC amount"
+      period: 2024-01
+      inputs:
+        meets_full_taxable_year_requirement: true
+        eitc_denied_for_excess_investment_income: false
+        eitc_amount: 2500
+      expect: 2500
+
+full_taxable_year_months:
+    - name: "Full taxable year requires 12 months"
+      period: 2024-01
+      inputs:
+        full_taxable_year_months_from_e: 12
+      expect: 12

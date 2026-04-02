@@ -1,0 +1,14 @@
+# 26 USC Section 24(c) tests
+
+ctc_qualifying_child_age_limit:
+    - name: "CTC qualifying child age limit is 17"
+      period: 2024-01
+      inputs:
+        ctc_qualifying_child_age_limit_from_c1: 17
+      expect: 17
+
+    - name: "CTC qualifying child age limit is stable in earlier years"
+      period: 2010-01
+      inputs:
+        ctc_qualifying_child_age_limit_from_c1: 17
+      expect: 17

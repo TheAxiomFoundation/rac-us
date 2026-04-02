@@ -40,6 +40,6 @@ phaseout_percentage:
     description: "Phaseout percentage per 26 USC 21(g)(4)(B): 20% reduced by 1 percentage point per $2,000 or fraction thereof of AGI exceeding $400,000, not below zero"
     from 2021-01-01:
         excess_agi = max(0, adjusted_gross_income - phaseout_agi_threshold)
-        increments = ceil(excess_agi / phaseout_agi_increment)
+        increments = -floor(-excess_agi / phaseout_agi_increment)
         reduction = increments * phaseout_rate_per_increment
         max(0, phaseout_base_rate - reduction)

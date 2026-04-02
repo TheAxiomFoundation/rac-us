@@ -1,0 +1,14 @@
+# 26 USC Section 21(b) tests
+
+qualifying_individual_under_13_age_limit:
+    - name: "Dependent-under-13 age limit is 13"
+      period: 2024-01
+      inputs:
+        qualifying_age_limit_under_13_from_b1a: 13
+      expect: 13
+
+    - name: "Dependent-under-13 age limit is stable in earlier years"
+      period: 2010-01
+      inputs:
+        qualifying_age_limit_under_13_from_b1a: 13
+      expect: 13

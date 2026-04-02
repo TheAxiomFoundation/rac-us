@@ -40,7 +40,7 @@ child_tax_credit:
     from 2018-01-01:
         credit = ctc_h2_credit_amount * qualifying_child_count + other_dependents_credit
         excess = max(0, ctc_modified_agi - ctc_h3_threshold_amount)
-        increments = ceil(excess / ctc_phaseout_income_increment)
+        increments = -floor(-excess / ctc_phaseout_income_increment)
         phaseout = increments * ctc_phaseout_reduction_per_increment
         before_advance = max(0, credit - phaseout)
         max(0, before_advance - advance_ctc_payments)
@@ -55,3 +55,15 @@ credit_qualified_children:
     description: "Number of qualified children taken into account in determining the credit allowed under 26 USC 24 for the taxable year, per 24(j)(2)(B)(iv)(II)"
     from 1998-01-01:
         qualifying_child_count
+
+ctc_qualifying_child_age_limit:
+    imports:
+        - 26/24/c/1#ctc_qualifying_child_age_limit as ctc_qualifying_child_age_limit_from_c1
+    entity: TaxUnit
+    period: Year
+    dtype: Integer
+    label: "CTC qualifying child age limit"
+    description: "Maximum age (exclusive) for a qualifying child for CTC purposes under 26 USC 24(c)(1)"
+    unit: years
+    from 1998-01-01:
+        ctc_qualifying_child_age_limit_from_c1

@@ -18,6 +18,18 @@ the threshold.
 
 status: encoded
 
+full_taxable_year_months:
+    imports:
+        - 26/32/e#full_taxable_year_months as full_taxable_year_months_from_e
+    entity: TaxUnit
+    period: Year
+    dtype: Integer
+    label: "Full taxable year months"
+    description: "Number of months required for a full taxable year under 26 USC 32(e)"
+    unit: Month
+    from 1975-01-01:
+        full_taxable_year_months_from_e
+
 earned_income_credit:
     imports:
         - 26/32/a#eitc_amount

@@ -13,6 +13,18 @@ of section 152(b)(3) were applied without regard to all that follows
 
 status: stub
 
+ctc_qualifying_child_age_limit:
+    imports:
+        - 26/24/c/1#ctc_qualifying_child_age_limit as ctc_qualifying_child_age_limit_from_c1
+    entity: TaxUnit
+    period: Year
+    dtype: Integer
+    label: "CTC qualifying child age limit"
+    description: "Maximum age (exclusive) for a qualifying child for CTC purposes under 26 USC 24(c)(1)"
+    unit: years
+    from 1998-01-01:
+        ctc_qualifying_child_age_limit_from_c1
+
 qualifying_child_count:
     imports:
         - 26/24/c/1#ctc_qualifying_child_age_limit

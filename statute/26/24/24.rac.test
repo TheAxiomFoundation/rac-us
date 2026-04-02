@@ -1,0 +1,28 @@
+# 26 USC Section 24 tests
+
+child_tax_credit:
+    - name: "Pre-2018 credit follows post-phaseout amount"
+      period: 2017-01
+      inputs:
+        ctc_after_phaseout: 2000
+      expect: 2000
+
+    - name: "Post-2017 credit applies phaseout and advance-payment reduction"
+      period: 2024-01
+      inputs:
+        qualifying_child_count: 2
+        ctc_h2_credit_amount: 2000
+        other_dependents_credit: 500
+        ctc_modified_agi: 160000
+        ctc_h3_threshold_amount: 150000
+        ctc_phaseout_income_increment: 1000
+        ctc_phaseout_reduction_per_increment: 50
+        advance_ctc_payments: 1000
+      expect: 3000
+
+ctc_qualifying_child_age_limit:
+    - name: "CTC qualifying child age limit is 17"
+      period: 2024-01
+      inputs:
+        ctc_qualifying_child_age_limit_from_c1: 17
+      expect: 17

@@ -1,0 +1,11 @@
+# 26 USC Section 152(c) tests
+
+qualifying_child_age_limit:
+    - name: "General qualifying-child age limit is 19"
+      period: 2024-01
+      expect: 19
+
+qualifying_child_student_age_limit:
+    - name: "Student qualifying-child age limit is 24"
+      period: 2024-01
+      expect: 24

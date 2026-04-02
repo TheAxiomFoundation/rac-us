@@ -1,0 +1,43 @@
+# 26 USC Section 24(b) tests
+
+ctc_phaseout_reduction:
+    - name: "Passes through computed phaseout reduction from paragraph (1)"
+      period: 2024-01
+      inputs:
+        b1_ctc_phaseout_reduction: 250
+      expect: 250
+
+ctc_phaseout_reduction_per_increment:
+    - name: "Phaseout reduction amount is $50 per increment"
+      period: 2024-01
+      inputs:
+        ctc_phaseout_reduction_per_increment_from_b1: 50
+      expect: 50
+
+ctc_phaseout_income_increment:
+    - name: "Phaseout income increment is $1,000"
+      period: 2024-01
+      inputs:
+        ctc_phaseout_income_increment_from_b1: 1000
+      expect: 1000
+
+ctc_threshold_joint:
+    - name: "Joint-return threshold is $110,000"
+      period: 2024-01
+      inputs:
+        ctc_threshold_joint_from_b2a: 110000
+      expect: 110000
+
+ctc_threshold_unmarried:
+    - name: "Unmarried threshold is $75,000"
+      period: 2024-01
+      inputs:
+        ctc_threshold_unmarried_from_b2b: 75000
+      expect: 75000
+
+ctc_threshold_married_separate:
+    - name: "Married-filing-separately threshold is $55,000"
+      period: 2024-01
+      inputs:
+        ctc_threshold_married_separate_from_b2c: 55000
+      expect: 55000

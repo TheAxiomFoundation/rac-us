@@ -79,7 +79,7 @@ ctc_phaseout_reduction:
     description: "Reduction in CTC based on modified AGI exceeding threshold, per 26 USC 24(b)(1): $50 for each $1,000 (or fraction thereof) of excess income"
     from 2001-01-01:
         excess = max(0, ctc_modified_agi - threshold_amount)
-        increments = ceil(excess / ctc_phaseout_income_increment)
+        increments = -floor(-excess / ctc_phaseout_income_increment)
         increments * ctc_phaseout_reduction_per_increment
 
 ctc_after_phaseout:

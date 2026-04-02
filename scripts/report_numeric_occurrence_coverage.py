@@ -25,6 +25,9 @@ STRUCTURAL_HEADING_PATTERN = re.compile(
 STRUCTURAL_PREFIX_PATTERN = re.compile(
     r"^\s*(?:\d+[A-Za-z]?\.\s+|\([0-9A-Za-zivxlcdm]+\)\s+)", re.IGNORECASE
 )
+SECTION_HEADING_PREFIX_PATTERN = re.compile(
+    r"^\s*Sec\.\s+\d+[A-Za-z]?\.\s*", re.IGNORECASE
+)
 SOURCE_REFERENCE_TARGET_PATTERN = (
     r"(?:\([^)]+\)|\d+[A-Za-z./-]*(?:\([^)]+\))*(?=$|[\s,.;:])|[ivxlcdm]+\b|[A-Z]{1,4}\b|[a-z]\b)"
 )
@@ -121,6 +124,7 @@ def extract_numeric_occurrences_from_text(text: str) -> list[float]:
             continue
         if STRUCTURAL_HEADING_PATTERN.match(stripped):
             continue
+        line = SECTION_HEADING_PREFIX_PATTERN.sub("", line)
         cleaned_lines.append(STRUCTURAL_PREFIX_PATTERN.sub("", line))
 
     cleaned = "\n".join(cleaned_lines)

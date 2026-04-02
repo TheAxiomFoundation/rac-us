@@ -1,0 +1,10 @@
+# 26 USC Section 21(a)(2) tests
+
+base_applicable_percentage:
+    - name: "Base applicable percentage is 50 percent"
+      period: 2024-01
+      expect: 0.50
+
+    - name: "Base applicable percentage is stable in earlier years"
+      period: 2010-01
+      expect: 0.50

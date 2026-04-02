@@ -20,6 +20,30 @@ taxable year.
 
 status: encoded
 
+earned_income_rate:
+    imports:
+        - 26/24/d/1/B/i#earned_income_rate as earned_income_rate_from_bi
+    entity: TaxUnit
+    period: Year
+    dtype: Rate
+    label: "Refundable-credit earned income rate"
+    description: "Rate applied to earned income above the refundable-credit threshold under 26 USC 24(d)(1)(B)(i)"
+    unit: rate
+    from 2001-01-01:
+        earned_income_rate_from_bi
+
+earned_income_threshold:
+    imports:
+        - 26/24/d/1/B/i#earned_income_threshold as earned_income_threshold_from_bi
+    entity: TaxUnit
+    period: Year
+    dtype: Money
+    label: "Refundable-credit earned income threshold"
+    description: "Earned income threshold used for the refundable-credit earned-income component under 26 USC 24(d)(1)(B)(i)"
+    unit: USD
+    from 2001-01-01:
+        earned_income_threshold_from_bi
+
 ctc_refundable_amount:
     imports:
         - 26/24/d/1/A#ctc_without_limitations

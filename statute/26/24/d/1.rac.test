@@ -1,0 +1,32 @@
+# 26 USC Section 24(d)(1) tests
+
+ctc_refundable_amount:
+    - name: "Refundable amount is limited by earned income component when it is smaller"
+      period: 2024-01
+      inputs:
+        ctc_without_limitations: 1800
+        earned_income_component: 1500
+        three_plus_children_alternative: 1000
+      expect: 1500
+
+    - name: "Refundable amount is limited by credit without limitations when alternatives are larger"
+      period: 2024-01
+      inputs:
+        ctc_without_limitations: 1200
+        earned_income_component: 1500
+        three_plus_children_alternative: 1800
+      expect: 1200
+
+earned_income_rate:
+    - name: "Refundable earned income rate is 15 percent"
+      period: 2024-01
+      inputs:
+        earned_income_rate_from_bi: 0.15
+      expect: 0.15
+
+earned_income_threshold:
+    - name: "Refundable earned income threshold is $3,000"
+      period: 2024-01
+      inputs:
+        earned_income_threshold_from_bi: 3000
+      expect: 3000

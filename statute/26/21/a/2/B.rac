@@ -52,6 +52,6 @@ further_reduction:
         threshold = if is_joint_return: further_reduction_agi_threshold_joint else: further_reduction_agi_threshold
         increment = if is_joint_return: further_reduction_agi_increment_joint else: further_reduction_agi_increment
         excess_agi = max(0, adjusted_gross_income - threshold)
-        increments = ceil(excess_agi / increment)
+        increments = -floor(-excess_agi / increment)
         reduction = increments * further_reduction_rate_per_increment
         max(0, reduction)
