@@ -18,6 +18,8 @@ status: encoded
 eligible_individual_no_qualifying_child:
     imports:
         - 26/32/c/1/A/ii/I#meets_eitc_us_abode_requirement
+        - 26/32/c/1/A/ii/II#eitc_minimum_age
+        - 26/32/c/1/A/ii/II#eitc_maximum_age
         - 26/32/c/1/A/ii/II#meets_eitc_age_requirement
         - 26/32/c/1/A/ii/III#meets_eitc_not_dependent_requirement
         - 26/32/c/1/A/i#has_qualifying_child

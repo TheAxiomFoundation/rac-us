@@ -34,6 +34,27 @@ SOURCE_REFERENCE_SEQUENCE_PATTERN = (
 )
 SOURCE_REFERENCE_PATTERNS = (
     re.compile(
+        r"\b(?:section|sections)\s+\d+[A-Za-z]?(?:\([^)]+\))*"
+        r"(?:\s*,\s*\d+[A-Za-z]?(?:\([^)]+\))*)*"
+        r"(?:\s*,?\s*(?:and|or)\s+\d+[A-Za-z]?(?:\([^)]+\))*)*",
+        re.IGNORECASE,
+    ),
+    re.compile(
+        r"\b(?:paragraph|paragraphs|subparagraph|subparagraphs|clause|clauses|subclause|subclauses)\s+"
+        r"\([^)]+\)(?:\([^)]+\))*"
+        r"(?:\s*,\s*\([^)]+\)(?:\([^)]+\))*)*"
+        r"(?:\s*,?\s*(?:and|or)\s+\([^)]+\)(?:\([^)]+\))*)*",
+        re.IGNORECASE,
+    ),
+    re.compile(
+        r"\b(?:section|sections)\s+\d+[A-Za-z]?(?:\([^)]+\))+",
+        re.IGNORECASE,
+    ),
+    re.compile(
+        r"\b(?:paragraph|paragraphs|subparagraph|subparagraphs|clause|clauses|subclause|subclauses)\s+\([^)]+\)(?:\([^)]+\))*",
+        re.IGNORECASE,
+    ),
+    re.compile(
         r"\b(?:section|sections|paragraph|paragraphs|regulation|regulations|part|parts|chapter|chapters|schedule|schedules|article|articles|subparagraph|subparagraphs|sub-paragraph|sub-paragraphs|subsection|subsections)\s+"
         rf"{SOURCE_REFERENCE_SEQUENCE_PATTERN}(?:\s+to\s+{SOURCE_REFERENCE_SEQUENCE_PATTERN})?",
         re.IGNORECASE,
@@ -44,6 +65,9 @@ BLOCK_HEADER_PATTERN = re.compile(r"^([A-Za-z_][A-Za-z0-9_]*)\s*:\s*$")
 TEMPORAL_LINE_PATTERN = re.compile(r"^(\s*)from\s+\d{4}-\d{2}-\d{2}:\s*(.*?)\s*$")
 SCALAR_LINE_PATTERN = re.compile(r"^\s*([A-Za-z_][A-Za-z0-9_]*)\s*:\s*(-?[\d,]+(?:\.\d+)?)\s*$")
 DIRECT_SCALAR_PATTERN = re.compile(r"-?[\d,]+(?:\.\d+)?")
+IMPORT_LINE_PATTERN = re.compile(
+    r"^\s*-\s+(?P<path>[^#\s]+)#(?P<symbol>[A-Za-z_][A-Za-z0-9_]*)(?:\s+as\s+(?P<alias>[A-Za-z_][A-Za-z0-9_]*))?\s*$"
+)
 METADATA_KEYS = {
     "entity",
     "period",
@@ -200,8 +224,42 @@ def extract_named_scalar_occurrences(
     return occurrences
 
 
+def extract_import_targets(rac_file: Path) -> list[tuple[str, str]]:
+    targets: list[tuple[str, str]] = []
+    for line in rac_file.read_text().splitlines():
+        match = IMPORT_LINE_PATTERN.match(line)
+        if not match:
+            continue
+        targets.append((match.group("path"), match.group("symbol")))
+    return targets
+
+
+def imported_scalar_values(
+    rac_file: Path,
+    root: Path,
+    cache: dict[tuple[str, str], list[float]],
+) -> list[float]:
+    values: list[float] = []
+    content_root = repo_layout.content_root(root)
+    for import_path, symbol in extract_import_targets(rac_file):
+        key = (import_path, symbol)
+        if key not in cache:
+            target_file = content_root / f"{import_path}.rac"
+            if not target_file.exists():
+                cache[key] = []
+            else:
+                cache[key] = [
+                    occurrence.value
+                    for occurrence in extract_named_scalar_occurrences(target_file, root)
+                    if occurrence.name == symbol
+                ]
+        values.extend(cache[key])
+    return values
+
+
 def build_report(root: Path) -> list[dict[str, object]]:
     rows: list[dict[str, object]] = []
+    imported_scalar_cache: dict[tuple[str, str], list[float]] = {}
 
     for rac_file in sorted(repo_layout.content_root(root).rglob("*.rac")):
         if rac_file.name.endswith(".rac.test"):
@@ -209,9 +267,8 @@ def build_report(root: Path) -> list[dict[str, object]]:
         content = rac_file.read_text()
         source_text = extract_embedded_source_text(content)
         source_counts = Counter(extract_numeric_occurrences_from_text(source_text))
-        named_counts = Counter(
-            item.value for item in extract_named_scalar_occurrences(rac_file, root)
-        )
+        named_counts = Counter(item.value for item in extract_named_scalar_occurrences(rac_file, root))
+        named_counts.update(imported_scalar_values(rac_file, root, imported_scalar_cache))
 
         for value, source_count in sorted(source_counts.items()):
             if value in IGNORED_VALUES:

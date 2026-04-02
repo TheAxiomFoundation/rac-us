@@ -15,6 +15,7 @@ status: stub
 
 qualifying_child_count:
     imports:
+        - 26/24/c/1#ctc_qualifying_child_age_limit
         - 26/24/c/1#ctc_qualifying_child
         - 26/24/c/2#ctc_meets_citizenship_requirement
     entity: TaxUnit

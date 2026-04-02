@@ -17,7 +17,7 @@ max_refundable_credit_per_child:
 max_refundable_credit_amount:
     imports:
         - 26/24/d/1/A#ctc_without_limitations
-        - 26/24/a#qualifying_child_count
+        - 26/24/c#qualifying_child_count
     entity: TaxUnit
     period: Year
     dtype: Money

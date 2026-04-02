@@ -19,7 +19,7 @@ status: encoded
 child_tax_credit:
     imports:
         - 26/24/a#ctc_per_child_amount
-        - 26/24/a#qualifying_child_count
+        - 26/24/c#qualifying_child_count
         - 26/24/b/1#ctc_after_phaseout
         - 26/24/b/1#ctc_modified_agi
         - 26/24/b/1#ctc_phaseout_reduction_per_increment

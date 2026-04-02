@@ -39,8 +39,18 @@ If the parents of an individual may claim such individual as a qualifying child 
 
 status: stub
 
+qualifying_child_age_limit:
+    description: "Maximum age (exclusive) for a qualifying child who is not a student under 26 USC 152(c)(3)(A)(i)"
+    unit: years
+    from 1998-01-01: 19
+
+qualifying_child_student_age_limit:
+    description: "Maximum age (exclusive) for a qualifying child who is a student under 26 USC 152(c)(3)(A)(ii)"
+    unit: years
+    from 1998-01-01: 24
+
 qualifying_child_of_taxpayer:
-    entity: TaxUnit
+    entity: Person
     period: Year
     dtype: Boolean
     label: "Qualifying child of taxpayer"

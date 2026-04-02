@@ -35,99 +35,8 @@
     "missing_count": 1
   },
   {
-    "file": "statute/26/1401/1401.rac",
-    "value": 7703.0,
-    "source_count": 1,
-    "named_count": 0,
-    "missing_count": 1
-  },
-  {
-    "file": "statute/26/152/c.rac",
-    "value": 19.0,
-    "source_count": 1,
-    "named_count": 0,
-    "missing_count": 1
-  },
-  {
-    "file": "statute/26/152/c.rac",
-    "value": 22.0,
-    "source_count": 1,
-    "named_count": 0,
-    "missing_count": 1
-  },
-  {
-    "file": "statute/26/152/c.rac",
-    "value": 24.0,
-    "source_count": 1,
-    "named_count": 0,
-    "missing_count": 1
-  },
-  {
-    "file": "statute/26/21/b/1/A.rac",
-    "value": 152.0,
-    "source_count": 1,
-    "named_count": 0,
-    "missing_count": 1
-  },
-  {
     "file": "statute/26/21/b/2/B.rac",
     "value": 8.0,
-    "source_count": 1,
-    "named_count": 0,
-    "missing_count": 1
-  },
-  {
-    "file": "statute/26/21/d.rac",
-    "value": 250.0,
-    "source_count": 1,
-    "named_count": 0,
-    "missing_count": 1
-  },
-  {
-    "file": "statute/26/21/d.rac",
-    "value": 500.0,
-    "source_count": 1,
-    "named_count": 0,
-    "missing_count": 1
-  },
-  {
-    "file": "statute/26/21/e/5/B.rac",
-    "value": 13.0,
-    "source_count": 1,
-    "named_count": 0,
-    "missing_count": 1
-  },
-  {
-    "file": "statute/26/21/e/6/B.rac",
-    "value": 152.0,
-    "source_count": 1,
-    "named_count": 0,
-    "missing_count": 1
-  },
-  {
-    "file": "statute/26/21/g/3.rac",
-    "value": 0.35,
-    "source_count": 1,
-    "named_count": 0,
-    "missing_count": 1
-  },
-  {
-    "file": "statute/26/21/g/3.rac",
-    "value": 0.5,
-    "source_count": 1,
-    "named_count": 0,
-    "missing_count": 1
-  },
-  {
-    "file": "statute/26/21/g/3.rac",
-    "value": 15000.0,
-    "source_count": 1,
-    "named_count": 0,
-    "missing_count": 1
-  },
-  {
-    "file": "statute/26/21/g/3.rac",
-    "value": 125000.0,
     "source_count": 1,
     "named_count": 0,
     "missing_count": 1
@@ -154,43 +63,8 @@
     "missing_count": 1
   },
   {
-    "file": "statute/26/24/b/1.rac",
-    "value": 933.0,
-    "source_count": 1,
-    "named_count": 0,
-    "missing_count": 1
-  },
-  {
-    "file": "statute/26/24/b/2.rac",
-    "value": 55000.0,
-    "source_count": 1,
-    "named_count": 0,
-    "missing_count": 1
-  },
-  {
-    "file": "statute/26/24/b/2.rac",
-    "value": 75000.0,
-    "source_count": 1,
-    "named_count": 0,
-    "missing_count": 1
-  },
-  {
-    "file": "statute/26/24/b/2.rac",
-    "value": 110000.0,
-    "source_count": 1,
-    "named_count": 0,
-    "missing_count": 1
-  },
-  {
     "file": "statute/26/24/b.rac",
     "value": 50.0,
-    "source_count": 1,
-    "named_count": 0,
-    "missing_count": 1
-  },
-  {
-    "file": "statute/26/24/b.rac",
-    "value": 933.0,
     "source_count": 1,
     "named_count": 0,
     "missing_count": 1
@@ -224,43 +98,8 @@
     "missing_count": 1
   },
   {
-    "file": "statute/26/24/c/1.rac",
-    "value": 152.0,
-    "source_count": 1,
-    "named_count": 0,
-    "missing_count": 1
-  },
-  {
-    "file": "statute/26/24/c.rac",
-    "value": 17.0,
-    "source_count": 1,
-    "named_count": 0,
-    "missing_count": 1
-  },
-  {
-    "file": "statute/26/24/c.rac",
-    "value": 152.0,
-    "source_count": 1,
-    "named_count": 0,
-    "missing_count": 1
-  },
-  {
-    "file": "statute/26/24/d/1/B/i.rac",
-    "value": 32.0,
-    "source_count": 1,
-    "named_count": 0,
-    "missing_count": 1
-  },
-  {
     "file": "statute/26/24/d/1.rac",
     "value": 0.15,
-    "source_count": 1,
-    "named_count": 0,
-    "missing_count": 1
-  },
-  {
-    "file": "statute/26/24/d/1.rac",
-    "value": 32.0,
     "source_count": 1,
     "named_count": 0,
     "missing_count": 1
@@ -294,13 +133,6 @@
     "missing_count": 1
   },
   {
-    "file": "statute/26/24/h/4/A.rac",
-    "value": 152.0,
-    "source_count": 1,
-    "named_count": 0,
-    "missing_count": 1
-  },
-  {
     "file": "statute/26/24/h/6.rac",
     "value": 3000.0,
     "source_count": 1,
@@ -317,20 +149,6 @@
   {
     "file": "statute/26/24/i/1.rac",
     "value": 5.0,
-    "source_count": 1,
-    "named_count": 0,
-    "missing_count": 1
-  },
-  {
-    "file": "statute/26/24/i/1.rac",
-    "value": 1400.0,
-    "source_count": 1,
-    "named_count": 0,
-    "missing_count": 1
-  },
-  {
-    "file": "statute/26/24/i/2.rac",
-    "value": 2200.0,
     "source_count": 1,
     "named_count": 0,
     "missing_count": 1
@@ -366,20 +184,6 @@
   {
     "file": "statute/26/3101/3101.rac",
     "value": 3101.0,
-    "source_count": 1,
-    "named_count": 0,
-    "missing_count": 1
-  },
-  {
-    "file": "statute/26/3101/3101.rac",
-    "value": 3121.0,
-    "source_count": 5,
-    "named_count": 0,
-    "missing_count": 5
-  },
-  {
-    "file": "statute/26/3101/3101.rac",
-    "value": 7703.0,
     "source_count": 1,
     "named_count": 0,
     "missing_count": 1
@@ -532,20 +336,6 @@
     "missing_count": 1
   },
   {
-    "file": "statute/26/32/c/1/A/ii.rac",
-    "value": 25.0,
-    "source_count": 1,
-    "named_count": 0,
-    "missing_count": 1
-  },
-  {
-    "file": "statute/26/32/c/1/A/ii.rac",
-    "value": 65.0,
-    "source_count": 1,
-    "named_count": 0,
-    "missing_count": 1
-  },
-  {
     "file": "statute/26/32/c/1/A.rac",
     "value": 25.0,
     "source_count": 1,
@@ -558,59 +348,10 @@
     "source_count": 1,
     "named_count": 0,
     "missing_count": 1
-  },
-  {
-    "file": "statute/26/32/c/2/A/ii.rac",
-    "value": 1402.0,
-    "source_count": 1,
-    "named_count": 0,
-    "missing_count": 1
-  },
-  {
-    "file": "statute/26/32/c/2/A.rac",
-    "value": 1402.0,
-    "source_count": 1,
-    "named_count": 0,
-    "missing_count": 1
-  },
-  {
-    "file": "statute/26/32/c/2.rac",
-    "value": 1402.0,
-    "source_count": 1,
-    "named_count": 0,
-    "missing_count": 1
-  },
-  {
-    "file": "statute/26/32/c/3/A.rac",
-    "value": 152.0,
-    "source_count": 1,
-    "named_count": 0,
-    "missing_count": 1
-  },
-  {
-    "file": "statute/26/32/c/3/B.rac",
-    "value": 152.0,
-    "source_count": 1,
-    "named_count": 0,
-    "missing_count": 1
-  },
-  {
-    "file": "statute/26/32/c/3.rac",
-    "value": 152.0,
-    "source_count": 2,
-    "named_count": 0,
-    "missing_count": 2
   },
   {
     "file": "statute/26/32/c.rac",
     "value": 4.0,
-    "source_count": 1,
-    "named_count": 0,
-    "missing_count": 1
-  },
-  {
-    "file": "statute/26/32/d/2/B/i.rac",
-    "value": 7703.0,
     "source_count": 1,
     "named_count": 0,
     "missing_count": 1
@@ -630,13 +371,6 @@
     "missing_count": 1
   },
   {
-    "file": "statute/26/32/d/2/B.rac",
-    "value": 7703.0,
-    "source_count": 1,
-    "named_count": 0,
-    "missing_count": 1
-  },
-  {
     "file": "statute/26/32/d/2.rac",
     "value": 6.0,
     "source_count": 1,
@@ -644,43 +378,8 @@
     "missing_count": 1
   },
   {
-    "file": "statute/26/32/d/2.rac",
-    "value": 7703.0,
-    "source_count": 1,
-    "named_count": 0,
-    "missing_count": 1
-  },
-  {
-    "file": "statute/26/32/f/2.rac",
-    "value": 50.0,
-    "source_count": 1,
-    "named_count": 0,
-    "missing_count": 1
-  },
-  {
     "file": "statute/26/32/f.rac",
     "value": 50.0,
-    "source_count": 1,
-    "named_count": 0,
-    "missing_count": 1
-  },
-  {
-    "file": "statute/26/32/i/2/D.rac",
-    "value": 1222.0,
-    "source_count": 1,
-    "named_count": 0,
-    "missing_count": 1
-  },
-  {
-    "file": "statute/26/32/i/2/E/ii.rac",
-    "value": 469.0,
-    "source_count": 1,
-    "named_count": 0,
-    "missing_count": 1
-  },
-  {
-    "file": "statute/26/32/i/2.rac",
-    "value": 1222.0,
     "source_count": 1,
     "named_count": 0,
     "missing_count": 1
@@ -777,36 +476,8 @@
     "missing_count": 1
   },
   {
-    "file": "statute/26/32/l.rac",
-    "value": 236.0,
-    "source_count": 1,
-    "named_count": 0,
-    "missing_count": 1
-  },
-  {
     "file": "statute/26/32/n/1/A.rac",
     "value": 25.0,
-    "source_count": 1,
-    "named_count": 0,
-    "missing_count": 1
-  },
-  {
-    "file": "statute/26/32/n/1/B.rac",
-    "value": 18.0,
-    "source_count": 1,
-    "named_count": 0,
-    "missing_count": 1
-  },
-  {
-    "file": "statute/26/32/n/1/B.rac",
-    "value": 19.0,
-    "source_count": 1,
-    "named_count": 0,
-    "missing_count": 1
-  },
-  {
-    "file": "statute/26/32/n/1/B.rac",
-    "value": 24.0,
     "source_count": 1,
     "named_count": 0,
     "missing_count": 1
@@ -841,28 +512,7 @@
   },
   {
     "file": "statute/26/32/n/4/A.rac",
-    "value": 4220.0,
-    "source_count": 1,
-    "named_count": 0,
-    "missing_count": 1
-  },
-  {
-    "file": "statute/26/32/n/4/A.rac",
     "value": 5280.0,
-    "source_count": 1,
-    "named_count": 0,
-    "missing_count": 1
-  },
-  {
-    "file": "statute/26/32/n/4/A.rac",
-    "value": 9820.0,
-    "source_count": 1,
-    "named_count": 0,
-    "missing_count": 1
-  },
-  {
-    "file": "statute/26/32/n/4/A.rac",
-    "value": 11610.0,
     "source_count": 1,
     "named_count": 0,
     "missing_count": 1
@@ -924,13 +574,6 @@
     "missing_count": 1
   },
   {
-    "file": "statute/26/63/c/4/B/i.rac",
-    "value": 5.0,
-    "source_count": 1,
-    "named_count": 0,
-    "missing_count": 1
-  },
-  {
     "file": "statute/26/63/c/6/C.rac",
     "value": 12.0,
     "source_count": 1,
@@ -950,13 +593,6 @@
     "source_count": 1,
     "named_count": 0,
     "missing_count": 1
-  },
-  {
-    "file": "statute/26/63/c.rac",
-    "value": 5.0,
-    "source_count": 2,
-    "named_count": 0,
-    "missing_count": 2
   },
   {
     "file": "statute/26/63/c.rac",
@@ -990,8 +626,8 @@
     "file": "statute/26/63/c.rac",
     "value": 4400.0,
     "source_count": 2,
-    "named_count": 0,
-    "missing_count": 2
+    "named_count": 1,
+    "missing_count": 1
   },
   {
     "file": "statute/26/63/c.rac",
