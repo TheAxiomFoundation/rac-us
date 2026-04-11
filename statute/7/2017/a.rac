@@ -14,6 +14,9 @@ determined by the Secretary under section 2012 of this title, rounded to the
 nearest whole dollar increment.
 """
 
+imports:
+  - statute/7/2014/e#snap_net_income
+
 status: encoded
 
 snap_expected_contribution_rate:
@@ -25,16 +28,6 @@ snap_one_two_person_minimum_allotment_rate:
     description: "Minimum allotment fraction for one- and two-person households under 7 USC 2017(a)"
     unit: /1
     from 2008-10-01: 0.08
-
-snap_net_income:
-    entity: Household
-    period: Month
-    dtype: Money
-    unit: USD
-    status: input
-    label: "SNAP net income"
-    description: "Household income determined under 7 USC 2014(d) and (e) for SNAP allotment calculation"
-    default: 0
 
 snap_household_size:
     entity: Household

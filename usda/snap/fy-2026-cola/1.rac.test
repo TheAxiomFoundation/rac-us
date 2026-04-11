@@ -34,7 +34,8 @@
   input:
     snap_region: CONTIGUOUS_US
     snap_household_size: 4
-    snap_net_income: 833
+    snap_gross_income: 1056
+    snap_standard_deduction: 223
   output:
     snap_allotment: 744.1
 
@@ -43,6 +44,7 @@
   input:
     snap_region: HI
     snap_household_size: 1
-    snap_net_income: 2000
+    snap_gross_income: 2223
+    snap_standard_deduction: 223
   output:
     snap_allotment: 41
