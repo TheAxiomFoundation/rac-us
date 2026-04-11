@@ -37,9 +37,9 @@
   input:
     snap_region: CONTIGUOUS_US
     snap_household_size: 4
-    snap_gross_income: 6000
+    snap_gross_income: 4000
     snap_standard_deduction: 223
-    snap_excess_shelter_expense_deduction: 3377
+    snap_monthly_shelter_cost: 3000
     snap_household_has_elderly_or_disabled_member: true
   output:
     meets_snap_income_tests: true

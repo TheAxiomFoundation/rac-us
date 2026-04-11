@@ -14,8 +14,10 @@ imports:
   - statute/7/2014/e#snap_deductions
   - statute/7/2014/e#snap_earned_income
   - statute/7/2014/e#snap_excess_medical_expense_deduction
+  - statute/7/2014/e#snap_excess_shelter_deduction_cap
   - statute/7/2014/e#snap_excess_shelter_expense_deduction
   - statute/7/2014/e#snap_homeless_shelter_deduction
+  - statute/7/2014/e#snap_monthly_shelter_cost
   - statute/7/2014/e#snap_net_income
   - statute/7/2014/e#snap_standard_deduction
   - statute/7/2014/c#snap_gross_income

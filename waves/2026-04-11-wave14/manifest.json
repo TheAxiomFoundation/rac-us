@@ -1,0 +1,34 @@
+{
+  "wave": "2026-04-11-wave14",
+  "provenance_tier": "manual_repo_change",
+  "created_from": {
+    "rac_us_commit": "27660ee",
+    "commit_date": "2026-04-11 19:47:28 -0400",
+    "commit_subject": "Add SNAP asset test execution path"
+  },
+  "seeded_from": {
+    "change_kind": "encoding",
+    "notes": "Manual federal SNAP shelter-deduction refinement: encode the 7 USC 2014(e)(6) excess shelter deduction formula with the 50-percent threshold, the published cap for households without an elderly or disabled member, and the uncapped path for households with an elderly or disabled member."
+  },
+  "summary": {
+    "rac_file_count": 2,
+    "changed_companion_test_count": 2,
+    "available_companion_test_count": 2
+  },
+  "cases": [
+    {
+      "index": 1,
+      "name": "7-2014-e-shelter",
+      "citation_path": "7/2014/e",
+      "repo_rac_path": "statute/7/2014/e.rac",
+      "repo_test_path": "statute/7/2014/e.rac.test"
+    },
+    {
+      "index": 2,
+      "name": "fy-2026-cola-3-income-tests",
+      "citation_path": "usda/snap/fy-2026-cola/3",
+      "repo_rac_path": "usda/snap/fy-2026-cola/3.rac",
+      "repo_test_path": "usda/snap/fy-2026-cola/3.rac.test"
+    }
+  ]
+}
