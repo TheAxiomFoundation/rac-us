@@ -1,0 +1,27 @@
+{
+  "wave": "2026-04-11-wave8",
+  "provenance_tier": "manual_repo_change",
+  "created_from": {
+    "rac_us_commit": "f3573bd",
+    "commit_date": "2026-04-11 19:14:23 -0400",
+    "commit_subject": "Add first federal SNAP allotment encoding"
+  },
+  "seeded_from": {
+    "change_kind": "encoding",
+    "notes": "Manual first federal SNAP seed in Title 7: 7 USC 2017(a) expected contribution, minimum allotment, and allotment formula with annual USDA TFP cost inputs left as explicit boundaries."
+  },
+  "summary": {
+    "rac_file_count": 1,
+    "changed_companion_test_count": 1,
+    "available_companion_test_count": 1
+  },
+  "cases": [
+    {
+      "index": 1,
+      "name": "a",
+      "citation_path": "7/2017/a",
+      "repo_rac_path": "statute/7/2017/a.rac",
+      "repo_test_path": "statute/7/2017/a.rac.test"
+    }
+  ]
+}
