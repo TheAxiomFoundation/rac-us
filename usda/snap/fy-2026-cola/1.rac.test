@@ -1,0 +1,48 @@
+- name: contiguous_maximum_allotment_for_four_person_household
+  period: 2026-10
+  input:
+    snap_region: CONTIGUOUS_US
+    snap_household_size: 4
+  output:
+    snap_maximum_allotment: 994
+
+- name: alaska_rural_2_additional_person_increment_applies_after_eight
+  period: 2026-10
+  input:
+    snap_region: AK_RURAL_2
+    snap_household_size: 9
+  output:
+    snap_maximum_allotment: 4029
+
+- name: hawaii_one_person_thrifty_food_plan_cost_uses_fy2026_publication_value
+  period: 2026-10
+  input:
+    snap_region: HI
+  output:
+    snap_one_person_thrifty_food_plan_cost: 506
+
+- name: hawaii_minimum_allotment_uses_published_override
+  period: 2026-10
+  input:
+    snap_region: HI
+    snap_household_size: 1
+  output:
+    snap_minimum_allotment: 41
+
+- name: contiguous_allotment_flows_through_statute_formula_with_publication_values
+  period: 2026-10
+  input:
+    snap_region: CONTIGUOUS_US
+    snap_household_size: 4
+    snap_net_income: 833
+  output:
+    snap_allotment: 744.1
+
+- name: hawaii_one_person_allotment_uses_published_minimum_when_expected_contribution_exceeds_maximum
+  period: 2026-10
+  input:
+    snap_region: HI
+    snap_household_size: 1
+    snap_net_income: 2000
+  output:
+    snap_allotment: 41

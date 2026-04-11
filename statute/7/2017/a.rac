@@ -45,6 +45,15 @@ snap_household_size:
     description: "Number of people in the SNAP household for allotment calculation"
     default: 1
 
+snap_region:
+    entity: Household
+    period: Month
+    dtype: String
+    status: input
+    label: "SNAP region"
+    description: "SNAP allotment region grouping used by annual USDA publications, such as CONTIGUOUS_US, GU, VI, AK_URBAN, AK_RURAL_1, AK_RURAL_2, and HI"
+    default: CONTIGUOUS_US
+
 snap_maximum_allotment:
     entity: Household
     period: Month
@@ -52,7 +61,7 @@ snap_maximum_allotment:
     unit: USD
     status: input
     label: "SNAP maximum allotment"
-    description: "Cost of the thrifty food plan for the household, which annual USDA allotment publications should supply for the applicable month"
+    description: "Cost of the thrifty food plan for the household, which annual USDA allotment publications should supply for the applicable month and SNAP region"
     default: 0
 
 snap_one_person_thrifty_food_plan_cost:
@@ -62,7 +71,7 @@ snap_one_person_thrifty_food_plan_cost:
     unit: USD
     status: input
     label: "One-person thrifty food plan cost"
-    description: "Cost of the thrifty food plan for a one-person household, as determined by the Secretary under 7 USC 2012"
+    description: "Cost of the thrifty food plan for a one-person household, as determined by the Secretary under 7 USC 2012 and supplied for the applicable month and SNAP region by annual USDA publications"
     default: 0
 
 snap_expected_contribution:

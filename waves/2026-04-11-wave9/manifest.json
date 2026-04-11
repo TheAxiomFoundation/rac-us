@@ -1,0 +1,27 @@
+{
+  "wave": "2026-04-11-wave9",
+  "provenance_tier": "manual_repo_change",
+  "created_from": {
+    "rac_us_commit": "093433c",
+    "commit_date": "2026-04-11 19:14:51 -0400",
+    "commit_subject": "Record provenance for first SNAP seed"
+  },
+  "seeded_from": {
+    "change_kind": "encoding",
+    "notes": "Manual first USDA SNAP publication layer: FY2026 COLA memo amending the canonical 7 USC 2017(a) symbols for regional one-person TFP cost, minimum allotment, and maximum allotment."
+  },
+  "summary": {
+    "rac_file_count": 1,
+    "changed_companion_test_count": 1,
+    "available_companion_test_count": 1
+  },
+  "cases": [
+    {
+      "index": 1,
+      "name": "fy-2026-cola-1",
+      "citation_path": "usda/snap/fy-2026-cola/1",
+      "repo_rac_path": "usda/snap/fy-2026-cola/1.rac",
+      "repo_test_path": "usda/snap/fy-2026-cola/1.rac.test"
+    }
+  ]
+}
