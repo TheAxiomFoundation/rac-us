@@ -1,0 +1,56 @@
+- name: contiguous_net_income_limit_for_four_person_household
+  period: 2026-10
+  input:
+    snap_region: CONTIGUOUS_US
+    snap_household_size: 4
+  output:
+    snap_net_income_limit: 2680
+
+- name: alaska_gross_income_limit_for_four_person_household
+  period: 2026-10
+  input:
+    snap_region: AK_URBAN
+    snap_household_size: 4
+  output:
+    snap_gross_income_limit: 4354
+
+- name: hawaii_net_income_limit_for_nine_person_household_uses_additional_member_increment
+  period: 2026-10
+  input:
+    snap_region: HI
+    snap_household_size: 9
+  output:
+    snap_net_income_limit: 5720
+
+- name: gross_income_test_fails_when_household_without_elderly_or_disabled_member_exceeds_limit
+  period: 2026-10
+  input:
+    snap_region: CONTIGUOUS_US
+    snap_household_size: 4
+    snap_gross_income: 3500
+    snap_net_income: 2400
+    snap_household_has_elderly_or_disabled_member: false
+  output:
+    meets_snap_gross_income_test: false
+
+- name: gross_income_test_is_bypassed_for_household_with_elderly_or_disabled_member
+  period: 2026-10
+  input:
+    snap_region: CONTIGUOUS_US
+    snap_household_size: 4
+    snap_gross_income: 6000
+    snap_net_income: 2400
+    snap_household_has_elderly_or_disabled_member: true
+  output:
+    meets_snap_income_tests: true
+
+- name: overall_income_tests_fail_when_net_income_exceeds_limit
+  period: 2026-10
+  input:
+    snap_region: CONTIGUOUS_US
+    snap_household_size: 4
+    snap_gross_income: 3000
+    snap_net_income: 2700
+    snap_household_has_elderly_or_disabled_member: false
+  output:
+    meets_snap_income_tests: false

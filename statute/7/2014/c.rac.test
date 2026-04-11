@@ -1,0 +1,43 @@
+- name: meets_both_income_tests_when_gross_and_net_income_are_below_limits
+  period: 2026-10
+  input:
+    snap_gross_income: 3000
+    snap_net_income: 2400
+    snap_gross_income_limit: 3483
+    snap_net_income_limit: 2680
+    snap_household_has_elderly_or_disabled_member: false
+  output:
+    meets_snap_income_tests: true
+
+- name: fails_gross_income_test_when_gross_income_exceeds_limit
+  period: 2026-10
+  input:
+    snap_gross_income: 3500
+    snap_net_income: 2400
+    snap_gross_income_limit: 3483
+    snap_net_income_limit: 2680
+    snap_household_has_elderly_or_disabled_member: false
+  output:
+    meets_snap_gross_income_test: false
+
+- name: elderly_or_disabled_household_is_exempt_from_gross_income_test
+  period: 2026-10
+  input:
+    snap_gross_income: 5000
+    snap_net_income: 2400
+    snap_gross_income_limit: 3483
+    snap_net_income_limit: 2680
+    snap_household_has_elderly_or_disabled_member: true
+  output:
+    meets_snap_gross_income_test: true
+
+- name: fails_net_income_test_when_net_income_exceeds_limit
+  period: 2026-10
+  input:
+    snap_gross_income: 3000
+    snap_net_income: 2700
+    snap_gross_income_limit: 3483
+    snap_net_income_limit: 2680
+    snap_household_has_elderly_or_disabled_member: false
+  output:
+    meets_snap_net_income_test: false
