@@ -1,0 +1,39 @@
+{
+  "wave": "2026-04-11-wave10",
+  "provenance_tier": "manual_repo_change",
+  "created_from": {
+    "rac_us_commit": "7afaf75",
+    "commit_date": "2026-04-11 19:26:07 -0400",
+    "commit_subject": "Add FY2026 USDA SNAP allotment layer"
+  },
+  "seeded_from": {
+    "change_kind": "encoding",
+    "notes": "Manual federal SNAP deductions and asset-limit seed: canonical 7 USC 2014(e) and 2014(g)(1) parameter identities plus FY2026 USDA COLA publication values for standard deduction, shelter cap, homeless deduction, and asset limits."
+  },
+  "summary": {
+    "rac_file_count": 3,
+    "changed_companion_test_count": 1,
+    "available_companion_test_count": 1
+  },
+  "cases": [
+    {
+      "index": 1,
+      "name": "7-2014-e",
+      "citation_path": "7/2014/e",
+      "repo_rac_path": "statute/7/2014/e.rac"
+    },
+    {
+      "index": 2,
+      "name": "7-2014-g-1",
+      "citation_path": "7/2014/g/1",
+      "repo_rac_path": "statute/7/2014/g/1.rac"
+    },
+    {
+      "index": 3,
+      "name": "fy-2026-cola-2",
+      "citation_path": "usda/snap/fy-2026-cola/2",
+      "repo_rac_path": "usda/snap/fy-2026-cola/2.rac",
+      "repo_test_path": "usda/snap/fy-2026-cola/2.rac.test"
+    }
+  ]
+}

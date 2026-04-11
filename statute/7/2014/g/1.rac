@@ -1,0 +1,34 @@
+# 7 USC Section 2014(g)(1) - SNAP asset limits
+
+"""
+(g) Allowable financial resources
+(1) Total amount
+(A) In general
+The Secretary shall prescribe the types and allowable amounts of financial
+resources an eligible household may own, and shall assure that a household
+otherwise eligible for SNAP will not be eligible if its resources exceed the
+statutory asset limits, subject to the annual inflation adjustment rules in
+subparagraph (B).
+"""
+
+status: encoded
+
+snap_asset_limit:
+    entity: Household
+    period: Month
+    dtype: Money
+    unit: USD
+    status: input
+    label: "SNAP asset limit"
+    description: "General household resource limit under 7 USC 2014(g)(1), supplied for the applicable month by annual USDA publications"
+    default: 0
+
+snap_asset_limit_with_elderly_or_disabled_member:
+    entity: Household
+    period: Month
+    dtype: Money
+    unit: USD
+    status: input
+    label: "SNAP asset limit with elderly or disabled member"
+    description: "Resource limit under 7 USC 2014(g)(1) for a household that includes an elderly or disabled member, supplied for the applicable month by annual USDA publications"
+    default: 0

@@ -1,0 +1,45 @@
+# 7 USC Section 2014(e) - Allowable deductions
+
+"""
+(e) Deductions
+Household income for purposes of the supplemental nutrition assistance program
+shall be determined by reducing the income of the household by allowable
+deductions, including the standard deduction, the excess shelter expense
+deduction, and the homeless shelter deduction, as provided in this subsection.
+"""
+
+imports:
+  - statute/7/2017/a#snap_household_size
+  - statute/7/2017/a#snap_region
+
+status: encoded
+
+snap_standard_deduction:
+    entity: Household
+    period: Month
+    dtype: Money
+    unit: USD
+    status: input
+    label: "SNAP standard deduction"
+    description: "Standard deduction under 7 USC 2014(e), supplied for the applicable month, SNAP region, and household-size band by annual USDA publications"
+    default: 0
+
+snap_excess_shelter_deduction_cap:
+    entity: Household
+    period: Month
+    dtype: Money
+    unit: USD
+    status: input
+    label: "SNAP excess shelter deduction cap"
+    description: "Maximum excess shelter deduction under 7 USC 2014(e), supplied for the applicable month and SNAP region by annual USDA publications"
+    default: 0
+
+snap_homeless_shelter_deduction:
+    entity: Household
+    period: Month
+    dtype: Money
+    unit: USD
+    status: input
+    label: "SNAP homeless shelter deduction"
+    description: "Alternative deduction for homeless households under 7 USC 2014(e)(6)(D), supplied for the applicable month by annual USDA publications"
+    default: 0

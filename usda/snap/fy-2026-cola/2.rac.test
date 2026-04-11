@@ -1,0 +1,49 @@
+- name: contiguous_standard_deduction_for_four_person_household
+  period: 2026-10
+  input:
+    snap_region: CONTIGUOUS_US
+    snap_household_size: 4
+  output:
+    snap_standard_deduction: 223
+
+- name: alaska_standard_deduction_for_six_person_household_uses_alaska_table
+  period: 2026-10
+  input:
+    snap_region: AK_RURAL_2
+    snap_household_size: 6
+  output:
+    snap_standard_deduction: 374
+
+- name: virgin_islands_standard_deduction_for_three_person_household_uses_publication_value
+  period: 2026-10
+  input:
+    snap_region: VI
+    snap_household_size: 3
+  output:
+    snap_standard_deduction: 185
+
+- name: hawaii_excess_shelter_deduction_cap_uses_publication_value
+  period: 2026-10
+  input:
+    snap_region: HI
+  output:
+    snap_excess_shelter_deduction_cap: 1003
+
+- name: homeless_shelter_deduction_uses_fy2026_publication_value
+  period: 2026-10
+  input:
+    snap_region: CONTIGUOUS_US
+  output:
+    snap_homeless_shelter_deduction: 198.99
+
+- name: general_asset_limit_uses_fy2026_publication_value
+  period: 2026-10
+  input: {}
+  output:
+    snap_asset_limit: 3000
+
+- name: elderly_or_disabled_asset_limit_uses_fy2026_publication_value
+  period: 2026-10
+  input: {}
+  output:
+    snap_asset_limit_with_elderly_or_disabled_member: 4500

@@ -1,0 +1,89 @@
+# USDA SNAP - Fiscal Year 2026 Cost-of-Living Adjustments (deductions and assets)
+
+"""
+USDA SNAP - Fiscal Year 2026 Cost-of-Living Adjustments.
+Effective October 1, 2025 through September 30, 2026.
+Source: https://fns-prod.azureedge.us/sites/default/files/resource-files/snap-cola-fy26memo.pdf
+"""
+
+imports:
+  - statute/7/2017/a#snap_household_size
+  - statute/7/2017/a#snap_region
+  - statute/7/2014/e#snap_standard_deduction
+  - statute/7/2014/e#snap_excess_shelter_deduction_cap
+  - statute/7/2014/e#snap_homeless_shelter_deduction
+  - statute/7/2014/g/1#snap_asset_limit
+  - statute/7/2014/g/1#snap_asset_limit_with_elderly_or_disabled_member
+
+amend snap_standard_deduction:
+    source: "USDA SNAP FY 2026 COLA memo"
+    source_tier: publication
+    from 2025-10-01:
+        match snap_region:
+            "CONTIGUOUS_US" =>
+                if snap_household_size <= 0: 0
+                elif snap_household_size <= 2: 209
+                elif snap_household_size == 3: 209
+                elif snap_household_size == 4: 223
+                elif snap_household_size == 5: 261
+                else: 299
+            "GU" =>
+                if snap_household_size <= 0: 0
+                elif snap_household_size <= 2: 420
+                elif snap_household_size == 3: 420
+                elif snap_household_size == 4: 445
+                elif snap_household_size == 5: 522
+                else: 598
+            "VI" =>
+                if snap_household_size <= 0: 0
+                elif snap_household_size <= 2: 184
+                elif snap_household_size == 3: 185
+                elif snap_household_size == 4: 223
+                elif snap_household_size == 5: 261
+                else: 299
+            "AK_URBAN" =>
+                if snap_household_size <= 0: 0
+                elif snap_household_size <= 5: 358
+                else: 374
+            "AK_RURAL_1" =>
+                if snap_household_size <= 0: 0
+                elif snap_household_size <= 5: 358
+                else: 374
+            "AK_RURAL_2" =>
+                if snap_household_size <= 0: 0
+                elif snap_household_size <= 5: 358
+                else: 374
+            "HI" =>
+                if snap_household_size <= 0: 0
+                elif snap_household_size <= 3: 295
+                elif snap_household_size == 4: 295
+                elif snap_household_size == 5: 300
+                else: 344
+
+amend snap_excess_shelter_deduction_cap:
+    source: "USDA SNAP FY 2026 COLA memo"
+    source_tier: publication
+    from 2025-10-01:
+        match snap_region:
+            "CONTIGUOUS_US" => 744
+            "GU" => 873
+            "VI" => 586
+            "AK_URBAN" => 1189
+            "AK_RURAL_1" => 1189
+            "AK_RURAL_2" => 1189
+            "HI" => 1003
+
+amend snap_homeless_shelter_deduction:
+    source: "USDA SNAP FY 2026 COLA memo"
+    source_tier: publication
+    from 2025-10-01: 198.99
+
+amend snap_asset_limit:
+    source: "USDA SNAP FY 2026 COLA memo"
+    source_tier: publication
+    from 2025-10-01: 3000
+
+amend snap_asset_limit_with_elderly_or_disabled_member:
+    source: "USDA SNAP FY 2026 COLA memo"
+    source_tier: publication
+    from 2025-10-01: 4500
