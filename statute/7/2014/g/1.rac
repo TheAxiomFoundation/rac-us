@@ -11,7 +11,20 @@ statutory asset limits, subject to the annual inflation adjustment rules in
 subparagraph (B).
 """
 
+imports:
+  - statute/7/2014/c#snap_household_has_elderly_or_disabled_member
+
 status: encoded
+
+snap_countable_resources:
+    entity: Household
+    period: Month
+    dtype: Money
+    unit: USD
+    status: input
+    label: "SNAP countable resources"
+    description: "Countable financial resources for SNAP asset-test purposes under 7 USC 2014(g)(1)"
+    default: 0
 
 snap_asset_limit:
     entity: Household
@@ -32,3 +45,25 @@ snap_asset_limit_with_elderly_or_disabled_member:
     label: "SNAP asset limit with elderly or disabled member"
     description: "Resource limit under 7 USC 2014(g)(1) for a household that includes an elderly or disabled member, supplied for the applicable month by annual USDA publications"
     default: 0
+
+snap_applicable_asset_limit:
+    entity: Household
+    period: Month
+    dtype: Money
+    unit: USD
+    label: "Applicable SNAP asset limit"
+    description: "SNAP asset limit applicable to the household under 7 USC 2014(g)(1), using the higher limit when the household includes an elderly or disabled member"
+    from 2008-10-01:
+        if snap_household_has_elderly_or_disabled_member:
+            snap_asset_limit_with_elderly_or_disabled_member
+        else:
+            snap_asset_limit
+
+meets_snap_asset_test:
+    entity: Household
+    period: Month
+    dtype: Boolean
+    label: "Meets SNAP asset test"
+    description: "Whether household countable resources do not exceed the applicable SNAP asset limit under 7 USC 2014(g)(1)"
+    from 2008-10-01:
+        snap_countable_resources <= snap_applicable_asset_limit

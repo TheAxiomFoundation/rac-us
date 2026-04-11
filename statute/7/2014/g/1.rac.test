@@ -1,0 +1,39 @@
+- name: general_household_uses_general_asset_limit
+  period: 2026-10
+  input:
+    snap_asset_limit: 3000
+    snap_asset_limit_with_elderly_or_disabled_member: 4500
+    snap_countable_resources: 2800
+    snap_household_has_elderly_or_disabled_member: false
+  output:
+    snap_applicable_asset_limit: 3000
+
+- name: household_with_elderly_or_disabled_member_uses_higher_asset_limit
+  period: 2026-10
+  input:
+    snap_asset_limit: 3000
+    snap_asset_limit_with_elderly_or_disabled_member: 4500
+    snap_countable_resources: 3200
+    snap_household_has_elderly_or_disabled_member: true
+  output:
+    snap_applicable_asset_limit: 4500
+
+- name: asset_test_fails_when_resources_exceed_general_limit
+  period: 2026-10
+  input:
+    snap_asset_limit: 3000
+    snap_asset_limit_with_elderly_or_disabled_member: 4500
+    snap_countable_resources: 3200
+    snap_household_has_elderly_or_disabled_member: false
+  output:
+    meets_snap_asset_test: false
+
+- name: asset_test_passes_when_higher_limit_applies
+  period: 2026-10
+  input:
+    snap_asset_limit: 3000
+    snap_asset_limit_with_elderly_or_disabled_member: 4500
+    snap_countable_resources: 3200
+    snap_household_has_elderly_or_disabled_member: true
+  output:
+    meets_snap_asset_test: true
