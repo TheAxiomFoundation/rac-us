@@ -3,10 +3,6 @@ Federal SNAP current-effective household eligibility composite
 This source slice combines the operative federal eligibility elements reflected in
 current SNAP household eligibility determinations.
 
-7 USC 2017(a): State agencies may issue SNAP allotments only to households
-certified as eligible to participate in the supplemental nutrition assistance
-program.
-
 7 USC 2014(a): Households in which each member receives supplemental security
 income or benefits under a State program funded under part A of title IV of the
 Social Security Act shall be eligible to participate in SNAP, and otherwise
