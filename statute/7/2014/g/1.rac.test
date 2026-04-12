@@ -37,3 +37,29 @@
     snap_household_has_elderly_or_disabled_member: true
   output:
     meets_snap_asset_test: true
+
+- name: financial_tests_pass_when_income_and_resources_both_pass
+  period: 2026-10
+  input:
+    snap_non_self_employment_income: 1500
+    snap_standard_deduction: 223
+    snap_net_income_limit: 2680
+    snap_gross_income_limit: 3483
+    snap_countable_resources: 2500
+    snap_asset_limit: 3000
+    snap_asset_limit_with_elderly_or_disabled_member: 4500
+  output:
+    meets_snap_financial_tests: true
+
+- name: financial_tests_fail_when_resource_test_fails
+  period: 2026-10
+  input:
+    snap_non_self_employment_income: 1500
+    snap_standard_deduction: 223
+    snap_net_income_limit: 2680
+    snap_gross_income_limit: 3483
+    snap_countable_resources: 3001
+    snap_asset_limit: 3000
+    snap_asset_limit_with_elderly_or_disabled_member: 4500
+  output:
+    meets_snap_financial_tests: false

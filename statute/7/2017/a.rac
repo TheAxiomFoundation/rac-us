@@ -16,6 +16,7 @@ nearest whole dollar increment.
 
 imports:
   - statute/7/2014/e#snap_net_income
+  - statute/7/2014/g/1#meets_snap_financial_tests
 
 status: encoded
 
@@ -46,6 +47,15 @@ snap_region:
     label: "SNAP region"
     description: "SNAP allotment region grouping used by annual USDA publications, such as CONTIGUOUS_US, GU, VI, AK_URBAN, AK_RURAL_1, AK_RURAL_2, and HI"
     default: CONTIGUOUS_US
+
+snap_household_meets_other_federal_eligibility_requirements:
+    entity: Household
+    period: Month
+    dtype: Boolean
+    status: input
+    label: "SNAP household meets other federal eligibility requirements"
+    description: "Whether the household satisfies the remaining federal SNAP eligibility rules outside the financial tests in 7 USC 2014(c) and 7 USC 2014(g)(1), such as citizenship, student, and work-related requirements"
+    default: true
 
 snap_maximum_allotment:
     entity: Household
@@ -109,3 +119,25 @@ snap_allotment:
     description: "Monthly SNAP allotment under 7 USC 2017(a): household thrifty food plan cost reduced by expected contribution, subject to the one- and two-person minimum allotment"
     from 2008-10-01:
         max(snap_minimum_allotment, snap_reduced_allotment_before_minimum)
+
+is_snap_federally_eligible:
+    entity: Household
+    period: Month
+    dtype: Boolean
+    label: "SNAP household is federally eligible"
+    description: "Whether the household meets the SNAP financial tests and the remaining federal eligibility requirements needed for a full-month allotment under 7 USC 2017(a)"
+    from 2008-10-01:
+        meets_snap_financial_tests and snap_household_meets_other_federal_eligibility_requirements
+
+snap_federal_full_month_benefit:
+    entity: Household
+    period: Month
+    dtype: Money
+    unit: USD
+    label: "SNAP federal full-month benefit"
+    description: "Full-month SNAP benefit payable under the federal core rules, zeroing out the allotment when the household is not federally eligible"
+    from 2008-10-01:
+        if is_snap_federally_eligible:
+            snap_allotment
+        else:
+            0

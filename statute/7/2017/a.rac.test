@@ -60,3 +60,65 @@ snap_allotment:
         snap_maximum_allotment: 298
         snap_one_person_thrifty_food_plan_cost: 298
       expect: 24
+
+is_snap_federally_eligible:
+    - name: "Federal SNAP eligibility requires the financial tests and remaining federal eligibility rules"
+      period: 2026-10
+      inputs:
+        snap_household_size: 4
+        snap_non_self_employment_income: 1056
+        snap_standard_deduction: 223
+        snap_net_income_limit: 2680
+        snap_gross_income_limit: 3483
+        snap_countable_resources: 2500
+        snap_asset_limit: 3000
+        snap_asset_limit_with_elderly_or_disabled_member: 4500
+        snap_household_meets_other_federal_eligibility_requirements: true
+      expect: true
+
+    - name: "Household failing the remaining federal eligibility rules is not federally eligible"
+      period: 2026-10
+      inputs:
+        snap_household_size: 4
+        snap_non_self_employment_income: 1056
+        snap_standard_deduction: 223
+        snap_net_income_limit: 2680
+        snap_gross_income_limit: 3483
+        snap_countable_resources: 2500
+        snap_asset_limit: 3000
+        snap_asset_limit_with_elderly_or_disabled_member: 4500
+        snap_household_meets_other_federal_eligibility_requirements: false
+      expect: false
+
+snap_federal_full_month_benefit:
+    - name: "Federal full-month benefit equals the allotment when the household is federally eligible"
+      period: 2026-10
+      inputs:
+        snap_household_size: 4
+        snap_non_self_employment_income: 1056
+        snap_standard_deduction: 223
+        snap_net_income_limit: 2680
+        snap_gross_income_limit: 3483
+        snap_countable_resources: 2500
+        snap_asset_limit: 3000
+        snap_asset_limit_with_elderly_or_disabled_member: 4500
+        snap_household_meets_other_federal_eligibility_requirements: true
+        snap_maximum_allotment: 994
+        snap_one_person_thrifty_food_plan_cost: 298
+      expect: 744
+
+    - name: "Federal full-month benefit is zero when the household is not federally eligible"
+      period: 2026-10
+      inputs:
+        snap_household_size: 4
+        snap_non_self_employment_income: 1056
+        snap_standard_deduction: 223
+        snap_net_income_limit: 2680
+        snap_gross_income_limit: 3483
+        snap_countable_resources: 3001
+        snap_asset_limit: 3000
+        snap_asset_limit_with_elderly_or_disabled_member: 4500
+        snap_household_meets_other_federal_eligibility_requirements: true
+        snap_maximum_allotment: 994
+        snap_one_person_thrifty_food_plan_cost: 298
+      expect: 0

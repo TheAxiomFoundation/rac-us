@@ -1,8 +1,8 @@
 - name: meets_both_income_tests_when_gross_and_net_income_are_below_limits
   period: 2026-10
   input:
-    snap_non_self_employment_income: 3000
-    snap_net_income: 2400
+    snap_non_self_employment_income: 2500
+    snap_standard_deduction: 223
     snap_gross_income_limit: 3483
     snap_net_income_limit: 2680
     snap_household_has_elderly_or_disabled_member: false
@@ -13,7 +13,7 @@
   period: 2026-10
   input:
     snap_non_self_employment_income: 3500
-    snap_net_income: 2400
+    snap_standard_deduction: 223
     snap_gross_income_limit: 3483
     snap_net_income_limit: 2680
     snap_household_has_elderly_or_disabled_member: false
@@ -24,7 +24,8 @@
   period: 2026-10
   input:
     snap_non_self_employment_income: 5000
-    snap_net_income: 2400
+    snap_standard_deduction: 223
+    snap_dependent_care_actual_costs: 2200
     snap_gross_income_limit: 3483
     snap_net_income_limit: 2680
     snap_household_has_elderly_or_disabled_member: true
@@ -35,7 +36,7 @@
   period: 2026-10
   input:
     snap_non_self_employment_income: 3000
-    snap_net_income: 2700
+    snap_standard_deduction: 223
     snap_gross_income_limit: 3483
     snap_net_income_limit: 2680
     snap_household_has_elderly_or_disabled_member: false
