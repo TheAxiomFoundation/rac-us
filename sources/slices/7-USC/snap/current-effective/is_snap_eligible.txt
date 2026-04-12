@@ -1,0 +1,31 @@
+Federal SNAP current-effective household eligibility composite
+
+This source slice combines the operative federal eligibility elements reflected in
+current SNAP household eligibility determinations.
+
+7 USC 2017(a): State agencies may issue SNAP allotments only to households
+certified as eligible to participate in the supplemental nutrition assistance
+program.
+
+7 USC 2014(a): Households in which each member receives supplemental security
+income or benefits under a State program funded under part A of title IV of the
+Social Security Act shall be eligible to participate in SNAP, and otherwise
+household income and financial resources shall be limited.
+
+7 USC 2014(c): A household shall be ineligible if its monthly net income exceeds
+the applicable poverty line and, unless the household contains an elderly or
+disabled member, if its monthly gross income exceeds 130 percent of the poverty
+line.
+
+7 USC 2014(g)(1): A household otherwise eligible to participate in SNAP shall
+not be eligible if its financial resources exceed the applicable resource limit.
+
+7 USC 2015(d)(1)(A): A household member subject to SNAP work requirements is not
+eligible if the member refuses or fails to comply with those work requirements.
+
+7 USC 2015(e): A person enrolled at least half-time in an institution of higher
+education is not eligible unless a statutory student exception applies.
+
+7 USC 2015(f): No person otherwise eligible as a household member may
+participate in SNAP unless the person is a resident of the United States and a
+citizen, national, or other qualifying eligible noncitizen.
