@@ -15,7 +15,7 @@ receive under this subsection is less than $10.
 """
 
 imports:
-  - statute/7/2017/a#snap_allotment
+  - statute/7/2017/a#snap_federal_full_month_benefit
 
 status: encoded
 
@@ -64,7 +64,7 @@ snap_prorated_initial_month_allotment:
     label: "SNAP prorated initial month allotment"
     description: "Initial-month SNAP allotment after applying the statutory proration ratio and rounding down to a whole dollar"
     from 2008-10-01:
-        floor(snap_allotment * snap_initial_month_proration_ratio)
+        floor(snap_federal_full_month_benefit * snap_initial_month_proration_ratio)
 
 snap_allotment_for_issuance_month:
     entity: Household
@@ -80,4 +80,4 @@ snap_allotment_for_issuance_month:
             else:
                 snap_prorated_initial_month_allotment
         else:
-            snap_allotment
+            snap_federal_full_month_benefit

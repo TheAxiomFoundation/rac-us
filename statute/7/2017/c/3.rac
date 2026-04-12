@@ -9,7 +9,7 @@ to the total amount of the initial allotment and the first regular allotment.
 """
 
 imports:
-  - statute/7/2017/a#snap_allotment
+  - statute/7/2017/a#snap_federal_full_month_benefit
   - statute/7/2017/c/1#snap_allotment_for_issuance_month
   - statute/7/2017/c/1#snap_is_initial_month
 
@@ -42,6 +42,6 @@ snap_combined_initial_and_next_month_allotment:
     description: "Optional combined allotment under 7 USC 2017(c)(3), equal to the initial allotment plus the first regular allotment for the following month when the state elects that issuance method for an eligible household applying after the 15th day"
     from 2008-10-01:
         if snap_state_issues_combined_initial_and_next_month_allotment and snap_is_initial_month and snap_application_day_of_month > 15:
-            snap_allotment_for_issuance_month + snap_allotment
+            snap_allotment_for_issuance_month + snap_federal_full_month_benefit
         else:
             snap_allotment_for_issuance_month
