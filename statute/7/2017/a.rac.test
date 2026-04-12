@@ -4,14 +4,14 @@ snap_expected_contribution:
     - name: "Monthly net income rounds down before applying 30 percent"
       period: 2022-01
       inputs:
-        snap_income_before_exclusions: 651.5
+        snap_non_self_employment_income: 651.5
         snap_standard_deduction: 223
       expect: 128.4
 
     - name: "Whole-dollar monthly net income uses 30 percent contribution"
       period: 2026-10
       inputs:
-        snap_income_before_exclusions: 1056
+        snap_non_self_employment_income: 1056
         snap_standard_deduction: 223
       expect: 249.9
 
@@ -35,7 +35,7 @@ snap_allotment:
       period: 2026-10
       inputs:
         snap_household_size: 4
-        snap_income_before_exclusions: 1056
+        snap_non_self_employment_income: 1056
         snap_standard_deduction: 223
         snap_maximum_allotment: 994
         snap_one_person_thrifty_food_plan_cost: 298
@@ -45,7 +45,7 @@ snap_allotment:
       period: 2026-10
       inputs:
         snap_household_size: 1
-        snap_income_before_exclusions: 1173
+        snap_non_self_employment_income: 1173
         snap_standard_deduction: 223
         snap_maximum_allotment: 298
         snap_one_person_thrifty_food_plan_cost: 298

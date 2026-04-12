@@ -9,14 +9,54 @@ enumerated in this subsection.
 
 status: encoded
 
-snap_income_before_exclusions:
+snap_non_self_employment_income:
     entity: Household
     period: Month
     dtype: Money
     unit: USD
     status: input
-    label: "SNAP income before exclusions"
-    description: "Household income from all sources before applying the exclusions in 7 USC 2014(d)"
+    label: "SNAP non-self-employment income"
+    description: "Household income from sources other than self-employment before applying the exclusions in 7 USC 2014(d)"
+    default: 0
+
+snap_nonfarm_self_employment_gross_income:
+    entity: Household
+    period: Month
+    dtype: Money
+    unit: USD
+    status: input
+    label: "SNAP nonfarm self-employment gross income"
+    description: "Gross nonfarm self-employment income before excluding production costs under 7 USC 2014(d)(9)"
+    default: 0
+
+snap_nonfarm_self_employment_production_costs:
+    entity: Household
+    period: Month
+    dtype: Money
+    unit: USD
+    status: input
+    label: "SNAP nonfarm self-employment production costs"
+    description: "Costs of producing nonfarm self-employment income for purposes of 7 USC 2014(d)(9)"
+    default: 0
+
+snap_farm_self_employment_gross_income:
+    entity: Household
+    period: Month
+    dtype: Money
+    unit: USD
+    status: input
+    label: "SNAP farm self-employment gross income"
+    description: "Gross farm self-employment income before excluding production costs under 7 USC 2014(d)(9)"
+    default: 0
+
+snap_farm_self_employment_production_costs:
+    entity: Household
+    period: Month
+    dtype: Money
+    unit: USD
+    status: input
+    label: "SNAP farm self-employment production costs"
+    description: "Costs of producing farm self-employment income for purposes of 7 USC 2014(d)(9)"
     default: 0
 
 snap_nonmoney_benefits_exclusion:
@@ -119,14 +159,10 @@ snap_nonrecurring_lump_sum_exclusion:
     default: 0
 
 snap_self_employment_cost_exclusion:
-    entity: Household
-    period: Month
-    dtype: Money
-    unit: USD
-    status: input
     label: "SNAP self-employment cost exclusion"
-    description: "Reduction for the cost of producing self-employment income under 7 USC 2014(d)(9)"
-    default: 0
+    description: "Reduction for the cost of producing self-employment income under 7 USC 2014(d)(9), with nonfarm costs limited to nonfarm gross income and farm costs allowed to exceed farm income"
+    from 2008-10-01:
+        min(snap_nonfarm_self_employment_production_costs, snap_nonfarm_self_employment_gross_income) + snap_farm_self_employment_production_costs
 
 snap_other_federally_excluded_income:
     entity: Household
@@ -240,6 +276,16 @@ snap_child_support_exclusion:
             0
         else:
             snap_child_support_payments_made
+
+snap_income_before_exclusions:
+    entity: Household
+    period: Month
+    dtype: Money
+    unit: USD
+    label: "SNAP income before exclusions"
+    description: "Household income from all sources before applying the exclusions in 7 USC 2014(d)"
+    from 2008-10-01:
+        snap_non_self_employment_income + snap_nonfarm_self_employment_gross_income + snap_farm_self_employment_gross_income
 
 snap_income_exclusions:
     entity: Household

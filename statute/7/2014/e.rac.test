@@ -1,9 +1,43 @@
 - name: earned_income_deduction_uses_twenty_percent_rate
   period: 2026-10
   input:
-    snap_earned_income: 1000
+    snap_earned_income_before_exclusions: 1000
   output:
     snap_earned_income_deduction: 200
+
+- name: earned_income_exclusions_and_public_assistance_reduce_earned_income_for_deduction
+  period: 2026-10
+  input:
+    snap_earned_income_before_exclusions: 1000
+    snap_child_earned_income_exclusion: 100
+    snap_other_earned_income_exclusions: 50
+    snap_work_support_public_assistance_income: 150
+  output:
+    snap_earned_income: 700
+
+- name: dependent_care_deduction_subtracts_excluded_expenses
+  period: 2026-10
+  input:
+    snap_dependent_care_actual_costs: 80
+    snap_dependent_care_excluded_expenses: 30
+  output:
+    snap_dependent_care_deduction: 50
+
+- name: excess_medical_expense_deduction_applies_threshold_for_elderly_or_disabled_household
+  period: 2026-10
+  input:
+    snap_household_has_elderly_or_disabled_member: true
+    snap_allowable_medical_expenses_before_threshold: 45
+  output:
+    snap_excess_medical_expense_deduction: 10
+
+- name: excess_medical_expense_deduction_is_zero_without_elderly_or_disabled_member
+  period: 2026-10
+  input:
+    snap_household_has_elderly_or_disabled_member: false
+    snap_allowable_medical_expenses_before_threshold: 100
+  output:
+    snap_excess_medical_expense_deduction: 0
 
 - name: shelter_deduction_uses_homeless_deduction_when_household_claims_it
   period: 2026-10
@@ -12,7 +46,7 @@
     snap_homeless_shelter_deduction: 198.99
     snap_monthly_shelter_cost: 900
     snap_excess_shelter_deduction_cap: 744
-    snap_income_before_exclusions: 1500
+    snap_non_self_employment_income: 1500
   output:
     snap_shelter_deduction: 198.99
 
@@ -20,12 +54,15 @@
   period: 2026-10
   input:
     snap_claims_homeless_shelter_deduction: false
-    snap_income_before_exclusions: 1500
+    snap_non_self_employment_income: 1500
     snap_standard_deduction: 223
-    snap_earned_income: 1000
-    snap_dependent_care_deduction: 50
-    snap_child_support_deduction: 25
-    snap_excess_medical_expense_deduction: 10
+    snap_earned_income_before_exclusions: 1000
+    snap_dependent_care_actual_costs: 80
+    snap_dependent_care_excluded_expenses: 30
+    snap_child_support_payments_made: 25
+    snap_state_uses_child_support_deduction: true
+    snap_household_has_elderly_or_disabled_member: true
+    snap_allowable_medical_expenses_before_threshold: 45
     snap_monthly_shelter_cost: 596
     snap_excess_shelter_deduction_cap: 744
   output:
@@ -34,9 +71,9 @@
 - name: excess_shelter_deduction_is_capped_for_household_without_elderly_or_disabled_member
   period: 2026-10
   input:
-    snap_income_before_exclusions: 2000
+    snap_non_self_employment_income: 2000
     snap_standard_deduction: 223
-    snap_earned_income: 1000
+    snap_earned_income_before_exclusions: 1000
     snap_monthly_shelter_cost: 1700
     snap_excess_shelter_deduction_cap: 744
     snap_household_has_elderly_or_disabled_member: false
@@ -46,9 +83,9 @@
 - name: excess_shelter_deduction_is_uncapped_for_household_with_elderly_or_disabled_member
   period: 2026-10
   input:
-    snap_income_before_exclusions: 2000
+    snap_non_self_employment_income: 2000
     snap_standard_deduction: 223
-    snap_earned_income: 1000
+    snap_earned_income_before_exclusions: 1000
     snap_monthly_shelter_cost: 1700
     snap_excess_shelter_deduction_cap: 744
     snap_household_has_elderly_or_disabled_member: true
@@ -66,12 +103,15 @@
 - name: total_deductions_sum_all_active_components
   period: 2026-10
   input:
-    snap_income_before_exclusions: 1500
+    snap_non_self_employment_income: 1500
     snap_standard_deduction: 223
-    snap_earned_income: 1000
-    snap_dependent_care_deduction: 50
-    snap_child_support_deduction: 25
-    snap_excess_medical_expense_deduction: 10
+    snap_earned_income_before_exclusions: 1000
+    snap_dependent_care_actual_costs: 80
+    snap_dependent_care_excluded_expenses: 30
+    snap_child_support_payments_made: 25
+    snap_state_uses_child_support_deduction: true
+    snap_household_has_elderly_or_disabled_member: true
+    snap_allowable_medical_expenses_before_threshold: 45
     snap_claims_homeless_shelter_deduction: false
     snap_monthly_shelter_cost: 596
     snap_excess_shelter_deduction_cap: 744
@@ -81,12 +121,15 @@
 - name: net_income_is_gross_income_minus_total_deductions_but_not_below_zero
   period: 2026-10
   input:
-    snap_income_before_exclusions: 300
+    snap_non_self_employment_income: 300
     snap_standard_deduction: 223
-    snap_earned_income: 1000
-    snap_dependent_care_deduction: 50
-    snap_child_support_deduction: 25
-    snap_excess_medical_expense_deduction: 10
+    snap_earned_income_before_exclusions: 1000
+    snap_dependent_care_actual_costs: 80
+    snap_dependent_care_excluded_expenses: 30
+    snap_child_support_payments_made: 25
+    snap_state_uses_child_support_deduction: true
+    snap_household_has_elderly_or_disabled_member: true
+    snap_allowable_medical_expenses_before_threshold: 45
     snap_claims_homeless_shelter_deduction: false
     snap_monthly_shelter_cost: 596
     snap_excess_shelter_deduction_cap: 744

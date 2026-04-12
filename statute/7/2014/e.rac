@@ -10,6 +10,7 @@ deduction, and the homeless shelter deduction, as provided in this subsection.
 
 imports:
   - statute/7/2014/c#snap_household_has_elderly_or_disabled_member
+  - statute/7/2014/d#snap_child_earned_income_exclusion
   - statute/7/2014/d#snap_child_support_payments_made
   - statute/7/2014/d#snap_gross_income
   - statute/7/2014/d#snap_state_uses_child_support_deduction
@@ -21,14 +22,34 @@ snap_earned_income_deduction_rate:
     unit: /1
     from 2008-10-01: 0.20
 
-snap_earned_income:
+snap_earned_income_before_exclusions:
     entity: Household
     period: Month
     dtype: Money
     unit: USD
     status: input
-    label: "SNAP earned income"
-    description: "Earned income used for the 20 percent earned income deduction under 7 USC 2014(e)(2)"
+    label: "SNAP earned income before exclusions"
+    description: "Earned income before applying the income exclusions referenced in 7 USC 2014(e)(2)(A)"
+    default: 0
+
+snap_other_earned_income_exclusions:
+    entity: Household
+    period: Month
+    dtype: Money
+    unit: USD
+    status: input
+    label: "SNAP other earned income exclusions"
+    description: "Portion of earned income excluded under 7 USC 2014(d) other than the child earned income exclusion"
+    default: 0
+
+snap_work_support_public_assistance_income:
+    entity: Household
+    period: Month
+    dtype: Money
+    unit: USD
+    status: input
+    label: "SNAP work support public assistance income"
+    description: "Portion of work supplementation or support program income attributable to public assistance and therefore excluded from earned income under 7 USC 2014(e)(2)(A)(ii)"
     default: 0
 
 snap_standard_deduction:
@@ -41,24 +62,34 @@ snap_standard_deduction:
     description: "Standard deduction under 7 USC 2014(e), supplied for the applicable month, SNAP region, and household-size band by annual USDA publications"
     default: 0
 
-snap_dependent_care_deduction:
+snap_dependent_care_actual_costs:
     entity: Household
     period: Month
     dtype: Money
     unit: USD
     status: input
-    label: "SNAP dependent care deduction"
-    description: "Dependent care deduction under 7 USC 2014(e)(3)"
+    label: "SNAP dependent care actual costs"
+    description: "Actual dependent care costs that may qualify for the deduction under 7 USC 2014(e)(3)"
     default: 0
 
-snap_excess_medical_expense_deduction:
+snap_dependent_care_excluded_expenses:
     entity: Household
     period: Month
     dtype: Money
     unit: USD
     status: input
-    label: "SNAP excess medical expense deduction"
-    description: "Excess medical expense deduction under 7 USC 2014(e)(5)"
+    label: "SNAP dependent care excluded expenses"
+    description: "Dependent care expenses excluded from the deduction under 7 USC 2014(e)(3)(B)"
+    default: 0
+
+snap_allowable_medical_expenses_before_threshold:
+    entity: Household
+    period: Month
+    dtype: Money
+    unit: USD
+    status: input
+    label: "SNAP allowable medical expenses before threshold"
+    description: "Actual allowable medical expenses after third-party payments and other exclusions, but before the 35-dollar threshold in 7 USC 2014(e)(5)"
     default: 0
 
 snap_excess_shelter_deduction_cap:
@@ -100,6 +131,26 @@ snap_claims_homeless_shelter_deduction:
     description: "Whether the household claims the homeless shelter deduction instead of the excess shelter expense deduction under 7 USC 2014(e)(6)(D)"
     default: false
 
+snap_earned_income_excluded_under_d:
+    entity: Household
+    period: Month
+    dtype: Money
+    unit: USD
+    label: "SNAP earned income excluded under subsection (d)"
+    description: "Portion of earned income excluded under 7 USC 2014(d) for purposes of the earned income definition in 7 USC 2014(e)(2)(A)(i)"
+    from 2008-10-01:
+        snap_child_earned_income_exclusion + snap_other_earned_income_exclusions
+
+snap_earned_income:
+    entity: Household
+    period: Month
+    dtype: Money
+    unit: USD
+    label: "SNAP earned income"
+    description: "Earned income for the 20 percent deduction after removing income excluded under 7 USC 2014(d) and work-support amounts attributable to public assistance under 7 USC 2014(e)(2)(A)"
+    from 2008-10-01:
+        max(0, snap_earned_income_before_exclusions - snap_earned_income_excluded_under_d - snap_work_support_public_assistance_income)
+
 snap_earned_income_deduction:
     entity: Household
     period: Month
@@ -109,6 +160,16 @@ snap_earned_income_deduction:
     description: "Earned income deduction equal to 20 percent of earned income under 7 USC 2014(e)(2)(B)"
     from 2008-10-01:
         snap_earned_income * snap_earned_income_deduction_rate
+
+snap_dependent_care_deduction:
+    entity: Household
+    period: Month
+    dtype: Money
+    unit: USD
+    label: "SNAP dependent care deduction"
+    description: "Dependent care deduction equal to actual dependent care costs minus excluded expenses under 7 USC 2014(e)(3)"
+    from 2008-10-01:
+        max(0, snap_dependent_care_actual_costs - snap_dependent_care_excluded_expenses)
 
 snap_child_support_deduction:
     entity: Household
@@ -120,6 +181,24 @@ snap_child_support_deduction:
     from 2008-10-01:
         if snap_state_uses_child_support_deduction:
             snap_child_support_payments_made
+        else:
+            0
+
+snap_medical_expense_threshold:
+    description: "Monthly threshold for the excess medical expense deduction under 7 USC 2014(e)(5)(A)"
+    unit: USD
+    from 2008-10-01: 35
+
+snap_excess_medical_expense_deduction:
+    entity: Household
+    period: Month
+    dtype: Money
+    unit: USD
+    label: "SNAP excess medical expense deduction"
+    description: "Excess medical expense deduction under 7 USC 2014(e)(5), available only for households with an elderly or disabled member"
+    from 2008-10-01:
+        if snap_household_has_elderly_or_disabled_member:
+            max(0, snap_allowable_medical_expenses_before_threshold - snap_medical_expense_threshold)
         else:
             0
 

@@ -1,14 +1,14 @@
 - name: gross_income_equals_income_before_exclusions_when_no_exclusions_apply
   period: 2026-10
   input:
-    snap_income_before_exclusions: 3000
+    snap_non_self_employment_income: 3000
   output:
     snap_gross_income: 3000
 
 - name: gross_income_subtracts_multiple_exclusion_buckets
   period: 2026-10
   input:
-    snap_income_before_exclusions: 3000
+    snap_non_self_employment_income: 3000
     snap_nonmoney_benefits_exclusion: 100
     snap_reimbursements_exclusion: 75
     snap_child_earned_income_exclusion: 250
@@ -19,7 +19,7 @@
 - name: child_support_is_excluded_when_state_does_not_use_deduction
   period: 2026-10
   input:
-    snap_income_before_exclusions: 2000
+    snap_non_self_employment_income: 2000
     snap_child_support_payments_made: 300
     snap_state_uses_child_support_deduction: false
   output:
@@ -28,7 +28,7 @@
 - name: child_support_is_not_excluded_when_state_uses_deduction
   period: 2026-10
   input:
-    snap_income_before_exclusions: 2000
+    snap_non_self_employment_income: 2000
     snap_child_support_payments_made: 300
     snap_state_uses_child_support_deduction: true
   output:
@@ -37,8 +37,26 @@
 - name: gross_income_floors_at_zero_when_exclusions_exceed_income
   period: 2026-10
   input:
-    snap_income_before_exclusions: 100
+    snap_non_self_employment_income: 100
     snap_nonrecurring_lump_sum_exclusion: 60
     snap_other_federally_excluded_income: 80
   output:
     snap_gross_income: 0
+
+- name: nonfarm_self_employment_costs_cannot_reduce_other_income_below_nonfarm_receipts
+  period: 2026-10
+  input:
+    snap_non_self_employment_income: 1000
+    snap_nonfarm_self_employment_gross_income: 400
+    snap_nonfarm_self_employment_production_costs: 600
+  output:
+    snap_self_employment_cost_exclusion: 400
+
+- name: farm_self_employment_losses_can_reduce_other_income
+  period: 2026-10
+  input:
+    snap_non_self_employment_income: 1000
+    snap_farm_self_employment_gross_income: 400
+    snap_farm_self_employment_production_costs: 600
+  output:
+    snap_gross_income: 800

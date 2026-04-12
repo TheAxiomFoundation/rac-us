@@ -1,0 +1,41 @@
+{
+  "wave": "2026-04-11-wave16",
+  "provenance_tier": "manual_repo_change",
+  "created_from": {
+    "rac_us_commit": "19b6efd",
+    "commit_date": "2026-04-11 20:16:04 -0400",
+    "commit_subject": "Encode SNAP income exclusions and gross income"
+  },
+  "seeded_from": {
+    "change_kind": "encoding",
+    "notes": "Manual federal SNAP computation refinement: replace the remaining self-employment and earned-income stubs with executable statutory logic, stop relying on test inputs that shadow computed variables, and convert dependent care and excess medical deductions into formula-driven paths."
+  },
+  "summary": {
+    "rac_file_count": 3,
+    "changed_companion_test_count": 5,
+    "available_companion_test_count": 5
+  },
+  "cases": [
+    {
+      "index": 1,
+      "name": "7-2014-d-self-employment",
+      "citation_path": "7/2014/d",
+      "repo_rac_path": "statute/7/2014/d.rac",
+      "repo_test_path": "statute/7/2014/d.rac.test"
+    },
+    {
+      "index": 2,
+      "name": "7-2014-e-earned-and-expense-deductions",
+      "citation_path": "7/2014/e",
+      "repo_rac_path": "statute/7/2014/e.rac",
+      "repo_test_path": "statute/7/2014/e.rac.test"
+    },
+    {
+      "index": 3,
+      "name": "downstream-snap-updates",
+      "citation_path": "7/2014/c and 7/2017/a and FY2026 USDA SNAP",
+      "repo_rac_path": "statute/7/2014/c.rac.test",
+      "repo_test_path": "usda/snap/fy-2026-cola/3.rac.test"
+    }
+  ]
+}

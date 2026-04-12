@@ -34,7 +34,7 @@
   input:
     snap_region: CONTIGUOUS_US
     snap_household_size: 4
-    snap_income_before_exclusions: 1056
+    snap_non_self_employment_income: 1056
     snap_standard_deduction: 223
   output:
     snap_allotment: 744.1
@@ -44,7 +44,7 @@
   input:
     snap_region: HI
     snap_household_size: 1
-    snap_income_before_exclusions: 2223
+    snap_non_self_employment_income: 2223
     snap_standard_deduction: 223
   output:
     snap_allotment: 41
