@@ -70,7 +70,7 @@ is_snap_federally_eligible:
         snap_standard_deduction: 223
         snap_net_income_limit: 2680
         snap_gross_income_limit: 3483
-        snap_countable_resources: 2500
+        snap_total_resources_before_exclusions: 2500
         snap_asset_limit: 3000
         snap_asset_limit_with_elderly_or_disabled_member: 4500
         snap_household_meets_other_federal_eligibility_requirements: true
@@ -84,7 +84,7 @@ is_snap_federally_eligible:
         snap_standard_deduction: 223
         snap_net_income_limit: 2680
         snap_gross_income_limit: 3483
-        snap_countable_resources: 2500
+        snap_total_resources_before_exclusions: 2500
         snap_asset_limit: 3000
         snap_asset_limit_with_elderly_or_disabled_member: 4500
         snap_household_meets_other_federal_eligibility_requirements: false
@@ -99,7 +99,7 @@ snap_federal_full_month_benefit:
         snap_standard_deduction: 223
         snap_net_income_limit: 2680
         snap_gross_income_limit: 3483
-        snap_countable_resources: 2500
+        snap_total_resources_before_exclusions: 2500
         snap_asset_limit: 3000
         snap_asset_limit_with_elderly_or_disabled_member: 4500
         snap_household_meets_other_federal_eligibility_requirements: true
@@ -115,7 +115,7 @@ snap_federal_full_month_benefit:
         snap_standard_deduction: 223
         snap_net_income_limit: 2680
         snap_gross_income_limit: 3483
-        snap_countable_resources: 3001
+        snap_total_resources_before_exclusions: 3001
         snap_asset_limit: 3000
         snap_asset_limit_with_elderly_or_disabled_member: 4500
         snap_household_meets_other_federal_eligibility_requirements: true

@@ -52,5 +52,5 @@ snap_allotment_for_issuance_month:
         snap_gross_income_limit: 3483
         snap_asset_limit: 3000
         snap_asset_limit_with_elderly_or_disabled_member: 4500
-        snap_countable_resources: 3001
+        snap_total_resources_before_exclusions: 3001
       expect: 0

@@ -17,15 +17,85 @@ imports:
 
 status: encoded
 
-snap_countable_resources:
+snap_total_resources_before_exclusions:
     entity: Household
     period: Month
     dtype: Money
     unit: USD
     status: input
-    label: "SNAP countable resources"
-    description: "Countable financial resources for SNAP asset-test purposes under 7 USC 2014(g)(1)"
+    label: "SNAP total resources before exclusions"
+    description: "Total financial resources before applying the exclusions under 7 USC 2014(g)"
     default: 0
+
+snap_mandatory_retirement_account_resource_exclusion:
+    entity: Household
+    period: Month
+    dtype: Money
+    unit: USD
+    status: input
+    label: "SNAP mandatory retirement-account resource exclusion"
+    description: "Value of retirement funds mandatorily excluded from SNAP resources under 7 USC 2014(g)(7)(A)"
+    default: 0
+
+snap_discretionary_retirement_account_resource_exclusion:
+    entity: Household
+    period: Month
+    dtype: Money
+    unit: USD
+    status: input
+    label: "SNAP discretionary retirement-account resource exclusion"
+    description: "Value of other retirement resources excluded at the Secretary's discretion under 7 USC 2014(g)(7)(B)"
+    default: 0
+
+snap_mandatory_education_account_resource_exclusion:
+    entity: Household
+    period: Month
+    dtype: Money
+    unit: USD
+    status: input
+    label: "SNAP mandatory education-account resource exclusion"
+    description: "Value of education funds mandatorily excluded from SNAP resources under 7 USC 2014(g)(8)(A)"
+    default: 0
+
+snap_discretionary_education_account_resource_exclusion:
+    entity: Household
+    period: Month
+    dtype: Money
+    unit: USD
+    status: input
+    label: "SNAP discretionary education-account resource exclusion"
+    description: "Value of education resources excluded at the Secretary's discretion under 7 USC 2014(g)(8)(B)"
+    default: 0
+
+snap_other_resource_exclusions_under_g:
+    entity: Household
+    period: Month
+    dtype: Money
+    unit: USD
+    status: input
+    label: "SNAP other resource exclusions under subsection (g)"
+    description: "Other financial resources excluded under 7 USC 2014(g) that are not yet modeled separately"
+    default: 0
+
+snap_resource_exclusions:
+    entity: Household
+    period: Month
+    dtype: Money
+    unit: USD
+    label: "SNAP resource exclusions"
+    description: "Total financial resources excluded under 7 USC 2014(g), including the retirement-account and education-account exclusions in paragraphs (7) and (8)"
+    from 2008-10-01:
+        snap_mandatory_retirement_account_resource_exclusion + snap_discretionary_retirement_account_resource_exclusion + snap_mandatory_education_account_resource_exclusion + snap_discretionary_education_account_resource_exclusion + snap_other_resource_exclusions_under_g
+
+snap_countable_resources:
+    entity: Household
+    period: Month
+    dtype: Money
+    unit: USD
+    label: "SNAP countable resources"
+    description: "Countable financial resources for SNAP asset-test purposes under 7 USC 2014(g)(1) after the exclusions under subsection (g), including paragraphs (7) and (8)"
+    from 2008-10-01:
+        max(0, snap_total_resources_before_exclusions - snap_resource_exclusions)
 
 snap_asset_limit:
     entity: Household

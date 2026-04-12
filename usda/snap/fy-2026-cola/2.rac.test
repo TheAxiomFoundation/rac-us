@@ -51,7 +51,7 @@
 - name: published_asset_test_fails_for_household_without_elderly_or_disabled_member_above_general_limit
   period: 2026-10
   input:
-    snap_countable_resources: 3200
+    snap_total_resources_before_exclusions: 3200
     snap_household_has_elderly_or_disabled_member: false
   output:
     meets_snap_asset_test: false
@@ -59,7 +59,7 @@
 - name: published_asset_test_passes_for_household_with_elderly_or_disabled_member_below_higher_limit
   period: 2026-10
   input:
-    snap_countable_resources: 3200
+    snap_total_resources_before_exclusions: 3200
     snap_household_has_elderly_or_disabled_member: true
   output:
     meets_snap_asset_test: true

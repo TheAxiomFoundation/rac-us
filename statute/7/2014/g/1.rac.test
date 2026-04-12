@@ -3,7 +3,7 @@
   input:
     snap_asset_limit: 3000
     snap_asset_limit_with_elderly_or_disabled_member: 4500
-    snap_countable_resources: 2800
+    snap_total_resources_before_exclusions: 2800
     snap_household_has_elderly_or_disabled_member: false
   output:
     snap_applicable_asset_limit: 3000
@@ -13,7 +13,7 @@
   input:
     snap_asset_limit: 3000
     snap_asset_limit_with_elderly_or_disabled_member: 4500
-    snap_countable_resources: 3200
+    snap_total_resources_before_exclusions: 3200
     snap_household_has_elderly_or_disabled_member: true
   output:
     snap_applicable_asset_limit: 4500
@@ -23,7 +23,7 @@
   input:
     snap_asset_limit: 3000
     snap_asset_limit_with_elderly_or_disabled_member: 4500
-    snap_countable_resources: 3200
+    snap_total_resources_before_exclusions: 3200
     snap_household_has_elderly_or_disabled_member: false
   output:
     meets_snap_asset_test: false
@@ -33,10 +33,32 @@
   input:
     snap_asset_limit: 3000
     snap_asset_limit_with_elderly_or_disabled_member: 4500
-    snap_countable_resources: 3200
+    snap_total_resources_before_exclusions: 3200
     snap_household_has_elderly_or_disabled_member: true
   output:
     meets_snap_asset_test: true
+
+- name: retirement_and_education_exclusions_reduce_countable_resources
+  period: 2026-10
+  input:
+    snap_total_resources_before_exclusions: 6000
+    snap_mandatory_retirement_account_resource_exclusion: 1200
+    snap_discretionary_retirement_account_resource_exclusion: 300
+    snap_mandatory_education_account_resource_exclusion: 700
+    snap_discretionary_education_account_resource_exclusion: 200
+    snap_other_resource_exclusions_under_g: 100
+  output:
+    snap_resource_exclusions: 2500
+    snap_countable_resources: 3500
+
+- name: resource_exclusions_do_not_drive_countable_resources_below_zero
+  period: 2026-10
+  input:
+    snap_total_resources_before_exclusions: 500
+    snap_mandatory_retirement_account_resource_exclusion: 400
+    snap_mandatory_education_account_resource_exclusion: 300
+  output:
+    snap_countable_resources: 0
 
 - name: financial_tests_pass_when_income_and_resources_both_pass
   period: 2026-10
@@ -45,7 +67,7 @@
     snap_standard_deduction: 223
     snap_net_income_limit: 2680
     snap_gross_income_limit: 3483
-    snap_countable_resources: 2500
+    snap_total_resources_before_exclusions: 2500
     snap_asset_limit: 3000
     snap_asset_limit_with_elderly_or_disabled_member: 4500
   output:
@@ -58,7 +80,7 @@
     snap_standard_deduction: 223
     snap_net_income_limit: 2680
     snap_gross_income_limit: 3483
-    snap_countable_resources: 3001
+    snap_total_resources_before_exclusions: 3001
     snap_asset_limit: 3000
     snap_asset_limit_with_elderly_or_disabled_member: 4500
   output:
