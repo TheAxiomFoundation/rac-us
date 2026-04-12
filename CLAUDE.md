@@ -125,5 +125,6 @@ Current tracked waves:
 
 - Historical US batch commits are backfilled as `backfilled_git_history` manifests.
 - New promotions should record full `autorac` provenance at promotion time.
-- Manual repo cleanups that materially change promoted `.rac` files should use the
-  `manual_repo_change` tier rather than pretending to be fresh generation waves.
+- Direct manual promotion of `.rac` policy changes is forbidden. New changes to
+  promoted `.rac` files must come through AutoRAC-generated runs and full
+  AutoRAC provenance, not `manual_repo_change`.

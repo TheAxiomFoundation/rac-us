@@ -40,6 +40,15 @@ def changed_manifest_files(paths: list[str]) -> list[Path]:
     )
 
 
+def manual_manifest_violations(manifest_paths: list[Path]) -> list[Path]:
+    violations: list[Path] = []
+    for path in manifest_paths:
+        payload = json.loads(path.read_text())
+        if payload.get("provenance_tier") == "manual_repo_change":
+            violations.append(path)
+    return violations
+
+
 def covered_rac_paths(manifest_paths: list[Path]) -> set[str]:
     covered: set[str] = set()
     for path in manifest_paths:
@@ -74,6 +83,17 @@ def main() -> int:
         )
         for path in rac_paths:
             print(f"- {path}", file=sys.stderr)
+        return 1
+
+    manual_violations = manual_manifest_violations(manifest_paths)
+    if manual_violations:
+        print(
+            "Changed wave manifest(s) use forbidden manual provenance. "
+            "Promote rac-us changes through AutoRAC instead of direct manual repo edits.",
+            file=sys.stderr,
+        )
+        for path in manual_violations:
+            print(f"- {path.relative_to(ROOT)}", file=sys.stderr)
         return 1
 
     covered = covered_rac_paths(manifest_paths)

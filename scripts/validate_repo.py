@@ -39,6 +39,10 @@ def main() -> int:
         cwd=validate_cwd,
     )
     run_step(
+        "Check manual-wave policy",
+        [sys.executable, str(ROOT / "scripts" / "check_manual_wave_policy.py")],
+    )
+    run_step(
         "Check companion .rac.test coverage against the tracked baseline",
         [sys.executable, str(ROOT / "scripts" / "check_companion_tests.py")],
     )

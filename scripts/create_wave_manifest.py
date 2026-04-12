@@ -96,7 +96,7 @@ def main() -> int:
     parser.add_argument(
         "--provenance-tier",
         default="full",
-        help="Manifest provenance tier, e.g. full, backfilled_git_history, or manual_repo_change.",
+        help="Manifest provenance tier, e.g. full or backfilled_git_history. manual_repo_change is forbidden for new promotions.",
     )
     parser.add_argument(
         "--change-kind",
@@ -116,6 +116,12 @@ def main() -> int:
         help="Write the manifest to waves/<wave>/manifest.json. Otherwise print JSON to stdout.",
     )
     args = parser.parse_args()
+
+    if args.provenance_tier == "manual_repo_change":
+        raise SystemExit(
+            "manual_repo_change is forbidden for new rac-us promotions. "
+            "Use AutoRAC-generated provenance instead."
+        )
 
     commit_subject = git_output("show", "-s", "--format=%s", args.source_commit)
     commit_date = git_output("show", "-s", "--format=%ci", args.source_commit)
