@@ -73,9 +73,19 @@ snap_expected_contribution:
     dtype: Money
     unit: USD
     label: "SNAP expected contribution"
-    description: "Household contribution equal to 30 percent of SNAP net income rounded down to the nearest whole dollar per 7 USC 2017(a)"
+    description: "Household contribution equal to 30 percent of SNAP net income under 7 USC 2017(a), before rounding the resulting allotment down to the nearest whole dollar"
     from 2008-10-01:
-        floor(snap_net_income) * snap_expected_contribution_rate
+        snap_net_income * snap_expected_contribution_rate
+
+snap_reduced_allotment_before_minimum:
+    entity: Household
+    period: Month
+    dtype: Money
+    unit: USD
+    label: "SNAP reduced allotment before minimum"
+    description: "Full-month SNAP allotment before the one- and two-person minimum is applied, rounded down to the nearest lower whole dollar under 7 USC 2017(a)"
+    from 2008-10-01:
+        floor(snap_maximum_allotment - snap_expected_contribution)
 
 snap_minimum_allotment:
     entity: Household
@@ -86,7 +96,7 @@ snap_minimum_allotment:
     description: "Minimum SNAP allotment for one- and two-person households per 7 USC 2017(a): 8 percent of the one-person thrifty food plan cost rounded to the nearest whole dollar"
     from 2008-10-01:
         if snap_household_size == 1 or snap_household_size == 2:
-            round(snap_one_person_thrifty_food_plan_cost * snap_one_two_person_minimum_allotment_rate)
+            floor((snap_one_person_thrifty_food_plan_cost * snap_one_two_person_minimum_allotment_rate) + 0.5)
         else:
             0
 
@@ -98,4 +108,4 @@ snap_allotment:
     label: "SNAP allotment"
     description: "Monthly SNAP allotment under 7 USC 2017(a): household thrifty food plan cost reduced by expected contribution, subject to the one- and two-person minimum allotment"
     from 2008-10-01:
-        max(snap_minimum_allotment, snap_maximum_allotment - snap_expected_contribution)
+        max(snap_minimum_allotment, snap_reduced_allotment_before_minimum)

@@ -1,12 +1,12 @@
 # 7 USC Section 2017(a) tests
 
 snap_expected_contribution:
-    - name: "Monthly net income rounds down before applying 30 percent"
+    - name: "Monthly net income keeps cents when computing 30 percent contribution"
       period: 2022-01
       inputs:
         snap_non_self_employment_income: 651.5
         snap_standard_deduction: 223
-      expect: 128.4
+      expect: 128.55
 
     - name: "Whole-dollar monthly net income uses 30 percent contribution"
       period: 2026-10
@@ -14,6 +14,16 @@ snap_expected_contribution:
         snap_non_self_employment_income: 1056
         snap_standard_deduction: 223
       expect: 249.9
+
+snap_reduced_allotment_before_minimum:
+    - name: "Reduced allotment rounds down to the nearest lower whole dollar"
+      period: 2026-10
+      inputs:
+        snap_household_size: 4
+        snap_non_self_employment_income: 1056
+        snap_standard_deduction: 223
+        snap_maximum_allotment: 994
+      expect: 744
 
 snap_minimum_allotment:
     - name: "One-person household minimum using FY2026 contiguous one-person plan cost"
@@ -31,7 +41,7 @@ snap_minimum_allotment:
       expect: 0
 
 snap_allotment:
-    - name: "Four-person allotment equals maximum allotment minus expected contribution"
+    - name: "Four-person allotment rounds the reduced allotment down to a whole dollar"
       period: 2026-10
       inputs:
         snap_household_size: 4
@@ -39,7 +49,7 @@ snap_allotment:
         snap_standard_deduction: 223
         snap_maximum_allotment: 994
         snap_one_person_thrifty_food_plan_cost: 298
-      expect: 744.1
+      expect: 744
 
     - name: "One-person household receives the statutory minimum when reduced allotment is lower"
       period: 2026-10

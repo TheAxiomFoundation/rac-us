@@ -37,7 +37,7 @@
     snap_non_self_employment_income: 1056
     snap_standard_deduction: 223
   output:
-    snap_allotment: 744.1
+    snap_allotment: 744
 
 - name: hawaii_one_person_allotment_uses_published_minimum_when_expected_contribution_exceeds_maximum
   period: 2026-10
