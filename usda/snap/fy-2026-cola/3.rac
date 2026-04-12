@@ -28,6 +28,16 @@ imports:
   - statute/7/2014/c#meets_snap_income_tests
   - statute/7/2014/c#meets_snap_net_income_test
 
+snap_usda_cola_net_income_limit:
+    entity: Household
+    period: Month
+    dtype: Money
+    unit: USD
+    label: "USDA COLA SNAP net income limit"
+    description: "Exported SNAP net income limit after applying the USDA annual publication amendments in this FY2026 COLA module"
+    from 2025-10-01:
+        snap_net_income_limit
+
 amend snap_net_income_limit:
     source: "USDA SNAP FY 2026 COLA memo"
     source_tier: publication

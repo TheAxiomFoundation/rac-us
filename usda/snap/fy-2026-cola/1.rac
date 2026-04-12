@@ -14,6 +14,16 @@ imports:
   - statute/7/2017/a#snap_one_person_thrifty_food_plan_cost
   - statute/7/2017/a#snap_region
 
+snap_usda_cola_maximum_allotment:
+    entity: Household
+    period: Month
+    dtype: Money
+    unit: USD
+    label: "USDA COLA SNAP maximum allotment"
+    description: "Exported SNAP maximum allotment value after applying the USDA annual publication amendments in this FY2026 COLA module"
+    from 2025-10-01:
+        snap_maximum_allotment
+
 amend snap_one_person_thrifty_food_plan_cost:
     source: "USDA SNAP FY 2026 COLA memo"
     source_tier: publication

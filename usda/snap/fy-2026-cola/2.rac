@@ -89,3 +89,13 @@ amend snap_asset_limit_with_elderly_or_disabled_member:
     source: "USDA SNAP FY 2026 COLA memo"
     source_tier: publication
     from 2025-10-01: 4500
+
+snap_usda_cola_standard_deduction:
+    entity: Household
+    period: Month
+    dtype: Money
+    unit: USD
+    label: "USDA COLA SNAP standard deduction"
+    description: "Exported SNAP standard deduction value after applying the USDA annual publication amendments in this FY2026 COLA module"
+    from 2025-10-01:
+        snap_standard_deduction
