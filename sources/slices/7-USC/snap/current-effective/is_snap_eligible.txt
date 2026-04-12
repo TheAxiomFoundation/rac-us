@@ -23,9 +23,15 @@ not be eligible if its financial resources exceed the applicable resource limit.
 7 USC 2015(d)(1)(A): A household member subject to SNAP work requirements is not
 eligible if the member refuses or fails to comply with those work requirements.
 
-7 USC 2015(e): A person enrolled at least half-time in an institution of higher
-education is not eligible unless a statutory student exception applies.
+7 USC 2015(e): No individual who is a member of a household otherwise eligible
+to participate in SNAP is eligible to participate as a member of that or any
+other household if the individual is enrolled at least half-time in an
+institution of higher education, unless a statutory student exception applies.
 
-7 USC 2015(f): No person otherwise eligible as a household member may
-participate in SNAP unless the person is a resident of the United States and a
-citizen, national, or other qualifying eligible noncitizen.
+7 USC 2015(f): No individual who is a member of a household otherwise eligible
+to participate in SNAP is eligible to participate as a member of that or any
+other household unless the individual is a resident of the United States and a
+citizen, national, or other qualifying eligible noncitizen. The income and
+financial resources of an individual rendered ineligible under this subsection
+shall still be considered in determining the eligibility and allotment of the
+household of which that individual is a member.
