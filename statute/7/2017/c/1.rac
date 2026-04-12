@@ -1,0 +1,83 @@
+# 7 USC Section 2017(c)(1) - Initial month proration
+
+"""
+(c) First month benefits prorated
+(1) The value of the allotment issued to any eligible household for the initial
+month or other initial period for which an allotment is issued shall have a
+value which bears the same ratio to the value of the allotment for a full month
+or other initial period for which the allotment is issued as the number of days
+(from the date of application) remaining in the month or other initial period
+for which the allotment is issued bears to the total number of days in the month
+or other initial period for which the allotment is issued, except that no
+allotment may be issued to a household for the initial month or period if the
+value of the allotment which such household would otherwise be eligible to
+receive under this subsection is less than $10.
+"""
+
+imports:
+  - statute/7/2017/a#snap_allotment
+
+status: encoded
+
+snap_is_initial_month:
+    entity: Household
+    period: Month
+    dtype: Boolean
+    status: input
+    label: "SNAP issuance month is the initial month"
+    description: "Whether the issuance month is the SNAP household's initial month under 7 USC 2017(c)"
+    default: false
+
+snap_initial_month_days_remaining:
+    entity: Household
+    period: Month
+    dtype: Integer
+    status: input
+    label: "SNAP initial month days remaining"
+    description: "Number of days remaining in the initial month or issuance period, counting from the date of application, for proration under 7 USC 2017(c)(1)"
+    default: 30
+
+snap_initial_month_total_days:
+    entity: Household
+    period: Month
+    dtype: Integer
+    status: input
+    label: "SNAP initial month total days"
+    description: "Total number of days in the initial month or issuance period for proration under 7 USC 2017(c)(1)"
+    default: 30
+
+snap_initial_month_proration_ratio:
+    entity: Household
+    period: Month
+    dtype: Float
+    unit: /1
+    label: "SNAP initial month proration ratio"
+    description: "Initial-month proration ratio under 7 USC 2017(c)(1): days remaining in the initial month divided by total days in the month or issuance period"
+    from 2008-10-01:
+        min(snap_initial_month_days_remaining, snap_initial_month_total_days) / max(1, snap_initial_month_total_days)
+
+snap_prorated_initial_month_allotment:
+    entity: Household
+    period: Month
+    dtype: Money
+    unit: USD
+    label: "SNAP prorated initial month allotment"
+    description: "Initial-month SNAP allotment after applying the statutory proration ratio and rounding down to a whole dollar"
+    from 2008-10-01:
+        floor(snap_allotment * snap_initial_month_proration_ratio)
+
+snap_allotment_for_issuance_month:
+    entity: Household
+    period: Month
+    dtype: Money
+    unit: USD
+    label: "SNAP allotment for issuance month"
+    description: "SNAP allotment for the issuance month after applying 7 USC 2017(c)(1) proration and the rule that no initial-month allotment below 10 dollars is issued"
+    from 2008-10-01:
+        if snap_is_initial_month:
+            if snap_prorated_initial_month_allotment < 10:
+                0
+            else:
+                snap_prorated_initial_month_allotment
+        else:
+            snap_allotment

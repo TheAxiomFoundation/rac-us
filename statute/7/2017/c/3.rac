@@ -1,0 +1,47 @@
+# 7 USC Section 2017(c)(3) - Optional combined allotment for expedited households
+
+"""
+(3) OPTIONAL COMBINED ALLOTMENT FOR EXPEDITED HOUSEHOLDS
+A State agency may provide to an eligible household applying after the 15th day
+of a month, in lieu of the initial allotment of the household and the regular
+allotment of the household for the following month, an allotment that is equal
+to the total amount of the initial allotment and the first regular allotment.
+"""
+
+imports:
+  - statute/7/2017/a#snap_allotment
+  - statute/7/2017/c/1#snap_allotment_for_issuance_month
+  - statute/7/2017/c/1#snap_is_initial_month
+
+status: encoded
+
+snap_application_day_of_month:
+    entity: Household
+    period: Month
+    dtype: Integer
+    status: input
+    label: "SNAP application day of month"
+    description: "Day of the month on which the SNAP household applied, for the optional combined allotment under 7 USC 2017(c)(3)"
+    default: 1
+
+snap_state_issues_combined_initial_and_next_month_allotment:
+    entity: Household
+    period: Month
+    dtype: Boolean
+    status: input
+    label: "SNAP state issues combined initial and next-month allotment"
+    description: "Whether the state elects the optional combined allotment for eligible expedited households applying after the 15th day of the month under 7 USC 2017(c)(3)"
+    default: false
+
+snap_combined_initial_and_next_month_allotment:
+    entity: Household
+    period: Month
+    dtype: Money
+    unit: USD
+    label: "SNAP combined initial and next-month allotment"
+    description: "Optional combined allotment under 7 USC 2017(c)(3), equal to the initial allotment plus the first regular allotment for the following month when the state elects that issuance method for an eligible household applying after the 15th day"
+    from 2008-10-01:
+        if snap_state_issues_combined_initial_and_next_month_allotment and snap_is_initial_month and snap_application_day_of_month > 15:
+            snap_allotment_for_issuance_month + snap_allotment
+        else:
+            snap_allotment_for_issuance_month

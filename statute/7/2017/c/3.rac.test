@@ -1,0 +1,26 @@
+snap_combined_initial_and_next_month_allotment:
+    - name: "Expedited household applying after the fifteenth can receive combined first and second allotments"
+      period: 2026-10
+      inputs:
+        snap_is_initial_month: true
+        snap_state_issues_combined_initial_and_next_month_allotment: true
+        snap_application_day_of_month: 20
+        snap_initial_month_days_remaining: 12
+        snap_initial_month_total_days: 31
+        snap_household_size: 4
+        snap_maximum_allotment: 994
+        snap_one_person_thrifty_food_plan_cost: 298
+      expect: 1378
+
+    - name: "Application on or before the fifteenth does not trigger the optional combined allotment"
+      period: 2026-10
+      inputs:
+        snap_is_initial_month: true
+        snap_state_issues_combined_initial_and_next_month_allotment: true
+        snap_application_day_of_month: 15
+        snap_initial_month_days_remaining: 17
+        snap_initial_month_total_days: 31
+        snap_household_size: 4
+        snap_maximum_allotment: 994
+        snap_one_person_thrifty_food_plan_cost: 298
+      expect: 545

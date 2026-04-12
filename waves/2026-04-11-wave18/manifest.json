@@ -1,0 +1,34 @@
+{
+  "wave": "2026-04-11-wave18",
+  "provenance_tier": "manual_repo_change",
+  "created_from": {
+    "rac_us_commit": "79f4d19",
+    "commit_date": "2026-04-11 21:53:26 -0400",
+    "commit_subject": "Fix SNAP allotment rounding semantics"
+  },
+  "seeded_from": {
+    "change_kind": "encoding",
+    "notes": "Manual federal SNAP issuance extension: add initial-month proration under 7 USC 2017(c)(1) and the optional combined initial-and-following-month allotment under 7 USC 2017(c)(3), both grounded in the corrected full-month allotment path."
+  },
+  "summary": {
+    "rac_file_count": 2,
+    "changed_companion_test_count": 2,
+    "available_companion_test_count": 2
+  },
+  "cases": [
+    {
+      "index": 1,
+      "name": "7-2017-c-1-initial-month-proration",
+      "citation_path": "7/2017/c/1",
+      "repo_rac_path": "statute/7/2017/c/1.rac",
+      "repo_test_path": "statute/7/2017/c/1.rac.test"
+    },
+    {
+      "index": 2,
+      "name": "7-2017-c-3-combined-expedited-allotment",
+      "citation_path": "7/2017/c/3",
+      "repo_rac_path": "statute/7/2017/c/3.rac",
+      "repo_test_path": "statute/7/2017/c/3.rac.test"
+    }
+  ]
+}
