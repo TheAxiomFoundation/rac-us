@@ -11,17 +11,10 @@ household's income after the exclusions in subsection (d) but before the
 deductions in subsection (e) exceeds such poverty line by more than 30 percent.
 """
 
-status: encoded
+imports:
+  - statute/7/2014/d#snap_gross_income
 
-snap_gross_income:
-    entity: Household
-    period: Month
-    dtype: Money
-    unit: USD
-    status: input
-    label: "SNAP gross income"
-    description: "Household income after the exclusions provided for in 7 USC 2014(d) but before the deductions in 7 USC 2014(e)"
-    default: 0
+status: encoded
 
 snap_household_has_elderly_or_disabled_member:
     entity: Household

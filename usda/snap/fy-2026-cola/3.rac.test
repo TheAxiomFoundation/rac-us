@@ -27,7 +27,7 @@
   input:
     snap_region: CONTIGUOUS_US
     snap_household_size: 4
-    snap_gross_income: 3500
+    snap_income_before_exclusions: 3500
     snap_household_has_elderly_or_disabled_member: false
   output:
     meets_snap_gross_income_test: false
@@ -37,7 +37,7 @@
   input:
     snap_region: CONTIGUOUS_US
     snap_household_size: 4
-    snap_gross_income: 4000
+    snap_income_before_exclusions: 4000
     snap_standard_deduction: 223
     snap_monthly_shelter_cost: 3000
     snap_household_has_elderly_or_disabled_member: true
@@ -49,7 +49,7 @@
   input:
     snap_region: CONTIGUOUS_US
     snap_household_size: 4
-    snap_gross_income: 2923
+    snap_income_before_exclusions: 2923
     snap_standard_deduction: 223
     snap_household_has_elderly_or_disabled_member: false
   output:
