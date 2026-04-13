@@ -1,0 +1,15 @@
+Tennessee SNAP telephone utility allowance under TennCare ABD Manual 125.020
+section 3.d.ii.1.c.iii for period 2026-01.
+
+Use monthly SNAP period 2026-01.
+
+TennCare Aged, Blind and Disabled Manual, Post Eligibility Treatment of Income,
+Policy Manual Number 125.020, October 1, 2025, section 3.d.ii.1.c:
+
+iii. The Standard Telephone Allowance is used when the community spouse is
+responsible for only telephone expenses.
+The Standard Telephone Allowance is $36, effective October 1, 2025.
+
+Model `snap_individual_utility_allowance` as the monthly SNAP individual utility
+allowance in USD for a Tennessee SNAP unit when
+`snap_utility_allowance_type = TUA` and `snap_utility_region_str = TN`.
