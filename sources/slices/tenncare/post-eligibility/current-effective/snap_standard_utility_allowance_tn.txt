@@ -1,0 +1,20 @@
+Tennessee SNAP standard utility allowance under TennCare ABD Manual 125.020
+section 3.d.ii.1.c.i for period 2026-01.
+
+Use monthly SNAP period 2026-01.
+
+TennCare Aged, Blind and Disabled Manual, Post Eligibility Treatment of Income,
+Policy Manual Number 125.020, October 1, 2025, section 3.d.ii.1.c:
+
+Utility Allowance: The utility allowance under the Supplemental Nutrition
+Assistance Program (SNAP) used in lieu of the community spouse's actual utility
+expenses.
+
+i. The Standard Utility Allowance (SUA) is used when the community spouse is
+responsible for heating or cooling costs. If the SUA is used, then it is
+considered to cover all utilities, including garbage, water, lighting, etc.
+The SUA is $451, effective October 1, 2025.
+
+Model `snap_standard_utility_allowance` as the monthly SNAP standard utility
+allowance in USD for a Tennessee SNAP unit when
+`snap_utility_region_str = TN`.
