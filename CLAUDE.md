@@ -2,7 +2,8 @@
 
 **THE home for US federal tax and benefit statute encodings.**
 
-All US-specific .rac files belong here, NOT in rac-compile.
+Federal U.S. cores belong here. State-administered overlays belong in their
+jurisdiction repos, not in `rac-us` and not in `rac-compile`.
 
 ## Structure
 
