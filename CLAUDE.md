@@ -13,4 +13,4 @@ This repo stores US federal RuleSpec source registry materials and related polic
 
 - Reintroduce legacy executable formula payloads.
 - Put unrelated jurisdiction materials here.
-- Add AKN/XML source payloads to Git.
+- Add generated source payloads to Git.
