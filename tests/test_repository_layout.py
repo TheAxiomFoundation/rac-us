@@ -6,8 +6,9 @@ import yaml
 
 
 ROOT = Path(__file__).resolve().parents[1]
-STATUTES_ROOT = ROOT / "statutes"
+RULESPEC_ROOTS = ("statutes", "regulations", "policies")
 IGNORED_DIRS = {".git", ".pytest_cache", ".venv", "__pycache__", "_axiom"}
+ALLOWED_YAML_ROOTS = {".github", "sources", *RULESPEC_ROOTS}
 
 
 def iter_repo_files() -> list[Path]:
@@ -21,24 +22,50 @@ def iter_repo_files() -> list[Path]:
 
 
 def iter_rulespec_files() -> list[Path]:
-    return sorted(
-        path
-        for path in STATUTES_ROOT.rglob("*.yaml")
-        if not path.name.endswith(".test.yaml")
-    )
+    files: list[Path] = []
+    for root_name in RULESPEC_ROOTS:
+        root = ROOT / root_name
+        if root.exists():
+            files.extend(
+                path for path in root.rglob("*.yaml") if not path.name.endswith(".test.yaml")
+            )
+    return sorted(files)
 
 
 def test_no_obsolete_formula_artifacts() -> None:
     obsolete = [
         path.relative_to(ROOT).as_posix()
         for path in iter_repo_files()
-        if path.name.endswith(".rac") or path.name.endswith(".rac.test")
+        if path.name.endswith(".rac")
+        or path.name.endswith(".rac.test")
+        or path.name in {"parameters.yaml", "tests.yaml"}
     ]
 
     assert obsolete == []
 
 
-def test_statute_rulespec_files_have_companion_tests() -> None:
+def test_no_legacy_roots_or_yaml_fixtures() -> None:
+    legacy_roots = [
+        name for name in ("statute", "regulation", "policy") if (ROOT / name).exists()
+    ]
+    yaml_fixtures = [
+        path.relative_to(ROOT).as_posix()
+        for path in (ROOT / "tests").rglob("*.yaml")
+        if (ROOT / "tests").exists()
+    ]
+    stray_yaml = [
+        path.relative_to(ROOT).as_posix()
+        for path in iter_repo_files()
+        if path.suffix in {".yaml", ".yml"}
+        and path.relative_to(ROOT).parts[0] not in ALLOWED_YAML_ROOTS
+    ]
+
+    assert legacy_roots == []
+    assert yaml_fixtures == []
+    assert stray_yaml == []
+
+
+def test_rulespec_files_have_companion_tests() -> None:
     missing = [
         path.relative_to(ROOT).as_posix()
         for path in iter_rulespec_files()
@@ -49,16 +76,21 @@ def test_statute_rulespec_files_have_companion_tests() -> None:
 
 
 def test_companion_tests_have_rulespec_files() -> None:
-    orphaned = [
-        path.relative_to(ROOT).as_posix()
-        for path in sorted(STATUTES_ROOT.rglob("*.test.yaml"))
-        if not path.with_name(f"{path.stem.removesuffix('.test')}.yaml").exists()
-    ]
+    orphaned = []
+    for root_name in RULESPEC_ROOTS:
+        root = ROOT / root_name
+        if not root.exists():
+            continue
+        orphaned.extend(
+            path.relative_to(ROOT).as_posix()
+            for path in sorted(root.rglob("*.test.yaml"))
+            if not path.with_name(f"{path.stem.removesuffix('.test')}.yaml").exists()
+        )
 
     assert orphaned == []
 
 
-def test_statute_rulespec_files_use_rulespec_v1_shape() -> None:
+def test_rulespec_files_use_rulespec_v1_shape() -> None:
     invalid: list[str] = []
 
     for path in iter_rulespec_files():
