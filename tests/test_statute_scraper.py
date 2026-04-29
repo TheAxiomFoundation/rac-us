@@ -260,10 +260,10 @@ class TestSaveSection:
 
             saved_path = scraper.save_section(section, "https://example.com")
 
-            # Path is now us/statute/26/32/2024-01-01
-            expected_dir = Path(tmpdir) / "us" / "statute" / "26" / "32" / "2024-01-01"
+            # Path is now us/statutes/26/32/2024-01-01
+            expected_dir = Path(tmpdir) / "us" / "statutes" / "26" / "32" / "2024-01-01"
             assert expected_dir.exists()
-            assert saved_path == "us/statute/26/32/2024-01-01"
+            assert saved_path == "us/statutes/26/32/2024-01-01"
 
     def test_save_section_writes_original_xml(self):
         """Test that original XML is saved."""

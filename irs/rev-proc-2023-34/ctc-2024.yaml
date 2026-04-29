@@ -12,8 +12,8 @@ source:
 # Refundable credit maximum per qualifying child
 # § 24(h)(5)(B): "$1,400 increased by an amount equal to..."
 refundable_maximum:
-  implements: statute/26/24/h/5  # Authority for inflation adjustment
-  overrides: statute/26/24/h/5/refundable_maximum#refundable_maximum
+  implements: statutes/26/24/h/5  # Authority for inflation adjustment
+  overrides: statutes/26/24/h/5/refundable_maximum#refundable_maximum
   value: 1700
   citations:
     - "Rev. Proc. 2023-34, Section 3.10(2)"

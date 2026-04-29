@@ -3,7 +3,7 @@ from __future__ import annotations
 from pathlib import Path
 
 
-CONTENT_DIR_CANDIDATES = ("legislation", "statute")
+CONTENT_DIR_CANDIDATES = ("statutes",)
 
 
 def content_root(root: Path) -> Path:

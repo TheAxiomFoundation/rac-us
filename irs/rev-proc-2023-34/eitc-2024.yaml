@@ -11,8 +11,8 @@ source:
 
 # Earned income amounts per § 32(b)(2)(A)
 earned_income_amount:
-  implements: statute/26/32/j/1  # Authority for inflation adjustment
-  overrides: statute/26/32/b/2/A/base_amounts#earned_income_amount
+  implements: statutes/26/32/j/1  # Authority for inflation adjustment
+  overrides: statutes/26/32/b/2/A/base_amounts#earned_income_amount
   indexed_by: num_qualifying_children
   values:
     0: 8260
@@ -23,8 +23,8 @@ earned_income_amount:
 # Phaseout threshold amounts per § 32(b)(2)(A)
 # For single/HOH filers - joint filers add joint_return_adjustment
 phaseout_amount:
-  implements: statute/26/32/j/1
-  overrides: statute/26/32/b/2/A/base_amounts#phaseout_amount
+  implements: statutes/26/32/j/1
+  overrides: statutes/26/32/b/2/A/base_amounts#phaseout_amount
   indexed_by: num_qualifying_children
   values:
     0: 10330   # Corrected from Rev. Proc. 2023-34
@@ -34,12 +34,12 @@ phaseout_amount:
 
 # Joint return adjustment per § 32(b)(2)(B)
 joint_return_adjustment:
-  implements: statute/26/32/j/1
-  overrides: statute/26/32/b/2/B/base_joint_return_adjustment#joint_return_adjustment
+  implements: statutes/26/32/j/1
+  overrides: statutes/26/32/b/2/B/base_joint_return_adjustment#joint_return_adjustment
   value: 6920
 
 # Investment income limit per § 32(i)(1)
 disqualified_income_limit:
-  implements: statute/26/32/j/1
-  overrides: statute/26/32/i/1/base_disqualified_income_limit#disqualified_income_limit
+  implements: statutes/26/32/j/1
+  overrides: statutes/26/32/i/1/base_disqualified_income_limit#disqualified_income_limit
   value: 11600

@@ -16,8 +16,8 @@ source:
 
 # Bracket thresholds for Single filers (§ 1(c) as modified by § 1(j)(2)(A))
 single:
-  implements: statute/26/1/f  # Authority for inflation adjustment
-  overrides: statute/26/1/brackets/base_thresholds#single
+  implements: statutes/26/1/f  # Authority for inflation adjustment
+  overrides: statutes/26/1/brackets/base_thresholds#single
   indexed_by: rate
   values:
     0.10: 0        # 10% bracket: $0 - $11,600
@@ -30,8 +30,8 @@ single:
 
 # Bracket thresholds for Married Filing Jointly and Surviving Spouses (§ 1(a) as modified by § 1(j)(2)(B))
 married_filing_jointly:
-  implements: statute/26/1/f
-  overrides: statute/26/1/brackets/base_thresholds#married_filing_jointly
+  implements: statutes/26/1/f
+  overrides: statutes/26/1/brackets/base_thresholds#married_filing_jointly
   indexed_by: rate
   values:
     0.10: 0        # 10% bracket: $0 - $23,200
@@ -44,8 +44,8 @@ married_filing_jointly:
 
 # Bracket thresholds for Head of Household (§ 1(b) as modified by § 1(j)(2)(C))
 head_of_household:
-  implements: statute/26/1/f
-  overrides: statute/26/1/brackets/base_thresholds#head_of_household
+  implements: statutes/26/1/f
+  overrides: statutes/26/1/brackets/base_thresholds#head_of_household
   indexed_by: rate
   values:
     0.10: 0        # 10% bracket: $0 - $16,550
@@ -58,8 +58,8 @@ head_of_household:
 
 # Bracket thresholds for Married Filing Separately (§ 1(d) as modified by § 1(j)(2)(D))
 married_filing_separately:
-  implements: statute/26/1/f
-  overrides: statute/26/1/brackets/base_thresholds#married_filing_separately
+  implements: statutes/26/1/f
+  overrides: statutes/26/1/brackets/base_thresholds#married_filing_separately
   indexed_by: rate
   values:
     0.10: 0        # 10% bracket: $0 - $11,600
