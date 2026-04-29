@@ -1,0 +1,23 @@
+format: rulespec/v1
+module:
+  summary: |-
+    Internal Revenue Code §3111(c) exempts wages paid to or received by an
+    individual from §3111 taxes during a period covered by a Social Security Act
+    §233 international agreement, to the extent those wages are subject
+    exclusively to the foreign country's social security system.
+rules:
+  - name: employer_wages_exempt_under_section_3111_c
+    kind: derived
+    entity: Business
+    dtype: Money
+    period: Year
+    unit: USD
+    source: 26 USC 3111(c)
+    source_url: https://www.law.cornell.edu/uscode/text/26/3111
+    versions:
+      - effective_from: '1986-01-01'
+        formula: |-
+          if section_233_social_security_agreement_in_effect:
+              wages_subject_exclusively_to_foreign_social_security_system
+          else:
+              0

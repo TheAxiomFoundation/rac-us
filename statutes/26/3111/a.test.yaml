@@ -1,0 +1,18 @@
+- name: employer_oasdi_excise_tax_on_wages_paid
+  period:
+    period_kind: tax_year
+    start: '2024-01-01'
+    end: '2024-12-31'
+  input:
+    wages: 100000
+  output:
+    employer_oasdi_excise_tax: 6200
+- name: employer_oasdi_excise_tax_zero_wages
+  period:
+    period_kind: tax_year
+    start: '2024-01-01'
+    end: '2024-12-31'
+  input:
+    wages: 0
+  output:
+    employer_oasdi_excise_tax: 0

@@ -1,0 +1,20 @@
+- name: wages_exempt_when_section_233_agreement_applies
+  period:
+    period_kind: tax_year
+    start: '2026-01-01'
+    end: '2026-12-31'
+  input:
+    section_233_social_security_agreement_in_effect: true
+    wages_subject_exclusively_to_foreign_social_security_system: 100000
+  output:
+    employer_wages_exempt_under_section_3111_c: 100000
+- name: no_exemption_when_no_section_233_agreement_applies
+  period:
+    period_kind: tax_year
+    start: '2026-01-01'
+    end: '2026-12-31'
+  input:
+    section_233_social_security_agreement_in_effect: false
+    wages_subject_exclusively_to_foreign_social_security_system: 100000
+  output:
+    employer_wages_exempt_under_section_3111_c: 0
