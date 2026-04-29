@@ -7,7 +7,7 @@ import yaml
 
 ROOT = Path(__file__).resolve().parents[1]
 STATUTES_ROOT = ROOT / "statutes"
-IGNORED_DIRS = {".git", ".pytest_cache", ".venv", "__pycache__"}
+IGNORED_DIRS = {".git", ".pytest_cache", ".venv", "__pycache__", "_axiom"}
 
 
 def iter_repo_files() -> list[Path]:
