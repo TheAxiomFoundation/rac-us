@@ -12,6 +12,8 @@ rules:
     kind: parameter
     dtype: Money
     unit: USD
+    source: 26 USC 63(c)(5)(B)
+    source_url: https://www.law.cornell.edu/uscode/text/26/63
     versions:
       - effective_from: '2026-01-01'
         formula: '1350'
@@ -19,6 +21,8 @@ rules:
     kind: parameter
     dtype: Money
     unit: USD
+    source: 26 USC 63(c)(5)(B)
+    source_url: https://www.law.cornell.edu/uscode/text/26/63
     versions:
       - effective_from: '2026-01-01'
         formula: '450'
@@ -26,6 +30,8 @@ rules:
     kind: parameter
     dtype: Money
     unit: USD
+    source: 26 USC 63(c)(2)
+    source_url: https://www.law.cornell.edu/uscode/text/26/63
     versions:
       - effective_from: '2026-01-01'
         formula: '16100'

@@ -9,6 +9,15 @@ ROOT = Path(__file__).resolve().parents[1]
 RULESPEC_ROOTS = ("statutes", "regulations", "policies")
 IGNORED_DIRS = {".git", ".pytest_cache", ".venv", "__pycache__", "_axiom"}
 ALLOWED_YAML_ROOTS = {".github", "sources", *RULESPEC_ROOTS}
+DISALLOWED_GENERIC_RULE_NAMES = {
+    "amount",
+    "base",
+    "excess",
+    "excess_wages",
+    "rate",
+    "threshold",
+    "value",
+}
 
 
 def iter_repo_files() -> list[Path]:
@@ -113,3 +122,78 @@ def test_rulespec_files_use_rulespec_v1_shape() -> None:
                     invalid.append(f"{path.relative_to(ROOT)}: rules[{index}] missing {key}")
 
     assert invalid == []
+
+
+def test_rulespec_rules_have_source_metadata() -> None:
+    missing: list[str] = []
+
+    for path in iter_rulespec_files():
+        payload = yaml.safe_load(path.read_text()) or {}
+        rules = payload.get("rules")
+        if not isinstance(rules, list):
+            continue
+        for index, rule in enumerate(rules):
+            if not isinstance(rule, dict):
+                continue
+            for field in ("source", "source_url"):
+                if not rule.get(field):
+                    name = rule.get("name", f"rules[{index}]")
+                    missing.append(f"{path.relative_to(ROOT)}: {name} missing {field}")
+
+    assert missing == []
+
+
+def test_rulespec_rule_names_are_specific() -> None:
+    vague: list[str] = []
+
+    for path in iter_rulespec_files():
+        payload = yaml.safe_load(path.read_text()) or {}
+        rules = payload.get("rules")
+        if not isinstance(rules, list):
+            continue
+        for rule in rules:
+            if not isinstance(rule, dict):
+                continue
+            name = rule.get("name")
+            if name in DISALLOWED_GENERIC_RULE_NAMES:
+                vague.append(f"{path.relative_to(ROOT)}: {name}")
+
+    assert vague == []
+
+
+def test_derived_rules_are_exercised_by_companion_tests() -> None:
+    missing: list[str] = []
+
+    for path in iter_rulespec_files():
+        payload = yaml.safe_load(path.read_text()) or {}
+        rules = payload.get("rules")
+        if not isinstance(rules, list):
+            continue
+        derived_rule_names = [
+            str(rule["name"])
+            for rule in rules
+            if isinstance(rule, dict)
+            and rule.get("kind") == "derived"
+            and isinstance(rule.get("name"), str)
+        ]
+
+        test_path = path.with_name(f"{path.stem}.test.yaml")
+        if not test_path.exists():
+            continue
+        cases = yaml.safe_load(test_path.read_text()) or []
+        covered_outputs: set[str] = set()
+        if isinstance(cases, list):
+            for case in cases:
+                if not isinstance(case, dict):
+                    continue
+                outputs = case.get("output")
+                if isinstance(outputs, dict):
+                    covered_outputs.update(str(name) for name in outputs)
+
+        missing.extend(
+            f"{path.relative_to(ROOT)}: {rule_name}"
+            for rule_name in derived_rule_names
+            if rule_name not in covered_outputs
+        )
+
+    assert missing == []

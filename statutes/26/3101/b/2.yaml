@@ -18,15 +18,19 @@ rules:
   - name: additional_medicare_tax_rate
     kind: parameter
     dtype: Rate
+    source: 26 USC 3101(b)(2)(A)
+    source_url: https://www.law.cornell.edu/uscode/text/26/3101
     versions:
       - effective_from: '2013-01-01'
         formula: '0.009'
-  - name: threshold
+  - name: additional_medicare_wage_tax_threshold
     kind: derived
     entity: TaxUnit
     dtype: Money
     period: Year
     unit: USD
+    source: 26 USC 3101(b)(2)(A)-(C)
+    source_url: https://www.law.cornell.edu/uscode/text/26/3101
     versions:
       - effective_from: '2013-01-01'
         formula: |-
@@ -35,21 +39,25 @@ rules:
               1 => 250000
               2 => 125000
               3 => 200000
-  - name: excess_wages
+  - name: additional_medicare_excess_wages
     kind: derived
     entity: TaxUnit
     dtype: Money
     period: Year
     unit: USD
+    source: 26 USC 3101(b)(2)(A)
+    source_url: https://www.law.cornell.edu/uscode/text/26/3101
     versions:
       - effective_from: '2013-01-01'
-        formula: max(0, wages - threshold)
+        formula: max(0, wages - additional_medicare_wage_tax_threshold)
   - name: additional_medicare_tax
     kind: derived
     entity: TaxUnit
     dtype: Money
     period: Year
     unit: USD
+    source: 26 USC 3101(b)(2)
+    source_url: https://www.law.cornell.edu/uscode/text/26/3101
     versions:
       - effective_from: '2013-01-01'
-        formula: excess_wages * additional_medicare_tax_rate
+        formula: additional_medicare_excess_wages * additional_medicare_tax_rate

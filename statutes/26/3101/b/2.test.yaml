@@ -7,6 +7,8 @@
     filing_status: 0
     wages: 150000
   output:
+    additional_medicare_wage_tax_threshold: 200000
+    additional_medicare_excess_wages: 0
     additional_medicare_tax: 0
 - name: single_above_threshold
   period:
@@ -18,6 +20,8 @@
     wages: 260000
   output:
     # (260000 - 200000) * 0.009 = 540
+    additional_medicare_wage_tax_threshold: 200000
+    additional_medicare_excess_wages: 60000
     additional_medicare_tax: 540
 - name: joint_below_threshold
   period:
@@ -28,6 +32,8 @@
     filing_status: 1
     wages: 200000
   output:
+    additional_medicare_wage_tax_threshold: 250000
+    additional_medicare_excess_wages: 0
     additional_medicare_tax: 0
 - name: joint_above_threshold
   period:
@@ -39,6 +45,8 @@
     wages: 300000
   output:
     # (300000 - 250000) * 0.009 = 450
+    additional_medicare_wage_tax_threshold: 250000
+    additional_medicare_excess_wages: 50000
     additional_medicare_tax: 450
 - name: separate_above_threshold
   period:
@@ -50,6 +58,8 @@
     wages: 200000
   output:
     # (200000 - 125000) * 0.009 = 675
+    additional_medicare_wage_tax_threshold: 125000
+    additional_medicare_excess_wages: 75000
     additional_medicare_tax: 675
 - name: head_of_household_above_threshold
   period:
@@ -61,4 +71,6 @@
     wages: 250000
   output:
     # (250000 - 200000) * 0.009 = 450
+    additional_medicare_wage_tax_threshold: 200000
+    additional_medicare_excess_wages: 50000
     additional_medicare_tax: 450

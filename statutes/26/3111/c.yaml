@@ -17,7 +17,7 @@ rules:
     versions:
       - effective_from: '1986-01-01'
         formula: |-
-          if section_233_social_security_agreement_in_effect:
+          if is_section_233_social_security_agreement_in_effect:
               wages_subject_exclusively_to_foreign_social_security_system
           else:
               0
