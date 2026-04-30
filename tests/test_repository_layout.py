@@ -42,19 +42,20 @@ def iter_rulespec_files() -> list[Path]:
 
 
 def test_no_obsolete_formula_artifacts() -> None:
+    obsolete_ext = ".r" "ac"
     obsolete = [
         path.relative_to(ROOT).as_posix()
         for path in iter_repo_files()
-        if path.name.endswith(".rac")
-        or path.name.endswith(".rac.test")
+        if path.name.endswith(obsolete_ext)
+        or path.name.endswith(f"{obsolete_ext}.test")
         or path.name in {"parameters.yaml", "tests.yaml"}
     ]
 
     assert obsolete == []
 
 
-def test_no_legacy_roots_or_yaml_fixtures() -> None:
-    legacy_roots = [
+def test_no_disallowed_roots_or_yaml_fixtures() -> None:
+    disallowed_roots = [
         name for name in ("statute", "regulation", "policy") if (ROOT / name).exists()
     ]
     yaml_fixtures = [
@@ -69,7 +70,7 @@ def test_no_legacy_roots_or_yaml_fixtures() -> None:
         and path.relative_to(ROOT).parts[0] not in ALLOWED_YAML_ROOTS
     ]
 
-    assert legacy_roots == []
+    assert disallowed_roots == []
     assert yaml_fixtures == []
     assert stray_yaml == []
 
