@@ -23,6 +23,20 @@ rules:
     versions:
       - effective_from: '2013-01-01'
         formula: '0.009'
+  - name: additional_medicare_wage_tax_threshold_table
+    kind: parameter
+    dtype: Money
+    unit: USD
+    indexed_by: filing_status
+    source: 26 USC 3101(b)(2)(A)-(C)
+    source_url: https://www.law.cornell.edu/uscode/text/26/3101
+    versions:
+      - effective_from: '2013-01-01'
+        values:
+          0: 200000
+          1: 250000
+          2: 125000
+          3: 200000
   - name: additional_medicare_wage_tax_threshold
     kind: derived
     entity: TaxUnit
@@ -33,12 +47,7 @@ rules:
     source_url: https://www.law.cornell.edu/uscode/text/26/3101
     versions:
       - effective_from: '2013-01-01'
-        formula: |-
-          match filing_status:
-              0 => 200000
-              1 => 250000
-              2 => 125000
-              3 => 200000
+        formula: additional_medicare_wage_tax_threshold_table[filing_status]
   - name: additional_medicare_excess_wages
     kind: derived
     entity: TaxUnit

@@ -40,6 +40,20 @@ rules:
     versions:
       - effective_from: '2013-01-01'
         formula: '0.009'
+  - name: additional_medicare_self_employment_threshold_table
+    kind: parameter
+    dtype: Money
+    unit: USD
+    indexed_by: filing_status
+    source: 26 USC 1401(b)(2)(A)
+    source_url: https://www.law.cornell.edu/uscode/text/26/1401
+    versions:
+      - effective_from: '2013-01-01'
+        values:
+          0: 200000
+          1: 250000
+          2: 125000
+          3: 200000
   - name: additional_medicare_self_employment_threshold
     kind: derived
     entity: TaxUnit
@@ -50,12 +64,7 @@ rules:
     source_url: https://www.law.cornell.edu/uscode/text/26/1401
     versions:
       - effective_from: '2013-01-01'
-        formula: |-
-          match filing_status:
-              1 => 250000
-              2 => 125000
-              0 => 200000
-              3 => 200000
+        formula: additional_medicare_self_employment_threshold_table[filing_status]
   - name: reduced_additional_medicare_self_employment_threshold
     kind: derived
     entity: TaxUnit

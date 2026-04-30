@@ -8,8 +8,8 @@
     member_of_tax_unit:
       - {is_aged_65_or_over: false}
   output:
-    basic_std_ded_amount: 16100
-    additional_std_ded_per_condition_amount: 2050
+    basic_standard_deduction_amount: 16100
+    additional_standard_deduction_per_condition_amount: 2050
     num_aged_members: 0
     standard_deduction: 16100
 - name: joint_one_aged
@@ -23,8 +23,8 @@
       - {is_aged_65_or_over: true}
       - {is_aged_65_or_over: false}
   output:
-    basic_std_ded_amount: 32200
-    additional_std_ded_per_condition_amount: 1650
+    basic_standard_deduction_amount: 32200
+    additional_standard_deduction_per_condition_amount: 1650
     num_aged_members: 1
     additional_std_ded_amount: 1650
     standard_deduction: 33850
@@ -39,7 +39,7 @@
       - {is_aged_65_or_over: true}
       - {is_aged_65_or_over: true}
   output:
-    additional_std_ded_per_condition_amount: 1650
+    additional_standard_deduction_per_condition_amount: 1650
     num_aged_members: 2
     additional_std_ded_amount: 3300
     standard_deduction: 35500
@@ -53,8 +53,8 @@
     member_of_tax_unit:
       - {is_aged_65_or_over: true}
   output:
-    basic_std_ded_amount: 24150
-    additional_std_ded_per_condition_amount: 2050
+    basic_standard_deduction_amount: 24150
+    additional_standard_deduction_per_condition_amount: 2050
     num_aged_members: 1
     additional_std_ded_amount: 2050
     standard_deduction: 26200

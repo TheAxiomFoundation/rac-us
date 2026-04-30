@@ -1,0 +1,18 @@
+- name: snap_maximum_allotment_for_one_person_household
+  period: 2026-01
+  input:
+    household_size: 1
+  output:
+    snap_maximum_allotment: 298
+- name: snap_maximum_allotment_for_eight_person_household
+  period: 2026-01
+  input:
+    household_size: 8
+  output:
+    snap_maximum_allotment: 1789
+- name: snap_maximum_allotment_adds_each_additional_person
+  period: 2026-01
+  input:
+    household_size: 9
+  output:
+    snap_maximum_allotment: 2007

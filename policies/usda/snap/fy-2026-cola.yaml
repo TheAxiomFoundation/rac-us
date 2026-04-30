@@ -1,0 +1,50 @@
+format: rulespec/v1
+module:
+  summary: |-
+    USDA SNAP FY 2026 cost-of-living adjustments set maximum monthly
+    allotments for the 48 states and the District of Columbia effective
+    October 1, 2025 through September 30, 2026. The maximum allotments are
+    298, 546, 785, 994, 1183, 1421, 1571, and 1789 for household sizes 1
+    through 8, plus 218 for each additional person.
+rules:
+  - name: snap_maximum_allotment_table
+    kind: parameter
+    dtype: Money
+    unit: USD
+    indexed_by: household_size
+    source: USDA SNAP FY 2026 maximum allotments and deductions
+    source_url: https://fns-prod.azureedge.us/sites/default/files/resource-files/snap-fy26maximumAllotments-deductions.pdf
+    versions:
+      - effective_from: '2025-10-01'
+        values:
+          1: 298
+          2: 546
+          3: 785
+          4: 994
+          5: 1183
+          6: 1421
+          7: 1571
+          8: 1789
+  - name: snap_maximum_allotment_additional_member
+    kind: parameter
+    dtype: Money
+    unit: USD
+    source: USDA SNAP FY 2026 maximum allotments and deductions
+    source_url: https://fns-prod.azureedge.us/sites/default/files/resource-files/snap-fy26maximumAllotments-deductions.pdf
+    versions:
+      - effective_from: '2025-10-01'
+        formula: '218'
+  - name: snap_maximum_allotment
+    kind: derived
+    entity: Household
+    dtype: Money
+    period: Month
+    unit: USD
+    source: USDA SNAP FY 2026 maximum allotments and deductions
+    source_url: https://fns-prod.azureedge.us/sites/default/files/resource-files/snap-fy26maximumAllotments-deductions.pdf
+    versions:
+      - effective_from: '2025-10-01'
+        formula: |-
+          if household_size > 8:
+              snap_maximum_allotment_table[8] + ((household_size - 8) * snap_maximum_allotment_additional_member)
+          else: snap_maximum_allotment_table[household_size]
