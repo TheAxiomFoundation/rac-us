@@ -1,0 +1,106 @@
+format: rulespec/v1
+module:
+  summary: |-
+    USDA SNAP FY 2026 cost-of-living adjustments set deductions for the
+    48 states and the District of Columbia effective October 1, 2025 through
+    September 30, 2026. The standard deductions are 209, 209, 209, 223,
+    261, and 299 for household sizes 1, 2, 3, 4, 5, and 6 or more. The
+    maximum excess shelter deduction is 744. The homeless shelter deduction
+    is 198.99. The maximum asset limits are 4500 for households with at
+    least one member age 60 or older or disabled, and 3000 for all other
+    households.
+  source_verification:
+    corpus_citation_path: us/guidance/usda/fns/snap-fy2026-cola/page-2
+    values:
+      snap_standard_deduction_48_states_dc_table:
+        1: 209
+        2: 209
+        3: 209
+        4: 223
+        5: 261
+        6: 299
+      snap_maximum_excess_shelter_deduction_48_states_dc: 744
+      snap_homeless_shelter_deduction: 198.99
+      snap_asset_limit_elderly_or_disabled_member: 4500
+      snap_asset_limit_other_households: 3000
+rules:
+  - name: snap_standard_deduction_48_states_dc_table
+    kind: parameter
+    dtype: Money
+    unit: USD
+    indexed_by: household_size
+    source: USDA SNAP FY 2026 maximum allotments and deductions
+    source_url: https://fns-prod.azureedge.us/sites/default/files/resource-files/snap-fy26maximumAllotments-deductions.pdf
+    versions:
+      - effective_from: '2025-10-01'
+        values:
+          1: 209
+          2: 209
+          3: 209
+          4: 223
+          5: 261
+          6: 299
+  - name: snap_standard_deduction_48_states_dc
+    kind: derived
+    entity: Household
+    dtype: Money
+    period: Month
+    unit: USD
+    source: USDA SNAP FY 2026 maximum allotments and deductions
+    source_url: https://fns-prod.azureedge.us/sites/default/files/resource-files/snap-fy26maximumAllotments-deductions.pdf
+    versions:
+      - effective_from: '2025-10-01'
+        formula: |-
+          if household_size > 6:
+              snap_standard_deduction_48_states_dc_table[6]
+          else: snap_standard_deduction_48_states_dc_table[household_size]
+  - name: snap_maximum_excess_shelter_deduction_48_states_dc
+    kind: parameter
+    dtype: Money
+    unit: USD
+    source: USDA SNAP FY 2026 maximum allotments and deductions
+    source_url: https://fns-prod.azureedge.us/sites/default/files/resource-files/snap-fy26maximumAllotments-deductions.pdf
+    versions:
+      - effective_from: '2025-10-01'
+        formula: '744'
+  - name: snap_homeless_shelter_deduction
+    kind: parameter
+    dtype: Money
+    unit: USD
+    source: USDA SNAP FY 2026 maximum allotments and deductions
+    source_url: https://fns-prod.azureedge.us/sites/default/files/resource-files/snap-fy26maximumAllotments-deductions.pdf
+    versions:
+      - effective_from: '2025-10-01'
+        formula: '198.99'
+  - name: snap_asset_limit_elderly_or_disabled_member
+    kind: parameter
+    dtype: Money
+    unit: USD
+    source: USDA SNAP FY 2026 maximum allotments and deductions
+    source_url: https://fns-prod.azureedge.us/sites/default/files/resource-files/snap-fy26maximumAllotments-deductions.pdf
+    versions:
+      - effective_from: '2025-10-01'
+        formula: '4500'
+  - name: snap_asset_limit_other_households
+    kind: parameter
+    dtype: Money
+    unit: USD
+    source: USDA SNAP FY 2026 maximum allotments and deductions
+    source_url: https://fns-prod.azureedge.us/sites/default/files/resource-files/snap-fy26maximumAllotments-deductions.pdf
+    versions:
+      - effective_from: '2025-10-01'
+        formula: '3000'
+  - name: snap_asset_limit
+    kind: derived
+    entity: Household
+    dtype: Money
+    period: Month
+    unit: USD
+    source: USDA SNAP FY 2026 maximum allotments and deductions
+    source_url: https://fns-prod.azureedge.us/sites/default/files/resource-files/snap-fy26maximumAllotments-deductions.pdf
+    versions:
+      - effective_from: '2025-10-01'
+        formula: |-
+          if snap_household_has_member_age_60_or_disabled:
+              snap_asset_limit_elderly_or_disabled_member
+          else: snap_asset_limit_other_households
