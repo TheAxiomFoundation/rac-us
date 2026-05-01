@@ -1,0 +1,26 @@
+- name: pre_shelter_net_income_subtracts_applicable_non_shelter_deductions
+  period: 2026-01
+  input:
+    snap_monthly_household_income: 1000
+    standard_deduction: 209
+    earned_income_deduction: 200
+    dependent_care_deduction: 0
+    child_support_deduction: 0
+    medical_deduction: 0
+    excess_shelter_deduction: 204.5
+  output:
+    snap_net_income_pre_shelter: 591
+    snap_net_income: 386.5
+- name: deductions_cannot_reduce_snap_net_income_below_zero
+  period: 2026-01
+  input:
+    snap_monthly_household_income: 100
+    standard_deduction: 209
+    earned_income_deduction: 0
+    dependent_care_deduction: 0
+    child_support_deduction: 0
+    medical_deduction: 0
+    excess_shelter_deduction: 50
+  output:
+    snap_net_income_pre_shelter: 0
+    snap_net_income: 0
