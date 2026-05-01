@@ -59,6 +59,9 @@ module:
       snap_homeless_shelter_deduction: 198.99
       snap_asset_limit_elderly_or_disabled_member: 4500
       snap_asset_limit_other_households: 3000
+relations:
+  - name: member_of_household
+    arity: 2
 rules:
   - name: snap_standard_deduction_48_states_dc_table
     kind: parameter
@@ -226,6 +229,16 @@ rules:
     versions:
       - effective_from: '2025-10-01'
         formula: '3000'
+  - name: snap_household_has_member_age_60_or_disabled
+    kind: derived
+    entity: Household
+    dtype: Judgment
+    period: Month
+    source: USDA SNAP FY 2026 maximum allotments and deductions
+    source_url: https://fns-prod.azureedge.us/sites/default/files/resource-files/snap-fy26maximumAllotments-deductions.pdf
+    versions:
+      - effective_from: '2025-10-01'
+        formula: count_where(member_of_household, snap_member_is_age_60_or_older_or_disabled) > 0
   - name: snap_asset_limit
     kind: derived
     entity: Household
