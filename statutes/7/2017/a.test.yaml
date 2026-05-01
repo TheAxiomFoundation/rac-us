@@ -1,0 +1,49 @@
+- name: regular_allotment_subtracts_thirty_percent_and_rounds_down
+  period: 2026-01
+  input:
+    household_size: 1
+    snap_maximum_allotment: 298
+    snap_one_person_thrifty_food_plan_cost: 298
+    snap_net_income: 100
+    snap_eligible: true
+  output:
+    snap_net_income_for_allotment: 100
+    snap_household_food_contribution: 30
+    snap_allotment_before_minimum: 268
+    snap_minimum_monthly_allotment: 24
+    snap_regular_month_allotment: 268
+- name: one_or_two_person_household_gets_minimum_allotment
+  period: 2026-01
+  input:
+    household_size: 2
+    snap_maximum_allotment: 546
+    snap_one_person_thrifty_food_plan_cost: 298
+    snap_net_income: 1816
+    snap_eligible: true
+  output:
+    snap_allotment_before_minimum: 1
+    snap_minimum_monthly_allotment: 24
+    snap_regular_month_allotment: 24
+- name: larger_household_has_no_minimum_allotment
+  period: 2026-01
+  input:
+    household_size: 3
+    snap_maximum_allotment: 785
+    snap_one_person_thrifty_food_plan_cost: 298
+    snap_net_income: 10000
+    snap_eligible: true
+  output:
+    snap_allotment_before_minimum: 0
+    snap_minimum_monthly_allotment: 0
+    snap_regular_month_allotment: 0
+- name: ineligible_household_gets_no_regular_allotment
+  period: 2026-01
+  input:
+    household_size: 1
+    snap_maximum_allotment: 298
+    snap_one_person_thrifty_food_plan_cost: 298
+    snap_net_income: 0
+    snap_eligible: false
+  output:
+    snap_allotment_before_minimum: 298
+    snap_regular_month_allotment: 0

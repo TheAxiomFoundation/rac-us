@@ -1,0 +1,81 @@
+format: rulespec/v1
+module:
+  summary: |-
+    7 USC 2017(a) sets the regular SNAP allotment for eligible households.
+    The allotment equals the cost of the thrifty food plan reduced by
+    30 percent of household income as determined under 7 USC 2014(d) and
+    (e), rounded down to the nearest lower whole dollar. For households of
+    one and two persons, the minimum allotment is 8 percent of the cost of
+    the thrifty food plan for a one-member household, rounded to the nearest
+    whole dollar increment. Nearest-dollar rounding is implemented as
+    floor(x + 0.5) for nonnegative dollar amounts.
+rules:
+  - name: snap_household_food_contribution_rate
+    kind: parameter
+    dtype: Rate
+    source: 7 USC 2017(a)
+    source_url: https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title7-section2017&num=0&edition=prelim
+    versions:
+      - effective_from: '2008-10-01'
+        formula: '0.30'
+  - name: snap_net_income_for_allotment
+    kind: derived
+    entity: Household
+    dtype: Money
+    period: Month
+    unit: USD
+    source: 7 USC 2017(a)
+    source_url: https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title7-section2017&num=0&edition=prelim
+    versions:
+      - effective_from: '2008-10-01'
+        formula: max(0, snap_net_income)
+  - name: snap_household_food_contribution
+    kind: derived
+    entity: Household
+    dtype: Money
+    period: Month
+    unit: USD
+    source: 7 USC 2017(a)
+    source_url: https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title7-section2017&num=0&edition=prelim
+    versions:
+      - effective_from: '2008-10-01'
+        formula: snap_net_income_for_allotment * snap_household_food_contribution_rate
+  - name: snap_allotment_before_minimum
+    kind: derived
+    entity: Household
+    dtype: Money
+    period: Month
+    unit: USD
+    source: 7 USC 2017(a)
+    source_url: https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title7-section2017&num=0&edition=prelim
+    versions:
+      - effective_from: '2008-10-01'
+        formula: floor(max(0, snap_maximum_allotment - snap_household_food_contribution))
+  - name: snap_minimum_monthly_allotment
+    kind: derived
+    entity: Household
+    dtype: Money
+    period: Month
+    unit: USD
+    source: 7 USC 2017(a)
+    source_url: https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title7-section2017&num=0&edition=prelim
+    versions:
+      - effective_from: '2008-10-01'
+        formula: |-
+          if household_size <= 2:
+              floor((snap_one_person_thrifty_food_plan_cost * 0.08) + 0.5)
+          else: 0
+  - name: snap_regular_month_allotment
+    kind: derived
+    entity: Household
+    dtype: Money
+    period: Month
+    unit: USD
+    source: 7 USC 2017(a)
+    source_url: https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title7-section2017&num=0&edition=prelim
+    versions:
+      - effective_from: '2008-10-01'
+        formula: |-
+          if snap_eligible:
+              max(snap_allotment_before_minimum, snap_minimum_monthly_allotment)
+          else: 0

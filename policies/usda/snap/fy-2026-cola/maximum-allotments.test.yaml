@@ -3,6 +3,7 @@
   input:
     household_size: 1
   output:
+    snap_one_person_thrifty_food_plan_cost: 298
     snap_maximum_allotment: 298
 - name: snap_maximum_allotment_for_eight_person_household
   period: 2026-01

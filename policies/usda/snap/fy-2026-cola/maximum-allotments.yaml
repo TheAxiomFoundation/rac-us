@@ -128,6 +128,17 @@ rules:
         formula: |-
           snap_maximum_allotment_table[max(min(household_size, 8), 1)]
           + (max(household_size - 8, 0) * snap_maximum_allotment_additional_member)
+  - name: snap_one_person_thrifty_food_plan_cost
+    kind: derived
+    entity: Household
+    dtype: Money
+    period: Month
+    unit: USD
+    source: USDA SNAP FY 2026 maximum allotments and deductions
+    source_url: https://fns-prod.azureedge.us/sites/default/files/resource-files/snap-fy26maximumAllotments-deductions.pdf
+    versions:
+      - effective_from: '2025-10-01'
+        formula: snap_maximum_allotment_table[1]
   - name: snap_maximum_allotment_alaska_urban_table
     kind: parameter
     dtype: Money
