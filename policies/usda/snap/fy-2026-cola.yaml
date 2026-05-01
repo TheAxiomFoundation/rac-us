@@ -6,6 +6,19 @@ module:
     October 1, 2025 through September 30, 2026. The maximum allotments are
     298, 546, 785, 994, 1183, 1421, 1571, and 1789 for household sizes 1
     through 8, plus 218 for each additional person.
+  source_verification:
+    corpus_citation_path: us/guidance/usda/fns/snap-fy2026-cola/page-1
+    values:
+      snap_maximum_allotment_table:
+        1: 298
+        2: 546
+        3: 785
+        4: 994
+        5: 1183
+        6: 1421
+        7: 1571
+        8: 1789
+      snap_maximum_allotment_additional_member: 218
 rules:
   - name: snap_maximum_allotment_table
     kind: parameter
