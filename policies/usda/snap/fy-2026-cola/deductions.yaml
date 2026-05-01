@@ -229,7 +229,7 @@ rules:
     versions:
       - effective_from: '2025-10-01'
         formula: '3000'
-  - name: snap_household_has_member_age_60_or_disabled
+  - name: snap_household_has_usda_elderly_or_disabled_member
     kind: derived
     entity: Household
     dtype: Judgment
@@ -238,7 +238,7 @@ rules:
     source_url: https://fns-prod.azureedge.us/sites/default/files/resource-files/snap-fy26maximumAllotments-deductions.pdf
     versions:
       - effective_from: '2025-10-01'
-        formula: count_where(member_of_household, snap_member_is_age_60_or_older_or_disabled) > 0
+        formula: count_where(member_of_household, snap_member_is_usda_elderly_or_disabled) > 0
   - name: snap_asset_limit
     kind: derived
     entity: Household
@@ -250,6 +250,6 @@ rules:
     versions:
       - effective_from: '2025-10-01'
         formula: |-
-          if snap_household_has_member_age_60_or_disabled:
+          if snap_household_has_usda_elderly_or_disabled_member:
               snap_asset_limit_elderly_or_disabled_member
           else: snap_asset_limit_other_households
