@@ -20,13 +20,13 @@
   period: 2026-01
   input:
     member_of_household:
-      - snap_member_is_usda_elderly_or_disabled: true
+      - snap_member_is_elderly_or_disabled: true
   output:
-    snap_household_has_usda_elderly_or_disabled_member: holds
+    snap_household_has_elderly_or_disabled_member: holds
     snap_asset_limit: 4500
 - name: asset_limit_for_other_households
   period: 2026-01
   input: {}
   output:
-    snap_household_has_usda_elderly_or_disabled_member: not_holds
+    snap_household_has_elderly_or_disabled_member: not_holds
     snap_asset_limit: 3000
