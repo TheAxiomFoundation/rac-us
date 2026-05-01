@@ -92,6 +92,17 @@ rules:
           if household_size > 6:
               snap_standard_deduction_48_states_dc_table[6]
           else: snap_standard_deduction_48_states_dc_table[household_size]
+  - name: snap_standard_deduction
+    kind: derived
+    entity: Household
+    dtype: Money
+    period: Month
+    unit: USD
+    source: USDA SNAP FY 2026 maximum allotments and deductions
+    source_url: https://fns-prod.azureedge.us/sites/default/files/resource-files/snap-fy26maximumAllotments-deductions.pdf
+    versions:
+      - effective_from: '2025-10-01'
+        formula: snap_standard_deduction_48_states_dc
   - name: snap_maximum_excess_shelter_deduction_48_states_dc
     kind: parameter
     dtype: Money

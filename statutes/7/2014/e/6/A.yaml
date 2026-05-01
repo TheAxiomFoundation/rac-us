@@ -6,6 +6,8 @@ module:
     applicable deductions have been allowed. This module models the
     pre-shelter net income base and final SNAP net income after the excess
     shelter deduction.
+imports:
+  - us:statutes/7/2014/e/2
 rules:
   - name: snap_net_income_pre_shelter
     kind: derived
@@ -21,8 +23,8 @@ rules:
           max(
               0,
               snap_monthly_household_income
-              - standard_deduction
-              - earned_income_deduction
+              - snap_standard_deduction
+              - snap_earned_income_deduction
               - dependent_care_deduction
               - child_support_deduction
               - medical_deduction
