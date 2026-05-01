@@ -126,9 +126,8 @@ rules:
     versions:
       - effective_from: '2025-10-01'
         formula: |-
-          if household_size > 8:
-              snap_maximum_allotment_table[8] + ((household_size - 8) * snap_maximum_allotment_additional_member)
-          else: snap_maximum_allotment_table[household_size]
+          snap_maximum_allotment_table[max(min(household_size, 8), 1)]
+          + (max(household_size - 8, 0) * snap_maximum_allotment_additional_member)
   - name: snap_maximum_allotment_alaska_urban_table
     kind: parameter
     dtype: Money
