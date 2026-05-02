@@ -15,12 +15,13 @@ module:
 
     Filing-status input convention: 0 single/other case, 1 joint return,
     2 married filing separately, 3 head of household/other case.
+  source_verification:
+    corpus_citation_path: us/statute/26/1401
 rules:
   - name: self_employment_oasdi_tax_rate
     kind: parameter
     dtype: Rate
     source: 26 USC 1401(a)
-    source_url: https://www.law.cornell.edu/uscode/text/26/1401
     versions:
       - effective_from: '1990-01-01'
         formula: '0.124'
@@ -28,7 +29,6 @@ rules:
     kind: parameter
     dtype: Rate
     source: 26 USC 1401(b)(1)
-    source_url: https://www.law.cornell.edu/uscode/text/26/1401
     versions:
       - effective_from: '1990-01-01'
         formula: '0.029'
@@ -36,7 +36,6 @@ rules:
     kind: parameter
     dtype: Rate
     source: 26 USC 1401(b)(2)(A)
-    source_url: https://www.law.cornell.edu/uscode/text/26/1401
     versions:
       - effective_from: '2013-01-01'
         formula: '0.009'
@@ -45,7 +44,6 @@ rules:
     dtype: Money
     unit: USD
     source: 26 USC 1401(b)(2)(A)
-    source_url: https://www.law.cornell.edu/uscode/text/26/1401
     versions:
       - effective_from: '2013-01-01'
         formula: '250000'
@@ -54,7 +52,6 @@ rules:
     dtype: Money
     unit: USD
     source: 26 USC 1401(b)(2)(A)
-    source_url: https://www.law.cornell.edu/uscode/text/26/1401
     versions:
       - effective_from: '2013-01-01'
         formula: '200000'
@@ -65,7 +62,6 @@ rules:
     period: Year
     unit: USD
     source: 26 USC 1401(b)(2)(A)
-    source_url: https://www.law.cornell.edu/uscode/text/26/1401
     versions:
       - effective_from: '2013-01-01'
         formula: |-
@@ -80,7 +76,6 @@ rules:
     period: Year
     unit: USD
     source: 26 USC 1401(b)(2)(B)
-    source_url: https://www.law.cornell.edu/uscode/text/26/1401
     versions:
       - effective_from: '2013-01-01'
         formula: |-
@@ -96,7 +91,6 @@ rules:
     period: Year
     unit: USD
     source: 26 USC 1401(b)(2)(A)-(B)
-    source_url: https://www.law.cornell.edu/uscode/text/26/1401
     versions:
       - effective_from: '2013-01-01'
         formula: |-
@@ -112,7 +106,6 @@ rules:
     period: Year
     unit: USD
     source: 26 USC 1401(a)
-    source_url: https://www.law.cornell.edu/uscode/text/26/1401
     versions:
       - effective_from: '1990-01-01'
         formula: self_employment_income * self_employment_oasdi_tax_rate
@@ -123,7 +116,6 @@ rules:
     period: Year
     unit: USD
     source: 26 USC 1401(b)(1)
-    source_url: https://www.law.cornell.edu/uscode/text/26/1401
     versions:
       - effective_from: '1990-01-01'
         formula: self_employment_income * self_employment_hospital_insurance_tax_rate
@@ -134,7 +126,6 @@ rules:
     period: Year
     unit: USD
     source: 26 USC 1401(b)(2)
-    source_url: https://www.law.cornell.edu/uscode/text/26/1401
     versions:
       - effective_from: '2013-01-01'
         formula: |-
@@ -147,7 +138,6 @@ rules:
     period: Year
     unit: USD
     source: 26 USC 1401(a)-(b)
-    source_url: https://www.law.cornell.edu/uscode/text/26/1401
     versions:
       - effective_from: '2013-01-01'
         formula: |-

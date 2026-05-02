@@ -5,6 +5,8 @@ module:
     individual from §3111 taxes during a period covered by a Social Security Act
     §233 international agreement, to the extent those wages are subject
     exclusively to the foreign country's social security system.
+  source_verification:
+    corpus_citation_path: us/statute/26/3111
 rules:
   - name: employer_wages_exempt_under_section_3111_c
     kind: derived
@@ -13,7 +15,6 @@ rules:
     period: Year
     unit: USD
     source: 26 USC 3111(c)
-    source_url: https://www.law.cornell.edu/uscode/text/26/3111
     versions:
       - effective_from: '1986-01-01'
         formula: |-

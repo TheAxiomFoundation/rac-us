@@ -14,12 +14,13 @@ module:
     26 USC §3101(b)(2)(A)-(C): $250,000 for a joint return or surviving
     spouse, one-half of that amount for a married individual filing
     separately, and $200,000 in any other case.
+  source_verification:
+    corpus_citation_path: us/statute/26/3101
 rules:
   - name: additional_medicare_tax_rate
     kind: parameter
     dtype: Rate
     source: 26 USC 3101(b)(2)(A)
-    source_url: https://www.law.cornell.edu/uscode/text/26/3101
     versions:
       - effective_from: '2013-01-01'
         formula: '0.009'
@@ -28,7 +29,6 @@ rules:
     dtype: Money
     unit: USD
     source: 26 USC 3101(b)(2)(A)-(C)
-    source_url: https://www.law.cornell.edu/uscode/text/26/3101
     versions:
       - effective_from: '2013-01-01'
         formula: '250000'
@@ -37,7 +37,6 @@ rules:
     dtype: Money
     unit: USD
     source: 26 USC 3101(b)(2)(A)-(C)
-    source_url: https://www.law.cornell.edu/uscode/text/26/3101
     versions:
       - effective_from: '2013-01-01'
         formula: '200000'
@@ -48,7 +47,6 @@ rules:
     period: Year
     unit: USD
     source: 26 USC 3101(b)(2)(A)-(C)
-    source_url: https://www.law.cornell.edu/uscode/text/26/3101
     versions:
       - effective_from: '2013-01-01'
         formula: |-
@@ -63,7 +61,6 @@ rules:
     period: Year
     unit: USD
     source: 26 USC 3101(b)(2)(A)
-    source_url: https://www.law.cornell.edu/uscode/text/26/3101
     versions:
       - effective_from: '2013-01-01'
         formula: max(0, wages - additional_medicare_wage_tax_threshold)
@@ -74,7 +71,6 @@ rules:
     period: Year
     unit: USD
     source: 26 USC 3101(b)(2)
-    source_url: https://www.law.cornell.edu/uscode/text/26/3101
     versions:
       - effective_from: '2013-01-01'
         formula: additional_medicare_excess_wages * additional_medicare_tax_rate

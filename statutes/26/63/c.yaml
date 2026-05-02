@@ -5,6 +5,8 @@ module:
     basic standard deduction plus any additional standard deduction. Annual
     inflation-adjusted dollar amounts are imported from the IRS tax-year
     authority, not encoded in the statute file.
+  source_verification:
+    corpus_citation_path: us/statute/26/63
 imports:
   - us:policies/irs/rev-proc-2025-32/standard-deduction
 rules:
@@ -14,7 +16,6 @@ rules:
     dtype: Integer
     period: Year
     source: IRC section 63(f)(1)(A)
-    source_url: https://www.law.cornell.edu/uscode/text/26/63
     versions:
       - effective_from: '2026-01-01'
         formula: count_where(member_of_tax_unit, is_aged_65_or_over)
@@ -25,7 +26,6 @@ rules:
     period: Year
     unit: USD
     source: IRC section 63(f)(1)(A), aggregated over qualifying individuals
-    source_url: https://www.law.cornell.edu/uscode/text/26/63
     versions:
       - effective_from: '2026-01-01'
         formula: num_aged_members * additional_standard_deduction_per_condition_amount
@@ -36,7 +36,6 @@ rules:
     period: Year
     unit: USD
     source: IRC section 63(c)(1)
-    source_url: https://www.law.cornell.edu/uscode/text/26/63
     versions:
       - effective_from: '2026-01-01'
         formula: basic_standard_deduction_amount + additional_std_ded_amount

@@ -146,12 +146,42 @@ def test_rulespec_rules_have_source_metadata() -> None:
             name = rule.get("name", f"rules[{index}]")
             if not rule.get("source"):
                 missing.append(f"{path.relative_to(ROOT)}: {name} missing source")
-            if not rule.get("source_url") and not module_source_locator:
+            if not module_source_locator:
                 missing.append(
                     f"{path.relative_to(ROOT)}: {name} missing source locator"
                 )
 
     assert missing == []
+
+
+def test_rulespec_files_use_corpus_source_locators() -> None:
+    legacy: list[str] = []
+
+    for path in iter_rulespec_files():
+        payload = yaml.safe_load(path.read_text()) or {}
+        if isinstance(payload, dict):
+            module = payload.get("module")
+            if isinstance(module, dict):
+                if module.get("source_url"):
+                    legacy.append(f"{path.relative_to(ROOT)}: module.source_url")
+                source_verification = module.get("source_verification")
+                if (
+                    isinstance(source_verification, dict)
+                    and source_verification.get("source_url")
+                ):
+                    legacy.append(
+                        f"{path.relative_to(ROOT)}: "
+                        "module.source_verification.source_url"
+                    )
+            rules = payload.get("rules")
+            if isinstance(rules, list):
+                for index, rule in enumerate(rules):
+                    if not isinstance(rule, dict) or not rule.get("source_url"):
+                        continue
+                    name = rule.get("name", f"rules[{index}]")
+                    legacy.append(f"{path.relative_to(ROOT)}: {name}.source_url")
+
+    assert legacy == []
 
 
 def module_has_source_locator(payload: object) -> bool:
@@ -160,13 +190,9 @@ def module_has_source_locator(payload: object) -> bool:
     module = payload.get("module")
     if not isinstance(module, dict):
         return False
-    if module.get("source_url"):
-        return True
     source_verification = module.get("source_verification")
     if not isinstance(source_verification, dict):
         return False
-    if source_verification.get("source_url"):
-        return True
     if source_verification.get("corpus_citation_path"):
         return True
     citation_paths = source_verification.get("corpus_citation_paths")

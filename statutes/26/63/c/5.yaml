@@ -6,6 +6,8 @@ module:
     an addition, subject to the single-filer basic standard deduction. Annual
     inflation-adjusted dollar amounts are imported from the IRS tax-year
     authority, not encoded in the statute file.
+  source_verification:
+    corpus_citation_path: us/statute/26/63
 imports:
   - us:policies/irs/rev-proc-2025-32/standard-deduction
 rules:
@@ -16,7 +18,6 @@ rules:
     period: Year
     unit: USD
     source: IRC section 63(c)(5)
-    source_url: https://www.law.cornell.edu/uscode/text/26/63
     versions:
       - effective_from: '2026-01-01'
         formula: |-

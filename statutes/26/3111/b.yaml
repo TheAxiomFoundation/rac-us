@@ -4,12 +4,13 @@ module:
     Internal Revenue Code §3111(b) imposes a 1.45 percent hospital insurance
     excise tax on every employer, in addition to the §3111(a) tax, measured by
     wages paid with respect to employment.
+  source_verification:
+    corpus_citation_path: us/statute/26/3111
 rules:
   - name: hospital_insurance_employer_tax_rate
     kind: parameter
     dtype: Rate
     source: 26 USC 3111(b)
-    source_url: https://www.law.cornell.edu/uscode/text/26/3111
     versions:
       - effective_from: '1986-01-01'
         formula: '0.0145'
@@ -20,7 +21,6 @@ rules:
     period: Year
     unit: USD
     source: 26 USC 3111(b)
-    source_url: https://www.law.cornell.edu/uscode/text/26/3111
     versions:
       - effective_from: '1986-01-01'
         formula: wages * hospital_insurance_employer_tax_rate

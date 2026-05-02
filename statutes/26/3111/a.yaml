@@ -4,12 +4,13 @@ module:
     Internal Revenue Code §3111(a) imposes a 6.2 percent old-age, survivors,
     and disability insurance excise tax on every employer, measured by wages
     paid with respect to employment.
+  source_verification:
+    corpus_citation_path: us/statute/26/3111
 rules:
   - name: employer_oasdi_excise_tax_rate
     kind: parameter
     dtype: Rate
     source: 26 USC 3111(a)
-    source_url: https://www.law.cornell.edu/uscode/text/26/3111
     versions:
       - effective_from: '1990-01-01'
         formula: '0.062'
@@ -20,7 +21,6 @@ rules:
     period: Year
     unit: USD
     source: 26 USC 3111(a)
-    source_url: https://www.law.cornell.edu/uscode/text/26/3111
     versions:
       - effective_from: '1990-01-01'
         formula: wages * employer_oasdi_excise_tax_rate

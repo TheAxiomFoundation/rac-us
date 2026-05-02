@@ -10,12 +10,13 @@ module:
     year 1993. This module encodes the amount formula when §45A applies;
     §45A(f) termination and §45A(b)-(e) definitions are outside this slice.
     The excess floors at 0.
+  source_verification:
+    corpus_citation_path: us/statute/26/45A
 rules:
   - name: indian_employment_credit_rate
     kind: parameter
     dtype: Rate
     source: 26 USC 45A(a)
-    source_url: https://www.law.cornell.edu/uscode/text/26/45A
     versions:
       - effective_from: '1994-01-01'
         formula: '0.20'
@@ -26,7 +27,6 @@ rules:
     period: Year
     unit: USD
     source: 26 USC 45A(a)(1)
-    source_url: https://www.law.cornell.edu/uscode/text/26/45A
     versions:
       - effective_from: '1994-01-01'
         formula: |-
@@ -39,7 +39,6 @@ rules:
     period: Year
     unit: USD
     source: 26 USC 45A(a)(2)
-    source_url: https://www.law.cornell.edu/uscode/text/26/45A
     versions:
       - effective_from: '1994-01-01'
         formula: |-
@@ -52,7 +51,6 @@ rules:
     period: Year
     unit: USD
     source: 26 USC 45A(a)
-    source_url: https://www.law.cornell.edu/uscode/text/26/45A
     versions:
       - effective_from: '1994-01-01'
         formula: |-
@@ -68,7 +66,6 @@ rules:
     period: Year
     unit: USD
     source: 26 USC 45A(a)
-    source_url: https://www.law.cornell.edu/uscode/text/26/45A
     versions:
       - effective_from: '1994-01-01'
         formula: |-
