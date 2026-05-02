@@ -139,15 +139,38 @@ def test_rulespec_rules_have_source_metadata() -> None:
         rules = payload.get("rules")
         if not isinstance(rules, list):
             continue
+        module_source_locator = module_has_source_locator(payload)
         for index, rule in enumerate(rules):
             if not isinstance(rule, dict):
                 continue
-            for field in ("source", "source_url"):
-                if not rule.get(field):
-                    name = rule.get("name", f"rules[{index}]")
-                    missing.append(f"{path.relative_to(ROOT)}: {name} missing {field}")
+            name = rule.get("name", f"rules[{index}]")
+            if not rule.get("source"):
+                missing.append(f"{path.relative_to(ROOT)}: {name} missing source")
+            if not rule.get("source_url") and not module_source_locator:
+                missing.append(
+                    f"{path.relative_to(ROOT)}: {name} missing source locator"
+                )
 
     assert missing == []
+
+
+def module_has_source_locator(payload: object) -> bool:
+    if not isinstance(payload, dict):
+        return False
+    module = payload.get("module")
+    if not isinstance(module, dict):
+        return False
+    if module.get("source_url"):
+        return True
+    source_verification = module.get("source_verification")
+    if not isinstance(source_verification, dict):
+        return False
+    if source_verification.get("source_url"):
+        return True
+    if source_verification.get("corpus_citation_path"):
+        return True
+    citation_paths = source_verification.get("corpus_citation_paths")
+    return isinstance(citation_paths, list) and any(citation_paths)
 
 
 def test_rulespec_rule_names_are_specific() -> None:
