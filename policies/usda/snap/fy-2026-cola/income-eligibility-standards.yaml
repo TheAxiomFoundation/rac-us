@@ -14,7 +14,9 @@ module:
     poverty level is 2152, 2909, 3665, 4421, 5177, 5934, 6690, and 7446 for
     household sizes 1 through 8, plus 757 for each additional member.
   source_verification:
-    source_url: https://fns-prod.azureedge.us/sites/default/files/resource-files/snap-fy26-incomeEligibilityStandards.pdf
+    corpus_citation_paths:
+      - us/guidance/usda/fns/snap-fy2026-income-eligibility-standards/page-1
+      - us/guidance/usda/fns/snap-fy2026-income-eligibility-standards/page-2
     values:
       snap_net_income_limit_100_percent_fpl_48_states_dc_table:
         1: 1305
@@ -53,7 +55,6 @@ rules:
     unit: USD
     indexed_by: household_size
     source: USDA SNAP FY 2026 income eligibility standards
-    source_url: https://fns-prod.azureedge.us/sites/default/files/resource-files/snap-fy26-incomeEligibilityStandards.pdf
     versions:
       - effective_from: '2025-10-01'
         values:
@@ -70,7 +71,6 @@ rules:
     dtype: Money
     unit: USD
     source: USDA SNAP FY 2026 income eligibility standards
-    source_url: https://fns-prod.azureedge.us/sites/default/files/resource-files/snap-fy26-incomeEligibilityStandards.pdf
     versions:
       - effective_from: '2025-10-01'
         formula: '459'
@@ -81,7 +81,6 @@ rules:
     period: Month
     unit: USD
     source: USDA SNAP FY 2026 income eligibility standards
-    source_url: https://fns-prod.azureedge.us/sites/default/files/resource-files/snap-fy26-incomeEligibilityStandards.pdf
     versions:
       - effective_from: '2025-10-01'
         formula: |-
@@ -93,7 +92,6 @@ rules:
     unit: USD
     indexed_by: household_size
     source: USDA SNAP FY 2026 income eligibility standards
-    source_url: https://fns-prod.azureedge.us/sites/default/files/resource-files/snap-fy26-incomeEligibilityStandards.pdf
     versions:
       - effective_from: '2025-10-01'
         values:
@@ -110,7 +108,6 @@ rules:
     dtype: Money
     unit: USD
     source: USDA SNAP FY 2026 income eligibility standards
-    source_url: https://fns-prod.azureedge.us/sites/default/files/resource-files/snap-fy26-incomeEligibilityStandards.pdf
     versions:
       - effective_from: '2025-10-01'
         formula: '596'
@@ -121,7 +118,6 @@ rules:
     period: Month
     unit: USD
     source: USDA SNAP FY 2026 income eligibility standards
-    source_url: https://fns-prod.azureedge.us/sites/default/files/resource-files/snap-fy26-incomeEligibilityStandards.pdf
     versions:
       - effective_from: '2025-10-01'
         formula: |-
@@ -133,7 +129,6 @@ rules:
     unit: USD
     indexed_by: household_size
     source: USDA SNAP FY 2026 income eligibility standards
-    source_url: https://fns-prod.azureedge.us/sites/default/files/resource-files/snap-fy26-incomeEligibilityStandards.pdf
     versions:
       - effective_from: '2025-10-01'
         values:
@@ -150,7 +145,6 @@ rules:
     dtype: Money
     unit: USD
     source: USDA SNAP FY 2026 income eligibility standards
-    source_url: https://fns-prod.azureedge.us/sites/default/files/resource-files/snap-fy26-incomeEligibilityStandards.pdf
     versions:
       - effective_from: '2025-10-01'
         formula: '757'
@@ -161,7 +155,6 @@ rules:
     period: Month
     unit: USD
     source: USDA SNAP FY 2026 income eligibility standards
-    source_url: https://fns-prod.azureedge.us/sites/default/files/resource-files/snap-fy26-incomeEligibilityStandards.pdf
     versions:
       - effective_from: '2025-10-01'
         formula: |-

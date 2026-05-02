@@ -4,7 +4,7 @@ module:
     IRS Revenue Procedure 2025-32 publishes tax year 2026 inflation-adjusted
     standard deduction amounts under IRC section 63.
   source_verification:
-    source_url: https://www.irs.gov/irb/2025-45_IRB
+    corpus_citation_path: us/guidance/irs/rev-proc-2025-32/page-18
     values:
       standard_deduction_single: 16100
       standard_deduction_joint: 32200
@@ -20,7 +20,6 @@ rules:
     dtype: Money
     unit: USD
     source: Rev. Proc. 2025-32 section 3.14(1)
-    source_url: https://www.irs.gov/irb/2025-45_IRB
     versions:
       - effective_from: '2026-01-01'
         formula: '16100'
@@ -29,7 +28,6 @@ rules:
     dtype: Money
     unit: USD
     source: Rev. Proc. 2025-32 section 3.14(1)
-    source_url: https://www.irs.gov/irb/2025-45_IRB
     versions:
       - effective_from: '2026-01-01'
         formula: '32200'
@@ -38,7 +36,6 @@ rules:
     dtype: Money
     unit: USD
     source: Rev. Proc. 2025-32 section 3.14(1)
-    source_url: https://www.irs.gov/irb/2025-45_IRB
     versions:
       - effective_from: '2026-01-01'
         formula: '16100'
@@ -47,7 +44,6 @@ rules:
     dtype: Money
     unit: USD
     source: Rev. Proc. 2025-32 section 3.14(1)
-    source_url: https://www.irs.gov/irb/2025-45_IRB
     versions:
       - effective_from: '2026-01-01'
         formula: '24150'
@@ -58,7 +54,6 @@ rules:
     period: Year
     unit: USD
     source: Rev. Proc. 2025-32 section 3.14(1)
-    source_url: https://www.irs.gov/irb/2025-45_IRB
     versions:
       - effective_from: '2026-01-01'
         formula: |-
@@ -72,7 +67,6 @@ rules:
     dtype: Money
     unit: USD
     source: Rev. Proc. 2025-32 section 3.14(3)
-    source_url: https://www.irs.gov/irb/2025-45_IRB
     versions:
       - effective_from: '2026-01-01'
         formula: '1650'
@@ -81,7 +75,6 @@ rules:
     dtype: Money
     unit: USD
     source: Rev. Proc. 2025-32 section 3.14(3)
-    source_url: https://www.irs.gov/irb/2025-45_IRB
     versions:
       - effective_from: '2026-01-01'
         formula: '2050'
@@ -92,7 +85,6 @@ rules:
     period: Year
     unit: USD
     source: Rev. Proc. 2025-32 section 3.14(3)
-    source_url: https://www.irs.gov/irb/2025-45_IRB
     versions:
       - effective_from: '2026-01-01'
         formula: |-
@@ -105,7 +97,6 @@ rules:
     dtype: Money
     unit: USD
     source: Rev. Proc. 2025-32 section 3.14(2)
-    source_url: https://www.irs.gov/irb/2025-45_IRB
     versions:
       - effective_from: '2026-01-01'
         formula: '1350'
@@ -114,7 +105,6 @@ rules:
     dtype: Money
     unit: USD
     source: Rev. Proc. 2025-32 section 3.14(2)
-    source_url: https://www.irs.gov/irb/2025-45_IRB
     versions:
       - effective_from: '2026-01-01'
         formula: '450'
@@ -125,7 +115,6 @@ rules:
     period: Year
     unit: USD
     source: Rev. Proc. 2025-32 section 3.14(1)
-    source_url: https://www.irs.gov/irb/2025-45_IRB
     versions:
       - effective_from: '2026-01-01'
         formula: standard_deduction_single

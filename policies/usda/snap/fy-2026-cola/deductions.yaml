@@ -68,7 +68,6 @@ rules:
     unit: USD
     indexed_by: household_size
     source: USDA SNAP FY 2026 maximum allotments and deductions
-    source_url: https://fns-prod.azureedge.us/sites/default/files/resource-files/snap-fy26maximumAllotments-deductions.pdf
     versions:
       - effective_from: '2025-10-01'
         values:
@@ -85,7 +84,6 @@ rules:
     period: Month
     unit: USD
     source: USDA SNAP FY 2026 maximum allotments and deductions
-    source_url: https://fns-prod.azureedge.us/sites/default/files/resource-files/snap-fy26maximumAllotments-deductions.pdf
     versions:
       - effective_from: '2025-10-01'
         formula: |-
@@ -99,7 +97,6 @@ rules:
     period: Month
     unit: USD
     source: USDA SNAP FY 2026 maximum allotments and deductions
-    source_url: https://fns-prod.azureedge.us/sites/default/files/resource-files/snap-fy26maximumAllotments-deductions.pdf
     versions:
       - effective_from: '2025-10-01'
         formula: snap_standard_deduction_48_states_dc
@@ -108,7 +105,6 @@ rules:
     dtype: Money
     unit: USD
     source: USDA SNAP FY 2026 maximum allotments and deductions
-    source_url: https://fns-prod.azureedge.us/sites/default/files/resource-files/snap-fy26maximumAllotments-deductions.pdf
     versions:
       - effective_from: '2025-10-01'
         formula: '744'
@@ -118,7 +114,6 @@ rules:
     unit: USD
     indexed_by: household_size
     source: USDA SNAP FY 2026 maximum allotments and deductions
-    source_url: https://fns-prod.azureedge.us/sites/default/files/resource-files/snap-fy26maximumAllotments-deductions.pdf
     versions:
       - effective_from: '2025-10-01'
         values:
@@ -134,7 +129,6 @@ rules:
     unit: USD
     indexed_by: household_size
     source: USDA SNAP FY 2026 maximum allotments and deductions
-    source_url: https://fns-prod.azureedge.us/sites/default/files/resource-files/snap-fy26maximumAllotments-deductions.pdf
     versions:
       - effective_from: '2025-10-01'
         values:
@@ -150,7 +144,6 @@ rules:
     unit: USD
     indexed_by: household_size
     source: USDA SNAP FY 2026 maximum allotments and deductions
-    source_url: https://fns-prod.azureedge.us/sites/default/files/resource-files/snap-fy26maximumAllotments-deductions.pdf
     versions:
       - effective_from: '2025-10-01'
         values:
@@ -166,7 +159,6 @@ rules:
     unit: USD
     indexed_by: household_size
     source: USDA SNAP FY 2026 maximum allotments and deductions
-    source_url: https://fns-prod.azureedge.us/sites/default/files/resource-files/snap-fy26maximumAllotments-deductions.pdf
     versions:
       - effective_from: '2025-10-01'
         values:
@@ -181,7 +173,6 @@ rules:
     dtype: Money
     unit: USD
     source: USDA SNAP FY 2026 maximum allotments and deductions
-    source_url: https://fns-prod.azureedge.us/sites/default/files/resource-files/snap-fy26maximumAllotments-deductions.pdf
     versions:
       - effective_from: '2025-10-01'
         formula: '1189'
@@ -190,7 +181,6 @@ rules:
     dtype: Money
     unit: USD
     source: USDA SNAP FY 2026 maximum allotments and deductions
-    source_url: https://fns-prod.azureedge.us/sites/default/files/resource-files/snap-fy26maximumAllotments-deductions.pdf
     versions:
       - effective_from: '2025-10-01'
         formula: '873'
@@ -199,7 +189,6 @@ rules:
     dtype: Money
     unit: USD
     source: USDA SNAP FY 2026 maximum allotments and deductions
-    source_url: https://fns-prod.azureedge.us/sites/default/files/resource-files/snap-fy26maximumAllotments-deductions.pdf
     versions:
       - effective_from: '2025-10-01'
         formula: '1003'
@@ -208,7 +197,6 @@ rules:
     dtype: Money
     unit: USD
     source: USDA SNAP FY 2026 maximum allotments and deductions
-    source_url: https://fns-prod.azureedge.us/sites/default/files/resource-files/snap-fy26maximumAllotments-deductions.pdf
     versions:
       - effective_from: '2025-10-01'
         formula: '586'
@@ -217,7 +205,6 @@ rules:
     dtype: Money
     unit: USD
     source: USDA SNAP FY 2026 maximum allotments and deductions
-    source_url: https://fns-prod.azureedge.us/sites/default/files/resource-files/snap-fy26maximumAllotments-deductions.pdf
     versions:
       - effective_from: '2025-10-01'
         formula: '198.99'
@@ -226,7 +213,6 @@ rules:
     dtype: Money
     unit: USD
     source: USDA SNAP FY 2026 maximum allotments and deductions
-    source_url: https://fns-prod.azureedge.us/sites/default/files/resource-files/snap-fy26maximumAllotments-deductions.pdf
     versions:
       - effective_from: '2025-10-01'
         formula: '4500'
@@ -235,7 +221,6 @@ rules:
     dtype: Money
     unit: USD
     source: USDA SNAP FY 2026 maximum allotments and deductions
-    source_url: https://fns-prod.azureedge.us/sites/default/files/resource-files/snap-fy26maximumAllotments-deductions.pdf
     versions:
       - effective_from: '2025-10-01'
         formula: '3000'
@@ -246,7 +231,6 @@ rules:
     period: Month
     unit: USD
     source: USDA SNAP FY 2026 maximum allotments and deductions
-    source_url: https://fns-prod.azureedge.us/sites/default/files/resource-files/snap-fy26maximumAllotments-deductions.pdf
     versions:
       - effective_from: '2025-10-01'
         formula: |-
