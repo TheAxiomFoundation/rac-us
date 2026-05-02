@@ -41,6 +41,12 @@ def iter_rulespec_files() -> list[Path]:
     return sorted(files)
 
 
+def canonical_rule_id(path: Path, rule_name: str) -> str:
+    repo_prefix = ROOT.name.removeprefix("rules-")
+    target = path.relative_to(ROOT).with_suffix("").as_posix()
+    return f"{repo_prefix}:{target}#{rule_name}"
+
+
 def test_no_obsolete_formula_artifacts() -> None:
     obsolete_ext = ".r" "ac"
     obsolete = [
@@ -194,7 +200,7 @@ def test_derived_rules_are_exercised_by_companion_tests() -> None:
         missing.extend(
             f"{path.relative_to(ROOT)}: {rule_name}"
             for rule_name in derived_rule_names
-            if rule_name not in covered_outputs
+            if canonical_rule_id(path, rule_name) not in covered_outputs
         )
 
     assert missing == []
