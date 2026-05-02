@@ -9,9 +9,9 @@ module:
     self-employment income.
     §1401(b)(2) imposes an additional 0.9 percent tax on self-employment
     income above $250,000 for a joint return, one-half of that amount
-    ($125,000) for a married taxpayer filing separately, and $200,000 in any
-    other case. The threshold is reduced, but not below 0, by wages already
-    taken into account for the additional Medicare tax on wages.
+    for a married taxpayer filing separately, and $200,000 in any other case.
+    The threshold is reduced, but not below 0, by wages already taken into
+    account for the additional Medicare tax on wages.
 
     Filing-status input convention: 0 single/other case, 1 joint return,
     2 married filing separately, 3 head of household/other case.
@@ -40,20 +40,24 @@ rules:
     versions:
       - effective_from: '2013-01-01'
         formula: '0.009'
-  - name: additional_medicare_self_employment_threshold_table
+  - name: additional_medicare_self_employment_joint_threshold
     kind: parameter
     dtype: Money
     unit: USD
-    indexed_by: filing_status
     source: 26 USC 1401(b)(2)(A)
     source_url: https://www.law.cornell.edu/uscode/text/26/1401
     versions:
       - effective_from: '2013-01-01'
-        values:
-          0: 200000
-          1: 250000
-          2: 125000
-          3: 200000
+        formula: '250000'
+  - name: additional_medicare_self_employment_other_threshold
+    kind: parameter
+    dtype: Money
+    unit: USD
+    source: 26 USC 1401(b)(2)(A)
+    source_url: https://www.law.cornell.edu/uscode/text/26/1401
+    versions:
+      - effective_from: '2013-01-01'
+        formula: '200000'
   - name: additional_medicare_self_employment_threshold
     kind: derived
     entity: TaxUnit
@@ -64,7 +68,11 @@ rules:
     source_url: https://www.law.cornell.edu/uscode/text/26/1401
     versions:
       - effective_from: '2013-01-01'
-        formula: additional_medicare_self_employment_threshold_table[filing_status]
+        formula: |-
+          match filing_status:
+              1 => additional_medicare_self_employment_joint_threshold
+              2 => additional_medicare_self_employment_joint_threshold / 2
+              0 => additional_medicare_self_employment_other_threshold
   - name: reduced_additional_medicare_self_employment_threshold
     kind: derived
     entity: TaxUnit

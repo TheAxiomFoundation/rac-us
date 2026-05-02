@@ -12,6 +12,7 @@
     us:policies/irs/rev-proc-2025-32/standard-deduction#additional_standard_deduction_per_condition_amount: 2050
     us:policies/irs/rev-proc-2025-32/standard-deduction#dependent_minimum: 1350
     us:policies/irs/rev-proc-2025-32/standard-deduction#dependent_earned_income_addition: 450
+    us:policies/irs/rev-proc-2025-32/standard-deduction#single_basic_standard_deduction: 16100
 - name: joint_filer_amounts
   period:
     period_kind: tax_year
