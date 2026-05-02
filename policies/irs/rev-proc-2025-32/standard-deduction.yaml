@@ -1,0 +1,131 @@
+format: rulespec/v1
+module:
+  summary: |-
+    IRS Revenue Procedure 2025-32 publishes tax year 2026 inflation-adjusted
+    standard deduction amounts under IRC section 63.
+  source_verification:
+    source_url: https://www.irs.gov/irb/2025-45_IRB
+    values:
+      standard_deduction_single: 16100
+      standard_deduction_joint: 32200
+      standard_deduction_separate: 16100
+      standard_deduction_head_of_household: 24150
+      additional_standard_deduction_married_or_surviving_spouse: 1650
+      additional_standard_deduction_unmarried_not_surviving_spouse: 2050
+      dependent_minimum: 1350
+      dependent_earned_income_addition: 450
+rules:
+  - name: standard_deduction_single
+    kind: parameter
+    dtype: Money
+    unit: USD
+    source: Rev. Proc. 2025-32 section 3.14(1)
+    source_url: https://www.irs.gov/irb/2025-45_IRB
+    versions:
+      - effective_from: '2026-01-01'
+        formula: '16100'
+  - name: standard_deduction_joint
+    kind: parameter
+    dtype: Money
+    unit: USD
+    source: Rev. Proc. 2025-32 section 3.14(1)
+    source_url: https://www.irs.gov/irb/2025-45_IRB
+    versions:
+      - effective_from: '2026-01-01'
+        formula: '32200'
+  - name: standard_deduction_separate
+    kind: parameter
+    dtype: Money
+    unit: USD
+    source: Rev. Proc. 2025-32 section 3.14(1)
+    source_url: https://www.irs.gov/irb/2025-45_IRB
+    versions:
+      - effective_from: '2026-01-01'
+        formula: '16100'
+  - name: standard_deduction_head_of_household
+    kind: parameter
+    dtype: Money
+    unit: USD
+    source: Rev. Proc. 2025-32 section 3.14(1)
+    source_url: https://www.irs.gov/irb/2025-45_IRB
+    versions:
+      - effective_from: '2026-01-01'
+        formula: '24150'
+  - name: basic_standard_deduction_amount
+    kind: derived
+    entity: TaxUnit
+    dtype: Money
+    period: Year
+    unit: USD
+    source: Rev. Proc. 2025-32 section 3.14(1)
+    source_url: https://www.irs.gov/irb/2025-45_IRB
+    versions:
+      - effective_from: '2026-01-01'
+        formula: |-
+          match filing_status:
+              1 => standard_deduction_joint
+              2 => standard_deduction_separate
+              3 => standard_deduction_head_of_household
+              0 => standard_deduction_single
+  - name: additional_standard_deduction_married_or_surviving_spouse
+    kind: parameter
+    dtype: Money
+    unit: USD
+    source: Rev. Proc. 2025-32 section 3.14(3)
+    source_url: https://www.irs.gov/irb/2025-45_IRB
+    versions:
+      - effective_from: '2026-01-01'
+        formula: '1650'
+  - name: additional_standard_deduction_unmarried_not_surviving_spouse
+    kind: parameter
+    dtype: Money
+    unit: USD
+    source: Rev. Proc. 2025-32 section 3.14(3)
+    source_url: https://www.irs.gov/irb/2025-45_IRB
+    versions:
+      - effective_from: '2026-01-01'
+        formula: '2050'
+  - name: additional_standard_deduction_per_condition_amount
+    kind: derived
+    entity: TaxUnit
+    dtype: Money
+    period: Year
+    unit: USD
+    source: Rev. Proc. 2025-32 section 3.14(3)
+    source_url: https://www.irs.gov/irb/2025-45_IRB
+    versions:
+      - effective_from: '2026-01-01'
+        formula: |-
+          if filing_status == 1 or filing_status == 2 or filing_status == 4:
+              additional_standard_deduction_married_or_surviving_spouse
+          else:
+              additional_standard_deduction_unmarried_not_surviving_spouse
+  - name: dependent_minimum
+    kind: parameter
+    dtype: Money
+    unit: USD
+    source: Rev. Proc. 2025-32 section 3.14(2)
+    source_url: https://www.irs.gov/irb/2025-45_IRB
+    versions:
+      - effective_from: '2026-01-01'
+        formula: '1350'
+  - name: dependent_earned_income_addition
+    kind: parameter
+    dtype: Money
+    unit: USD
+    source: Rev. Proc. 2025-32 section 3.14(2)
+    source_url: https://www.irs.gov/irb/2025-45_IRB
+    versions:
+      - effective_from: '2026-01-01'
+        formula: '450'
+  - name: single_basic_standard_deduction
+    kind: derived
+    entity: TaxUnit
+    dtype: Money
+    period: Year
+    unit: USD
+    source: Rev. Proc. 2025-32 section 3.14(1)
+    source_url: https://www.irs.gov/irb/2025-45_IRB
+    versions:
+      - effective_from: '2026-01-01'
+        formula: standard_deduction_single

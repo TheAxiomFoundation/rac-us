@@ -1,76 +1,19 @@
 format: rulespec/v1
 module:
   summary: |-
-    Internal Revenue Code §63(c) — basic + age-additional standard deduction.
-
-    §63(c)(2): basic standard deduction by filing status (2026 rates, post-OBBBA):
-    $16,100 for single or married filing separately, $32,200 for joint returns,
-    and $24,150 for heads of household. §63(f)(1)(A): one additional deduction
-    per qualifying taxpayer or spouse aged 65 or over, with 2026 additional
-    amounts of $2,050 for unmarried filers and $1,650 for married filers. Blind
-    additions at §63(f)(1)(B) and the dependent cap at §63(c)(5) are out of
-    scope.
-
-    Filing status convention: 0 single, 1 joint, 2 separate, 3 head of
-    household. Age qualification is pre-computed by the caller on each Person
-    member as `is_aged_65_or_over`.
+    Internal Revenue Code section 63(c) defines the standard deduction as the
+    basic standard deduction plus any additional standard deduction. Annual
+    inflation-adjusted dollar amounts are imported from the IRS tax-year
+    authority, not encoded in the statute file.
+imports:
+  - us:policies/irs/rev-proc-2025-32/standard-deduction
 rules:
-  - name: basic_standard_deduction_table
-    kind: parameter
-    dtype: Money
-    unit: USD
-    indexed_by: filing_status
-    source: IRC §63(c)(2) as amended 2026
-    source_url: https://www.law.cornell.edu/uscode/text/26/63
-    versions:
-      - effective_from: '2026-01-01'
-        values:
-          0: 16100
-          1: 32200
-          2: 16100
-          3: 24150
-  - name: basic_standard_deduction_amount
-    kind: derived
-    entity: TaxUnit
-    dtype: Money
-    period: Year
-    unit: USD
-    source: IRC §63(c)(2) as amended 2026
-    source_url: https://www.law.cornell.edu/uscode/text/26/63
-    versions:
-      - effective_from: '2026-01-01'
-        formula: basic_standard_deduction_table[filing_status]
-  - name: additional_standard_deduction_per_condition_table
-    kind: parameter
-    dtype: Money
-    unit: USD
-    indexed_by: filing_status
-    source: IRC §63(f)(1) as amended 2026
-    source_url: https://www.law.cornell.edu/uscode/text/26/63
-    versions:
-      - effective_from: '2026-01-01'
-        values:
-          0: 2050
-          1: 1650
-          2: 1650
-          3: 2050
-  - name: additional_standard_deduction_per_condition_amount
-    kind: derived
-    entity: TaxUnit
-    dtype: Money
-    period: Year
-    unit: USD
-    source: IRC §63(f)(1) as amended 2026
-    source_url: https://www.law.cornell.edu/uscode/text/26/63
-    versions:
-      - effective_from: '2026-01-01'
-        formula: additional_standard_deduction_per_condition_table[filing_status]
   - name: num_aged_members
     kind: derived
     entity: TaxUnit
     dtype: Integer
     period: Year
-    source: IRC §63(f)(1)(A)
+    source: IRC section 63(f)(1)(A)
     source_url: https://www.law.cornell.edu/uscode/text/26/63
     versions:
       - effective_from: '2026-01-01'
@@ -81,7 +24,7 @@ rules:
     dtype: Money
     period: Year
     unit: USD
-    source: IRC §63(f)(1)(A) aggregated over qualifying individuals
+    source: IRC section 63(f)(1)(A), aggregated over qualifying individuals
     source_url: https://www.law.cornell.edu/uscode/text/26/63
     versions:
       - effective_from: '2026-01-01'
@@ -92,7 +35,7 @@ rules:
     dtype: Money
     period: Year
     unit: USD
-    source: IRC §63(c)(1)
+    source: IRC section 63(c)(1)
     source_url: https://www.law.cornell.edu/uscode/text/26/63
     versions:
       - effective_from: '2026-01-01'

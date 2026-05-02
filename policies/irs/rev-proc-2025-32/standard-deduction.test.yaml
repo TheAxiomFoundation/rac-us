@@ -1,0 +1,48 @@
+- name: single_filer_amounts
+  period:
+    period_kind: tax_year
+    start: 2026-01-01
+    end: 2026-12-31
+  input:
+    filing_status: 0
+  output:
+    us:policies/irs/rev-proc-2025-32/standard-deduction#standard_deduction_single: 16100
+    us:policies/irs/rev-proc-2025-32/standard-deduction#basic_standard_deduction_amount: 16100
+    us:policies/irs/rev-proc-2025-32/standard-deduction#additional_standard_deduction_unmarried_not_surviving_spouse: 2050
+    us:policies/irs/rev-proc-2025-32/standard-deduction#additional_standard_deduction_per_condition_amount: 2050
+    us:policies/irs/rev-proc-2025-32/standard-deduction#dependent_minimum: 1350
+    us:policies/irs/rev-proc-2025-32/standard-deduction#dependent_earned_income_addition: 450
+- name: joint_filer_amounts
+  period:
+    period_kind: tax_year
+    start: 2026-01-01
+    end: 2026-12-31
+  input:
+    filing_status: 1
+  output:
+    us:policies/irs/rev-proc-2025-32/standard-deduction#standard_deduction_joint: 32200
+    us:policies/irs/rev-proc-2025-32/standard-deduction#basic_standard_deduction_amount: 32200
+    us:policies/irs/rev-proc-2025-32/standard-deduction#additional_standard_deduction_married_or_surviving_spouse: 1650
+    us:policies/irs/rev-proc-2025-32/standard-deduction#additional_standard_deduction_per_condition_amount: 1650
+- name: married_filing_separately_amounts
+  period:
+    period_kind: tax_year
+    start: 2026-01-01
+    end: 2026-12-31
+  input:
+    filing_status: 2
+  output:
+    us:policies/irs/rev-proc-2025-32/standard-deduction#standard_deduction_separate: 16100
+    us:policies/irs/rev-proc-2025-32/standard-deduction#basic_standard_deduction_amount: 16100
+    us:policies/irs/rev-proc-2025-32/standard-deduction#additional_standard_deduction_per_condition_amount: 1650
+- name: head_of_household_amounts
+  period:
+    period_kind: tax_year
+    start: 2026-01-01
+    end: 2026-12-31
+  input:
+    filing_status: 3
+  output:
+    us:policies/irs/rev-proc-2025-32/standard-deduction#standard_deduction_head_of_household: 24150
+    us:policies/irs/rev-proc-2025-32/standard-deduction#basic_standard_deduction_amount: 24150
+    us:policies/irs/rev-proc-2025-32/standard-deduction#additional_standard_deduction_per_condition_amount: 2050
