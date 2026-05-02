@@ -6,7 +6,7 @@
   input:
     wages: 0
   output:
-    oasdi_wage_tax: 0
+    us:statutes/26/3101/a#oasdi_wage_tax: 0
 - name: oasdi_tax_is_6_2_percent_of_wages
   period:
     period_kind: tax_year
@@ -15,4 +15,4 @@
   input:
     wages: 100000
   output:
-    oasdi_wage_tax: 6200
+    us:statutes/26/3101/a#oasdi_wage_tax: 6200

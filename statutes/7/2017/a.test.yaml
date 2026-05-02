@@ -7,11 +7,11 @@
     snap_net_income: 100
     snap_eligible: true
   output:
-    snap_net_income_for_allotment: 100
-    snap_household_food_contribution: 30
-    snap_allotment_before_minimum: 268
-    snap_minimum_monthly_allotment: 24
-    snap_regular_month_allotment: 268
+    us:statutes/7/2017/a#snap_net_income_for_allotment: 100
+    us:statutes/7/2017/a#snap_household_food_contribution: 30
+    us:statutes/7/2017/a#snap_allotment_before_minimum: 268
+    us:statutes/7/2017/a#snap_minimum_monthly_allotment: 24
+    us:statutes/7/2017/a#snap_regular_month_allotment: 268
 - name: one_or_two_person_household_gets_minimum_allotment
   period: 2026-01
   input:
@@ -21,9 +21,9 @@
     snap_net_income: 1816
     snap_eligible: true
   output:
-    snap_allotment_before_minimum: 1
-    snap_minimum_monthly_allotment: 24
-    snap_regular_month_allotment: 24
+    us:statutes/7/2017/a#snap_allotment_before_minimum: 1
+    us:statutes/7/2017/a#snap_minimum_monthly_allotment: 24
+    us:statutes/7/2017/a#snap_regular_month_allotment: 24
 - name: larger_household_has_no_minimum_allotment
   period: 2026-01
   input:
@@ -33,9 +33,9 @@
     snap_net_income: 10000
     snap_eligible: true
   output:
-    snap_allotment_before_minimum: 0
-    snap_minimum_monthly_allotment: 0
-    snap_regular_month_allotment: 0
+    us:statutes/7/2017/a#snap_allotment_before_minimum: 0
+    us:statutes/7/2017/a#snap_minimum_monthly_allotment: 0
+    us:statutes/7/2017/a#snap_regular_month_allotment: 0
 - name: ineligible_household_gets_no_regular_allotment
   period: 2026-01
   input:
@@ -45,5 +45,5 @@
     snap_net_income: 0
     snap_eligible: false
   output:
-    snap_allotment_before_minimum: 298
-    snap_regular_month_allotment: 0
+    us:statutes/7/2017/a#snap_allotment_before_minimum: 298
+    us:statutes/7/2017/a#snap_regular_month_allotment: 0

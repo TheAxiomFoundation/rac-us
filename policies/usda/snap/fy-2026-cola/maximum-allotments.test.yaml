@@ -3,17 +3,17 @@
   input:
     household_size: 1
   output:
-    snap_one_person_thrifty_food_plan_cost: 298
-    snap_maximum_allotment: 298
+    us:policies/usda/snap/fy-2026-cola/maximum-allotments#snap_one_person_thrifty_food_plan_cost: 298
+    us:policies/usda/snap/fy-2026-cola/maximum-allotments#snap_maximum_allotment: 298
 - name: snap_maximum_allotment_for_eight_person_household
   period: 2026-01
   input:
     household_size: 8
   output:
-    snap_maximum_allotment: 1789
+    us:policies/usda/snap/fy-2026-cola/maximum-allotments#snap_maximum_allotment: 1789
 - name: snap_maximum_allotment_adds_each_additional_person
   period: 2026-01
   input:
     household_size: 9
   output:
-    snap_maximum_allotment: 2007
+    us:policies/usda/snap/fy-2026-cola/maximum-allotments#snap_maximum_allotment: 2007

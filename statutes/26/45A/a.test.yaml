@@ -9,10 +9,10 @@
     qualified_wages_paid_or_incurred_during_1993: 70000
     qualified_employee_health_insurance_costs_paid_or_incurred_during_1993: 10000
   output:
-    current_year_indian_employment_costs: 120000
-    base_year_1993_indian_employment_costs: 80000
-    indian_employment_credit_excess_costs: 40000
-    indian_employment_credit: 8000
+    us:statutes/26/45A/a#current_year_indian_employment_costs: 120000
+    us:statutes/26/45A/a#base_year_1993_indian_employment_costs: 80000
+    us:statutes/26/45A/a#indian_employment_credit_excess_costs: 40000
+    us:statutes/26/45A/a#indian_employment_credit: 8000
 - name: current_costs_below_1993_base
   period:
     period_kind: tax_year
@@ -24,10 +24,10 @@
     qualified_wages_paid_or_incurred_during_1993: 70000
     qualified_employee_health_insurance_costs_paid_or_incurred_during_1993: 10000
   output:
-    current_year_indian_employment_costs: 65000
-    base_year_1993_indian_employment_costs: 80000
-    indian_employment_credit_excess_costs: 0
-    indian_employment_credit: 0
+    us:statutes/26/45A/a#current_year_indian_employment_costs: 65000
+    us:statutes/26/45A/a#base_year_1993_indian_employment_costs: 80000
+    us:statutes/26/45A/a#indian_employment_credit_excess_costs: 0
+    us:statutes/26/45A/a#indian_employment_credit: 0
 - name: health_costs_create_excess
   period:
     period_kind: tax_year
@@ -39,5 +39,5 @@
     qualified_wages_paid_or_incurred_during_1993: 70000
     qualified_employee_health_insurance_costs_paid_or_incurred_during_1993: 10000
   output:
-    indian_employment_credit_excess_costs: 20000
-    indian_employment_credit: 4000
+    us:statutes/26/45A/a#indian_employment_credit_excess_costs: 20000
+    us:statutes/26/45A/a#indian_employment_credit: 4000

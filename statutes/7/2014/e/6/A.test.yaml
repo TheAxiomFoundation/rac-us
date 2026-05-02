@@ -10,8 +10,8 @@
     medical_deduction: 0
     excess_shelter_deduction: 204.5
   output:
-    snap_net_income_pre_shelter: 591
-    snap_net_income: 386.5
+    us:statutes/7/2014/e/6/A#snap_net_income_pre_shelter: 591
+    us:statutes/7/2014/e/6/A#snap_net_income: 386.5
 - name: deductions_cannot_reduce_snap_net_income_below_zero
   period: 2026-01
   input:
@@ -24,5 +24,5 @@
     medical_deduction: 0
     excess_shelter_deduction: 50
   output:
-    snap_net_income_pre_shelter: 0
-    snap_net_income: 0
+    us:statutes/7/2014/e/6/A#snap_net_income_pre_shelter: 0
+    us:statutes/7/2014/e/6/A#snap_net_income: 0

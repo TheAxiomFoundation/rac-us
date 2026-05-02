@@ -8,10 +8,10 @@
     member_of_tax_unit:
       - {is_aged_65_or_over: false}
   output:
-    basic_standard_deduction_amount: 16100
-    additional_standard_deduction_per_condition_amount: 2050
-    num_aged_members: 0
-    standard_deduction: 16100
+    us:statutes/26/63/c#basic_standard_deduction_amount: 16100
+    us:statutes/26/63/c#additional_standard_deduction_per_condition_amount: 2050
+    us:statutes/26/63/c#num_aged_members: 0
+    us:statutes/26/63/c#standard_deduction: 16100
 - name: joint_one_aged
   period:
     period_kind: tax_year
@@ -23,11 +23,11 @@
       - {is_aged_65_or_over: true}
       - {is_aged_65_or_over: false}
   output:
-    basic_standard_deduction_amount: 32200
-    additional_standard_deduction_per_condition_amount: 1650
-    num_aged_members: 1
-    additional_std_ded_amount: 1650
-    standard_deduction: 33850
+    us:statutes/26/63/c#basic_standard_deduction_amount: 32200
+    us:statutes/26/63/c#additional_standard_deduction_per_condition_amount: 1650
+    us:statutes/26/63/c#num_aged_members: 1
+    us:statutes/26/63/c#additional_std_ded_amount: 1650
+    us:statutes/26/63/c#standard_deduction: 33850
 - name: joint_both_aged
   period:
     period_kind: tax_year
@@ -39,10 +39,10 @@
       - {is_aged_65_or_over: true}
       - {is_aged_65_or_over: true}
   output:
-    additional_standard_deduction_per_condition_amount: 1650
-    num_aged_members: 2
-    additional_std_ded_amount: 3300
-    standard_deduction: 35500
+    us:statutes/26/63/c#additional_standard_deduction_per_condition_amount: 1650
+    us:statutes/26/63/c#num_aged_members: 2
+    us:statutes/26/63/c#additional_std_ded_amount: 3300
+    us:statutes/26/63/c#standard_deduction: 35500
 - name: head_of_household_aged
   period:
     period_kind: tax_year
@@ -53,8 +53,8 @@
     member_of_tax_unit:
       - {is_aged_65_or_over: true}
   output:
-    basic_standard_deduction_amount: 24150
-    additional_standard_deduction_per_condition_amount: 2050
-    num_aged_members: 1
-    additional_std_ded_amount: 2050
-    standard_deduction: 26200
+    us:statutes/26/63/c#basic_standard_deduction_amount: 24150
+    us:statutes/26/63/c#additional_standard_deduction_per_condition_amount: 2050
+    us:statutes/26/63/c#num_aged_members: 1
+    us:statutes/26/63/c#additional_std_ded_amount: 2050
+    us:statutes/26/63/c#standard_deduction: 26200
